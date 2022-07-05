@@ -24,7 +24,7 @@ defmodule Sequence.Chat.Message do
 
     field :attachments, :map
     field :message, :string
-    field :deleted_at, :utc_datetime, usec: false
+    field :deleted_at, :utc_datetime
     field :kind, :string
     field :encrypted, :boolean, default: false
 

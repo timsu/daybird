@@ -20,9 +20,6 @@ defmodule Sequence.Topicflow.Session.Supervisor do
         )
       )
 
-    %{active: active} = DynamicSupervisor.count_children(__MODULE__)
-    _ = Appsignal.set_gauge("topicflow.session.count", active)
-
     r
   end
 

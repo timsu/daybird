@@ -14,8 +14,8 @@ defmodule Sequence.Mobile.PushToken do
 
     field :deleted_at, :utc_datetime
     field :token, :string
-    field :type, :string, size: 20
-    field :name, :string, size: 30
+    field :type, :string
+    field :name, :string
     field :device_id, :string
 
     timestamps()

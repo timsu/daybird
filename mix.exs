@@ -33,8 +33,7 @@ defmodule Sequence.MixProject do
       extra_applications: [
         :logger,
         :runtime_tools,
-        :bamboo,
-        :smoothie,
+        :mojito,
       ]
     ]
   end
@@ -61,12 +60,13 @@ defmodule Sequence.MixProject do
       {:gettext, "~> 0.18"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:timex, "~> 3.6.3", override: true},
+
+      {:timex, "~> 3.7", override: true},
       {:cors_plug, "~> 1.5"},
-      {:guardian, "~> 2.1"},
+      {:guardian, "~> 2.2"},
       {:comeonin, "~> 5.3"},
       {:bcrypt_elixir, "~> 2.3"},
-      {:cloak, "~> 1.1.1"},
+      {:cloak, "~> 1.1"},
       {:redix, ">= 0.0.0"},
       {:ex_aws, "~> 2.2"},
       {:ex_aws_s3, "~> 2.3"},
@@ -76,6 +76,8 @@ defmodule Sequence.MixProject do
       {:arc_gcs, "~> 0.2"},
       {:csv, "~> 2.3"},
       {:stripity_stripe, "~> 2.0"},
+      {:mint, "~> 1.4"},
+      {:mojito, "~> 0.7"},
 
       # dev dependencies
       {:mix_test_watch, "~> 0.6", only: [:dev, :docker], runtime: false},

@@ -16,10 +16,9 @@ defmodule Sequence.Invites.TeamInvite do
     field :type, :string
     field :role, :string
     field :status, :string
-    field :slack_team_id, :string, size: 50
-    field :expires_at, :utc_datetime, usec: false
+    field :expires_at, :utc_datetime
     field :count, :integer
-    field :recipient, :string, size: 50
+    field :recipient, :string
     field :joined, :boolean
 
     timestamps()

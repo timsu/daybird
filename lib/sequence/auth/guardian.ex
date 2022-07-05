@@ -52,7 +52,6 @@ defmodule Sequence.Auth.Guardian do
     cond do
       scopes != nil and !allow_partial -> {:error, :unauthorized}
       user ->
-        Sequence.Appsignal.set_meta_data(%{ user_id: user.id })
         {:ok, user}
       true -> {:error, :unauthorized}
     end
@@ -65,7 +64,6 @@ defmodule Sequence.Auth.Guardian do
   def user_team_for_guest_token(claims) do
     team_id = claims["team_id"]
     user_id = claims["user_id"]
-    Sequence.Appsignal.set_meta_data(%{ user_id: user_id, team_id: team_id })
     {user_id, team_id}
   end
 

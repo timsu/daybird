@@ -1,6 +1,5 @@
 defmodule SequenceWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :sequence
-  use Appsignal.Phoenix
 
   socket "/socket", SequenceWeb.UserSocket,
     websocket: [

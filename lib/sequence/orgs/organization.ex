@@ -7,8 +7,8 @@ defmodule Sequence.Orgs.Organization do
   @timestamps_opts [type: :utc_datetime, usec: false]
   schema "organizations" do
     field :uuid, Ecto.UUID
-    field :name, :string, size: 50
-    field :domain, :string, size: 50
+    field :name, :string
+    field :domain, :string
     field :domains, :string
     field :profile_img, :string
     field :deleted_at, :utc_datetime

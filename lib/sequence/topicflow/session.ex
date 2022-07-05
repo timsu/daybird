@@ -158,7 +158,6 @@ defmodule Sequence.Topicflow.Session do
   end
 
   def handle_cast({:receive_messages, messages}, session) do
-    _ = Appsignal.increment_counter("topicflow.receive.messages", length(messages))
     session = receive_message_at(session, messages)
 
     {:noreply,
@@ -286,7 +285,6 @@ defmodule Sequence.Topicflow.Session do
     |> Enum.count()
 
     if num_dead > 0 do
-      Appsignal.increment_counter("topicflow.health_check.failed", num_dead)
       Logger.warn("HEALTH CHECK FAILED #{inspect(self())}")
 
       {:stop, {:shutdown, :topic_down}, session}
@@ -700,8 +698,6 @@ defmodule Sequence.Topicflow.Session do
   end
 
   defp send_messages(%Session{socket_pid: socket_pid} = session, messages, max_wait) do
-    _ = Appsignal.increment_counter("topicflow.send.messages", length(messages))
-
     {:ok, session, messages} = send_messages_at(session, messages)
 
     :ok = Socket.send_messages(socket_pid, messages, max_wait)
@@ -974,8 +970,6 @@ defmodule Sequence.Topicflow.Session do
         reply =
           if at != nil do
             elapsed = now - at
-
-            _ = Appsignal.add_distribution_value("topicflow.request_reply.us", elapsed)
 
             JsonRpc.set_reply_meta(reply, elapsed)
           else

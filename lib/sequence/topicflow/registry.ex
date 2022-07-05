@@ -77,7 +77,6 @@ defmodule Sequence.Topicflow.Registry do
   end
 
   defp log_stats(pids) do
-    Appsignal.increment_counter("topicflow.antientropy.killed", length(pids))
     pids
   end
 

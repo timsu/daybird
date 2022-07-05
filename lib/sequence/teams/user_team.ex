@@ -26,7 +26,7 @@ defmodule Sequence.Teams.UserTeam do
     field :status, :string
     field :presence, :integer
     field :last_doc, Ecto.UUID
-    field :left_at, :utc_datetime, usec: false
+    field :left_at, :utc_datetime
     field :meta, :map
     field :invite_id, :id
 

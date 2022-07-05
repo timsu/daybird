@@ -17,25 +17,17 @@ defmodule Sequence.Teams.Team do
   @timestamps_opts [type: :utc_datetime, usec: false]
   schema "teams" do
     field :uuid, Ecto.UUID
-    field :name, :string, size: 100
-    field :domain, :string, size: 50
-    field :status, :string, size: 20
-    field :deleted_at, :utc_datetime, usec: false
+    field :name, :string
+    field :domain, :string
+    field :status, :string
+    field :deleted_at, :utc_datetime
     field :meta, :map
-    field :referrer, :string, size: 100
-    field :async, :string, size: 20
+    field :referrer, :string
+    field :async, :string
     field :size, :integer
-    field :activated_at, :utc_datetime, usec: false
-    field :critical_mass_at, :utc_datetime, usec: false
-    field :origin_type, :string, size: 10
-
-    # when teams hit 100 calling hours
-    field :large_activated_at, :utc_datetime, usec: false
-
-    # billing type (monthly, annual)
-    field :billing_plan, :string, size: 20
-    # billing start date (for active billing teams)
-    field :billing_starts_at, :utc_datetime, usec: false
+    field :activated_at, :utc_datetime
+    field :critical_mass_at, :utc_datetime
+    field :origin_type, :string
 
     belongs_to :org, Organization
     belongs_to :creator, User

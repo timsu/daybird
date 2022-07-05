@@ -4,7 +4,6 @@ defmodule Sequence.Topicflow.Topic do
   alias Sequence.Topicflow.{Registry, Topic, Session, Memcache}
   alias Sequence.Topicflow.System, as: TFSystem
   alias Sequence.Utils
-  alias Appsignal.Span
 
   require Logger
 
@@ -424,7 +423,7 @@ defmodule Sequence.Topicflow.Topic do
   end
 
   def handle_cast(
-        {:topic_verify_reply, ref, snapshot, client_id, user_id},
+        {:topic_verify_reply, ref, snapshot, _client_id, _user_id},
         %Topic{id: id, verify_ignore_presence_keys: ignored_keys,
           data: %Data{epoch: epoch} = data, verify_data: verify_data, verify_ref: ref} = topic
       ) do
@@ -437,18 +436,6 @@ defmodule Sequence.Topicflow.Topic do
       found_snapshot |> filter_snapshot(ignored_keys))
 
     if expected != found do
-
-      _ = Appsignal.increment_counter("topicflow.verify.failed", 1)
-      _ = Appsignal.send_error(:error, "Topicflow snapshots differ", [], fn span ->
-          span
-          |> Span.set_attribute("user_id", user_id)
-          |> Span.set_attribute("client_id", client_id)
-          |> Span.set_attribute("expected", expected)
-          |> Span.set_attribute("found", found)
-          |> Span.set_attribute("expected_snapshot", expected_snapshot)
-          |> Span.set_attribute("found_snapshot", found_snapshot)
-      end)
-
       session_pid = Registry.whereis_name(ref)
 
       :ok = Session.cast_topic_snapshot(session_pid, id, make_snapshot(data), epoch)
@@ -477,8 +464,7 @@ defmodule Sequence.Topicflow.Topic do
     handle_info(m, topic)
   end
 
-  def handle_cast(message, topic) do
-    Appsignal.send_error(:error, "Unknown topic message: #{inspect(message)}, topic: #{inspect(topic)}}", Utils.current_stack_trace())
+  def handle_cast(_message, topic) do
     {:noreply, topic}
   end
 

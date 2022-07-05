@@ -2,7 +2,7 @@ defmodule Sequence.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Sequence.{Users.MagicLink, Repo, Teams.Team, Orgs.Organization, Rooms.UserRoom}
+  alias Sequence.{Users.MagicLink, Repo, Teams.Team, Orgs.Organization}
 
   @type t :: %__MODULE__{}
 
@@ -32,24 +32,23 @@ defmodule Sequence.Users.User do
   @timestamps_opts [type: :utc_datetime, usec: false]
   schema "users" do
     field :uuid, Ecto.UUID
-    field :name, :string, size: 100
-    field :nickname, :string, size: 50
-    field :email, :string, size: 150
-    field :google_id, :string, size: 25
-    field :profile_img, :string, size: 255
+    field :name, :string
+    field :nickname, :string
+    field :email, :string
+    field :google_id, :string
+    field :profile_img, :string
     field :password, :string, virtual: true
-    field :password_hash, :string, size: 60
-    field :timezone, :string, size: 30
+    field :password_hash, :string
+    field :timezone, :string
     field :invite_id, :integer
     field :meta, :map
-    field :activated_at, :utc_datetime, usec: false
-    field :origin_type, :string, size: 10
-    field :last_call_at, :utc_datetime, usec: false
+    field :activated_at, :utc_datetime
+    field :origin_type, :string
+    field :last_call_at, :utc_datetime
 
     belongs_to :primary_team, Team
     belongs_to :org, Organization
     has_one :magic_link, MagicLink
-    has_many :user_rooms, UserRoom
 
     timestamps()
   end
