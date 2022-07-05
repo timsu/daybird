@@ -1,0 +1,4 @@
+<%= raw assigns[:html] %>
+<%= if assigns[:js] do %>
+<script defer crossorigin src="<%= js_path(@conn, "/js/#{@js}") %>" />
+<% end %>

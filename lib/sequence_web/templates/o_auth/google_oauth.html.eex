@@ -1,0 +1,26 @@
+<script type="text/javascript">
+<%= if assigns[:error] do %>
+  var data = {
+    type: "oauth",
+    error: "<%= raw String.replace(assigns[:error], "\"", "") %>"
+  }
+  if (window.opener) {
+    window.opener.postMessage(data, "<%= raw assigns[:origin] %>")
+    window.close()
+  } else {
+    document.write(data.error)
+  }
+<% end %>
+<%= if assigns[:result] do %>
+  var data = {
+    type: "oauth",
+    result: <%= raw assigns[:result] %>
+  }
+  if (window.opener) {
+    window.opener.postMessage(data, "<%= raw assigns[:origin] %>")
+    window.close()
+  } else {
+    location.href = "/"
+  }
+<% end %>
+</script>

@@ -1,5 +1,11 @@
 defmodule SequenceWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :sequence
+  use Appsignal.Phoenix
+
+  socket "/socket", SequenceWeb.UserSocket,
+    websocket: [
+      check_origin: false
+    ]
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -14,13 +20,27 @@ defmodule SequenceWeb.Endpoint do
 
   # Serve at "/" the static files from "priv/static" directory.
   #
-  # You should set gzip to true if you are running phx.digest
+  # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/",
     from: :sequence,
-    gzip: false,
-    only: ~w(assets fonts images favicon.ico robots.txt)
+    gzip: true,
+    only: ~w(css files images js sounds videos favicon.ico robots.txt version.json sitemap.xml)
+
+  plug Plug.Static,
+    at: "/", from: :sequence,
+    gzip: true,
+    cache_control_for_etags: "public, max-age=31536000",
+    only: ~w(fonts)
+
+  plug Plug.Static,
+    at: "/", from: :sequence,
+    gzip: true,
+    cache_control_for_etags: "public, max-age=604800",
+    only: ~w(images videos sounds app_status)
+
+  plug Plug.Static, at: "/media", from: "media/"
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -38,13 +58,43 @@ defmodule SequenceWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
+
+  # Since Plug.Parsers removes the raw request_body in body_parsers
+  # we need to parse out the Stripe webhooks before this
+  plug Stripe.WebhookPlug,
+    at: "/webhook/stripe",
+    handler: Sequence.StripeHandler,
+    secret: {Application, :get_env, [:stripity_stripe, :signing_secret]}
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
-    json_decoder: Phoenix.json_library()
+    json_decoder: Phoenix.json_library(),
+    length: 30 * 0x100000 # 30 MB
 
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+
+  plug CORSPlug
+
   plug SequenceWeb.Router
+
+  @doc """
+  Callback invoked for dynamically configuring the endpoint.
+
+  It receives the endpoint configuration and checks if
+  configuration should be loaded from the system environment.
+  """
+  @impl true
+  def init(_key, config) do
+    if config[:load_from_system_env] do
+      port = System.get_env("PORT") || raise "expected the PORT environment variable to be set"
+      {:ok, Keyword.put(config, :http, [:inet6, port: port])}
+    else
+      {:ok, config}
+    end
+  end
+
+
 end

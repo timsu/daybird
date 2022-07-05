@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" class="not-dragging">
+  <head>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TQLQXXH');</script>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
+    <meta name="csrf-token" content="<%= Plug.CSRFProtection.get_csrf_token() %>">
+
+    <%
+    title = assigns[:title] || "A virtual office for remote teams"
+    description = assigns[:description] ||
+      "Re-discover the flow of working together in-person. Easily see who's available to talk, who's in a conversation, and who's busy. Start conversations as easily as tapping someone on the shoulder. Unlock spontaneous collaboration in your team. Interactive screen-sharing and online co-working."
+    facebook_img = assigns[:social_image] || "https://tandem.chat/meta/social-facebook.png"
+    twitter_img = assigns[:social_image] || "https://tandem.chat/meta/social-twitter.png"
+    social_url = assigns[:social_url] || "https://tandem.chat"
+    %>
+    <title>Tandem | <%= title %></title>
+    <meta name="description" content="<%= description %>">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Tandem" />
+    <meta property="og:url" content="<%= social_url %>" />
+    <meta property="og:title" content="<%= title %>" />
+    <meta property="og:description" content="<%= description %>" />
+    <meta property="og:image" content="<%= facebook_img %>" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:logo" content="//tandem.chat/meta/logo-icon.png" size="256x234"/>
+    <meta property="og:logo" content="//tandem.chat/meta/favicon-32x32.png" size="32x32"/>
+    <meta property="og:logo" content="//tandem.chat/meta/favicon-16x16.png" size="16x16"/>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:domain" content="tandem.chat" />
+    <meta name="twitter:title" content="<%= title %>" />
+    <meta name="twitter:description" content="<%= description %>" />
+    <meta name="twitter:image" content="<%= twitter_img %>" />
+    <meta name="twitter:url" content="<%= social_url %>" />
+    <link rel="apple-touch-icon" sizes="128x128" href="/images/icon128.png">
+  </head>
+
+  <body>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQLQXXH"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <%= if assigns[:meta] do %>
+    <script type="text/javascript">window.landing = <%= raw Jason.encode! assigns[:meta] %></script>
+    <% end %>
+    <%= @inner_content %>
+    <script defer type="text/javascript">
+    (function(){if(localStorage.getItem('utm'))return;var tracker={};var search=new URLSearchParams(location.search);var fields=['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];var data=fields.forEach(function (f) {if(search.get(f)) tracker[f]=search.get(f)});
+    if(document.referrer){tracker.referrer = document.referrer;tracker.referring_domain=new URL(document.referrer).host};if(Object.keys(tracker).length>0)localStorage.setItem('utm', JSON.stringify(tracker));})()
+    </script>
+  </body>
+</html>

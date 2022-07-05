@@ -1,0 +1,25 @@
+<style>
+  html, body { height: 100%; margin: 0; -webkit-app-region: drag }
+  body { background: white; font-family: sans-serif; overflow: hidden }
+  .container { display: flex; height: 100%; justify-content: center; align-items: center; }
+  .maintenance { background: #eeeeee; max-width: 650px; padding: 10px 40px 20px }
+  h1 { font-size: 32px; font-weight: 700 }
+</style>
+
+<div class="container">
+  <div class="maintenance">
+    <h1>We'll be back soon!</h1>
+
+    <p>Tandem is undergoing maintenance to make our service better. Hang tight!</p>
+
+    <p>If you'd like to track our status, please see our <a href="https://twitter.com/Tandem">Twitter page</a>.</p>
+
+    <p class="team">-The Tandem Team</p>
+  </div>
+</div>
+
+::CLOUDFLARE_ERROR_500S_BOX::
+
+<script>
+  setInterval(() => location.reload(), 20000)
+</script>
