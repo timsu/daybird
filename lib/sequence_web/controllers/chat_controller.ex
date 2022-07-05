@@ -4,12 +4,11 @@ defmodule SequenceWeb.ChatController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Auth.Guardian, Chat, Teams, Users, Utils, Repo, Meetings}
+  alias Sequence.{Auth.Guardian, Chat, Teams, Users, Utils, Repo}
   alias Sequence.Chat.Message
   alias Sequence.Mobile
   alias SequenceWeb.Endpoint
   alias Sequence.Chat.{Attachment, ImageAttachment}
-  alias Sequence.Workers.MissedCommunications
 
   # GET /chat/unread
   def unread(conn, %{ "team" => team_id}) do
@@ -51,19 +50,12 @@ defmodule SequenceWeb.ChatController do
 
   # PUT /chat/unread
   def update_unread(conn, %{ "team" => team_id, "key" => key } = params) do
-    other_uuid = params["userId"]
     with user <- Guardian.Plug.current_resource(conn),
          {:ok, team} <- Teams.team_by_uuid(user.id, team_id) do
 
       {:ok, _} = Chat.update_unread_map(user, team, fn map ->
         Map.delete(map, key)
       end)
-
-      if other_uuid != nil && other_uuid != "" do
-        with {:ok, other} <- Users.find_by_uuid(other_uuid) do
-          MissedCommunications.clear_reminders(other.id, user.id)
-        end
-      end
 
       json conn, %{ success: true }
     end
@@ -218,13 +210,6 @@ defmodule SequenceWeb.ChatController do
           Chat.add_unread_message(other, team, channel.key, unread)
         end
 
-        # need this workaround to avoid sending a missed dm reminder in the case of a missed call
-        # since we use the chat API to send a missed call notification via the frontend
-        if !(message.kind == "missed_call") and type == "dm" do
-          MissedCommunications.enqueue_reminder(%MissedCommunications.Params{type: "dm",
-            from_user_id: user.id, to_user_id: other.id, team_id: team.id})
-        end
-
         # send a push for dm or mention
         should_push = type == "dm" or MapSet.member?(mention_set, user_uuid)
 
@@ -317,8 +302,6 @@ defmodule SequenceWeb.ChatController do
       if !skip_push_notification do
         Mobile.send_notification(other, payload)
       end
-
-      MissedCommunications.enqueue_reminder(%MissedCommunications.Params{type: "wave", from_user_id: user.id, to_user_id: other.id, team_id: team.id})
 
       json conn, %{ success: true }
     end

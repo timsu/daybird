@@ -6,10 +6,7 @@ defmodule Sequence.Users do
   import Ecto.Query, warn: false
   alias Sequence.{Repo, Utils, Teams.UserTeam}
 
-  alias Sequence.Users.User
-  alias Sequence.Users.UserData
-  alias Sequence.Users.MagicLink
-  alias Sequence.Users.FunnelData
+  alias Sequence.Users.{User, UserData, MagicLink}
 
   ### Authentication
 
@@ -494,128 +491,6 @@ defmodule Sequence.Users do
   """
   def change_magic_link(%MagicLink{} = magic_link) do
     MagicLink.changeset(magic_link, %{})
-  end
-
-  ### funnel data
-
-  # funnel stage type definitions
-  # keys are strings instead of atoms because ecto converts atom keys to strings anyway as part of json encoding for storage
-  def stage_signed_up, do: "signed_up"
-  def stage_created_team, do: "created_team"
-  def stage_joined_team, do: "joined_team"
-  def stage_completed_survey, do: "completed_survey"
-  def stage_downloaded_app, do: "downloaded_app"
-  def stage_signed_into_app, do: "signed_into_app"
-  def stage_finished_onboarding, do: "finished_onboarding"
-  def stage_sent_invite, do: "sent_invite"
-  def stage_saw_teammate_online, do: "saw_teammate_online"
-  def stage_made_call, do: "made_call"
-
-  @doc """
-  Returns the list of funnel_data.
-
-  ## Examples
-
-      iex> list_funnel_data()
-      [%FunnelData{}, ...]
-
-  """
-  def list_funnel_data do
-    Repo.all(FunnelData)
-  end
-
-  @doc """
-  Gets a single funnel_data.
-
-  Raises `Ecto.NoResultsError` if the Funnel data does not exist.
-
-  ## Examples
-
-      iex> get_funnel_data!(123)
-      %FunnelData{}
-
-      iex> get_funnel_data!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_funnel_data!(id), do: Repo.get!(FunnelData, id)
-
-  def get_funnel_data(%User{} = user) do
-    funnel_data = Repo.one(from fd in FunnelData, where: fd.user_id == ^user.id)
-    if funnel_data, do: {:ok, funnel_data}, else: {:error, :not_found}
-  end
-
-  @doc """
-  Creates a funnel_data.
-
-  ## Examples
-
-      iex> create_funnel_data(%{field: value})
-      {:ok, %FunnelData{}}
-
-      iex> create_funnel_data(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_funnel_data(attrs \\ %{}) do
-    %FunnelData{}
-    |> FunnelData.changeset(attrs)
-    |> Repo.insert()
-  end
-
-  @doc """
-  Updates a funnel_data.
-
-  ## Examples
-
-      iex> update_funnel_data(funnel_data, %{field: new_value})
-      {:ok, %FunnelData{}}
-
-      iex> update_funnel_data(funnel_data, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_funnel_data(%FunnelData{} = funnel_data, attrs) do
-    funnel_data
-    |> FunnelData.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a funnel_data.
-
-  ## Examples
-
-      iex> delete_funnel_data(funnel_data)
-      {:ok, %FunnelData{}}
-
-      iex> delete_funnel_data(funnel_data)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_funnel_data(%FunnelData{} = funnel_data) do
-    Repo.delete(funnel_data)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking funnel_data changes.
-
-  ## Examples
-
-      iex> change_funnel_data(funnel_data)
-      %Ecto.Changeset{data: %FunnelData{}}
-
-  """
-  def change_funnel_data(%FunnelData{} = funnel_data, attrs \\ %{}) do
-    FunnelData.changeset(funnel_data, attrs)
-  end
-
-  def persist_funnel_event(%User{} = user, stage) do
-    with {:ok, funnel_data} <- get_funnel_data(user) do
-      if !funnel_data.stages[stage] do
-        update_funnel_data(funnel_data, %{ stages: Map.put(funnel_data.stages, stage, Timex.now) })
-      end
-    end
   end
 
 end

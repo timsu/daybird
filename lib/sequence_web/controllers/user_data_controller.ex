@@ -2,7 +2,7 @@ defmodule SequenceWeb.UserDataController do
   use SequenceWeb, :controller
   require Logger
 
-  alias Sequence.{ICal, Users, Teams}
+  alias Sequence.{Users, Teams}
 
   action_fallback SequenceWeb.FallbackController
 

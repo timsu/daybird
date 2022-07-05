@@ -9,7 +9,7 @@ defmodule Sequence.Invites do
   @code_length 10
   @code_expiry_days 30
 
-  alias Sequence.{Invites.TeamInvite, Teams.UserTeam, Teams, Teams.Team, Users, Users.User, Orgs, Leads, Leads.Lead }
+  alias Sequence.{Invites.TeamInvite, Teams.UserTeam, Teams, Teams.Team, Users, Users.User, Orgs}
 
   def type_email, do: "email"
   def type_link, do: "link"
@@ -45,10 +45,6 @@ defmodule Sequence.Invites do
       true -> case invite_by_code(invite_code) do
         {:ok, invite} ->
           team = Teams.get_team!(invite.team_id)
-
-          with %Lead{} = lead <- Leads.find_lead_by_team_invite_id(invite.id) do
-            Leads.update_lead(lead, %{ joined_at: Timex.now() })
-          end
 
           org_ok = team.org_id == nil || team.org_id == org_id
           if org_ok || Teams.allow_external(team) do

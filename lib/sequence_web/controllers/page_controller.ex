@@ -2,98 +2,11 @@ defmodule SequenceWeb.PageController do
   use SequenceWeb, :controller
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Config, Invites, Teams, Meetings}
-
-  @static_paths ~w(/ /terms /privacy /pricing /customers /worktogether /hybrid /newsletter)
-
-  @static_path Path.join(:code.priv_dir(:sequence), "static")
-  @static_filenames ~w(index terms privacy pricing customers worktogether hybrid)
-    |> Enum.map(fn name -> {name, Path.join(@static_path, name <> ".html")} end)
-    |> Enum.into(%{})
-  @static_files @static_filenames
-    |> Enum.map(fn {name, path} -> {name, File.read(path)} end)
-    |> Enum.into(%{})
-
-  @default_landing_meta %{
-    "title" => "Work together, wherever you are."
-  }
-
-  @landing_titles %{
-    "terms" => "Terms of Service",
-    "privacy" => "Privacy Policy",
-    "pricing" => "Pricing",
-    "customers" => "Customers",
-    "hybrid" => "Hybrid spaces - A window into your physical office",
-    "newsletter" => "Newsletter - This week in hybrid",
-  }
-
-  @landing_descriptions %{
-    "terms" => "",
-    "privacy" => "",
-    "hybrid" => "Be at the office, when you can't be at the office. Hybrid spaces helps you to bridge the gap between your remote and in-person teammates by enabling them to teleport around the office in one click.",
-    "newsletter" => "Subscribe to get the latest hybrid work news, research and tech delivered to your inbox weekly.",
-  }
-
-  @social_images %{
-    "hybrid" => "https://tandem.chat/meta/social-hybrid.jpg",
-  }
-
-  @social_urls %{
-    "hybrid" => "https://tandem.chat/hybrid",
-  }
-
-  @rehydrate %{
-    "pricing" => "landing.js"
-  }
-
-  def ip_to_bucket(conn, modulo) do
-    Tuple.sum(conn.remote_ip) |> rem(modulo)
-  end
+  alias Sequence.{Config, Invites, Teams}
 
   def index(conn, _params) do
-    cond do
-      conn.request_path in @static_paths ->
-        filename = if conn.request_path == "/" do
-          "index"
-        else
-          String.slice(conn.request_path, 1..-1)
-        end
-        # in dev mode, read dynamically from the file system
-        static_file = if Sequence.dev?, do: File.read(Map.get(@static_filenames, filename) || ""), else: Map.get(@static_files, filename)
-        is_marketing_site = conn.request_path == "/worktogether"
-
-        meta = if String.contains?(conn.query_string, "utm_campaign") do
-          landing_meta = Config.get(:landing_meta) || "{}"
-          conn = Plug.Conn.fetch_query_params(conn)
-          params = conn.query_params
-          landing_meta_json = Jason.decode! landing_meta
-          landing_meta_json[params["utm_campaign"]]
-        end || @default_landing_meta
-
-        page_title = Map.get(@landing_titles, filename)
-        page_description = Map.get(@landing_descriptions, filename)
-        social_image = Map.get(@social_images, filename)
-        social_url = Map.get(@social_urls, filename)
-        rehydrate = Map.get(@rehydrate, filename)
-
-        with {:ok, file} <- static_file do
-          file = if is_marketing_site do
-            String.replace(file, "%%page-title%%", meta["title"])
-          else
-            file
-          end
-          render conn, "raw.html", layout: {SequenceWeb.LayoutView, "landing.html"},
-            html: file, title: page_title, description: page_description, social_image: social_image,
-            social_url: social_url, js: rehydrate
-        else
-          _ -> render conn, "landing.html", layout: {SequenceWeb.LayoutView, "landing.html"},
-            meta: meta, title: page_title, description: page_description, social_image: social_image, social_url: social_url
-        end
-      String.match?(conn.request_path, ~r/.*\.js$/) ->
-        conn |> put_status(404) |> json(%{ not_found: true })
-      true ->
-        render conn, "landing.html", layout: {SequenceWeb.LayoutView, "landing.html"}
-    end
+    render conn, "landing.html", layout: {SequenceWeb.LayoutView, "landing.html"},
+      js_path: SequenceWeb.PageView.js_path(conn, "/js/landing.js")
   end
 
   def app(conn, _params) do

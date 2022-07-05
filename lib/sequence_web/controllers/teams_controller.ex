@@ -2,7 +2,8 @@ defmodule SequenceWeb.TeamsController do
   use SequenceWeb, :controller
   require Logger
 
-  alias Sequence.{Auth.Guardian, Experiments, Invites, Teams, Teams.Team, Teams.UserTeam, Users, Users.User, Orgs, Utils, Workers.InviteOthersCampaign}
+  alias Sequence.{Auth.Guardian, Teams, Teams.Team, Teams.UserTeam, Users, Users.User,
+    Orgs, Utils}
 
   action_fallback SequenceWeb.FallbackController
 
@@ -169,17 +170,6 @@ defmodule SequenceWeb.TeamsController do
 
       if user.origin_type == "unknown" do
         {:ok, _} = Users.update_user(user, %{origin_type: "champion"})
-      end
-
-      if user.origin_type != "meeting" do
-        {:ok, invite} = Invites.gen_team_invite(%{ user_id: user.id, team_id: team.id, role: "member",
-          type: Invites.type_link, forever: nil })
-        InviteOthersCampaign.initiate_campaign(
-          %InviteOthersCampaign.Params{
-            invite_code: invite.code,
-            user_id: user.id,
-            team_id: team.id
-        })
       end
 
       render conn, "get.json", team: team, org: org
