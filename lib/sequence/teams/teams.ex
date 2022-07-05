@@ -11,7 +11,6 @@ defmodule Sequence.Teams do
   alias Sequence.Teams.{Team, UserTeam}
   alias Sequence.Users
   alias Sequence.Users.User
-  alias Sequence.CallLogs
 
   @spec list_user_teams(User.t()) :: [Team.t()]
   def list_user_teams(user) do
@@ -246,7 +245,6 @@ defmodule Sequence.Teams do
     where(queryable, [t], fragment("id in (select team_id from team_buckets where test = ? and variant = ?)", ^test, ^variant))
   end
 
-
   def teammate_exists?(user, email) do
     !!Repo.one(from u in User,
         join: ut1 in UserTeam, on: ut1.user_id == u.id,
@@ -266,13 +264,6 @@ defmodule Sequence.Teams do
       join: ut1 in UserTeam, on: ut1.user_id == u.id and ut1.team_id == ^team.id,
       where: not is_nil(u.activated_at),
       select: count())
-  end
-
-  def team_call_hours(team, start_time, end_time) do
-    Repo.one(from uc in CallLogs.UserCall,
-      select: sum(uc.call_length),
-      where: fragment("inserted_at BETWEEN ? AND ?", ^(start_time), ^(end_time))
-      and uc.team_id == ^team.id) / 3600.0
   end
 
   ### TEAM CRUD

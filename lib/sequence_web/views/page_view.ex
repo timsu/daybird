@@ -1,6 +1,8 @@
 defmodule SequenceWeb.PageView do
   use SequenceWeb, :view
 
+  alias SequenceWeb.Endpoint
+
   def js_path(conn, path) do
     cond do
       Sequence.dev? or Sequence.test? ->

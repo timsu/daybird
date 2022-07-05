@@ -78,6 +78,8 @@ defmodule Sequence.MixProject do
       {:stripity_stripe, "~> 2.0"},
       {:mint, "~> 1.4"},
       {:mojito, "~> 0.7"},
+      {:email_checker, "~> 0.1.3"},
+      {:memcachex, "~> 0.5.0"},
 
       # dev dependencies
       {:mix_test_watch, "~> 0.6", only: [:dev, :docker], runtime: false},

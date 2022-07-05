@@ -49,7 +49,7 @@ defmodule SequenceWeb.ChatController do
   end
 
   # PUT /chat/unread
-  def update_unread(conn, %{ "team" => team_id, "key" => key } = params) do
+  def update_unread(conn, %{ "team" => team_id, "key" => key }) do
     with user <- Guardian.Plug.current_resource(conn),
          {:ok, team} <- Teams.team_by_uuid(user.id, team_id) do
 
