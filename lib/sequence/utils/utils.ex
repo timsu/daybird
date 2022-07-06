@@ -2,8 +2,6 @@ defmodule Sequence.Utils do
 
   require Logger
 
-  alias SequenceWeb.Presence
-
   @dialyzer [{:nowarn_function, free_email_domain?: 1}]
 
   # convert int, float, and decimal to float
@@ -96,24 +94,6 @@ defmodule Sequence.Utils do
   @spec free_email_domain?(binary) :: boolean
   def free_email_domain?(domain) do
     !! (@free_email_domain_list |> MapSet.member?(String.downcase(domain)))
-  end
-
-  # generate a map of users to call_ids in a channel
-  # optional param: filter users before parsing
-  def user_map(team_uuid, filter \\ nil) do
-    voice_channel = "voice:#{team_uuid}"
-    Presence.list(voice_channel)
-    |> Enum.reduce(%{}, fn {_client_id, data}, acc ->
-      metas = data.metas
-      Enum.reduce(metas, acc, fn meta, acc ->
-        user_id = meta["user"]
-        if filter == nil or filter.(meta) do
-          Map.put(acc, user_id, meta[:call] || acc[user_id])
-        else
-          acc
-        end
-      end)
-    end)
   end
 
   def updated_meta_field(nil, incoming) do updated_meta_field(%{}, incoming) end

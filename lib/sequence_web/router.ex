@@ -75,6 +75,8 @@ defmodule SequenceWeb.Router do
     get "/analyze_email", AuthController, :analyze_email
     post "/exchange_token", AuthController, :exchange_token
 
+    get "/time", ConfigController, :time
+
     get "/valid_invite", InvitesController, :valid_invite
     post "/log_join_event", InvitesController, :log_join_event
 

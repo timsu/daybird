@@ -8,16 +8,10 @@ defmodule SequenceWeb.TeamsController do
   action_fallback SequenceWeb.FallbackController
 
   # GET /teams
-  def index(conn, params) do
+  def index(conn, _params) do
     with user <- Guardian.Plug.current_resource(conn),
          :ok <- assert_user(user),
          teams <- Teams.list_user_teams_with_presence(user) do
-
-      teams = if params["include_integrations"] == "true" do
-        teams |> add_slack_teams()
-      else
-        teams
-      end
 
       primary = if Enum.empty?(teams) do
         nil
@@ -52,18 +46,11 @@ defmodule SequenceWeb.TeamsController do
   end
 
   # GET /teams/id
-  def show(conn, %{ "id" => id } = params) do
-    # with {_, user, team} <- get_user_team(conn, id) do
+  def show(conn, %{ "id" => id }) do
     with user <- Guardian.Plug.current_resource(conn),
          {:ok, team, user_team} <- Teams.user_team_by_uuid(user, id) do
       org = if team.org_id, do: Orgs.get_organization(team.org_id)
       team = team |> add_members() |> add_user_team_attrs(user_team)
-      team = if params["include_integrations"] == "true" do
-        [team] = [team] |> add_slack_teams()
-        team
-      else
-        team
-      end
 
       render conn, "get.json", team: team, org: org
     end
@@ -152,7 +139,7 @@ defmodule SequenceWeb.TeamsController do
     org_data = params["org"]
     with user <- Guardian.Plug.current_resource(conn),
          {:ok, org} <- get_org(org_data, user),
-         {:ok, team} <- Teams.create_team_with_default_rooms(%{
+         {:ok, team} <- Teams.create_team_with_defaults(%{
             name: name,
             size: 0,
             meta: params["meta"],
@@ -288,43 +275,11 @@ defmodule SequenceWeb.TeamsController do
     end
   end
 
-  # GET /teams/id/buckets
-  # get buckets
-  def buckets(conn, %{ "id" => team_id, "experiment_id" => experiment_id }) do
-    with user <- Guardian.Plug.current_resource(conn),
-      {:ok, team} <- Teams.team_by_uuid(user.id, team_id) do
-
-      case Experiments.find_or_create_bucket(user, team, experiment_id) do
-        :not_found -> {:error, :not_found, "Experiment does not exist"}
-        %{ test: ^experiment_id } ->
-          buckets = Experiments.get_buckets(user, team)
-          render conn, "buckets.json", buckets: buckets
-      end
-    end
-  end
-
-  def buckets(conn, %{ "id" => id }) do
-    with user <- Guardian.Plug.current_resource(conn),
-         {:ok, team} <- Teams.team_by_uuid(user.id, id) do
-
-      buckets = Experiments.get_buckets(user, team)
-
-      render conn, "buckets.json", buckets: buckets
-    end
-  end
-
   ### helpers
 
   def add_members(team) do
     members = Teams.list_team_members_as_maps(team)
     Map.put(team, :members, members)
-  end
-
-  def add_slack_teams(teams) do
-    team_ids = teams |> Enum.map(&(&1.id))
-    slack_teams = Sequence.Slack.get_slack_teams_by_team_id(team_ids)
-    map = slack_teams |> Enum.reduce(%{},&(Map.put(&2, &1.team_id, &1)))
-    teams |> Enum.map(&(Map.put(&1, :slack_team, map[&1.id])))
   end
 
   def add_user_team_attrs(team, user_team) do

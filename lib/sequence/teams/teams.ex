@@ -4,12 +4,11 @@ defmodule Sequence.Teams do
   """
 
   import Ecto.Query, warn: false
-  alias Sequence.{Repo, Rooms, Orgs, Utils}
+  alias Sequence.{Repo, Orgs, Utils}
 
   ### TEAM OPERATIONS
 
   alias Sequence.Teams.{Team, UserTeam}
-  alias Sequence.Users
   alias Sequence.Users.User
 
   @spec list_user_teams(User.t()) :: [Team.t()]
@@ -193,13 +192,7 @@ defmodule Sequence.Teams do
     if team.size != count, do: update_team(team, %{ size: count })
   end
 
-  def update_team_size_on_join(team, user) do
-    if team.size  == 0 do
-      Users.persist_funnel_event(user, Users.stage_created_team)
-    else
-      Users.persist_funnel_event(user, Users.stage_joined_team)
-    end
-
+  def update_team_size_on_join(team, _user) do
     update_team_size(team)
   end
 
@@ -367,13 +360,10 @@ defmodule Sequence.Teams do
     |> Repo.insert()
   end
 
-  def create_team_with_default_rooms(attrs \\ %{}) do
-    result = create_team(attrs)
+  def create_team_with_defaults(attrs \\ %{}) do
+    create_team(attrs)
 
-    with {:ok, team} <- result do
-      Rooms.create_defaults(team)
-      result
-    end
+    # todo create default stuff
   end
 
   @doc """

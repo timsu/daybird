@@ -2,7 +2,7 @@ defmodule Sequence.Topics.UserSettingsTopic do
   alias Sequence.Topicflow.{Registry, Topic}
   alias Sequence.Topics.UserSettingsTopic.BackingData
 
-  alias Sequence.{Users, Users.UserData, Presence}
+  alias Sequence.{Users, Users.UserData}
 
   @topic_identifier "user_settings"
 
@@ -52,8 +52,6 @@ defmodule Sequence.Topics.UserSettingsTopic do
 
         bulk_data =
           BackingData.UserSettings.load(user)
-          ++
-          BackingData.CustomStatus.load(user)
 
         {bulk_data, topic}
 
@@ -63,31 +61,6 @@ defmodule Sequence.Topics.UserSettingsTopic do
   end
 
   defmodule BackingData do
-    defmodule CustomStatus do
-      def load(user) do
-        case Presence.user_persistent_presences(user, "customStatus") do
-
-          [] -> []
-
-          presences ->
-            presence = hd(presences)
-            expires_in = if presence && presence.expires_at do
-              Timex.to_unix(presence.expires_at) - Timex.to_unix(Timex.now())
-            end
-
-            history = Enum.map(presences, fn p -> p.data end)
-
-            # {key, {value, ttl}, current time}
-            if expires_in != nil && expires_in > 0 do
-              [{"custom_status", {presence.data, expires_in * 1000}, Topic.server_ts()},
-                {"custom_status_history", {history, nil}, Topic.server_ts()}]
-            else
-              [{"custom_status_history", {history, nil}, Topic.server_ts()}]
-            end
-        end
-
-      end
-    end
 
     defmodule UserSettings do
       def load(user) do

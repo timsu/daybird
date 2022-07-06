@@ -103,9 +103,6 @@ defmodule SequenceWeb.ChatController do
         nil ->
           team_db_id = if team, do: team.id, else: nil
           {:ok, channel} = Chat.create_channel(%{ team_id: team_db_id, key: key })
-
-          maybe_touch_meeting(key)
-
           channel
         channel -> channel
       end
@@ -156,17 +153,6 @@ defmodule SequenceWeb.ChatController do
 
         render conn, "message.json", message: message, total: total, temp_uuid: temp_uuid
       end
-    end
-  end
-
-  defp maybe_touch_meeting(key) do
-    case Regex.run(~r/^mtg:(.+)$/, key) do
-      [_, inner] ->
-        meeting = Meetings.find_meeting_by_uuid(inner)
-        if meeting do
-          Meetings.update_meeting(meeting, %{ has_chat: true })
-        end
-      _ -> nil
     end
   end
 

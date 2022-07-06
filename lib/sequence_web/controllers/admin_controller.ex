@@ -4,9 +4,7 @@ defmodule SequenceWeb.AdminController do
   import Ecto.Query, warn: false
 
   action_fallback SequenceWeb.FallbackController
-  alias Sequence.{Auth, Billing, Buckets, CallLogs, Experiments, Feedback, Invites, Teams, Users, Slack,
-    Users.User, Repo, Rooms, Rooms.Room, Surveys, Utils, Config, Deleter, Rooms, Orgs, Machines, PmfSurveys}
-  alias SequenceWeb.{TeamsView, TeamsController}
+  alias Sequence.{Billing, Invites, Teams, Users, Users.User, Repo, Deleter, Orgs}
 
   plug SequenceWeb.EnsureAdmin
 
@@ -53,7 +51,7 @@ defmodule SequenceWeb.AdminController do
     user_id = params["user_id"]
     with {:ok, team} <- Teams.team_by_uuid(id) do
       {user_roles, users} = Teams.list_team_members(team)
-      presence = Utils.user_map(id)
+      presence = %{} # Utils.user_map(id)
       org = if team.org_id do
         org = Orgs.get_organization! team.org_id
         %{
@@ -90,10 +88,6 @@ defmodule SequenceWeb.AdminController do
       |> Enum.map(fn i -> {i.id, if(i.user, do: i.user.name)} end)
       |> Enum.into(%{})
       user = Enum.find(members, fn m -> m.id == user_id end)
-
-      events = []
-
-      user_map = Enum.map(users, fn u -> {u.id, u.name} end) |> Enum.into(%{})
 
       json conn, %{ id: team.uuid, db_id: team.id, meta: team.meta,
         name: team.name, members: members, user: user, org: org, invited_by: invited_by, sub: sub
@@ -223,65 +217,6 @@ defmodule SequenceWeb.AdminController do
     end
   end
 
-  # POST /admin/delete_slack_user
-  def delete_slack_user(conn, %{ "email" => email }) do
-    with {:ok, user} <- Users.find_by_email(email) do
-      Repo.delete_all(from u in Slack.SlackUser, where: u.user_id == ^user.id)
-      json conn, %{ success: true }
-    end
-  end
-
-  ### buckets
-
-  def get_experiments(conn, _) do
-    {user, team, _} = Experiments.experiments()
-    render conn, "experiments.json", experiments: user ++ team
-  end
-
-  def update_buckets(conn, %{ "type" => type, "uuids" => uuids, "test" => test, "variant" => variant }) do
-    try do
-      update_buckets(conn, type, uuids, test, variant)
-    rescue
-      Ecto.Query.CastError -> {:error, :bad_request, "Invalid UUIDs"}
-    end
-  end
-
-  defp update_buckets(conn, "team", uuids, test, variant) do
-    with teams <- Teams.teams_by_uuid(uuids) do
-      if length(uuids) == length(teams) do
-        Enum.each(teams, fn team ->
-          Experiments.update_team_test(team, test, variant)
-          SequenceWeb.Endpoint.broadcast("team:#{team.uuid}", "update_buckets", %{})
-        end)
-        json conn, %{ success: true }
-      else
-        {:error, :not_found, "Could not find all team uuids"}
-      end
-    end
-  end
-
-  defp update_buckets(conn, "user", uuids, test, variant) do
-    with users <- Users.by_uuid(uuids) do
-      if length(uuids) == length(users) do
-        Enum.each(users, fn user ->
-          Experiments.update_user_test(user, test, variant)
-          SequenceWeb.Endpoint.broadcast("user:#{user.uuid}", "update_buckets", %{})
-        end)
-        json conn, %{ success: true }
-      else
-        {:error, :not_found, "Could not find all user uuids"}
-      end
-    end
-  end
-
-  defp update_buckets(conn, "email", emails, test, variant) do
-    Enum.each(emails, fn email ->
-      Experiments.update_email_test(email, test, variant)
-      SequenceWeb.Endpoint.broadcast("email:#{email}", "update_buckets", %{})
-    end)
-    json conn, %{ success: true }
-  end
-
   ### merge teams
 
   def merge_teams(conn, %{ "team1" => team1, "team2" => team2 } = params) do
@@ -372,12 +307,6 @@ defmodule SequenceWeb.AdminController do
     datetime
     |> Timex.Timezone.convert("Etc/UTC")
     |> Timex.Timezone.convert("America/Los_Angeles")
-  end
-
-  defp to_date(datetime) do
-    datetime
-    |> to_pst
-    |> Timex.to_date
   end
 
 end

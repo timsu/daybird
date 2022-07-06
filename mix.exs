@@ -80,6 +80,9 @@ defmodule Sequence.MixProject do
       {:mojito, "~> 0.7"},
       {:email_checker, "~> 0.1.3"},
       {:memcachex, "~> 0.5.0"},
+      {:pigeon, ">= 0.0.0"},
+      {:kadabra, ">= 0.0.0"},
+      {:uuid, "~> 1.1"},
 
       # dev dependencies
       {:mix_test_watch, "~> 0.6", only: [:dev, :docker], runtime: false},

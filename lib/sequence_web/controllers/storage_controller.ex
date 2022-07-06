@@ -3,12 +3,12 @@ defmodule SequenceWeb.StorageController do
   require Logger
 
   alias Sequence.Users.{Avatar, User}
-  alias Sequence.{AppDataDefinitions.AppIcon, Chat.Attachment, Chat.ImageAttachment, Calls.VirtualBackground}
+  alias Sequence.{Chat.Attachment, Chat.ImageAttachment}
   alias Sequence.StorageController.StorageError
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Teams, Users}
+  alias Sequence.{Users}
 
   # upload profile picture via HTML post
   def upload_profile_picture(conn, %{ "upload" => upload, "token" => token, "redirect" => redirect } = params) do
@@ -67,20 +67,6 @@ defmodule SequenceWeb.StorageController do
     {:error, :bad_request}
   end
 
-  def upload_app_icon(conn, %{ "upload" => upload }) do
-    with user <- Guardian.Plug.current_resource(conn) do
-      scope = {user, Timex.now |> Timex.to_unix |> Integer.to_string}
-      with {:ok, file_name} <- AppIcon.store({upload, scope}) do
-        json conn, %{ url: AppIcon.url({file_name, scope}, :thumb) }
-
-      else
-        {:error, :invalid_file} -> {:error, :bad_request, "Image type unsupported."}
-        error ->
-          raise StorageError, message: "Error uploading app icon: #{inspect(error)}"
-      end
-    end
-  end
-
   def upload_attachment(conn, %{ "upload" => upload, "token" => token }) do
     with {:ok, user, _} <- Sequence.Auth.Guardian.resource_from_token(token) do
       timestamp = Timex.now |> Timex.to_unix |> Integer.to_string
@@ -111,38 +97,6 @@ defmodule SequenceWeb.StorageController do
     json conn, %{}
   end
 
-  # POST /files/send
-  def send_file(conn, %{ "user_id" => user_id, "team_id" => team_id, "channel_id" => channel_id,
-      "description" => description }) do
-    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, _} <- Teams.team_by_uuid(user.id, team_id),
-         to_user <- Users.by_uuid(user_id),
-         {:ok, _} <- Teams.team_by_uuid(to_user.id, team_id) do
-
-      SequenceWeb.Endpoint.broadcast! "user:#{user_id}", "file_transfer", %{ id: channel_id, from: user.uuid,
-          from_name: user.name, team: team_id, description: description }
-      json conn, %{ success: true }
-    else
-      nil -> {:error, :unauthorized}
-      {:error, :not_found} -> {:error, :not_found}
-    end
-  end
-
-  # POST /logs/call
-  def send_call_log(conn, %{ "team_id" => team_id, "call_id" => call_id }) do
-    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, _} <- Teams.team_by_uuid(user.id, team_id) do
-
-      path = "#{team_id}/#{call_id}/#{user.uuid}"
-      {:ok, url} = ExAws.Config.new(:s3) |> ExAws.S3.presigned_url(:put, "tandem-call-logs", path,
-        query_params: [{"x-amz-storage-class", "ONEZONE_IA"}])
-      json conn, %{ url: url, path: path }
-    else
-      nil -> {:error, :unauthorized}
-      {:error, :not_found} -> {:error, :not_found}
-    end
-  end
-
   # POST /logs/user
   def send_user_log(conn, _) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn) do
@@ -159,19 +113,6 @@ defmodule SequenceWeb.StorageController do
     end
   end
 
-  # POST /calls/background
-  def upload_background(conn, %{ "upload" => upload, "token" => token  }) do
-    with {:ok, user, _} <- Sequence.Auth.Guardian.resource_from_token(token) do
-      scope = {user, Timex.now |> Timex.to_unix |> Integer.to_string}
-      with {:ok, file_name} <- VirtualBackground.store({upload, scope}) do
-        json conn, %{url: VirtualBackground.url({file_name, scope}, :original) }
-      else
-        {:error, :invalid_file} -> {:error, :bad_request, "Image type unsupported."}
-        error ->
-          raise StorageError, message: "Error uploading virtual background: #{inspect(error)}"
-      end
-    end
-  end
 end
 
 defmodule Sequence.StorageController.StorageError do

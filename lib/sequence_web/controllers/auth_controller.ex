@@ -2,10 +2,9 @@ defmodule SequenceWeb.AuthController do
   use SequenceWeb, :controller
   require Logger
 
-  alias Sequence.{Analytics, Auth, Auth.OAuth, Teams, Teams.Team, Teams.UserTeam, Invites, Mailer, Repo,
-    Users, Users.User, Utils, Experiments, Orgs, Meetings}
+  alias Sequence.{Auth, Auth.OAuth, Teams, Teams.Team, Teams.UserTeam, Invites, Repo,
+    Users, Users.User, Utils, Orgs}
   alias Sequence.Security.RateLimiter
-  alias SequenceWeb.Emails
 
   action_fallback SequenceWeb.FallbackController
 
@@ -51,15 +50,9 @@ defmodule SequenceWeb.AuthController do
     [name, _domain] = String.split(email, "@")
     name = if params["name"] != nil and params["name"] != "", do: params["name"], else: name
     create_params = %{name: name, email: email, origin_type: params["origin_type"] || "guest" }
-    with {:ok, user, created} <- Users.find_or_create_by_email(email, create_params) do
+    with {:ok, user, _created} <- Users.find_or_create_by_email(email, create_params) do
       token = Auth.gen_meeting_guest_token(user)
       user = Map.put(user, :meta, %{ "guest" => true })
-
-      # for meeting invites, we pass the meeting code into the code
-      if created == :created and params["code"] != nil and params["code"] != "guest-user" do
-        meeting_invite = Meetings.find_invite_by_code(params["code"])
-        Analytics.create_event("server-event", meeting_invite.user.name, meeting_invite.user.uuid, nil, nil, "joinForInviter", "meeting", user.uuid)
-      end
       render conn, "token.json", %{token: token, guest: true, existing: true, team: nil, user: user}
     end
   end
@@ -111,11 +104,11 @@ defmodule SequenceWeb.AuthController do
     end
   end
 
-  defp send_magic_link(user, email, path, team \\ nil) do
+  defp send_magic_link(user, email, _path, _team \\ nil) do
     case check_magic_link_rate_limit(user || email) do
       {:ok, _} ->
         {code, _} = Users.gen_magic_link(user || email)
-        Emails.magic_link(email, code, path, team) |> Mailer.deliver_later
+        # Emails.magic_link(email, code, path, team) |> Mailer.deliver_later
         if Sequence.dev?, do: IO.puts("MAGIC LOGIN: #{code}")
         :ok
       {:exceeded, _} ->
@@ -143,31 +136,12 @@ defmodule SequenceWeb.AuthController do
     end
   end
 
-  # POST /download_reminder
-  # Send a reminder to download Tandem
-
-  def download_reminder(conn, params) do
-    with user <- Guardian.Plug.current_resource(conn) do
-      ldre = User.meta(user, User.meta_last_download_reminder_email)
-      Logger.debug("LDRE: #{ldre}")
-      if params["force"] || !ldre || Timex.from_unix(ldre) < Timex.subtract(Timex.now, Timex.Duration.from_days(1))  do
-        user = Repo.preload(user, :primary_team)
-        Emails.download_reminder(user, user.primary_team) |> Mailer.deliver_later
-        Users.update_user_meta(user, User.meta_last_download_reminder_email(Timex.to_unix(Timex.now)))
-      else
-        Logger.debug("Too soon to send another download email")
-      end
-      json conn, %{success: true}
-    end
-  end
+  ### private helpers
 
   defp sign_up_new_user(conn, user_attrs, team_attrs, meeting_invite, %{ "origin_type" => "meeting" } = params) when is_binary(meeting_invite) do
     case sign_up_new_user(conn, user_attrs, team_attrs, nil, params) do
       {:error, _} = error -> error
-      success ->
-        meeting_invite = Meetings.find_invite_by_code(meeting_invite)
-        Analytics.create_event("server-event", meeting_invite.user.name, meeting_invite.user.uuid, nil, nil, "joinForInviter", "meeting")
-        success
+      success -> success
     end
   end
 
@@ -181,10 +155,6 @@ defmodule SequenceWeb.AuthController do
 
     with {:ok, user} <- Users.create_user(user_attrs) do
       token = Auth.gen_token(user, user.google_id != nil)
-      Analytics.create_event("server-event", user.name, user.uuid, nil, nil, "newUserSignup")
-      Experiments.bucket_new_user(user)
-      {:ok, _} = Users.create_funnel_data(%{ user_id: user.id, stages: %{Users.stage_signed_up => Timex.now} })
-      Sequence.Workers.StartActivationCampaign.schedule_event(user.uuid)
       render conn, "token.json", existing: false, token: token, user: user, team: nil, no_team: true
     end
   end
@@ -204,7 +174,7 @@ defmodule SequenceWeb.AuthController do
 
       existing_team = team != nil
       {:ok, team} = if team, do: {:ok, team}, else:
-        Teams.create_team_with_default_rooms(team_attrs)
+        Teams.create_team_with_defaults(team_attrs)
 
       invite_id = if invite, do: invite.id
       user_attrs = Map.put(user_attrs, "invite_id", invite_id)
@@ -229,9 +199,6 @@ defmodule SequenceWeb.AuthController do
       {:ok, _} = Teams.create_user_team(user, team, role, invite_id)
       Teams.update_team_size_on_join(team, user)
 
-      if invite && team.size <= 10, do: Emails.ping_invite_accepted(invite.user, user.name, user.profile_img) |> Mailer.deliver_later
-      if invite, do: Analytics.create_event("server-event", invite.user.name, invite.user.uuid, nil, nil, "joinForInviter", "invite", user.uuid)
-
       {user, team}
     end
 
@@ -240,10 +207,6 @@ defmodule SequenceWeb.AuthController do
 
       token = Auth.gen_token(user, user.google_id != nil)
       SequenceWeb.Endpoint.broadcast("team:#{team.uuid}", "update_members", %{})
-      Analytics.create_event("server-event", user.name, user.uuid, team.name, team.uuid, "newUserSignup")
-      Experiments.bucket_new_user_team(user, team)
-      {:ok, _} = Users.create_funnel_data(%{ user_id: user.id, stages: %{Users.stage_signed_up => Timex.now} })
-      Sequence.Workers.StartActivationCampaign.schedule_event(user.uuid)
       render conn, "token.json", existing: false, token: token, user: user, team: team
     end
   end
