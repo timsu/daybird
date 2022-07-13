@@ -1,6 +1,6 @@
+import Helmet from '@/components/core/Helmet'
 import LandingLayout from '@/components/layout/LandingLayout'
 import SignInForm from '@/screens/auth/SignInForm'
-import { Helmet } from '@notwoods/preact-helmet'
 
 type Props = {
   path: string

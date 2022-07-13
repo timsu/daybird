@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "author": "Tim Su <tim@tandem.chat>",
   "private": true,
+  "scripts": {
+    "tsc": "cd assets && yarn tsc"
+  },
   "devDependencies": {
     "prettier": "^2.7.1"
   },
