@@ -6,16 +6,25 @@ import path from 'path'
 export default defineConfig({
   plugins: [preact()],
   build: {
+    outDir: '../priv/static',
     // generate manifest.json in outDir
     manifest: true,
     rollupOptions: {
       // overwrite default .html entry
-      input: 'src/main.tsx',
+      input: {
+        landing: 'src/landing.tsx',
+        app: 'src/app.tsx',
+      },
     },
   },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+    },
+  },
+  esbuild: {
+    define: {
+      this: 'window',
     },
   },
 })

@@ -1,6 +1,6 @@
 <div id="app"></div>
 <%= if Sequence.dev? do %>
   <script type="module" src={"http://localhost:3000/src/#{@entry}.tsx"}></script>
-<%= else %>
+<% else %>
   <script src={js_path(@conn, "/js/#{@entry}.js")}></script>
 <% end %>

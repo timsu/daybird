@@ -18,15 +18,7 @@ defmodule SequenceWeb.Router do
       Plug.Static,
       at: "/", from: :sequence,
       gzip: true,
-      only: ~w(css images files js sounds videos favicon.ico robots.txt version.json apple-app-site-association)
-    )
-
-    plug(
-      Plug.Static,
-      at: "/", from: :sequence,
-      gzip: true,
-      cache_control_for_etags: "public, max-age=31536000",
-      only: ~w(fonts)
+      only: ~w(assets favicon.ico robots.txt version.json)
     )
   end
 

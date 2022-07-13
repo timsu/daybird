@@ -25,7 +25,7 @@ defmodule SequenceWeb.Endpoint do
     at: "/",
     from: :sequence,
     gzip: true,
-    only: ~w(css files images js sounds videos favicon.ico robots.txt version.json sitemap.xml)
+    only: ~w(assets favicon.ico robots.txt sitemap.xml)
 
   plug Plug.Static,
     at: "/", from: :sequence,
@@ -37,7 +37,7 @@ defmodule SequenceWeb.Endpoint do
     at: "/", from: :sequence,
     gzip: true,
     cache_control_for_etags: "public, max-age=604800",
-    only: ~w(images videos sounds app_status)
+    only: ~w(assets)
 
   plug Plug.Static, at: "/media", from: "media/"
 

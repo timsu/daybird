@@ -1,5 +1,7 @@
 import Config
 
+serve_static = System.get_env("SERVE_STATIC")
+
 # Configure your database
 config :sequence, Sequence.Repo,
   url: System.get_env("ECTO_URL") || "pg://localhost/sequence_dev",
@@ -23,8 +25,10 @@ config :sequence, SequenceWeb.Endpoint,
   secret_key_base: "2LYN/gOfrfsIewT52XqVRFxZ/1szWHLUZmM02pzPaGaWGS4AQMhtb/dHXHTCDYtl",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]}
+    yarn: ["vite", "dev", cd: Path.expand("../assets", __DIR__)]
   ]
+
+config :teamtalk, serve_static: serve_static
 
 # ## SSL Support
 #
