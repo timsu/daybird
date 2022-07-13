@@ -1,4 +1,4 @@
-import paths from '@/config/paths'
+import { paths } from '@/config'
 
 export default () => (
   <main className="mx-auto max-w-7xl px-4 sm:mt-24">

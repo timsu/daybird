@@ -1,4 +1,4 @@
-export default {
+export const paths = {
   ROOT: '/',
 
   SIGNIN: '/signin',

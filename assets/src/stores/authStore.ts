@@ -1,10 +1,17 @@
+import { atom, onMount } from 'nanostores'
+
 import { User } from '@/models'
 
-import { atom, onMount } from 'nanostores'
+const LS_AUTH_TOKENS = 'at'
 
 export const loggedInUser = atom<User | null | undefined>()
 
 onMount(loggedInUser, () => {
   console.log('loading user')
-  loggedInUser.set(null)
+  const tokens = localStorage.getItem(LS_AUTH_TOKENS)
+
+  if (tokens) loginHelper(tokens)
+  else loggedInUser.set(null)
 })
+
+const loginHelper = async (tokens: string) => {}

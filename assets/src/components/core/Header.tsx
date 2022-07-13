@@ -1,5 +1,5 @@
 import Logo from '@/components/core/Logo'
-import paths from '@/config/paths'
+import { paths } from '@/config'
 
 export default function () {
   return (

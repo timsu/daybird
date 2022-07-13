@@ -1,6 +1,6 @@
 import Router from 'preact-router'
 
-import paths from '@/config/paths'
+import { paths } from '@/config'
 import SignInScreen from '@/screens/auth/SignInScreen'
 import SignUpScreen from '@/screens/auth/SignUpScreen'
 
