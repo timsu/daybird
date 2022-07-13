@@ -1,0 +1,24 @@
+{
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.rulers": [100],
+  "emmet.showExpandedAbbreviation": "never",
+  "files.trimTrailingWhitespace": true,
+  "search.exclude": {
+    "**/.git/": true,
+    "**/*.d.ts": true,
+    "**/*.hpp": true,
+    "**/*.map": true,
+    "yarn.lock": true
+  },
+  "editor.formatOnSave": false,
+  "prettier.configPath": "package.json",
+  "prettier.prettierPath": "./node_modules/prettier",
+  "[typescript][javascript][typescriptreact][javascriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "css.lint.unknownAtRules": "ignore"
+}

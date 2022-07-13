@@ -5,5 +5,10 @@
   "license": "private",
   "devDependencies": {
     "prettier": "^2.7.1"
+  },
+  "prettier": {
+    "semi": false,
+    "printWidth": 100,
+    "singleQuote": true
   }
 }
