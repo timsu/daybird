@@ -44,11 +44,9 @@ defmodule Sequence.Users.User do
     field :meta, :map
     field :activated_at, :utc_datetime
     field :origin_type, :string
-    field :last_call_at, :utc_datetime
 
-    belongs_to :primary_team, Team
-    belongs_to :org, Organization
     has_one :magic_link, MagicLink
+    belongs_to :org, Organization
 
     timestamps()
   end
@@ -65,8 +63,8 @@ defmodule Sequence.Users.User do
 
     user
     |> cast(attrs, [:uuid, :name, :nickname, :profile_img,
-      :email, :google_id, :password, :timezone, :activated_at, :last_call_at,
-      :primary_team_id, :invite_id, :meta, :org_id, :origin_type])
+      :email, :google_id, :password, :timezone, :activated_at,
+      :invite_id, :meta, :org_id, :origin_type])
     |> cast_assoc(:magic_link)
     |> Repo.generate_uuid
     |> validate_required([:uuid, :name, :email])

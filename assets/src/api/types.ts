@@ -13,7 +13,6 @@ export type ErrorResponse = {
 
 export type SignInResponse = {
   user?: User
-  team?: Team
   token?: string
 }
 

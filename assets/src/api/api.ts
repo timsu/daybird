@@ -117,21 +117,27 @@ class APIService {
   }
 
   // auth
-  async logInElseSignUpMagicLink(
-    email: string,
-    code: string,
-    invite: string | null,
-    allowSignUp: boolean = true,
-    originType?: string,
-    name?: string
-  ): Promise<R.SignInResponse> {
-    const response = await axios.post(`${this.endpoint}/log_in_else_sign_up_magic_link`, {
+  async signIn(email: string, password: string): Promise<R.SignInResponse> {
+    const response = await axios.post(`${this.endpoint}/sign_in`, {
       email,
-      code,
-      invite,
-      allow_sign_up: allowSignUp,
-      origin_type: originType,
+      password,
+    })
+    return response.data
+  }
+
+  async createAccount(
+    name: string,
+    email: string,
+    password: string,
+    invite?: string,
+    originType?: string
+  ): Promise<R.SignInResponse> {
+    const response = await axios.post(`${this.endpoint}/create_account`, {
       name,
+      email,
+      password,
+      invite,
+      origin_type: originType,
     })
     return response.data
   }

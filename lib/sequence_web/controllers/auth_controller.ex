@@ -8,207 +8,43 @@ defmodule SequenceWeb.AuthController do
 
   action_fallback SequenceWeb.FallbackController
 
-  @integration_scopes ["meeting_create", "meeting_update", "meeting_delete"]
-
-  @valid_secrets %{
-    "Google Calendar Workspace Add-On" => "3wSvy/hGaVjQE0xIf1X5R4LWXif98atnnE1+Bqsp0rs=",
-    "Cal.com" => "29yyYE+y+eVY1M7Y5K5um6sQgxH5m0Cxzh9KIVnxE6Y=",
-    "Cal.com Staging" => "ZjQzYmNjMjUtMjI3Ni00N2ZjLWE4YWUtMjExOWQ0NDA1YzVl"
-  }
-
-  # POST /log_in_else_sign_up_magic_link
-  # log in with email and password or magic link
-  def log_in_else_sign_up_magic_link(conn, %{"email" => email, "code" => "demo" } = params) do
-    create_params = %{ name: email, email: email, origin_type: params["origin_type"] || "demo" }
-    if String.contains?(email, "@demo.com") do
-      with {:ok, user, _} <- Users.find_or_create_by_email(email, create_params) do
-        team = Teams.find_demo_team()
-        if !Teams.is_member?(team, user) do
-          _ = Teams.create_user_team(user, team, "member", nil)
-        end
-        token = Auth.gen_token(user)
-        render conn, "token.json", %{token: token, existing: true, team: team, user: user}
-      end
-    else
-      {:error, :unauthorized, "Not a valid demo user" }
-    end
-  end
-
-  @recording_email "recording@tandem.chat"
-  @recording_code "recording123"
-
-  def log_in_else_sign_up_magic_link(conn, %{"email" => @recording_email, "code" => @recording_code} = params) do
-    create_params = %{ name: "Tandem Recording", email: @recording_email, origin_type: params["origin_type"] || "recording" }
-    with {:ok, user, _} <- Users.find_or_create_by_email(@recording_email, create_params) do
-      token = Auth.gen_token(user)
-      render conn, "token.json", %{token: token, guest: false, team: nil, user: user}
-    end
-  end
-
-  # meeting guest flow. generates a special partial token
-  def log_in_else_sign_up_magic_link(conn, %{"email" => email, "invite" => "guest-user" } = params) do
-    [name, _domain] = String.split(email, "@")
-    name = if params["name"] != nil and params["name"] != "", do: params["name"], else: name
-    create_params = %{name: name, email: email, origin_type: params["origin_type"] || "guest" }
-    with {:ok, user, _created} <- Users.find_or_create_by_email(email, create_params) do
-      token = Auth.gen_meeting_guest_token(user)
-      user = Map.put(user, :meta, %{ "guest" => true })
-      render conn, "token.json", %{token: token, guest: true, existing: true, team: nil, user: user}
-    end
-  end
-
-  def log_in_else_sign_up_magic_link(conn, %{"email" => email, "code" => code } = params) when not is_nil(code) do
-    allow_sign_up = if Map.has_key?(params, "allow_sign_up"), do: params["allow_sign_up"], else: true
-    case Users.magic_link_authenticate(email, code) do
-      {:ok, nil} ->
-        if allow_sign_up do
-          [name, _domain] = String.split(email, "@")
-          sign_up_new_user(conn, %{"email" => email, "name" => name}, nil, params["invite"], params)
-        else
-          {:error, :not_found, %{ msg: "There's no account associated with #{email}.", email: email }}
-        end
-
+  def sign_in(conn, %{"email" => email, "password" => password } = params) do
+    case Users.authenticate_user(email, password) do
       {:ok, user} ->
-        token = Auth.gen_token(user)
-        conn = Auth.Guardian.Plug.remember_me(conn, user)
-        render conn, "token.json", %{token: token, existing: true, team: user.primary_team, user: user}
+        sign_in_success(conn, user)
       {:error, reason} ->
         if !Sequence.test?, do: Process.sleep(2000)
         {:error, :unauthorized, reason}
     end
   end
 
-  def log_in_else_sign_up_magic_link(_, %{ "email" => _ }), do: {:error, :bad_request, "No authentication method provided"}
-
-  # POST /magic_link
-  # Send magic link for existing users, request additional information
-  def magic_link(conn, %{"email" => email} = params) do
-    path = params["path"]
-    with [_,_] <- String.split(email, "@") do
-      r = case Users.find_by_email(email) do
-        {:ok, user} ->
-          send_magic_link(user, email, path, params["team"])
-        _ ->
-          send_magic_link(nil, email, path)
-      end
-
-      case r do
-        :ok ->
-          json(conn, %{ success: true })
-        {:error, :rate_limit_exceeded} ->
-          {:error, :too_many_requests, "Sorry, maximum number of emails have been sent. If you " <>
-            "think this is an error please contact support using the (?) button below."}
-      end
-    else
-      _ -> {:error, :unauthorized, "Sorry, that does not appear to be a valid email address."}
-    end
-  end
-
-  defp send_magic_link(user, email, _path, _team \\ nil) do
-    case check_magic_link_rate_limit(user || email) do
-      {:ok, _} ->
-        {code, _} = Users.gen_magic_link(user || email)
-        # Emails.magic_link(email, code, path, team) |> Mailer.deliver_later
-        if Sequence.dev?, do: IO.puts("MAGIC LOGIN: #{code}")
-        :ok
-      {:exceeded, _} ->
-        {:error, :rate_limit_exceeded}
-    end
-  end
-
-  @magic_link_rate_limit_period_ms 24 * 3600 * 1000
-  @magic_link_rate_limit 10
-
-  defp check_magic_link_rate_limit(user) when is_map(user) do
-    check_magic_link_rate_limit(user.id)
-  end
-
-  defp check_magic_link_rate_limit(key) do
-    case Sequence.env() do
-      "dev" ->
-        {:ok, 0}
-      "test" ->
-        {:ok, 0}
-      "staging" ->
-        RateLimiter.check_rate_limit("magic_link:user:#{key}", @magic_link_rate_limit_period_ms, 5000)
-      _ ->
-        RateLimiter.check_rate_limit("magic_link:user:#{key}", @magic_link_rate_limit_period_ms, @magic_link_rate_limit)
-    end
-  end
-
-  ### private helpers
-
-  defp sign_up_new_user(conn, user_attrs, team_attrs, meeting_invite, %{ "origin_type" => "meeting" } = params) when is_binary(meeting_invite) do
-    case sign_up_new_user(conn, user_attrs, team_attrs, nil, params) do
-      {:error, _} = error -> error
-      success -> success
-    end
-  end
-
-  # Assumes user does not exist.  Sign up without team or invite (user will get directed to a page to fix the lack of team)
-  defp sign_up_new_user(conn, user_attrs, nil, nil, params) do
-    LogDNA.BatchLogger.info("sign_up_new_user #{user_attrs["email"]}", %{ user: user_attrs, team: nil, invite: nil })
-    org = Orgs.org_for_email(user_attrs["email"])
-
-    user_attrs = Map.put(user_attrs, "org_id", org && org.id)
-    user_attrs = Map.put(user_attrs, "origin_type", params["origin_type"] || "unknown")
-
-    with {:ok, user} <- Users.create_user(user_attrs) do
-      token = Auth.gen_token(user, user.google_id != nil)
-      render conn, "token.json", existing: false, token: token, user: user, team: nil, no_team: true
-    end
-  end
-
-  # Assumes that user doesn't already exist.  Sign up with a team and/or an invite
-  defp sign_up_new_user(conn, user_attrs, team_attrs, invite, params) do
-    LogDNA.BatchLogger.info("sign_up_new_user #{user_attrs["email"]}", %{ user: user_attrs, team: team_attrs, invite: invite })
-    org = Orgs.org_for_email(user_attrs["email"])
-
-    transaction = fn invite, team ->
-      team_attrs = if team_attrs do
-        Map.merge(team_attrs, %{
-          "org_id" => if(org, do: org.id),
-          "origin_type" => "sign-up"
-        })
-      end
-
-      existing_team = team != nil
-      {:ok, team} = if team, do: {:ok, team}, else:
-        Teams.create_team_with_defaults(team_attrs)
-
-      invite_id = if invite, do: invite.id
-      user_attrs = Map.put(user_attrs, "invite_id", invite_id)
-      user_attrs = Map.put(user_attrs, "primary_team_id", team.id)
-      user_attrs = Map.put(user_attrs, "org_id", org && org.id)
-      user_attrs = if Team.meta(team, Team.meta_default_hear_before_accept) do
-        Map.put(user_attrs, "meta", Map.put(%{}, User.meta_hear_before_accept, true ))
-      else
-        user_attrs
-      end
-      user_attrs = Map.put(user_attrs, "origin_type",
-        case Map.get(params, "origin_type") do
-          "meeting" -> "meeting"
-          _ -> if(Timex.after?(team.inserted_at, Timex.shift(Timex.now, weeks: -2)), do: "join-new", else: "join-exist")
+  def create_account(conn, %{"name" => name, "email" => email, "password" => password } = params) do
+    case Users.find_by_email(email) do
+      {:ok, user} ->
+        case Users.authenticate_user(email, password) do
+          {:ok, user} ->
+            sign_in_success(conn, user)
+          {:error, reason} ->
+            if !Sequence.test?, do: Process.sleep(2000)
+            {:error, :unauthorized, "That email is already taken"}
         end
-      )
-      {:ok, user} = Users.create_user(user_attrs)
-
-      if !existing_team, do: Teams.update_team(team, %{ creator_id: user.id })
-
-      role = if invite, do: invite.role, else: UserTeam.role_admin
-      {:ok, _} = Teams.create_user_team(user, team, role, invite_id)
-      Teams.update_team_size_on_join(team, user)
-
-      {user, team}
+      {:error, :not_found} ->
+        user_attrs = %{
+          name: name,
+          email: email,
+          password: password,
+          origin_type: params["origin_type"] || "create"
+        }
+        with {:ok, user} <- Users.create_user(user_attrs) do
+          sign_in_success(conn, user)
+        end
     end
+  end
 
-    with {:ok, invite, team} <- get_or_validate_team(invite, team_attrs, user_attrs, org),
-         {:ok, {user, team}} <- Repo.transaction(fn -> transaction.(invite, team) end) do
-
-      token = Auth.gen_token(user, user.google_id != nil)
-      SequenceWeb.Endpoint.broadcast("team:#{team.uuid}", "update_members", %{})
-      render conn, "token.json", existing: false, token: token, user: user, team: team
-    end
+  defp sign_in_success(conn, user) do
+    token = Auth.gen_token(user)
+    conn = Auth.Guardian.Plug.remember_me(conn, user)
+    render conn, "token.json", %{token: token, user: user}
   end
 
   defp attrs_from_google_profile(profile, params) do
@@ -232,7 +68,7 @@ defmodule SequenceWeb.AuthController do
         if allow_sign_up do
           team_attrs = Map.get(params, "team")
           user_attrs = attrs_from_google_profile(profile, params)
-          sign_up_new_user(conn, user_attrs, team_attrs, invite, params)
+          # sign_up_new_user(conn, user_attrs, team_attrs, invite, params)
         else
           {:error, :not_found, %{ msg: "There's no account associated with #{profile.email}.", email: profile.email }}
         end
@@ -434,23 +270,6 @@ defmodule SequenceWeb.AuthController do
       json conn, %{ success: true }
     end
   end
-
-  # GET /analyze_email
-  # Do some analysis of an email address.  Currently only checks if it's a google domain
-  def analyze_email(conn, %{"email" => email}) do
-    domain = EmailChecker.Tools.domain_name(email)
-    mx = EmailChecker.Tools.lookup(domain)
-    google = mx && Regex.match?(~r/google.com\z/i, mx)
-
-    assigns = %{
-      domain: domain,
-      mx: mx,
-      is_google_mx: !!google
-    }
-
-    json conn, assigns
-  end
-
 
   # GET /api/v1/oauth/v2/authorize
   def oauth_authorize(conn, %{ "redirect_uri" => redirect_uri, "state" => state }) do

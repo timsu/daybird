@@ -2,12 +2,26 @@ import { useState } from 'preact/hooks'
 
 import Input from '@/components/core/Input'
 import Submit from '@/components/core/Submit'
+import { config } from '@/config'
+import { authStore } from '@/stores/authStore'
+import { unwrapError } from '@/utils'
 
 export default () => {
   const [name, setName] = useState<string>()
   const [email, setEmail] = useState<string>()
   const [password, setPassword] = useState<string>()
-  const [password2, setPassword2] = useState<string>()
+  const [error, setError] = useState<string>()
+
+  const onSubmit = (e: Event) => {
+    e.preventDefault()
+    if (!name) return setError('Name is required')
+    if (!email) return setError('Email is required')
+    if (!password) return setError('Password is required')
+    if (!email.includes('@')) setError('Email is invalid')
+    if (!config.dev && password.length < 6) setError('Password needs to be at least 6 characters')
+
+    authStore.createAccount(name, email, password).catch((e) => setError(unwrapError(e)))
+  }
 
   return (
     <>
@@ -20,7 +34,7 @@ export default () => {
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-6" action="#" method="POST" onSubmit={onSubmit}>
               <Input
                 id="name"
                 type="text"
@@ -51,17 +65,9 @@ export default () => {
                 onChange={(e) => setPassword((e.target as HTMLInputElement).value)}
               />
 
-              <Input
-                id="confirm-password"
-                type="password"
-                label="Confirm Password"
-                autoComplete="new-password"
-                required
-                value={password2}
-                onChange={(e) => setPassword2((e.target as HTMLInputElement).value)}
-              />
-
               <Submit label="Create account" />
+
+              {error && <div className="mt-6 text-red-600 bold">{error}</div>}
             </form>
 
             {/* <div className="mt-6">

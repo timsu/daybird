@@ -5,7 +5,7 @@ defmodule Sequence.Orgs.Organization do
   @type t :: %__MODULE__{}
 
   @timestamps_opts [type: :utc_datetime, usec: false]
-  schema "organizations" do
+  schema "orgs" do
     field :uuid, Ecto.UUID
     field :name, :string
     field :domain, :string

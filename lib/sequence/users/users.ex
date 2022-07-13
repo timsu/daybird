@@ -56,12 +56,12 @@ defmodule Sequence.Users do
     |> check_password(given_password)
   end
 
-  def check_password(nil, _), do: {:error, "Incorrect username or password"}
+  def check_password(nil, _), do: {:error, "Incorrect email or password"}
 
   def check_password(user, given_password) do
     case Bcrypt.verify_pass(given_password, user.password_hash) do
       true -> {:ok, user}
-      false -> {:error, "Incorrect username or password"}
+      false -> {:error, "Incorrect email or password"}
     end
   end
 

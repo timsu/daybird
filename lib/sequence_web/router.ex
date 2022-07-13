@@ -59,12 +59,11 @@ defmodule SequenceWeb.Router do
     pipe_through :api
     pipe_through :logging
 
-    post "/magic_link", AuthController, :magic_link
-    post "/log_in_else_sign_up_magic_link", AuthController, :log_in_else_sign_up_magic_link
-    post "/log_in_else_sign_up_oauth", AuthController, :log_in_else_sign_up_oauth
+    post "/sign_in", AuthController, :sign_in
+    post "/create_account", AuthController, :create_account
+    post "/sign_in_oauth", AuthController, :sign_in_oauth
     post "/forgot_password", AuthController, :forgot_password
     post "/reset_password", AuthController, :reset_password
-    get "/analyze_email", AuthController, :analyze_email
     post "/exchange_token", AuthController, :exchange_token
 
     get "/time", ConfigController, :time
