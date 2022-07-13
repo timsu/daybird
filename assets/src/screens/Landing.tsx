@@ -1,6 +1,6 @@
-import { Logo } from './logo'
+import Logo from '@/components/core/Logo'
 
-export function App() {
+export default function Landing() {
   return (
     <>
       <Logo />
