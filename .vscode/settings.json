@@ -22,5 +22,6 @@
   "javascript.preferences.importModuleSpecifier": "non-relative",
   "css.lint.unknownAtRules": "ignore",
   "importSorter.generalConfiguration.sortOnBeforeSave": true,
-  "importSorter.importStringConfiguration.hasSemicolon": false
+  "importSorter.importStringConfiguration.hasSemicolon": false,
+  "prettier.printWidth": 100
 }

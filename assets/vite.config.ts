@@ -1,6 +1,7 @@
-import { defineConfig } from 'vite'
-import preact from '@preact/preset-vite'
 import path from 'path'
+import { defineConfig } from 'vite'
+
+import preact from '@preact/preset-vite'
 
 // allow phoenix to kill this process
 process.stdin.on('close', function () {
@@ -19,9 +20,9 @@ export default defineConfig({
     manifest: true,
     cssCodeSplit: false,
     rollupOptions: {
-      // overwrite default .html entry
       input: {
         landing: 'src/landing.tsx',
+        auth: 'src/auth.tsx',
         app: 'src/app.tsx',
       },
     },

@@ -177,6 +177,11 @@ defmodule SequenceWeb.Router do
 
     get "/app", PageController, :app
 
+    get "/signup", PageController, :auth
+    get "/signin", PageController, :auth
+    get "/forgot_password", PageController, :auth
+    get "/reset_password", PageController, :auth
+
     get "/admin/*path", PageController, :admin
 
     get "/about", PageController, :redirect_about

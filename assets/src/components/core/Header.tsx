@@ -3,7 +3,7 @@ import paths from '@/config/paths'
 
 export default function () {
   return (
-    <div className="flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10">
+    <div className="bg-white flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10">
       <div>
         <a href={paths.ROOT} className="flex">
           <span className="sr-only">Sequence</span>

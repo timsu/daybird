@@ -10,6 +10,10 @@ defmodule SequenceWeb.PageController do
     render conn, "app.html", entry: "app"
   end
 
+  def auth(conn, _params) do
+    render conn, "app.html", entry: "auth"
+  end
+
   def admin(conn, _params) do
     render conn, "app.html", entry: "admin"
   end
