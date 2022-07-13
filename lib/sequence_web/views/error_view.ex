@@ -14,6 +14,10 @@ defmodule SequenceWeb.ErrorView do
     %{ error: %{ message: "Not found", resend: false } }
   end
 
+  def render("500.html", %{ message: message }) do
+    "<html><body>#{message}</body></html>"
+  end
+
   def render("500.json", %{ message: message }) do
     %{ error: %{ message: message, resend: false } }
   end

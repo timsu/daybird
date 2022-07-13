@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" class="not-dragging">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="csrf-token" content={csrf_token_value()}>
+    <%
+      title = assigns[:title] || ""
+    %>
+    <title>Sequence | <%= title %></title>
+    <link rel="apple-touch-icon" sizes="128x128" href="/images/icon128.png">
+  </head>
+
+  <body>
+    <%= @inner_content %>
+    <script defer type="text/javascript">
+    (function(){if(localStorage.getItem('utm'))return;var tracker={};var search=new URLSearchParams(location.search);var fields=['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];var data=fields.forEach(function (f) {if(search.get(f)) tracker[f]=search.get(f)});
+    if(document.referrer){tracker.referrer = document.referrer;tracker.referring_domain=new URL(document.referrer).host};if(Object.keys(tracker).length>0)localStorage.setItem('utm', JSON.stringify(tracker));})()
+    </script>
+  </body>
+</html>

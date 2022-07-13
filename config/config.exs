@@ -79,7 +79,6 @@ redis_url = System.get_env("REDIS_URL") || "redis://127.0.0.1:6379/0"
 config :sequence, redis: redis_url
 
 config :sequence, local_timezone: "America/Los_Angeles"
-config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :mojito,
   timeout: 10_000,

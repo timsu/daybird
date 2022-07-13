@@ -185,6 +185,7 @@ defmodule SequenceWeb.Router do
 
     get "/welcome/*path", PageController, :app_auth
     get "/auth/*path", PageController, :app_auth
+    get "/app", PageController, :app
 
     get "/admin/*path", PageController, :admin
 

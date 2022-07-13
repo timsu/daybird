@@ -4,6 +4,8 @@ defmodule SequenceWeb.PageController do
 
   alias Sequence.{Config, Invites, Teams}
 
+  plug :put_layout, "root.html"
+
   def index(conn, _params) do
     render conn, "landing.html", layout: {SequenceWeb.LayoutView, "landing.html"},
       js_path: SequenceWeb.PageView.js_path(conn, "/js/landing.js")
