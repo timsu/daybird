@@ -6,7 +6,6 @@ defmodule Sequence.Cache do
   end
 
   def init(_) do
-    :ets.new(:conversations, [:set, :public, :named_table])
     :ets.new(:config, [:set, :public, :named_table])
     :ets.new(:docdata, [:set, :public, :named_table])
     :ets.new(:cache, [:set, :public, :named_table])

@@ -13,6 +13,7 @@ config :sequence,
 # Configures the endpoint
 config :sequence, SequenceWeb.Endpoint,
   url: [host: "localhost"],
+  version: Mix.Project.config[:version],
   render_errors: [view: SequenceWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Sequence.PubSub,
   live_view: [signing_salt: "MkW9CMZy"]
@@ -46,6 +47,44 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+
+##############################
+# Server configuration
+
+# Configure Teamtalk.Application's clustering topology
+config :sequence, :cluster_topology, [
+  strategy: Cluster.Strategy.Epmd,
+  config: [hosts: []],
+]
+
+config :sequence, env: Mix.env
+config :sequence, prod: Mix.env == :prod
+config :sequence, dev: Mix.env == :dev
+config :sequence, test: Mix.env == :test
+config :sequence, staging: System.get_env("STAGING")
+
+config :sequence, static_asset_path: "priv/static"
+config :sequence, load_application_links_from_s3: false
+
+config :sequence, sendgrid_api_key: System.get_env("SENDGRID_KEY")
+
+config :sequence, Sequence.Auth.Guardian,
+  issuer: "sequence",
+  secret_key: "hNl6o6PmZIvYBP2dx3nDixwG4xA+MquH+MR4u5xBGXBwROzCPNeAOddVssKb7A0i",
+  token_ttl: %{ "access" => {3, :day}, "refresh" => {12, :week} }
+
+redis_url = System.get_env("REDIS_URL") || "redis://127.0.0.1:6379/0"
+
+config :sequence, redis: redis_url
+
+config :sequence, local_timezone: "America/Los_Angeles"
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
+config :mojito,
+  timeout: 10_000,
+  pool_opts: [size: 100, max_overflow: 500]
+
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

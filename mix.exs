@@ -67,7 +67,7 @@ defmodule Sequence.MixProject do
       {:comeonin, "~> 5.3"},
       {:bcrypt_elixir, "~> 2.3"},
       {:cloak, "~> 1.1"},
-      {:redix, ">= 0.0.0"},
+      {:redix, "~> 1.1"},
       {:ex_aws, "~> 2.2"},
       {:ex_aws_s3, "~> 2.3"},
       {:libcluster, "~> 3.2.1"},

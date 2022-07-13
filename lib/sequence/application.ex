@@ -33,10 +33,6 @@ defmodule Sequence.Application do
       # redis global instance
       {Redix, {Application.get_env(:sequence, :redis), [name: :redix]}},
 
-      # Start presence system
-      SequenceWeb.Presence,
-      SequenceWeb.CallPresence,
-
       # Start the Ecto repository
       Sequence.Repo,
       Sequence.Vault,
@@ -48,9 +44,6 @@ defmodule Sequence.Application do
       # Start the Endpoint (http/https)
       SequenceWeb.Endpoint,
 
-      # Oban job scheduler
-      {Oban, Application.get_env(:sequence, :oban)},
-
       # Start your own worker by calling: Sequence.Worker.start_link(arg1, arg2, arg3)
       %{ id: Sequence.Cache, start: { Sequence.Cache, :start_link, [] } },
       %{ id: Sequence.Config, start: { Sequence.Config, :start_link, [] } },
@@ -59,8 +52,6 @@ defmodule Sequence.Application do
       (Sequence.test?() || Sequence.server?()) && {Sequence.Topicflow.Supervisor, [topic_modules: topic_modules]},
 
     ] |> Enum.reject(&(&1 == nil or &1 == false))
-
-    :ok = Oban.Telemetry.attach_default_logger(:debug)
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
