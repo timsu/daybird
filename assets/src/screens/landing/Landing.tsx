@@ -1,6 +1,4 @@
-import Logo from '@/components/core/Logo'
-
-export default function Landing() {
+export default () => {
   return (
     <div class="m-8">
       <div class="text-xl font-bold">SEQUENCE</div>
