@@ -1,0 +1,9 @@
+{
+  "name": "sequence",
+  "version": "1.0.0",
+  "author": "Tim Su <tim@tandem.chat>",
+  "license": "private",
+  "devDependencies": {
+    "prettier": "^2.7.1"
+  }
+}
