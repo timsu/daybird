@@ -9,6 +9,7 @@ export default defineConfig({
     outDir: '../priv/static',
     // generate manifest.json in outDir
     manifest: true,
+    cssCodeSplit: false,
     rollupOptions: {
       // overwrite default .html entry
       input: {
