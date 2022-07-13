@@ -1,5 +1,6 @@
 import Loader from '@/components/core/Loader'
-import Login from '@/screens/app/Login'
+import LandingLayout from '@/components/layout/LandingLayout'
+import Login from '@/screens/auth/SignInScreen'
 import { loggedInUser } from '@/stores/authStore'
 import { useStore } from '@nanostores/preact'
 
@@ -10,16 +11,8 @@ export default () => {
   if (user === undefined) return <Loader class="mx-auto my-40" size={80} />
 
   return (
-    <div class="m-8">
-      <div class="text-xl font-bold">
-        <a href="/">SEQUENCE</a>
-      </div>
-
-      <hr class="my-4" />
-
-      <div class="my-4">The app.</div>
-
-      <Login />
-    </div>
+    <LandingLayout>
+      <div class="text-xl">APP</div>
+    </LandingLayout>
   )
 }

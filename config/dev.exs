@@ -28,7 +28,7 @@ config :sequence, SequenceWeb.Endpoint,
     yarn: ["vite", "dev", cd: Path.expand("../assets", __DIR__)]
   ]
 
-config :teamtalk, serve_static: serve_static
+config :sequence, serve_static: serve_static
 
 # ## SSL Support
 #
