@@ -1,6 +1,7 @@
 import Loader from '@/components/core/Loader'
-import LandingLayout from '@/components/layout/LandingLayout'
+import AppLayout from '@/components/layout/AppLayout'
 import { paths } from '@/config'
+import Dashboard from '@/screens/app/Dashboard'
 import { authStore } from '@/stores/authStore'
 import { useStore } from '@nanostores/preact'
 
@@ -14,8 +15,8 @@ export default () => {
   if (!user) return <Loader class="mx-auto my-40" size={80} />
 
   return (
-    <LandingLayout>
-      <div class="text-xl">APP</div>
-    </LandingLayout>
+    <AppLayout>
+      <Dashboard />
+    </AppLayout>
   )
 }

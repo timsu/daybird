@@ -1,5 +1,10 @@
 import { logger } from '@/utils/logger'
 
+/** join class names */
+export function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ')
+}
+
 /** wrap an async method in a promise, rejecting if the function throws errors */
 export function AsyncPromise<T>(
   promiseFunction: (
