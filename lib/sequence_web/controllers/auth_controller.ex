@@ -2,13 +2,11 @@ defmodule SequenceWeb.AuthController do
   use SequenceWeb, :controller
   require Logger
 
-  alias Sequence.{Auth, Auth.OAuth, Teams, Teams.Team, Teams.UserTeam, Invites, Repo,
-    Users, Users.User, Utils, Orgs}
-  alias Sequence.Security.RateLimiter
+  alias Sequence.{Auth, Auth.OAuth, Teams, Invites, Users, Users.User, Utils}
 
   action_fallback SequenceWeb.FallbackController
 
-  def sign_in(conn, %{"email" => email, "password" => password } = params) do
+  def sign_in(conn, %{"email" => email, "password" => password }) do
     case Users.authenticate_user(email, password) do
       {:ok, user} ->
         sign_in_success(conn, user)
@@ -21,10 +19,10 @@ defmodule SequenceWeb.AuthController do
   def create_account(conn, %{"name" => name, "email" => email, "password" => password } = params) do
     case Users.find_by_email(email) do
       {:ok, user} ->
-        case Users.authenticate_user(email, password) do
+        case Users.val(email, password) do
           {:ok, user} ->
             sign_in_success(conn, user)
-          {:error, reason} ->
+          {:error, _reason} ->
             if !Sequence.test?, do: Process.sleep(2000)
             {:error, :unauthorized, "That email is already taken"}
         end

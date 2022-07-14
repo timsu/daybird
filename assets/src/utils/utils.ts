@@ -26,10 +26,21 @@ export function unwrapError(error: any, defaultMessage?: string) {
   if (error.response) {
     let response = error.response
     if (response.data) logger.info(response.data)
-    if (typeof response.data?.error?.message == 'string') {
-      return response.data.error.message
-    } else if (response.data.error?.message) {
-      return JSON.stringify(response.data.error.message)
+
+    const errorObject = response.data.error
+    if (errorObject) {
+      const message =
+        typeof errorObject.message == 'string'
+          ? errorObject.message
+          : JSON.stringify(errorObject.message)
+      const otherKeys = Object.keys(response.data.error).filter(
+        (k) => k != 'message' && k != 'resend'
+      )
+      if (otherKeys.length > 0) {
+        return message + ': ' + otherKeys.map((k) => `${k} ${response.data.error[k]}`).join(', ')
+      } else {
+        return message
+      }
     } else {
       return defaultMessage
     }

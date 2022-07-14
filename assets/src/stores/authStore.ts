@@ -14,12 +14,24 @@ class AuthStore {
 
   authTokens = atom<AuthTokenPair | undefined>()
 
-  // --- login
+  // --- initialization
 
   loginHelper = async (givenTokens: AuthTokenPair) => {
     const tokens = await API.exchangeAndSetAuthToken(givenTokens)
+    const { access, refresh } = tokens || {}
+    if (!tokens?.access) throw 'Tokens were invalid'
 
-    // todo: get user info
+    const response = await API.getUser()
+    logger.info('AUTH - logged in', response)
+
+    if (
+      tokens &&
+      (refresh?.token != givenTokens.refresh?.token || access?.token != givenTokens.access?.token)
+    ) {
+      this.saveTokens(tokens)
+    }
+
+    this.loggedInUser.set(response.user)
   }
 
   saveTokens = async (tokens: AuthTokenPair) => {
@@ -32,7 +44,7 @@ class AuthStore {
     if (tokens.refresh?.token) this.saveTokens(tokens)
   })
 
-  // --- account creation
+  // --- sign in / sign up
 
   createAccount = async (name: string, email: string, password: string) => {
     logger.info('AUTH —— create account', name, email)
@@ -42,6 +54,18 @@ class AuthStore {
 
     location.href = paths.APP
   }
+
+  signIn = async (email: string, password: string) => {
+    const response = await API.signIn(email, password)
+    const tokens = { refresh: { token: response.token! } }
+    this.saveTokens(tokens)
+
+    location.href = paths.APP
+  }
+
+  logout = () => {
+    localStorage.removeItem(LS_AUTH_TOKENS)
+  }
 }
 
 export const authStore = new AuthStore()
@@ -50,9 +74,12 @@ if (config.dev) (window as any)['authStore'] = authStore
 // --- triggered actions
 
 onMount(authStore.loggedInUser, () => {
-  console.log('loading user')
   const tokens = localStorage.getItem(LS_AUTH_TOKENS)
 
-  if (tokens) authStore.loginHelper(JSON.parse(tokens))
-  else authStore.loggedInUser.set(null)
+  if (tokens) {
+    authStore.loginHelper(JSON.parse(tokens)).catch((e) => {
+      logger.warn(e)
+      authStore.loggedInUser.set(null)
+    })
+  } else authStore.loggedInUser.set(null)
 })
