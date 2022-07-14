@@ -4,6 +4,7 @@ import Loader from '@/components/core/Loader'
 import AppLayout from '@/components/layout/AppLayout'
 import { paths } from '@/config'
 import Dashboard from '@/screens/app/Dashboard'
+import Doc from '@/screens/app/Doc'
 import Projects from '@/screens/app/Projects'
 import { authStore } from '@/stores/authStore'
 import { useStore } from '@nanostores/preact'
@@ -22,6 +23,7 @@ export default () => {
       <Router>
         <Dashboard path={paths.APP} />
         <Projects path={paths.PROJECTS} />
+        <Doc path={paths.DOC} />
       </Router>
     </AppLayout>
   )

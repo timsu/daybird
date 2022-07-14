@@ -3,7 +3,7 @@ import Match from 'preact-router/match'
 import LogoDark from '@/components/core/LogoDark'
 import { paths } from '@/config'
 import { classNames } from '@/utils'
-import { FolderIcon, HomeIcon } from '@heroicons/react/outline'
+import { DocumentIcon, FolderIcon, HomeIcon } from '@heroicons/react/outline'
 
 const navigation = [
   { name: 'Dashboard', href: paths.APP, icon: HomeIcon },
@@ -11,6 +11,11 @@ const navigation = [
     name: 'Projects',
     href: paths.PROJECTS,
     icon: FolderIcon,
+  },
+  {
+    name: 'Doc',
+    href: paths.DOC,
+    icon: DocumentIcon,
   },
 ]
 
