@@ -19,4 +19,19 @@ defmodule Sequence.ProjectsFixtures do
 
     project
   end
+
+  @doc """
+  Generate a user_project.
+  """
+  def user_project_fixture(attrs \\ %{}) do
+    {:ok, user_project} =
+      attrs
+      |> Enum.into(%{
+        left_at: ~U[2022-07-13 06:14:00Z],
+        role: "some role"
+      })
+      |> Sequence.Projects.create_user_project()
+
+    user_project
+  end
 end
