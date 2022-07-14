@@ -20,6 +20,8 @@ export default () => {
     e.preventDefault()
     if (!name) return setError('Name must not be blank')
 
+    setName('')
+    setError('')
     close()
   }
 

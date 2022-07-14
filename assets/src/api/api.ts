@@ -204,6 +204,18 @@ class APIService {
     return response.data
   }
 
+  // projects
+
+  async listProjects(): Promise<R.ProjectsResponse> {
+    const response = await this.axios.get(`${this.endpoint}/projects`)
+    return response.data
+  }
+
+  async createProject(name: string): Promise<R.ProjectsResponse> {
+    const response = await this.axios.post(`${this.endpoint}/projects`, { name })
+    return response.data
+  }
+
   // for storybooks, put API into a stub state
 
   stubMode() {

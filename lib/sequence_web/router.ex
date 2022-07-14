@@ -82,7 +82,10 @@ defmodule SequenceWeb.Router do
     post "/verify_email", AuthController, :verify_email
     post "/login_success", AuthController, :login_success
 
+    resources "/projects", ProjectsController
+
     resources "/teams", TeamsController
+
     get "/domain_info", TeamsController, :domain_info
     post "/teams/:id/leave", TeamsController, :leave
     post "/teams/:id/join", TeamsController, :join

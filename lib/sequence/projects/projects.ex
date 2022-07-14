@@ -6,7 +6,81 @@ defmodule Sequence.Projects do
   import Ecto.Query, warn: false
   alias Sequence.Repo
 
-  alias Sequence.Projects.Project
+  alias Sequence.{Users.User}
+  alias Sequence.Projects.{Project, UserProject}
+
+  @spec list_user_projects(User.t()) :: [Project.t()]
+  def list_user_projects(user, include_archived \\ false) do
+    project_ids = list_user_project_ids(user)
+    query = from p in Project, where: p.id in ^project_ids and is_nil(p.deleted_at), order_by: [asc: :id]
+
+    if !include_archived do
+      query |> where([up], is_nil(up.archived_at))
+    else
+      query
+    end |> Repo.all
+  end
+
+  @spec list_user_projects(User.t()) :: [UserProject.t()]
+  def list_user_project_ids(user) do
+    Repo.all(from up in UserProject, select: up.project_id, where: up.user_id == ^user.id and is_nil(up.left_at))
+  end
+
+  @spec get_user_project(User.t() | binary, Team.t() | binary, boolean) :: UserTeam.t() | nil
+  def get_user_project(user, project, active_only \\ true) do
+    user_id = if is_map(user), do: user.id, else: user
+    project_id = if is_map(project), do: project.id, else: project
+
+    query = from up in UserProject, where: up.user_id == ^user_id and
+      up.project_id == ^project_id, limit: 1
+
+    if active_only do
+      query |> where([up], is_nil(up.left_at))
+    else
+      query
+    end |> Repo.one
+  end
+
+  def is_member?(project, user) do
+    get_user_project(user, project) != nil
+  end
+
+  @spec project_by_uuid!(binary, binary) :: Project.t()
+  def project_by_uuid!(user_id, uuid) do
+    {:ok, project} = project_by_uuid(user_id, uuid)
+    project
+  end
+
+  @spec project_by_uuid(binary, binary) :: {:error, :not_found} | {:ok, Project.t()}
+  def project_by_uuid(nil, _uuid), do: {:error, :not_found}
+  def project_by_uuid(_user_id, nil), do: {:error, :not_found}
+
+  def project_by_uuid(user_id, uuid) do
+    with {:ok, project} <- project_by_uuid(uuid) do
+      if is_member?(project, user_id), do: {:ok, project}, else: {:error, :not_found}
+    end
+  end
+
+  @spec project_by_uuid(binary) :: {:error, :not_found} | {:ok, Project.t()}
+  def project_by_uuid(uuid) do
+    if uuid != nil and uuid != "undefined" and uuid != "" do
+      project = Repo.one(from q in Project, where: q.uuid == ^uuid)
+      if project, do: {:ok, project}, else: {:error, :not_found}
+    else
+      {:error, :not_found}
+    end
+  end
+
+  @spec join_project(User.t(), Project.t(), binary) :: {:ok, UserProject.t()}
+  def join_project(user, project, role) do
+    case get_user_project(user, project, false) do
+      nil ->
+        create_user_project(%{ user_id: user.id, project_id: project.id,
+          role: role })
+      up ->
+        update_user_project(up, %{ left_at: nil })
+    end
+  end
 
   @doc """
   Returns the list of projects.
@@ -101,8 +175,6 @@ defmodule Sequence.Projects do
   def change_project(%Project{} = project, attrs \\ %{}) do
     Project.changeset(project, attrs)
   end
-
-  alias Sequence.Projects.UserProject
 
   @doc """
   Returns the list of user_projects.

@@ -3,6 +3,7 @@ defmodule Sequence.Repo.Migrations.CreateTasks do
 
   def change do
     create table(:tasks) do
+      add :uuid, :uuid
       add :short_id, :integer
       add :title, :string
       add :description, :text
@@ -16,6 +17,7 @@ defmodule Sequence.Repo.Migrations.CreateTasks do
       timestamps()
     end
 
+    create unique_index(:tasks, [:uuid])
     create index(:tasks, [:creator_id])
     create index(:tasks, [:user_id])
     create index(:tasks, [:project_id])

@@ -2,8 +2,10 @@ import { action, atom, onMount } from 'nanostores'
 
 import { API } from '@/api'
 import { config, paths } from '@/config'
-import { AuthTokenPair, User } from '@/models'
+import { AuthTokenPair, Project, User } from '@/models'
 import { logger } from '@/utils'
+
+import { projectStore } from './projectStore'
 
 const LS_AUTH_TOKENS = 'at'
 
@@ -16,12 +18,14 @@ class AuthStore {
 
   // --- initialization
 
+  hasToken = () => !!localStorage.getItem(LS_AUTH_TOKENS)
+
   loginHelper = async (givenTokens: AuthTokenPair) => {
     const tokens = await API.exchangeAndSetAuthToken(givenTokens)
     const { access, refresh } = tokens || {}
     if (!tokens?.access) throw 'Tokens were invalid'
 
-    const response = await API.getUser()
+    const response = await API.listProjects()
     logger.info('AUTH - logged in', response)
 
     if (
@@ -32,6 +36,7 @@ class AuthStore {
     }
 
     this.loggedInUser.set(User.fromJSON(response.user))
+    projectStore.updateProjects(response.projects.map((p) => Project.fromJSON(p)))
   }
 
   saveTokens = async (tokens: AuthTokenPair) => {

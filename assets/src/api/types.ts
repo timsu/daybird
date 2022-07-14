@@ -1,4 +1,4 @@
-import { Team, User } from '@/models'
+import { Project, User } from '@/models'
 
 export type SuccessResponse = {
   success: boolean
@@ -22,4 +22,13 @@ export type OAuthSignInResponse = SignInResponse & {
 
 export type UserResponse = {
   user: User
+}
+
+export type ProjectsResponse = {
+  projects: Project[]
+  user: User
+}
+
+export type ProjectResponse = {
+  project: Project
 }

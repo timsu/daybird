@@ -17,12 +17,7 @@ defmodule SequenceWeb.AuthView do
     %{
       success: (if Map.has_key?(params, :success), do: params[:success], else: true),
       token: params[:token],
-      team: params[:team] && %{id: params[:team].uuid},
-      domainTeams: params[:domain_teams],
-      existing: params[:existing],
       user: render_user(params[:user]),
-      no_team: params[:no_team],
-      guest: params[:guest],
     }
   end
 
