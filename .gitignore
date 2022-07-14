@@ -34,3 +34,6 @@ yarn-error.log
 !**/.yarn/sdks
 !**/.yarn/versions
 **/.pnp.*
+
+# documents
+/docs/
