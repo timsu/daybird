@@ -1,7 +1,10 @@
+import Router from 'preact-router'
+
 import Loader from '@/components/core/Loader'
 import AppLayout from '@/components/layout/AppLayout'
 import { paths } from '@/config'
 import Dashboard from '@/screens/app/Dashboard'
+import Projects from '@/screens/app/Projects'
 import { authStore } from '@/stores/authStore'
 import { useStore } from '@nanostores/preact'
 
@@ -16,7 +19,10 @@ export default () => {
 
   return (
     <AppLayout>
-      <Dashboard />
+      <Router>
+        <Dashboard path={paths.APP} />
+        <Projects path={paths.PROJECTS} />
+      </Router>
     </AppLayout>
   )
 }

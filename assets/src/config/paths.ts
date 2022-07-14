@@ -6,4 +6,8 @@ export const paths = {
   SIGNUP: '/signup',
 
   APP: '/app',
+
+  PROJECTS: '/app/projects',
+
+  DOC: '/app/docs/',
 }
