@@ -2,7 +2,7 @@ defmodule Sequence.Users.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Sequence.{Users.MagicLink, Repo, Teams.Team, Orgs.Organization}
+  alias Sequence.{Users.MagicLink, Repo, Orgs.Organization}
 
   @type t :: %__MODULE__{}
 

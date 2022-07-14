@@ -19,7 +19,7 @@ defmodule SequenceWeb.AuthController do
   def create_account(conn, %{"name" => name, "email" => email, "password" => password } = params) do
     case Users.find_by_email(email) do
       {:ok, user} ->
-        case Users.val(email, password) do
+        case Users.check_password(user, password) do
           {:ok, user} ->
             sign_in_success(conn, user)
           {:error, _reason} ->
@@ -64,9 +64,10 @@ defmodule SequenceWeb.AuthController do
       {:not_found, profile} ->
         allow_sign_up = if Map.has_key?(params, "allow_sign_up"), do: params["allow_sign_up"], else: true
         if allow_sign_up do
-          team_attrs = Map.get(params, "team")
           user_attrs = attrs_from_google_profile(profile, params)
-          # sign_up_new_user(conn, user_attrs, team_attrs, invite, params)
+          with {:ok, user} <- Users.create_user(user_attrs) do
+            sign_in_success(conn, user)
+          end
         else
           {:error, :not_found, %{ msg: "There's no account associated with #{profile.email}.", email: profile.email }}
         end
@@ -81,9 +82,7 @@ defmodule SequenceWeb.AuthController do
           end
         end
 
-        token = Auth.gen_token(user, true)
-        conn = Auth.Guardian.Plug.remember_me(conn, user)
-        render conn, "token.json", token: token, user: user, existing: true
+        sign_in_success(conn, user)
     end
   end
 
@@ -93,9 +92,7 @@ defmodule SequenceWeb.AuthController do
       {:not_found, profile} ->
         {:error, :not_found, %{ msg: "There's no account associated with #{profile.email}.", email: profile.email }}
       {:ok, user} ->
-        token = Auth.gen_token(user, true)
-        conn = Auth.Guardian.Plug.remember_me(conn, user)
-        render conn, "token.json", token: token, user: user, existing: true
+        sign_in_success(conn, user)
     end
   end
 
@@ -176,32 +173,6 @@ defmodule SequenceWeb.AuthController do
     end
   end
 
-  defp get_or_validate_team(invite, team_attrs, _user_attrs, org) do
-    cond do
-      # user wants to join team given invite. validate invite and fetch team.
-      invite != nil -> Invites.validate_invite(invite, org && org.id)
-
-      # user wants to join team with given uuid. make sure user domain matches team domain.
-      Map.has_key?(team_attrs, "id") ->
-        case Teams.team_by_uuid(team_attrs["id"]) do
-          {:ok, team} ->
-            cond do
-              org == nil -> {:error, :bad_request, "Need user domain to authorize joining team."}
-              Team.meta(team, "private") == true -> {:error, :bad_request, "Can't join private team."}
-              team.org_id != org.id -> {:error, :bad_request, "Domain mismatch, can't join team."}
-              true -> {:ok, nil, team}
-            end
-          _ -> {:error, :bad_request, "The team uuid #{team_attrs["id"]} doesn't exist"}
-        end
-
-      # else user wants to create new team. make sure name is provided
-      !Map.has_key?(team_attrs, "name") ->
-        {:error, :bad_request, "Must either provide invite or team id to join existing team, or team name to create new team."}
-
-      true -> {:ok, nil, nil}
-    end
-  end
-
   # GET /user
   # get user information
   def fetch_user(conn, _params) do
@@ -266,41 +237,6 @@ defmodule SequenceWeb.AuthController do
       token = Auth.gen_token(user)
       SequenceWeb.Endpoint.broadcast("login:#{code}", "token", %{ token: token, payload: payload })
       json conn, %{ success: true }
-    end
-  end
-
-  # GET /api/v1/oauth/v2/authorize
-  def oauth_authorize(conn, %{ "redirect_uri" => redirect_uri, "state" => state }) do
-
-    with user <- Sequence.Auth.Guardian.current_resource(conn),
-        {:ok, token, _claims} <- Sequence.Auth.Guardian.partial_token(user, @integration_scopes) do
-
-      base_uri = URI.parse(redirect_uri)
-
-      query = URI.encode_query(%{ code: token, state: state })
-
-      redirect_url =  Map.put(base_uri, :query, query)
-      |> URI.to_string()
-
-       json conn, %{ url: redirect_url }
-    end
-  end
-
-  # POST /api/v1/gcal/oauth/token OR /api/v1/oauth/v2/token
-  def oauth_token(conn, %{ "client_id" => client_id, "client_secret" => client_secret, "refresh_token" => code }) do
-    oauth_token(conn, %{ "client_id" => client_id, "client_secret" => client_secret, "code" => code })
-  end
-
-  def oauth_token(conn, %{ "client_id" => client_id, "client_secret" => client_secret, "code" => code }) do
-
-    with %{ ^client_id => ^client_secret } <- @valid_secrets,
-      {:ok, _old_token, {token, _claims}} <- Sequence.Auth.Guardian.refresh(code, ttl: {52, :week}) do
-
-      expires_in = 86_400 # 1 day
-
-      json conn, %{ refresh_token: token, access_token: token, expires_in: expires_in, token_type: "Bearer" }
-    else
-      _ -> {:error, :unauthorized}
     end
   end
 
