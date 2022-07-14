@@ -31,7 +31,7 @@ class AuthStore {
       this.saveTokens(tokens)
     }
 
-    this.loggedInUser.set(response.user)
+    this.loggedInUser.set(User.fromJSON(response.user))
   }
 
   saveTokens = async (tokens: AuthTokenPair) => {
