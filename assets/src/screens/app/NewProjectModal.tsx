@@ -5,6 +5,8 @@ import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
 import Submit from '@/components/core/Submit'
 import { modalStore } from '@/stores/modalStore'
+import { projectStore } from '@/stores/projectStore'
+import { unwrapError } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
 import { PlusIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -12,17 +14,26 @@ import { useStore } from '@nanostores/preact'
 export default () => {
   const [name, setName] = useState<string>()
   const [error, setError] = useState<string>()
+  const [submitting, setSubmitting] = useState<boolean>(false)
   const open = useStore(modalStore.newProjectModal)
 
   const close = () => modalStore.newProjectModal.set(false)
 
-  const submit = (e: Event) => {
+  const submit = async (e: Event) => {
     e.preventDefault()
     if (!name) return setError('Name must not be blank')
 
-    setName('')
-    setError('')
-    close()
+    try {
+      setSubmitting(true)
+      await projectStore.createProject(name)
+      setName('')
+      setError('')
+      close()
+    } catch (e) {
+      setError(unwrapError(e))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -72,7 +83,7 @@ export default () => {
                     </div>
                   </div>
                   <div className="mt-5 sm:mt-6">
-                    <Submit label="Create" />
+                    <Submit label="Create" disabled={submitting} />
                   </div>
 
                   <ErrorMessage error={error} />

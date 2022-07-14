@@ -12,8 +12,9 @@ export default () => {
   const [email, setEmail] = useState<string>()
   const [password, setPassword] = useState<string>()
   const [error, setError] = useState<string>()
+  const [submitting, setSubmitting] = useState<boolean>(false)
 
-  const onSubmit = (e: Event) => {
+  const onSubmit = async (e: Event) => {
     e.preventDefault()
     if (!name) return setError('Name is required')
     if (!email) return setError('Email is required')
@@ -21,7 +22,14 @@ export default () => {
     if (!email.includes('@')) setError('Email is invalid')
     if (password.length < 6) setError('Password needs to be at least 6 characters')
 
-    authStore.createAccount(name, email, password).catch((e) => setError(unwrapError(e)))
+    try {
+      setSubmitting(true)
+      await authStore.createAccount(name, email, password)
+    } catch (e) {
+      setError(unwrapError(e))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (

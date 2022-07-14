@@ -1,7 +1,7 @@
 export class User {
-  public id?: string
+  public id: string = ''
 
-  public name?: string
+  public name: string = ''
 
   public nickname?: string
 

@@ -99,6 +99,7 @@ export default function ({ children }: RenderableProps<{}>) {
                     placeholder="Search"
                     type="search"
                     name="search"
+                    autoComplete="off"
                   />
                 </div>
               </form>

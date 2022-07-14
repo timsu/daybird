@@ -36,6 +36,7 @@ class AuthStore {
     }
 
     this.loggedInUser.set(User.fromJSON(response.user))
+    this.loggedInUser.notify()
     projectStore.updateProjects(response.projects.map((p) => Project.fromJSON(p)))
   }
 
