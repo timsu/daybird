@@ -35,9 +35,11 @@ class AuthStore {
       this.saveTokens(tokens)
     }
 
-    this.loggedInUser.set(User.fromJSON(response.user))
+    const user = User.fromJSON(response.user)
+    this.loggedInUser.set(user)
     this.loggedInUser.notify()
     projectStore.updateProjects(response.projects.map((p) => Project.fromJSON(p)))
+    projectStore.updateCurrentProject(user)
   }
 
   saveTokens = async (tokens: AuthTokenPair) => {
@@ -71,7 +73,17 @@ class AuthStore {
 
   logout = () => {
     localStorage.removeItem(LS_AUTH_TOKENS)
+
+    location.href = paths.SIGNIN
   }
+
+  // --- user management
+
+  updateUser = action(this.loggedInUser, 'updateUser', async (store, updates: Partial<User>) => {
+    logger.info(`AUTH —— Update User`, updates)
+    const response = await API.updateUser(updates)
+    store.set(User.fromJSON(response.user))
+  })
 }
 
 export const authStore = new AuthStore()

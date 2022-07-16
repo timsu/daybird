@@ -15,11 +15,23 @@ export class User {
 
   public timezone?: string
 
-  // whether user is an anonymous (pre-auth) user
-  public anonymous?: boolean
+  public meta: UserMeta = {}
 
   public static fromJSON(obj: Object): User {
     let item: User = Object.assign(new User(), obj)
+    if (!item.meta) item.meta = {}
     return item
   }
+
+  public static meta(user: User | null | undefined): UserMeta {
+    return user?.meta || {}
+  }
+}
+
+export class UserMeta {
+  /** last project */
+  lp?: string
+
+  /** last file */
+  lf?: string
 }

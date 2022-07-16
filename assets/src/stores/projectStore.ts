@@ -2,7 +2,7 @@ import { action, atom, map } from 'nanostores'
 
 import { API } from '@/api'
 import { config } from '@/config'
-import { Project } from '@/models'
+import { Project, User } from '@/models'
 import { logger } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
@@ -19,9 +19,24 @@ class ProjectStore {
   // --- actions
 
   updateProjects = action(this.projects, 'updateProjects', (store, projects: Project[]) => {
+    logger.info('PROJECTS - update', projects)
     store.set(projects)
     this.updateProjectMap(projects)
   })
+
+  updateCurrentProject = action(
+    this.currentProject,
+    'updateCurrentProject',
+    (store, user: User) => {
+      const projects = this.projects.get()
+      const lastProjectId = user.meta.lp
+      let currentProject: Project | undefined = projects[0]
+      if (lastProjectId) {
+        currentProject = projects.find((p) => p.id == lastProjectId)
+      }
+      store.set(currentProject)
+    }
+  )
 
   updateProjectMap = action(this.projectMap, 'updateProjectMap', (store, projects: Project[]) => {
     const projectMap: ProjectMap = {}

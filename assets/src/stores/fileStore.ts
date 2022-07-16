@@ -4,6 +4,7 @@ import { API } from '@/api'
 import { config, File, FileType } from '@/config'
 import { Project } from '@/models'
 import { projectStore } from '@/stores/projectStore'
+// import { projectStore } from '@/stores/projectStore'
 import { logger } from '@/utils'
 
 const DOC_EXT = '.delta'
@@ -40,7 +41,10 @@ class FileStore {
 export const fileStore = new FileStore()
 if (config.dev) (window as any)['fileStore'] = fileStore
 
-projectStore.currentProject.listen((project) => {
-  if (!project) return
-  fileStore.loadFiles(project)
+onMount(fileStore.files, () => {
+  const unsub = projectStore.currentProject.subscribe((project) => {
+    if (!project) return
+    fileStore.loadFiles(project)
+  })
+  return unsub()
 })
