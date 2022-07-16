@@ -33,7 +33,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
         <Links />
         {project && (
           <>
-            <div class="border-t border-t-gray-500 p-4 bg-gray-800 mt-4 text-gray-100 font-semibold text-sm">
+            <div class="border-t border-t-gray-500 p-4 text-gray-400 font-semibold text-sm">
               {project.name.toUpperCase()}
             </div>
 

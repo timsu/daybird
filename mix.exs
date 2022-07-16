@@ -84,6 +84,7 @@ defmodule Sequence.MixProject do
       {:kadabra, ">= 0.0.0"},
       {:uuid, "~> 1.1"},
       {:xfile, "~> 0.4"},
+      {:delta, "~> 0.2"},
 
       # dev dependencies
       {:mix_test_watch, "~> 0.6", only: [:dev, :docker], runtime: false},

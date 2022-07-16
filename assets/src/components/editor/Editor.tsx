@@ -4,6 +4,8 @@ import './quill-style.css'
 import { useEffect, useRef } from 'preact/hooks'
 import Quill from 'quill'
 
+import { config } from '@/config'
+
 export default () => {
   const quillRef = useRef<Quill>()
 
@@ -12,6 +14,7 @@ export default () => {
       theme: 'bubble',
     })
     quillRef.current = quill
+    if (config.dev) (window as any)['quill'] = quill
 
     quill.focus()
   }, [])

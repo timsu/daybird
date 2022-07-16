@@ -23,7 +23,6 @@ class FileStore {
   })
 
   loadFiles = async (project: Project) => {
-    logger.info('FILES - loading files for', project.name)
     const response = await API.listFiles(project)
     const files: File[] = response.files.map((filename) => {
       const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'
@@ -34,6 +33,7 @@ class FileStore {
         depth: 0,
       }
     })
+    logger.info('FILES - loaded files', files)
     this.updateFiles(files)
   }
 }

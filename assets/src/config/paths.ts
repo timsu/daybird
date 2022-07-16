@@ -9,5 +9,5 @@ export const paths = {
 
   PROJECTS: '/app/projects',
 
-  DOC: '/app/docs/',
+  DOC: '/app/docs',
 }
