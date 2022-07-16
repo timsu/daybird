@@ -5,8 +5,14 @@ import preact from '@preact/preset-vite'
 
 // allow phoenix to kill this process
 process.stdin.on('close', function () {
+  console.log('Received CLOSE on stdin')
   process.exit(0)
 })
+process.stdin.on('end', function () {
+  console.log('Received END on stdin')
+  process.exit(0)
+})
+process.stdin.resume()
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -18,7 +24,7 @@ export default defineConfig({
     outDir: '../priv/static',
     // generate manifest.json in outDir
     manifest: true,
-    cssCodeSplit: false,
+    // cssCodeSplit: false,
     rollupOptions: {
       input: {
         landing: 'src/landing.tsx',
