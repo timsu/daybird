@@ -4,10 +4,14 @@ defmodule Sequence.Docs do
 
   @extension ".delta"
 
-  def list_docs(project) do
+  # opts:
+  #   recursive: boolean or integer (for recursion depth)
+  def list_docs(project, _opts \\ []) do
     path = project_path(project)
     case File.ls(path) do
-      {:ok, list} -> {:ok, list}
+      {:ok, stream} ->
+        list = Enum.to_list(stream)
+        {:ok, list}
       {:error, :enoent} -> {:ok, []}
       error -> error
     end
@@ -33,7 +37,7 @@ defmodule Sequence.Docs do
     folderpath = Path.join(path, name)
 
     with :ok <- mkdir_if_needed(path),
-         :ok <- file_not_exists(filepath) do
+         :ok <- file_not_exists(folderpath) do
       File.mkdir(folderpath)
     end
   end
@@ -45,7 +49,7 @@ defmodule Sequence.Docs do
 
   def write_doc(project, name, contents) do
     filepath = file_path(project, name)
-    File.write(filepath, data)
+    File.write(filepath, contents)
   end
 
   ### helpers
@@ -69,7 +73,8 @@ defmodule Sequence.Docs do
   end
 
   def file_path(project, filename) do
-    Path.join(@doc_root, to_string(project.id), filename)
+    project_path(project)
+    |> Path.join(filename)
   end
 
 end

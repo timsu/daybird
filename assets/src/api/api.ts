@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 import { config, OAuthProvider } from '@/config'
-import { AuthToken, AuthTokenPair, Team, User } from '@/models'
+import { AuthToken, AuthTokenPair, Project, Team, User } from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
 import * as R from './types'
@@ -213,6 +213,41 @@ class APIService {
 
   async createProject(name: string): Promise<R.ProjectResponse> {
     const response = await this.axios.post(`${this.endpoint}/projects`, { name })
+    return response.data
+  }
+
+  // files
+
+  async listFiles(project: Project): Promise<R.FilesResponse> {
+    const response = await this.axios.get(`${this.endpoint}/files?project_id=${project.id}`)
+    return response.data
+  }
+
+  async createFolder(project: Project, name: string): Promise<R.ProjectResponse> {
+    const response = await this.axios.post(
+      `${this.endpoint}/files/folder?project_id=${project.id}`,
+      { name }
+    )
+    return response.data
+  }
+
+  async readFile(project: Project, filename: string): Promise<R.FilesResponse> {
+    const encodedName = encodeURIComponent(filename)
+    const response = await this.axios.get(
+      `${this.endpoint}/files?project_id=${project.id}&filename=${encodedName}`
+    )
+    return response.data
+  }
+
+  async writeFile(project: Project, filename: string, contents: any): Promise<R.ProjectResponse> {
+    const encodedName = encodeURIComponent(filename)
+    const response = await this.axios.post(
+      `${this.endpoint}/files/folder?project_id=${project.id}`,
+      {
+        filename: encodedName,
+        contents,
+      }
+    )
     return response.data
   }
 

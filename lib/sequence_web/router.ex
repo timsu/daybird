@@ -84,6 +84,11 @@ defmodule SequenceWeb.Router do
 
     resources "/projects", ProjectsController
 
+    get "/files", DocsController, :list_files
+    post "/files/folder", DocsController, :create_folder
+    get "/doc", DocsController, :get_doc
+    post "/doc", DocsController, :save_doc
+
     resources "/teams", TeamsController
 
     get "/domain_info", TeamsController, :domain_info

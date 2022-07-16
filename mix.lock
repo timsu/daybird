@@ -87,4 +87,5 @@
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.7.0", "bc84380c9ab48177092f43ac89e4dfa2c6d62b40b8bd132b1059ecc7232f9a78", [:rebar3], [], "hexpm", "25eee6d67df61960cf6a794239566599b09e17e668d3700247bc498638152521"},
   "uri_query": {:hex, :uri_query, "0.1.2", "ae35b83b472f3568c2c159eee3f3ccf585375d8a94fb5382db1ea3589e75c3b4", [:mix], [], "hexpm", "e3bc81816c98502c36498b9b2f239b89c71ce5eadfff7ceb2d6c0a2e6ae2ea0c"},
   "uuid": {:hex, :uuid, "1.1.8", "e22fc04499de0de3ed1116b770c7737779f226ceefa0badb3592e64d5cfb4eb9", [:mix], [], "hexpm", "c790593b4c3b601f5dc2378baae7efaf5b3d73c4c6456ba85759905be792f2ac"},
+  "xfile": {:hex, :xfile, "0.4.0", "d7e092d70b9e4d6f16ca5bcdbcb129f0a31ea4dc0085c064395bd625d8009488", [:mix], [], "hexpm", "8b4fac75bdd3b97cf06e94de1826ca97a514e271bc2992234e2d252126bf24ab"},
 }

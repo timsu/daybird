@@ -32,3 +32,7 @@ export type ProjectsResponse = {
 export type ProjectResponse = {
   project: Project
 }
+
+export type FilesResponse = {
+  files: string[]
+}
