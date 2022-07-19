@@ -1,7 +1,7 @@
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
 import Button from '@/components/core/Button'
-import NewProjectModal from '@/screens/app/NewProjectModal'
+import NewProjectModal from '@/components/modals/NewProjectModal'
 import NoProjects from '@/screens/app/NoProjects'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -14,6 +14,10 @@ type Props = {
 }
 export default ({ id }: Props) => {
   const project = useStore(projectStore.projectMap)[id || '']
+
+  useEffect(() => {
+    if (project) projectStore.setCurrentProject(project)
+  }, [project?.id])
 
   if (!project) return null
 

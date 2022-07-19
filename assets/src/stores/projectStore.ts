@@ -3,6 +3,7 @@ import { action, atom, map } from 'nanostores'
 import { API } from '@/api'
 import { config } from '@/config'
 import { Project, User } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { logger } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
@@ -35,6 +36,17 @@ class ProjectStore {
         currentProject = projects.find((p) => p.id == lastProjectId)
       }
       store.set(currentProject)
+    }
+  )
+
+  setCurrentProject = action(
+    this.currentProject,
+    'setCurrentProject',
+    (store, project: Project) => {
+      if (store.get()?.id != project.id) {
+        store.set(project)
+        authStore.updateUser({ meta: { lp: project.id } })
+      }
     }
   )
 

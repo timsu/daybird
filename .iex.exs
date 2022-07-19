@@ -2,7 +2,7 @@
 Logger.configure(level: :info)
 
 # global aliases
-alias Sequence.{Auth, Invites, Repo, Teams, Users, Utils, Docs}
+alias Sequence.{Auth, Invites, Repo, Teams, Users, Utils, Docs, Projects}
 import Ecto.Query
 
 # color formatting

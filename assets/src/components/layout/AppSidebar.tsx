@@ -69,12 +69,12 @@ function Links() {
     <nav className="px-2 py-4 space-y-1">
       {navigation.map((item) => (
         <Match path={item.href}>
-          {({ matches }: { matches: boolean }) => (
+          {({ matches, url }: { matches: boolean; url: string }) => (
             <a
               key={item.name}
               href={item.href}
               className={classNames(
-                matches
+                url == item.href
                   ? 'bg-gray-900 text-white'
                   : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                 'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
@@ -83,7 +83,7 @@ function Links() {
             >
               {item.href == paths.PROJECTS && (
                 <ProjectExpandCheck
-                  active={matches}
+                  url={url}
                   expanded={projectsExpanded}
                   setExpanded={setProjectsExpanded}
                 />
@@ -91,7 +91,7 @@ function Links() {
               {item.icon && (
                 <item.icon
                   className={classNames(
-                    matches ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
+                    url == item.href ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
                     'mr-3 flex-shrink-0 h-6 w-6'
                   )}
                   aria-hidden="true"
@@ -107,17 +107,18 @@ function Links() {
 }
 
 function ProjectExpandCheck({
-  active,
+  url,
   expanded,
   setExpanded,
 }: {
-  active: boolean
+  url: string
   expanded: boolean
   setExpanded: (b: boolean) => void
 }) {
   useEffect(() => {
+    const active = url.startsWith(paths.PROJECTS)
     if (active != expanded) setExpanded(active)
-  }, [active, expanded])
+  }, [url, expanded])
   return null
 }
 

@@ -49,7 +49,11 @@ defmodule Sequence.Docs do
 
   def write_doc(project, name, contents) do
     filepath = file_path(project, name)
-    File.write(filepath, contents)
+    path = Path.dirname(filepath)
+
+    with :ok <- mkdir_if_needed(path) do
+      File.write(filepath, contents)
+    end
   end
 
   ### helpers
@@ -64,7 +68,7 @@ defmodule Sequence.Docs do
   def mkdir_if_needed(path) do
     case File.dir?(path) do
       true -> :ok
-      false -> File.mkdir(path)
+      false -> File.mkdir_p(path)
     end
   end
 

@@ -14,7 +14,6 @@ export default () => {
       {files.map((item) => {
         if (item.type == 'doc') {
           const href = paths.DOC + '/' + item.path
-          console.log(href)
           return (
             <Match path={href}>
               {({ url }: { url: string }) => {

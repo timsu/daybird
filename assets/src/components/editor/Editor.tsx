@@ -4,6 +4,7 @@ import './quill-style.css'
 import { useEffect, useRef } from 'preact/hooks'
 import Quill from 'quill'
 import Delta from 'quill-delta'
+import { text } from 'stream/consumers'
 
 import { config } from '@/config'
 import { debounce, DebounceStyle } from '@/utils'
@@ -18,7 +19,6 @@ const SAVE_INTERVAL = 5_000
 
 export default ({ filename, contents, saveContents }: Props) => {
   const quillRef = useRef<Quill>()
-  const textChangeHandler = useRef<() => void>()
   const currentFile = useRef<string>()
   const isDirty = useRef<boolean>()
 
@@ -36,16 +36,10 @@ export default ({ filename, contents, saveContents }: Props) => {
     const quill = quillRef.current
     if (!quill || !filename) return
 
-    // clear existing text change handler. invoke one last time if dirty
-    if (textChangeHandler.current) {
-      if (isDirty.current) saveContents(currentFile.current!, quill.getContents())
-      quillRef.current?.off('text-change', textChangeHandler.current)
-    }
-
     quill.setContents(contents)
     currentFile.current = filename
     isDirty.current = false
-    textChangeHandler.current = () => {
+    const textChangeHandler = () => {
       isDirty.current = true
       debounce(
         'quill-' + filename,
@@ -57,12 +51,16 @@ export default ({ filename, contents, saveContents }: Props) => {
         DebounceStyle.RESET_ON_NEW
       )
     }
-    quill.on('text-change', textChangeHandler.current)
+    quill.on('text-change', textChangeHandler)
     window.onbeforeunload = () => {
       if (isDirty.current) saveContents(filename, quill.getContents())
     }
 
-    return () => (window.onbeforeunload = null)
+    return () => {
+      quill.off('text-change', textChangeHandler)
+      if (isDirty.current) saveContents(filename, quill.getContents())
+      window.onbeforeunload = null
+    }
   }, [contents])
 
   return <div id="editor" class="max-w-2xl mx-auto h-full py-8 px-4" />

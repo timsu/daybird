@@ -24,6 +24,7 @@ class FileStore {
   })
 
   loadFiles = async (project: Project) => {
+    this.updateFiles([])
     const response = await API.listFiles(project)
     const files: File[] = response.files.map((filename) => {
       const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'
@@ -34,7 +35,7 @@ class FileStore {
         depth: 0,
       }
     })
-    logger.info('FILES - loaded files', files)
+    logger.info('FILES - loaded files for project', project.name, files)
     this.updateFiles(files)
   }
 
@@ -43,7 +44,7 @@ class FileStore {
     assertIsDefined(project, 'project is defined')
 
     const path = name.endsWith(DOC_EXT) ? name : name + DOC_EXT
-    API.writeFile(project, path, '')
+    await API.writeFile(project, path, '')
     logger.info('FILES - new file', name)
     const file: File = { name, path, type: 'doc', depth: 0 }
     this.files.set([...this.files.get(), file])
@@ -60,5 +61,5 @@ onMount(fileStore.files, () => {
     if (!project) return
     fileStore.loadFiles(project)
   })
-  return unsub()
+  return () => unsub()
 })

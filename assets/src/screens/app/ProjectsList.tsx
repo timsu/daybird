@@ -62,7 +62,7 @@ function ProjectList({ projects }: { projects: Project[] }) {
 
   return (
     <div>
-      <ul role="list" className="grid grid-cols-1 gap-5 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <ul role="list" className="grid grid-cols-2 gap-5 sm:gap-6">
         {projectItems.map((project) => (
           <a href={project.href}>
             <li key={project.name} className="col-span-1 flex shadow-sm rounded-md">
