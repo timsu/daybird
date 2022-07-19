@@ -1,7 +1,7 @@
 import Button from '@/components/core/Button'
+import NewProjectModal from '@/components/modals/NewProjectModal'
 import { paths } from '@/config'
 import { Project } from '@/models'
-import NewProjectModal from '@/screens/app/NewProjectModal'
 import NoProjects from '@/screens/app/NoProjects'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -17,7 +17,7 @@ export default (props: Props) => {
 
   return (
     <div className="py-6">
-      <div className="px-4 sm:px-6 md:px-8">
+      <div className="px-4 sm:px-6 hover:bg-white md:px-8 mt-4">
         <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
       </div>
 

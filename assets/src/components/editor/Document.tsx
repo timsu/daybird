@@ -14,9 +14,9 @@ export default ({ filename }: { filename: string | undefined }) => {
     if (filename) docStore.loadDoc(filename)
   }, [filename])
 
-  const saveContents = (contents: Delta) => {
-    docStore.saveDoc(contents)
+  const saveContents = (filename: string, contents: Delta) => {
+    docStore.saveDoc(filename, contents)
   }
 
-  return <Editor contents={contents} saveContents={saveContents} />
+  return <Editor filename={filename} contents={contents} saveContents={saveContents} />
 }

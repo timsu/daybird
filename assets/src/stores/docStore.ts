@@ -46,13 +46,11 @@ class DocStore {
     }
   }
 
-  saveDoc = async (contents: Delta) => {
-    logger.info('DOCS - saving doc')
+  saveDoc = async (filename: string, contents: Delta) => {
+    logger.info('DOCS - saving doc', filename, contents)
     try {
       const project = projectStore.currentProject.get()
-      const filename = this.filename.get()
       assertIsDefined(project, 'project is defined')
-      assertIsDefined(filename, 'filename is defined')
       await API.writeFile(project, filename, contents)
     } catch (e) {
       this.docError.set(unwrapError(e))

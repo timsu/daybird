@@ -53,3 +53,18 @@ export function unwrapError(error: any, defaultMessage?: string) {
     return defaultMessage
   }
 }
+
+const SHORTWORDS =
+  /^(and|as|but|for|if|nor|or|so|yet|a|an|the|as|at|by|for|in|of|off|on|per|to|up|via)$/i
+
+/** for titles */
+export function toTitleCase(str: string, delim?: string) {
+  const title = str.replace(/\w\S*/g, function (txt) {
+    if (txt.match(SHORTWORDS)) {
+      return txt.toLowerCase()
+    } else {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    }
+  })
+  return title.charAt(0).toUpperCase() + title.substr(1)
+}

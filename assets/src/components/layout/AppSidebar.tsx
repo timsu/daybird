@@ -4,11 +4,17 @@ import { useEffect, useState } from 'preact/hooks'
 
 import { isTokenExpired } from '@/api'
 import LogoDark from '@/components/core/LogoDark'
+import Pressable from '@/components/core/Pressable'
+import Tooltip from '@/components/core/Tooltip'
 import FileTree from '@/components/layout/FileTree'
+import NewFileModal from '@/components/modals/NewFileModal'
 import { paths } from '@/config'
+import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
-import { BriefcaseIcon, DocumentIcon, FolderIcon, HomeIcon } from '@heroicons/react/outline'
+import {
+    BriefcaseIcon, DocumentAddIcon, DocumentIcon, FolderAddIcon, FolderIcon, HomeIcon, PlusIcon
+} from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type NavItem = {
@@ -19,8 +25,6 @@ type NavItem = {
 }
 
 export default ({ darkHeader }: { darkHeader?: boolean }) => {
-  const project = useStore(projectStore.currentProject)
-
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-gray-800">
       <div
@@ -33,15 +37,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
       </div>
       <div className="flex-1 flex flex-col overflow-y-auto">
         <Links />
-        {project && (
-          <>
-            <div class="border-t border-t-gray-500 p-4 text-gray-400 font-semibold text-sm">
-              {project.name.toUpperCase()}
-            </div>
-
-            <FileTree />
-          </>
-        )}
+        <CurrentProject />
       </div>
     </div>
   )
@@ -123,4 +119,36 @@ function ProjectExpandCheck({
     if (active != expanded) setExpanded(active)
   }, [active, expanded])
   return null
+}
+
+function CurrentProject() {
+  const project = useStore(projectStore.currentProject)
+
+  if (!project) return null
+
+  const onNewFile = () => {
+    modalStore.newFileModal.set('file')
+  }
+
+  const onNewFolder = () => {
+    modalStore.newFileModal.set('folder')
+  }
+
+  return (
+    <>
+      <div class="border-t border-t-gray-500 p-4 flex flex-row items-center text-gray-400 font-semibold text-sm">
+        <div class="mr-1">{project.name.toUpperCase()}</div>
+        <Pressable tooltip="New File" onClick={onNewFile}>
+          <DocumentAddIcon class="h-4 w-4" />
+        </Pressable>
+        <div class="mr-1" />
+        <Pressable tooltip="New Folder" onClick={onNewFolder}>
+          <FolderAddIcon class="h-4 w-4" />
+        </Pressable>
+      </div>
+
+      <FileTree />
+      <NewFileModal />
+    </>
+  )
 }

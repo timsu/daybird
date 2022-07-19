@@ -1,11 +1,12 @@
 import { action, atom, map, onMount } from 'nanostores'
+import { route } from 'preact-router'
 
 import { API } from '@/api'
-import { config, File, FileType } from '@/config'
+import { config, File, FileType, paths } from '@/config'
 import { Project } from '@/models'
 import { projectStore } from '@/stores/projectStore'
 // import { projectStore } from '@/stores/projectStore'
-import { logger } from '@/utils'
+import { assertIsDefined, logger } from '@/utils'
 
 const DOC_EXT = '.delta'
 
@@ -35,6 +36,19 @@ class FileStore {
     })
     logger.info('FILES - loaded files', files)
     this.updateFiles(files)
+  }
+
+  newFile = async (name: string) => {
+    const project = projectStore.currentProject.get()
+    assertIsDefined(project, 'project is defined')
+
+    const path = name.endsWith(DOC_EXT) ? name : name + DOC_EXT
+    API.writeFile(project, path, '')
+    logger.info('FILES - new file', name)
+    const file: File = { name, path, type: 'doc', depth: 0 }
+    this.files.set([...this.files.get(), file])
+
+    route(paths.DOC + '/' + path)
   }
 }
 
