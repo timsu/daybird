@@ -1,7 +1,7 @@
 defmodule SequenceWeb.DocChannel do
   use Phoenix.Channel
 
-  alias Sequence.Document
+  alias Sequence.{Cache, Document, DocRegistry}
 
   @cache_table :docdata
 
@@ -31,7 +31,7 @@ defmodule SequenceWeb.DocChannel do
     {:reply, {:ok, %{ contents: contents }}, socket}
   end
 
-  def handle_in("delta", %{ "version" => version, "delta" => delta }, socket) do
+  def handle_in("delta", %{ "version" => _version, "delta" => delta }, socket) do
     {:ok, pid} = DocRegistry.load_doc(filename(socket))
 
     # TODO: do operational transform
@@ -69,12 +69,12 @@ defmodule SequenceWeb.DocChannel do
 
   defp cache_key(socket, type), do: "#{filename(socket)}:#{type}"
 
-  defp put_cache(socket, type, data) do
-    key = cache_key(socket, type)
-    map = (Cache.get(@cache_table, key) || %{})
-    |> Map.put(client_id(socket), data)
-    Cache.set(@cache_table, key, map)
-  end
+  # defp put_cache(socket, type, data) do
+  #   key = cache_key(socket, type)
+  #   map = (Cache.get(@cache_table, key) || %{})
+  #   |> Map.put(client_id(socket), data)
+  #   Cache.set(@cache_table, key, map)
+  # end
 
   defp send_cache(socket, type) do
     key = cache_key(socket, type)

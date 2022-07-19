@@ -9,11 +9,13 @@ import Tooltip from '@/components/core/Tooltip'
 import FileTree from '@/components/layout/FileTree'
 import NewFileModal from '@/components/modals/NewFileModal'
 import { paths } from '@/config'
+import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
 import {
-    BriefcaseIcon, DocumentAddIcon, DocumentIcon, FolderAddIcon, FolderIcon, HomeIcon, PlusIcon
+    BriefcaseIcon, CalendarIcon, DocumentAddIcon, DocumentIcon, FolderAddIcon, FolderIcon, HomeIcon,
+    PlusIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -127,13 +129,9 @@ function CurrentProject() {
 
   if (!project) return null
 
-  const onNewFile = () => {
-    modalStore.newFileModal.set('file')
-  }
-
-  const onNewFolder = () => {
-    modalStore.newFileModal.set('folder')
-  }
+  const onNewFile = () => modalStore.newFileModal.set('file')
+  const onNewFolder = () => modalStore.newFileModal.set('folder')
+  const onNewDailyFile = () => fileStore.newDailyFile()
 
   return (
     <>
@@ -143,9 +141,12 @@ function CurrentProject() {
           <DocumentAddIcon class="h-4 w-4" />
         </Pressable>
         <div class="mr-1" />
-        <Pressable tooltip="New Folder" onClick={onNewFolder}>
-          <FolderAddIcon class="h-4 w-4" />
+        <Pressable tooltip="New File with Today's Date" onClick={onNewDailyFile}>
+          <CalendarIcon class="h-4 w-4" />
         </Pressable>
+        {/* <Pressable tooltip="New Folder" onClick={onNewFolder}>
+          <FolderAddIcon class="h-4 w-4" />
+        </Pressable> */}
       </div>
 
       <FileTree />

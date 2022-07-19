@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { action, atom, map, onMount } from 'nanostores'
 import { route } from 'preact-router'
 
@@ -50,6 +51,11 @@ class FileStore {
     this.files.set([...this.files.get(), file])
 
     route(paths.DOC + '/' + path)
+  }
+
+  newDailyFile = async () => {
+    const name = moment().format('YYYY-MM-DD')
+    console.log(name)
   }
 }
 

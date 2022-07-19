@@ -2,10 +2,12 @@ import { RenderableProps } from 'preact'
 
 export default ({
   tooltip,
+  tooltipWidth,
   onClick,
   children,
 }: RenderableProps<{
   tooltip?: string
+  tooltipWidth?: number
   onClick: (e: MouseEvent) => void
 }>) => {
   return (
@@ -15,7 +17,10 @@ export default ({
     >
       {children}
       {tooltip && (
-        <div className="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex min-w-[75px]">
+        <div
+          className="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex"
+          style={{ minWidth: tooltipWidth || 75 }}
+        >
           <span
             className="relative z-10 p-2 text-xs leading-none text-white whitespace-no-wrap
             font-normal bg-black shadow-lg rounded-md"

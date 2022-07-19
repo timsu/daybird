@@ -17,7 +17,7 @@
     "phoenix": "../deps/phoenix",
     "preact": "^10.5.15",
     "preact-router": "^4.1.0",
-    "quill": "https://github.com/quilljs/quill.git#master",
+    "quill": "https://github.com/timsu/quill.git#develop",
     "quill-delta": "^5.0.0"
   },
   "devDependencies": {

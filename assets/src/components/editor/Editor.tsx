@@ -1,5 +1,5 @@
 import 'quill/dist/quill.bubble.css'
-import './quill-style.css'
+import './quill.sequence.css'
 
 import { useEffect, useRef } from 'preact/hooks'
 import Quill from 'quill'
