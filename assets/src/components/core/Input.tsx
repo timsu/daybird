@@ -5,7 +5,7 @@ type Props = {
 export default (props: Props) => {
   const { label, ...rest } = props
   return (
-    <div>
+    <div className="mb-2">
       <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
         {label}
       </label>

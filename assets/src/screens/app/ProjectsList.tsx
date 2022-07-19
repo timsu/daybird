@@ -54,7 +54,7 @@ const COLORS = ['bg-pink-600', 'bg-blue-600', 'bg-purple-600', 'bg-yellow-500', 
 function ProjectList({ projects }: { projects: Project[] }) {
   const projectItems: ProjectItem[] = projects.map((p, i) => ({
     name: p.name,
-    initials: makeInitials(p.name),
+    initials: p.shortcode,
     href: paths.PROJECTS + '/' + p.id,
     members: 1,
     bgColor: COLORS[i % COLORS.length],

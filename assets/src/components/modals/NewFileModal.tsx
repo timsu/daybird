@@ -45,7 +45,7 @@ export default () => {
   }
 
   return (
-    <Modal open={!!open}>
+    <Modal open={!!open} close={close}>
       <form onSubmit={submit}>
         <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
           <PlusIcon className="h-6 w-6 text-green-600" aria-hidden="true" />

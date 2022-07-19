@@ -57,8 +57,8 @@ class ProjectStore {
     store.set(projectMap)
   })
 
-  createProject = action(this.projects, 'createProject', async (store, name: string) => {
-    const response = await API.createProject(name)
+  createProject = action(this.projects, 'createProject', async (store, attrs: Partial<Project>) => {
+    const response = await API.createProject(attrs)
     logger.info('PROJECTS - create', response)
     const project = Project.fromJSON(response.project)
     const projects = [...store.get(), project]

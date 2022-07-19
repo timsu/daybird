@@ -211,8 +211,8 @@ class APIService {
     return response.data
   }
 
-  async createProject(name: string): Promise<R.ProjectResponse> {
-    const response = await this.axios.post(`${this.endpoint}/projects`, { name })
+  async createProject(project: Partial<Project>): Promise<R.ProjectResponse> {
+    const response = await this.axios.post(`${this.endpoint}/projects`, project)
     return response.data
   }
 

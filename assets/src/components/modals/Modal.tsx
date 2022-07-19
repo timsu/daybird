@@ -4,9 +4,10 @@ import { Dialog, Transition } from '@headlessui/react'
 
 type Props = {
   open: boolean
+  close: () => void
 }
 
-export default ({ open, children }: RenderableProps<Props>) => {
+export default ({ open, close, children }: RenderableProps<Props>) => {
   if (!open) return null
 
   return (

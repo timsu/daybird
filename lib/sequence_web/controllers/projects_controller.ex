@@ -26,9 +26,12 @@ defmodule SequenceWeb.ProjectsController do
   end
 
   # POST /projects
-  def create(conn, %{ "name" => name } = _params) do
+  def create(conn, %{ "name" => name, "shortcode" => shortcode } = _params) do
     with user <- Guardian.Plug.current_resource(conn),
-         {:ok, project} <- Projects.create_project(%{ name: name, creator_id: user.id }) do
+         attrs <- %{
+          name: name, creator_id: user.id, shortcode: shortcode
+         },
+         {:ok, project} <- Projects.create_project(attrs) do
 
       Projects.join_project(user, project, "admin")
 

@@ -6,6 +6,7 @@ defmodule SequenceWeb.ProjectsView do
     %{
       id: project.uuid,
       name: project.name,
+      shortcode: project.shortcode
     }
   end
 
