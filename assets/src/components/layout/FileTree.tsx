@@ -1,4 +1,5 @@
 import Match from 'preact-router/match'
+import { CSSTransition, TransitionGroup } from 'preact-transitioning'
 
 import { paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
@@ -15,7 +16,7 @@ export default () => {
         if (item.type == 'doc') {
           const href = paths.DOC + '/' + item.path
           return (
-            <Match path={href}>
+            <Match key={item.path} path={href}>
               {({ url }: { url: string }) => {
                 const matches = url == href
                 return (
@@ -26,7 +27,7 @@ export default () => {
                       matches
                         ? 'bg-gray-900 text-white'
                         : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
+                      'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
                     )}
                     style={{ marginLeft: item.depth * 20 }}
                   >
@@ -39,8 +40,8 @@ export default () => {
         } else if (item.type == 'folder') {
           return (
             <div
-              key={item.name}
-              className="text-gray-300 hover:bg-gray-700 hover:text-white group flex items-center px-2 py-2 text-sm font-medium rounded-md"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
+                    items-center px-2 py-2 text-sm font-medium rounded-md transition-all"
               style={{ marginLeft: item.depth * 20 }}
             >
               <FolderIcon

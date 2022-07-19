@@ -25,7 +25,6 @@ class FileStore {
   })
 
   loadFiles = async (project: Project) => {
-    this.updateFiles([])
     const response = await API.listFiles(project)
     const files: File[] = response.files.map((filename) => {
       const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'

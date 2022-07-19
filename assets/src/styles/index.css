@@ -10,3 +10,13 @@ body,
   padding: 0;
   margin: 0;
 }
+
+.fade-appear { opacity: 0 }
+.fade-appear-active { opacity: 1 }
+.fade-appear-done { opacity: 1 }
+.fade-enter { opacity: 0 }
+.fade-enter-active { opacity: 1 }
+.fade-enter-done { opacity: 1 }
+.fade-exit { opacity: 1 }
+.fade-exit-active { opacity: 0 }
+.fade-exit-done { opacity: 0 }
