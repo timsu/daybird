@@ -1,6 +1,8 @@
 import { JSX } from 'preact'
 import Match from 'preact-router/match'
+import { useEffect, useState } from 'preact/hooks'
 
+import { isTokenExpired } from '@/api'
 import LogoDark from '@/components/core/LogoDark'
 import FileTree from '@/components/layout/FileTree'
 import { paths } from '@/config'
@@ -46,23 +48,26 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
 }
 
 function Links() {
-  const projects = useStore(projectStore.projects)
+  const [projectsExpanded, setProjectsExpanded] = useState(location.pathname == paths.PROJECTS)
 
-  const projectItems: NavItem[] = projects.map((p) => ({
-    name: p.name!,
-    href: paths.PROJECTS + '/' + p.id,
-    indent: 35,
-  }))
-
-  const navigation: NavItem[] = [
+  let navigation: NavItem[] = [
     { name: 'Dashboard', href: paths.APP, icon: HomeIcon },
     {
       name: 'Projects',
       href: paths.PROJECTS,
       icon: BriefcaseIcon,
     },
-    ...projectItems,
   ]
+
+  if (projectsExpanded) {
+    const projects = useStore(projectStore.projects)
+    const projectItems: NavItem[] = projects.map((p) => ({
+      name: p.name!,
+      href: paths.PROJECTS + '/' + p.id,
+      indent: 35,
+    }))
+    navigation = [...navigation, ...projectItems]
+  }
 
   return (
     <nav className="px-2 py-4 space-y-1">
@@ -80,6 +85,13 @@ function Links() {
               )}
               style={{ marginLeft: item.indent }}
             >
+              {item.href == paths.PROJECTS && (
+                <ProjectExpandCheck
+                  active={matches}
+                  expanded={projectsExpanded}
+                  setExpanded={setProjectsExpanded}
+                />
+              )}
               {item.icon && (
                 <item.icon
                   className={classNames(
@@ -96,4 +108,19 @@ function Links() {
       ))}
     </nav>
   )
+}
+
+function ProjectExpandCheck({
+  active,
+  expanded,
+  setExpanded,
+}: {
+  active: boolean
+  expanded: boolean
+  setExpanded: (b: boolean) => void
+}) {
+  useEffect(() => {
+    if (active != expanded) setExpanded(active)
+  }, [active, expanded])
+  return null
 }
