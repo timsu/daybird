@@ -7,14 +7,14 @@ import { classNames } from '@/utils'
 import { FolderIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
-export default () => {
+export default ({ projectId }: { projectId: string }) => {
   const files = useStore(fileStore.files)
 
   return (
     <nav className="flex-1 px-2 space-y-1">
       {files.map((item) => {
         if (item.type == 'doc') {
-          const href = paths.DOC + '/' + item.path
+          const href = `${paths.DOC}/${projectId}/${item.path}`
           return (
             <Match key={item.path} path={href}>
               {({ url }: { url: string }) => {

@@ -7,17 +7,19 @@ import Delta from 'quill-delta'
 import { text } from 'stream/consumers'
 
 import { config } from '@/config'
+import { Project } from '@/models'
 import { debounce, DebounceStyle } from '@/utils'
 
 type Props = {
+  project: Project
   filename?: string
   contents: Delta
-  saveContents: (filename: string, contents: Delta) => void
+  saveContents: (project: Project, filename: string, contents: Delta) => void
 }
 
 const SAVE_INTERVAL = 5_000
 
-export default ({ filename, contents, saveContents }: Props) => {
+export default ({ project, filename, contents, saveContents }: Props) => {
   const quillRef = useRef<Quill>()
   const currentFile = useRef<string>()
   const isDirty = useRef<boolean>()
@@ -45,7 +47,7 @@ export default ({ filename, contents, saveContents }: Props) => {
         'quill-' + filename,
         () => {
           if (filename != currentFile.current) return
-          saveContents(filename, quill.getContents())
+          saveContents(project, filename, quill.getContents())
         },
         SAVE_INTERVAL,
         DebounceStyle.RESET_ON_NEW
@@ -53,12 +55,12 @@ export default ({ filename, contents, saveContents }: Props) => {
     }
     quill.on('text-change', textChangeHandler)
     window.onbeforeunload = () => {
-      if (isDirty.current) saveContents(filename, quill.getContents())
+      if (isDirty.current) saveContents(project, filename, quill.getContents())
     }
 
     return () => {
       quill.off('text-change', textChangeHandler)
-      if (isDirty.current) saveContents(filename, quill.getContents())
+      if (isDirty.current) saveContents(project, filename, quill.getContents())
       window.onbeforeunload = null
     }
   }, [contents])

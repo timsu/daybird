@@ -11,6 +11,6 @@ export default () => (
     <Dashboard path={paths.APP} />
     <ProjectsList path={paths.PROJECTS} />
     <ProjectView path={paths.PROJECTS + '/:id'} />
-    <DocScreen path={paths.DOC + '/:filename'} />
+    <DocScreen path={paths.DOC + '/:projectId/:filename'} />
   </Router>
 )

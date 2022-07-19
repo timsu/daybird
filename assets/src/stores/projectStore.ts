@@ -43,10 +43,17 @@ class ProjectStore {
   setCurrentProject = action(
     this.currentProject,
     'setCurrentProject',
-    (store, project: Project) => {
-      if (store.get()?.id != project.id) {
-        store.set(project)
-        authStore.updateUser({ meta: { lp: project.id } })
+    (store, projectOrId: Project | string) => {
+      const projectId = typeof projectOrId == 'string' ? projectOrId : projectOrId.id
+
+      if (store.get()?.id != projectId) {
+        const project = this.projects.get().find((p) => p.id == projectId)
+        if (project) {
+          store.set(project)
+          authStore.updateUser({ meta: { lp: project.id } })
+
+          return project
+        }
       }
     }
   )

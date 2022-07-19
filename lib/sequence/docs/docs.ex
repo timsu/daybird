@@ -2,7 +2,7 @@ defmodule Sequence.Docs do
 
   @doc_root Application.get_env(:sequence, :docroot, "docs")
 
-  @extension ".delta"
+  @extension ".seq"
 
   # opts:
   #   recursive: boolean or integer (for recursion depth)

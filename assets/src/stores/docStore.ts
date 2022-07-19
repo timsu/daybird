@@ -25,7 +25,7 @@ class DocStore {
 
   docChannel?: Channel
 
-  loadDoc = async (filename: string) => {
+  loadDoc = async (project: Project, filename: string) => {
     if (this.docChannel) this.docChannel.leave()
 
     this.filename.set(filename)
@@ -35,8 +35,6 @@ class DocStore {
     // this.docChannel.join()
 
     try {
-      const project = projectStore.currentProject.get()
-      assertIsDefined(project, 'project is defined')
       const response = await API.readFile(project, filename)
       logger.info('DOCS - doc loaded', filename, response)
 
@@ -46,11 +44,9 @@ class DocStore {
     }
   }
 
-  saveDoc = async (filename: string, contents: Delta) => {
+  saveDoc = async (project: Project, filename: string, contents: Delta) => {
     logger.info('DOCS - saving doc', filename, contents)
     try {
-      const project = projectStore.currentProject.get()
-      assertIsDefined(project, 'project is defined')
       await API.writeFile(project, filename, contents)
     } catch (e) {
       this.docError.set(unwrapError(e))
