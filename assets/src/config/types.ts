@@ -12,3 +12,9 @@ export type File = {
   children?: File[]
   depth: number
 }
+
+export enum QuillSource {
+  API = 'api',
+  USER = 'user',
+  SILENT = 'silent',
+}

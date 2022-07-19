@@ -14,6 +14,7 @@
     "axios": "^0.27.2",
     "moment": "^2.29.4",
     "nanostores": "^0.5.12",
+    "parchment": "^2.0.1",
     "phoenix": "../deps/phoenix",
     "preact": "^10.5.15",
     "preact-router": "^4.1.0",
@@ -34,6 +35,7 @@
     "vite": "^2.9.9"
   },
   "resolutions": {
+    "parchment": "2.0.1",
     "quill-delta": "5.0.0"
   }
 }

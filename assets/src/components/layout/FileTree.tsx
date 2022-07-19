@@ -18,7 +18,7 @@ export default ({ projectId }: { projectId: string }) => {
           return (
             <Match key={item.path} path={href}>
               {({ url }: { url: string }) => {
-                const matches = url == href
+                const matches = url == encodeURI(href)
                 return (
                   <a
                     key={item.name}

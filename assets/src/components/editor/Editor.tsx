@@ -6,6 +6,7 @@ import Quill from 'quill'
 import Delta from 'quill-delta'
 import { text } from 'stream/consumers'
 
+import QuillConfig from '@/components/editor/QuillConfig'
 import { config } from '@/config'
 import { Project } from '@/models'
 import { debounce, DebounceStyle } from '@/utils'
@@ -27,6 +28,7 @@ export default ({ project, filename, contents, saveContents }: Props) => {
   useEffect(() => {
     const quill = new Quill('#editor', {
       theme: 'bubble',
+      modules: QuillConfig,
     })
     quillRef.current = quill
     if (config.dev) (window as any)['quill'] = quill
