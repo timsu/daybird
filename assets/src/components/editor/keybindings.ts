@@ -26,7 +26,7 @@ type Context = {
   format: string[] | { [format: string]: boolean | string }
 }
 
-type Keybinding = {
+export type Keybinding = {
   // what key to trigger on
   key: string | string[]
 

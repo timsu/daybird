@@ -1,86 +1,184 @@
 /**
- * https://github.com/SmallImprovements/
+ * https://github.com/visualjerk/quill-magic-url/blob/master/src/index.js
  */
-import Quill, { DeltaOperation } from 'quill'
+import normalizeUrl from 'normalize-url'
+import Quill from 'quill'
 import Delta from 'quill-delta'
 
-import { extractDocId, isDocLink } from './docLinkBlot'
-
-type Options = { paste?: boolean; type?: boolean }
-
-const DEFAULT_OPTIONS: Options = {
-  paste: true,
-  type: true,
+const defaults: Options = {
+  globalRegularExpression: /(https?:\/\/|www\.)[\w-\.]+\.[\w-\.]+(\/([\S]+)?)?/gi,
+  urlRegularExpression: /(https?:\/\/|www\.)[\w-\.]+\.[\w-\.]+(\/([\S]+)?)?/gi,
+  globalMailRegularExpression: /([\w-\.]+@[\w-\.]+\.[\w-\.]+)/gi,
+  mailRegularExpression: /([\w-\.]+@[\w-\.]+\.[\w-\.]+)/gi,
+  normalizeRegularExpression: /(https?:\/\/|www\.)[\S]+/i,
+  normalizeUrlOptions: {
+    stripWWW: false,
+  },
 }
 
-const REGEXP_GLOBAL = /https?:\/\/[^\s]+/g
-const REGEXP_WITH_PRECEDING_WS = /(?:\s|^)(https?:\/\/[^\s]+)/
-
-const sliceFromLastWhitespace = (str: string) => {
-  const whitespaceI = str.lastIndexOf(' ')
-  const sliceI = whitespaceI === -1 ? 0 : whitespaceI + 1
-  return str.slice(sliceI)
-}
-function registerTypeListener(quill: Quill) {
-  quill.keyboard.addBinding(
-    { key: ' ' },
-    {
-      collapsed: true,
-      prefix: REGEXP_WITH_PRECEDING_WS,
-    },
-    (range, context) => {
-      const url = sliceFromLastWhitespace(context.prefix)
-      const retain = range.index - url.length
-      const ops: DeltaOperation[] = retain ? [{ retain }] : []
-      ops.push({ delete: url.length }, { insert: url, attributes: { link: url } })
-      quill.updateContents({ ops })
-      return true
-    }
-  )
+type Options = {
+  globalRegularExpression: RegExp
+  urlRegularExpression: RegExp
+  globalMailRegularExpression: RegExp
+  mailRegularExpression: RegExp
+  normalizeRegularExpression: RegExp
+  normalizeUrlOptions: {
+    stripWWW: boolean
+  }
 }
 
-function registerPasteListener(quill: Quill) {
-  quill.clipboard.addMatcher('A.doclink', (node: HTMLElement, delta) => {
-    if (node.children.length != 1) return new Delta()
-    return delta
-  })
-  quill.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
-    if (typeof node.data !== 'string') {
+type Normalizer = (url: string) => string
+
+export default class MagicUrl {
+  quill: Quill
+  options: Options
+
+  urlNormalizer: Normalizer = (url: string) => this.normalize(url)
+  mailNormalizer: Normalizer = (mail: string) => `mailto:${mail}`
+
+  constructor(quill: Quill, options: Options) {
+    this.quill = quill
+    options = options || {}
+    this.options = { ...defaults, ...options }
+
+    this.registerTypeListener()
+    this.registerPasteListener()
+    this.registerBlurListener()
+  }
+  registerPasteListener() {
+    // Preserves existing links
+    this.quill.clipboard.addMatcher('A', (node, delta) => {
+      const href = node.getAttribute('href')
+      const attributes = delta.ops[0].attributes
+      if (attributes != null && attributes.link != null) {
+        attributes.link = href
+      }
+      return delta
+    })
+    this.quill.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => {
+      if (typeof node.data !== 'string') {
+        return
+      }
+      const urlRegExp = this.options.globalRegularExpression
+      const mailRegExp = this.options.globalMailRegularExpression
+      urlRegExp.lastIndex = 0
+      mailRegExp.lastIndex = 0
+      const newDelta = new Delta()
+      let index = 0
+      let urlResult = urlRegExp.exec(node.data)
+      let mailResult = mailRegExp.exec(node.data)
+      const handleMatch = (result: RegExpMatchArray, regExp: RegExp, normalizer: Normalizer) => {
+        const head = node.data.substring(index, result.index)
+        newDelta.insert(head)
+        const match = result[0]
+        newDelta.insert(match, { link: normalizer(match) })
+        index = regExp.lastIndex
+        return regExp.exec(node.data)
+      }
+      while (urlResult !== null || mailResult !== null) {
+        if (urlResult === null) {
+          mailResult = handleMatch(mailResult!, mailRegExp, this.mailNormalizer)
+        } else if (mailResult === null) {
+          urlResult = handleMatch(urlResult, urlRegExp, this.urlNormalizer)
+        } else if (mailResult.index <= urlResult.index) {
+          while (urlResult !== null && urlResult.index < mailRegExp.lastIndex) {
+            urlResult = urlRegExp.exec(node.data)
+          }
+          mailResult = handleMatch(mailResult, mailRegExp, this.mailNormalizer)
+        } else {
+          while (mailResult !== null && mailResult.index < urlRegExp.lastIndex) {
+            mailResult = mailRegExp.exec(node.data)
+          }
+          urlResult = handleMatch(urlResult, urlRegExp, this.urlNormalizer)
+        }
+      }
+      if (index > 0) {
+        const tail = node.data.substring(index)
+        newDelta.insert(tail)
+        delta.ops = newDelta.ops
+      }
+      return delta
+    })
+  }
+  registerTypeListener() {
+    this.quill.on('text-change', (delta) => {
+      const ops = delta.ops
+      // Only return true, if last operation includes whitespace inserts
+      // Equivalent to listening for enter, tab or space
+      if (!ops || ops.length < 1 || ops.length > 2) {
+        return
+      }
+      const lastOp = ops[ops.length - 1]
+      if (!lastOp.insert || typeof lastOp.insert !== 'string' || !lastOp.insert.match(/\s/)) {
+        return
+      }
+      this.checkTextForUrl(lastOp.insert.match(/ |\t/))
+    })
+  }
+  registerBlurListener() {
+    this.quill.root.addEventListener('blur', () => {
+      this.checkTextForUrl()
+    })
+  }
+  checkTextForUrl(triggeredByInlineWhitespace = false) {
+    const sel = this.quill.getSelection()
+    if (!sel) {
       return
     }
-    const matches = (node.data as string).match(REGEXP_GLOBAL)
-    if (matches && matches.length > 0) {
-      const ops = []
-      let str = node.data
-      matches.forEach((match) => {
-        const split = str.split(match)
-        const beforeLink = split.shift()
-        ops.push({ insert: beforeLink })
+    const [leaf] = this.quill.getLeaf(sel.index)
+    const leafIndex = this.quill.getIndex(leaf)
 
-        if (isDocLink(match)) {
-          ops.push({ insert: { doclink: extractDocId(match) } })
-        } else {
-          ops.push({ insert: match, attributes: { link: match } })
-        }
-        str = split.join(match)
-      })
-      ops.push({ insert: str })
-      delta.ops = ops
+    if (!leaf.text) {
+      return
     }
 
-    return delta
-  })
-}
-
-export default class AutoLinks {
-  constructor(quill: Quill, options = {}) {
-    const opts = { ...DEFAULT_OPTIONS, ...options }
-
-    if (opts.type) {
-      registerTypeListener(quill)
+    // We only care about the leaf until the current cursor position
+    const relevantLength = sel.index - leafIndex
+    const text = leaf.text.slice(0, relevantLength)
+    if (!text || leaf.parent.domNode.localName === 'a') {
+      return
     }
-    if (opts.paste) {
-      registerPasteListener(quill)
+
+    const nextLetter = leaf.text[relevantLength]
+    // Do not proceed if we are in the middle of a word
+    if (nextLetter != null && nextLetter.match(/\S/)) {
+      return
     }
+
+    const bailOutEndingRegex = triggeredByInlineWhitespace ? /\s\s$/ : /\s$/
+    if (text.match(bailOutEndingRegex)) {
+      return
+    }
+
+    const urlMatches = text.match(this.options.urlRegularExpression)
+    const mailMatches = text.match(this.options.mailRegularExpression)
+    if (urlMatches) {
+      this.handleMatches(leafIndex, text, urlMatches, this.urlNormalizer)
+    } else if (mailMatches) {
+      this.handleMatches(leafIndex, text, mailMatches, this.mailNormalizer)
+    }
+  }
+  handleMatches(leafIndex: number, text: string, matches: string[], normalizer: Normalizer) {
+    const match = matches.pop()!
+    const matchIndex = text.lastIndexOf(match)
+    const after = text.split(match).pop()!
+    if (after.match(/\S/)) {
+      return
+    }
+    this.updateText(leafIndex + matchIndex, match.trim(), normalizer)
+  }
+  updateText(index: number, string: string, normalizer: Normalizer) {
+    const ops = new Delta().retain(index).retain(string.length, { link: normalizer(string) })
+    this.quill.updateContents(ops)
+  }
+  normalize(url: string) {
+    if (this.options.normalizeRegularExpression.test(url)) {
+      try {
+        return normalizeUrl(url, this.options.normalizeUrlOptions)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    return url
   }
 }

@@ -14,6 +14,7 @@
     "axios": "^0.27.2",
     "moment": "^2.29.4",
     "nanostores": "^0.5.12",
+    "normalize-url": "^7.0.3",
     "parchment": "^2.0.1",
     "phoenix": "../deps/phoenix",
     "preact": "^10.5.15",
