@@ -231,21 +231,27 @@ class APIService {
     return response.data
   }
 
-  async readFile(project: Project, filename: string): Promise<R.FilesResponse> {
+  async readFile(project: Project, filename: string): Promise<any> {
     const encodedName = encodeURIComponent(filename)
     const response = await this.axios.get(
-      `${this.endpoint}/files?project_id=${project.id}&filename=${encodedName}`
+      `${this.endpoint}/doc?project_id=${project.id}&filename=${encodedName}`
     )
     return response.data
   }
 
   async writeFile(project: Project, filename: string, contents: any): Promise<R.ProjectResponse> {
     const encodedName = encodeURIComponent(filename)
+
+    const data = new FormData()
+    data.append('contents', JSON.stringify(contents))
+
     const response = await this.axios.post(
-      `${this.endpoint}/files/folder?project_id=${project.id}`,
+      `${this.endpoint}/doc?project_id=${project.id}&filename=${encodedName}`,
+      data,
       {
-        filename: encodedName,
-        contents,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       }
     )
     return response.data

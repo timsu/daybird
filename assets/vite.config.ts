@@ -1,3 +1,4 @@
+import { execSync } from 'child_process'
 import path from 'path'
 import { defineConfig } from 'vite'
 
@@ -13,6 +14,11 @@ process.stdin.on('end', function () {
   process.exit(0)
 })
 process.stdin.resume()
+
+// load global variables
+
+const commitHash = execSync('git rev-parse HEAD').toString().trimEnd()
+process.env.VITE_GIT_HASH = commitHash
 
 // https://vitejs.dev/config/
 export default defineConfig({

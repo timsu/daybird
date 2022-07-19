@@ -1,4 +1,4 @@
-import Editor from '@/components/editor/Editor'
+import Document from '@/components/editor/Document'
 
 type Props = {
   path: string
@@ -6,6 +6,6 @@ type Props = {
 }
 export default (props: Props) => (
   <div class="grow bg-white h-full w-full">
-    <Editor filename={props.filename} />
+    <Document filename={props.filename} />
   </div>
 )

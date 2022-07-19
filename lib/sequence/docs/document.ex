@@ -1,4 +1,4 @@
-defmodule Document do
+defmodule Sequence.Document do
   use GenServer
 
   @initial_state %{
@@ -18,7 +18,7 @@ defmodule Document do
   # Public API
   # ----------
 
-  def start_link, do: GenServer.start_link(__MODULE__, :ok)
+  def start_link(filename), do: GenServer.start_link(__MODULE__, filename)
   def stop(pid),  do: GenServer.stop(pid)
 
   def update(pid, change), do: GenServer.call(pid, {:update, change})
@@ -32,7 +32,10 @@ defmodule Document do
 
   # Initialize the document with the default state
   @impl true
-  def init(:ok), do: {:ok, @initial_state}
+  def init(filename) do
+    state = Map.put(@initial_state, :filename, filename)
+    {:ok, state}
+  end
 
   # Apply a given change to the document, updating its contents
   # and incrementing the version
@@ -44,12 +47,13 @@ defmodule Document do
     inverted = Delta.invert(change, state.contents)
 
     state = %{
+      filename: state.filename,
       version: state.version + 1,
       contents: Delta.compose(state.contents, change),
       inverted_changes: [inverted | state.inverted_changes],
     }
 
-    {:reply, state.contents, state}
+    {:reply, state.version, state}
   end
 
   # Fetch the current contents of the document
@@ -86,6 +90,7 @@ defmodule Document do
     [last_change | changes] = state.inverted_changes
 
     state = %{
+      filename: state.filename,
       version: state.version - 1,
       contents: Delta.compose(state.contents, last_change),
       inverted_changes: changes,

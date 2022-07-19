@@ -41,7 +41,7 @@ defmodule SequenceWeb.DocsController do
       case Docs.write_doc(project, filename, contents) do
         :ok -> json conn, %{ success: true }
         {:error, reason} ->
-          {:error, :bad_request, "Failed to list docs: #{reason}"}
+          {:error, :bad_request, "Failed to save doc: #{reason}"}
       end
     end
   end

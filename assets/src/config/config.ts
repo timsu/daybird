@@ -48,6 +48,8 @@ export const config = {
 
   env,
 
+  hash: import.meta.env.VITE_GIT_HASH,
+
   sentry: {},
 
   amplitude: {},
