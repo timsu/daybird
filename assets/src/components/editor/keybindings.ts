@@ -1,4 +1,5 @@
 import Quill, { RangeStatic } from 'quill'
+import Delta from 'quill-delta'
 
 import { QuillSource } from '@/config'
 
@@ -73,6 +74,54 @@ const QuillKeybindings: Keybindindings = {
         // Otherwise propogate to Quill's default
         return true
       }
+    },
+  },
+
+  // modified from Quill
+  // https://github.com/quilljs/quill/blob/develop/modules/keyboard.js
+  'list autofill': {
+    key: ' ',
+    shiftKey: false,
+    collapsed: true,
+    format: {
+      list: false,
+      'code-block': false,
+      blockquote: false,
+      header: false,
+      table: false,
+    },
+    prefix: /^\s*?(1\.|\*)$/,
+    handler: function (this: Keyboard, range, context) {
+      const { length } = context.prefix!
+      const [line, offset] = this.quill.getLine(range.index)
+      if (offset > length) return true
+      let value
+      switch (context.prefix!.trim()) {
+        case '[]':
+        case '[ ]':
+          value = 'unchecked'
+          break
+        case '[x]':
+          value = 'checked'
+          break
+        case '-':
+        case '*':
+          value = 'bullet'
+          break
+        default:
+          value = 'ordered'
+      }
+      this.quill.insertText(range.index, ' ', QuillSource.USER)
+      this.quill.getModule('history').cutoff()
+      const delta = new Delta()
+        .retain(range.index - offset)
+        .delete(length + 1)
+        .retain(line.length() - 2 - offset)
+        .retain(1, { list: value })
+      this.quill.updateContents(delta, QuillSource.USER)
+      this.quill.getModule('history').cutoff()
+      this.quill.setSelection(range.index - length, 0, QuillSource.SILENT)
+      return false
     },
   },
 }
