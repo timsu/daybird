@@ -55,7 +55,7 @@ class FileStore {
 
   newDailyFile = async () => {
     const name = moment().format('YYYY-MM-DD')
-    console.log(name)
+    await this.newFile(name)
   }
 }
 

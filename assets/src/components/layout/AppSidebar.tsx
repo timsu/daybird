@@ -141,7 +141,7 @@ function CurrentProject() {
           <DocumentAddIcon class="h-4 w-4" />
         </Pressable>
         <div class="mr-1" />
-        <Pressable tooltip="New File with Today's Date" onClick={onNewDailyFile}>
+        <Pressable tooltip="New File with Today's Date" tooltipWidth={200} onClick={onNewDailyFile}>
           <CalendarIcon class="h-4 w-4" />
         </Pressable>
         {/* <Pressable tooltip="New Folder" onClick={onNewFolder}>

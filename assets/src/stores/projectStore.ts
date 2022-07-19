@@ -1,7 +1,8 @@
 import { action, atom, map } from 'nanostores'
+import { route } from 'preact-router'
 
 import { API } from '@/api'
-import { config } from '@/config'
+import { config, paths } from '@/config'
 import { Project, User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { logger } from '@/utils'
@@ -59,8 +60,11 @@ class ProjectStore {
   createProject = action(this.projects, 'createProject', async (store, name: string) => {
     const response = await API.createProject(name)
     logger.info('PROJECTS - create', response)
-    const projects = [...store.get(), response.project]
+    const project = Project.fromJSON(response.project)
+    const projects = [...store.get(), project]
     this.updateProjects(projects)
+
+    route(paths.PROJECTS + '/' + project.id)
   })
 }
 
