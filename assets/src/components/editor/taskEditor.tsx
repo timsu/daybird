@@ -10,15 +10,14 @@ import TaskRow from '@/components/task/TaskRow'
 
 const BlockEmbed = Quill.import('blots/block/embed')
 
-type Data = { id: string }
+type Data = { id: string; focus?: boolean }
 
 class SeqTaskBlot extends BlockEmbed {
   static create(data: Data) {
     const node = super.create(data) as HTMLDivElement
     node.dataset['id'] = data.id
 
-    console.log('RENDERED A TASK', node, data)
-    render(<TaskRow />, node)
+    render(<TaskRow focus={data.focus} />, node)
 
     return node
   }
