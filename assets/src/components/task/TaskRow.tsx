@@ -29,9 +29,7 @@ export default ({ id, focus, onCreate }: Props) => {
       e.stopPropagation()
       if (e.key == 'Enter') {
         e.preventDefault()
-        div.parentElement!.dispatchEvent(
-          new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
-        )
+        window.quill?.setSelection(window.quill.getSelection()?.index!, 0)
       }
     })
   }, [])

@@ -13,6 +13,6 @@ defmodule Sequence.Repo.Migrations.UpdateTaskFields do
     end
 
     create index(:tasks, [:short_code])
-    create index(:tasks, [:project_id, :archived_at, :deleted_at])
+    create index(:tasks, [:project_id, :completed_at, :archived_at, :deleted_at])
   end
 end

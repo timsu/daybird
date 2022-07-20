@@ -10,7 +10,8 @@ defmodule Sequence.Tasks do
 
   @spec list_tasks(User.t()) :: [Task.t()]
   def list_tasks(project) do
-    from(t in Task, where: t.project_id == ^project.id and is_nil(t.deleted_at) and is_nil(t.archived_at))
+    from(t in Task, where: t.project_id == ^project.id and is_nil(t.deleted_at) and is_nil(t.archived_at)
+      and is_nil(t.completed_at), order_by: [asc: :id])
     |> Repo.all
   end
 
