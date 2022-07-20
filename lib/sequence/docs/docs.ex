@@ -4,13 +4,24 @@ defmodule Sequence.Docs do
 
   @extension ".seq"
 
-  # opts:
-  #   recursive: boolean or integer (for recursion depth)
-  def list_docs(project, _opts \\ []) do
+  def list_docs(project) do
     path = project_path(project)
     case File.ls(path) do
+      {:ok, list} -> {:ok, list}
+      {:error, :enoent} -> {:ok, []}
+      error -> error
+    end
+  end
+
+  def list_docs_recursive(project, depth \\ nil) do
+    path = project_path(project)
+    docroot_length = String.length(path) + 1
+    case Xfile.ls(path, recursive: depth || true) do
       {:ok, stream} ->
-        list = Enum.to_list(stream)
+        list = stream
+        |> Enum.map(fn item ->
+          String.slice(item, docroot_length, 999)
+        end)
         {:ok, list}
       {:error, :enoent} -> {:ok, []}
       error -> error
