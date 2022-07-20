@@ -12,7 +12,7 @@ defmodule Sequence.Repo.Migrations.UpdateTaskFields do
       add :priority, :integer
     end
 
-    create unique_index(:tasks, [:short_code])
+    create index(:tasks, [:short_code])
     create index(:tasks, [:project_id, :archived_at, :deleted_at])
   end
 end

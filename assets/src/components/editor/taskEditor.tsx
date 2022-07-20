@@ -1,12 +1,11 @@
 /**
  * https://github.com/visualjerk/quill-magic-url/blob/master/src/index.js
  */
-import { EmbedBlot } from 'parchment'
 import { render } from 'preact'
 import Quill from 'quill'
-import Delta from 'quill-delta'
 
 import TaskRow from '@/components/task/TaskRow'
+import { Task } from '@/models'
 
 const BlockEmbed = Quill.import('blots/block/embed')
 
@@ -17,19 +16,27 @@ class SeqTaskBlot extends BlockEmbed {
     const node = super.create(data) as HTMLDivElement
     node.dataset['id'] = data.id
 
-    render(<TaskRow focus={data.focus} />, node)
+    const onCreate = (task: Task) => {
+      node.dataset['id'] = task.id
+      console.log('on create', task, node)
+    }
+
+    render(<TaskRow id={data.id} focus={data.focus} onCreate={onCreate} />, node)
 
     return node
   }
 
   static value(domNode: HTMLAnchorElement) {
+    const id = domNode.dataset['id']
+    if (!id) return {}
     return {
-      id: domNode.dataset['id'],
+      id,
     }
   }
 
   static blotName = 'seqtask'
   static tagName = 'div'
+  static className = 'seqtask'
 }
 
 Quill.register('formats/seqtask', SeqTaskBlot)
@@ -75,9 +82,12 @@ export default class TaskEditor {
       setTimeout(() => {
         this.quill.deleteText(startIndex, text.length)
 
-        const id = 'S-1'
-
-        this.quill.insertEmbed(startIndex + 1, 'seqtask', { id, focus: true }, Quill.sources.USER)
+        this.quill.insertEmbed(
+          startIndex + 1,
+          'seqtask',
+          { id: null, focus: true },
+          Quill.sources.USER
+        )
         this.quill.insertText(startIndex + 2, '\n', Quill.sources.SILENT)
         this.quill.setSelection((startIndex + 2) as any, Quill.sources.SILENT)
       }, 0)

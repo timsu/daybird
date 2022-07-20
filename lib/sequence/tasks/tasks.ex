@@ -17,7 +17,7 @@ defmodule Sequence.Tasks do
   @spec task_by_uuid(binary) :: {:error, :not_found} | {:ok, Task.t()}
   def task_by_uuid(uuid) do
     if uuid != nil and uuid != "undefined" and uuid != "" do
-      task = Repo.one(from q in Task, where: q.uuid == ^uuid)
+      task = Repo.one(from q in Task, where: q.uuid == ^Base.decode16!(String.upcase(uuid)))
       if task, do: {:ok, task}, else: {:error, :not_found}
     else
       {:error, :not_found}

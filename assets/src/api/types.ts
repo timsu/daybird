@@ -1,4 +1,4 @@
-import { Project, User } from '@/models'
+import { Project, Task, User } from '@/models'
 
 export type SuccessResponse = {
   success: boolean
@@ -35,4 +35,12 @@ export type ProjectResponse = {
 
 export type FilesResponse = {
   files: string[]
+}
+
+export type TasksResponse = {
+  tasks: Task[]
+}
+
+export type TaskResponse = {
+  task: Task
 }

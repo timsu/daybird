@@ -5,13 +5,15 @@ defmodule SequenceWeb.TasksController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Tasks}
+  alias Sequence.{Projects, Tasks}
 
   # GET /tasks
-  def index(conn, _) do
-    with user when is_map(user) <- Guardian.Plug.current_resource(conn) do
+  def index(conn, %{ "project_id" => project_uuid }) do
+    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid),
+         tasks <- Tasks.list_tasks(project) do
 
-      render conn, "list.json", tasks: []
+      render conn, "list.json", tasks: tasks
     end
   end
 
@@ -25,12 +27,16 @@ defmodule SequenceWeb.TasksController do
   end
 
   # POST /tasks
-  def create(conn, %{ "title" => title } = params) do
+  def create(conn, %{ "project_id" => project_uuid, "title" => title } = params) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid),
+         short_code <- Projects.generate_short_code(project),
          attrs <- %{
           type: params["type"] || 0,
+          short_code: short_code,
           title: title,
-          creator_id: user.id
+          creator_id: user.id,
+          project_id: project.id
          },
          {:ok, task} <- Tasks.create_task(attrs) do
 

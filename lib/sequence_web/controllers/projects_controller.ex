@@ -19,7 +19,7 @@ defmodule SequenceWeb.ProjectsController do
   # GET /projects/id
   def show(conn, %{"id" => project_uuid}) do
     with user <- Guardian.Plug.current_resource(conn),
-       {:ok, project} <- Projects.project_by_uuid(project_uuid) do
+       {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid) do
 
       render conn, "get.json", project: project, user: user
     end

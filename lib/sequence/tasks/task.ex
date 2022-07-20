@@ -37,6 +37,6 @@ defmodule Sequence.Tasks.Task do
     |> cast(attrs, [:type, :short_code, :title, :description, :state, :completed_at, :deleted_at,
       :archived_at, :project_id, :user_id, :creator_id])
     |> Repo.generate_uuid
-    |> validate_required([:uuid, :short_id, :title, :creator_id, :project_id])
+    |> validate_required([:uuid, :short_code, :title, :creator_id, :project_id])
   end
 end

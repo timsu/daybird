@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 import { config, OAuthProvider } from '@/config'
-import { AuthToken, AuthTokenPair, Project, Team, User } from '@/models'
+import { AuthToken, AuthTokenPair, Project, Task, Team, User } from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
 import * as R from './types'
@@ -254,6 +254,28 @@ class APIService {
         },
       }
     )
+    return response.data
+  }
+
+  // tasks
+
+  async listTasks(project: Project): Promise<R.TasksResponse> {
+    const response = await this.axios.get(`${this.endpoint}/tasks?project_id=${project.id}`)
+    return response.data
+  }
+
+  async createTask(project: Project, task: Partial<Task>): Promise<R.TaskResponse> {
+    const response = await this.axios.post(`${this.endpoint}/tasks?project_id=${project.id}`, task)
+    return response.data
+  }
+
+  async getTask(id: string): Promise<R.TaskResponse> {
+    const response = await this.axios.get(`${this.endpoint}/tasks/${id}`)
+    return response.data
+  }
+
+  async updateTask(id: string, task: Partial<Task>): Promise<R.TaskResponse> {
+    const response = await this.axios.put(`${this.endpoint}/tasks/${id}`, task)
     return response.data
   }
 

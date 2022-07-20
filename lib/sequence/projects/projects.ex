@@ -64,7 +64,7 @@ defmodule Sequence.Projects do
   @spec project_by_uuid(binary) :: {:error, :not_found} | {:ok, Project.t()}
   def project_by_uuid(uuid) do
     if uuid != nil and uuid != "undefined" and uuid != "" do
-      project = Repo.one(from q in Project, where: q.uuid == ^uuid)
+      project = Repo.one(from q in Project, where: q.uuid == ^Base.decode16!(String.upcase(uuid)))
       if project, do: {:ok, project}, else: {:error, :not_found}
     else
       {:error, :not_found}
@@ -80,6 +80,16 @@ defmodule Sequence.Projects do
       up ->
         update_user_project(up, %{ left_at: nil })
     end
+  end
+
+  def generate_short_code(project) do
+    {:ok, next_id} = Repo.transaction(fn ->
+      project = get_project!(project.id)
+      next_id = (project.next_id || 0) + 1
+      update_project(project, %{ next_id: next_id })
+      next_id
+    end)
+    "#{project.shortcode}-#{next_id}"
   end
 
   @doc """
