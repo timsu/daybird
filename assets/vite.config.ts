@@ -25,7 +25,7 @@ export default defineConfig({
   plugins: [preact()],
   server: {
     host: '0.0.0.0',
-    // origin: '//127.0.0.1:3000',
+    origin: '//127.0.0.1:3000',
   },
   build: {
     outDir: '../priv/static',
