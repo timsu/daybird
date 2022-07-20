@@ -1,4 +1,5 @@
 import { JSX } from 'preact'
+import { Link } from 'preact-router'
 import Match from 'preact-router/match'
 import { useEffect, useState } from 'preact/hooks'
 
@@ -72,7 +73,7 @@ function Links() {
       {navigation.map((item) => (
         <Match path={item.href}>
           {({ matches, url }: { matches: boolean; url: string }) => (
-            <a
+            <Link
               key={item.name}
               href={item.href}
               className={classNames(
@@ -100,7 +101,7 @@ function Links() {
                 />
               )}
               {item.name}
-            </a>
+            </Link>
           )}
         </Match>
       ))}

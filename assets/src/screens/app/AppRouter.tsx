@@ -5,9 +5,10 @@ import Dashboard from '@/screens/app/Dashboard'
 import DocScreen from '@/screens/app/DocScreen'
 import ProjectsList from '@/screens/app/ProjectsList'
 import ProjectView from '@/screens/app/ProjectView'
+import { uiStore } from '@/stores/uiStore'
 
 export default () => (
-  <Router>
+  <Router onChange={uiStore.routerOnChange}>
     <Dashboard path={paths.APP} />
     <ProjectsList path={paths.PROJECTS} />
     <ProjectView path={paths.PROJECTS + '/:id'} />

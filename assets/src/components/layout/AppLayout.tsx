@@ -1,9 +1,10 @@
 import { Fragment, RenderableProps } from 'preact'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
 import LogoDark from '@/components/core/LogoDark'
 import AppSidebar from '@/components/layout/AppSidebar'
 import UserMenu from '@/components/layout/UserMenu'
+import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
 import { BellIcon, MenuAlt2Icon, XIcon } from '@heroicons/react/outline'
@@ -11,6 +12,13 @@ import { SearchIcon } from '@heroicons/react/solid'
 
 export default function ({ children }: RenderableProps<{}>) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    if (sidebarOpen) {
+      const unsub = uiStore.path.listen(() => setSidebarOpen(false))
+      return unsub
+    }
+  }, [sidebarOpen])
 
   return (
     <>
@@ -59,7 +67,7 @@ export default function ({ children }: RenderableProps<{}>) {
                     </button>
                   </div>
                 </Transition.Child>
-                <AppSidebar />
+                {sidebarOpen && <AppSidebar />}
               </Dialog.Panel>
             </Transition.Child>
             <div className="flex-shrink-0 w-14" aria-hidden="true">

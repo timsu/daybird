@@ -1,3 +1,4 @@
+import { Link } from 'preact-router'
 import Match from 'preact-router/match'
 import { CSSTransition, TransitionGroup } from 'preact-transitioning'
 
@@ -20,7 +21,7 @@ export default ({ projectId }: { projectId: string }) => {
               {({ url }: { url: string }) => {
                 const matches = url == encodeURI(href)
                 return (
-                  <a
+                  <Link
                     key={item.name}
                     href={href}
                     className={classNames(
@@ -32,7 +33,7 @@ export default ({ projectId }: { projectId: string }) => {
                     style={{ marginLeft: item.depth * 20 }}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 )
               }}
             </Match>
