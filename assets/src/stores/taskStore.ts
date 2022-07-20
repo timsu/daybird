@@ -2,7 +2,7 @@ import { action, atom, map } from 'nanostores'
 
 import { API } from '@/api'
 import { config } from '@/config'
-import { Task } from '@/models'
+import { Project, Task } from '@/models'
 import { projectStore } from '@/stores/projectStore'
 import { assertIsDefined, logger } from '@/utils'
 
@@ -21,6 +21,17 @@ class TaskStore {
     task = Task.fromJSON(task)
     store.setKey(task.id, task)
   })
+
+  loadTasks = async (project: Project) => {
+    this.taskList.set([])
+
+    const response = await API.listTasks(project)
+    const tasks = response.tasks.map((t) => Task.fromJSON(t))
+    const taskMap = this.taskMap.get()
+    tasks.forEach((t) => (taskMap[t.id] = t))
+    this.taskMap.notify()
+    this.taskList.set(tasks)
+  }
 
   loadTask = async (id: string) => {
     if (this.taskMap.get()[id]) return
