@@ -16,16 +16,12 @@ class SeqTaskBlot extends BlockEmbed {
     const node = super.create(data) as HTMLDivElement
     node.dataset['id'] = data.id
 
-    const onCreate = (task: Task) => {
+    const onCreateTask = (task: Task) => {
       node.dataset['id'] = task.id
-
-      // re-render node with id
-      node.childNodes.forEach((n) => n.remove())
-      render(<TaskRow id={data.id} />, node)
     }
 
     node.childNodes.forEach((n) => n.remove())
-    render(<TaskRow id={data.id} focus={data.focus} onCreate={onCreate} />, node)
+    render(<TaskRow id={data.id} focus={data.focus} onCreate={onCreateTask} />, node)
 
     return node
   }
@@ -40,6 +36,11 @@ class SeqTaskBlot extends BlockEmbed {
 
   update(mutations: any) {
     // nothing to do at the moment
+  }
+
+  deleteAt() {
+    // disallow deletion
+    return false
   }
 
   static blotName = 'seqtask'

@@ -6,13 +6,16 @@ import { classNames } from '@/utils'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
-  id: string
+  id: string | undefined
   focus?: boolean
   onCreate?: (task: Task) => void
 }
 
 export default ({ id, focus, onCreate }: Props) => {
-  const task = useStore(taskStore.taskMap)[id]
+  const [savedId, setSavedId] = useState<string>()
+
+  id = id || savedId
+  const task = useStore(taskStore.taskMap)[id!]
   const titleRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -39,7 +42,7 @@ export default ({ id, focus, onCreate }: Props) => {
     if (!div) return
     const onFocusOut = async (e: Event) => {
       const title = titleRef.current?.innerText
-      const task = taskStore.taskMap.get()[id]
+      const task = taskStore.taskMap.get()[id!]
 
       const dirty = title != task?.title
       if (!dirty) return
@@ -47,13 +50,15 @@ export default ({ id, focus, onCreate }: Props) => {
       if (!task) {
         const newTask = await taskStore.createTask({ title })
         onCreate?.(newTask)
+        div.innerText = '' // need to clear div text so it gets re-populated when id comes in
+        setSavedId(newTask.id)
       } else {
         await taskStore.saveTask(task, { title })
       }
     }
 
     div.addEventListener('focusout', onFocusOut)
-    if (focus) div.focus()
+    if (focus && !id) div.focus()
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [id, focus])
 
@@ -81,6 +86,8 @@ export default ({ id, focus, onCreate }: Props) => {
       >
         {task?.title}
       </div>
+
+      <div class="text-sm font-semibold text-slate-500 ml-2">{task?.short_code}</div>
 
       {/* <input
           type="text"

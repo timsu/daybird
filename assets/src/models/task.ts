@@ -8,7 +8,7 @@ export class Task {
 
   public title: string = ''
 
-  public shortcode: string = ''
+  public short_code: string = ''
 
   public type: TaskType = TaskType.TASK
 
