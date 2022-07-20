@@ -1,11 +1,11 @@
 type Props = {
-  width?: number
+  class?: string
 }
 
 export default (props: Props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    style={{ width: props.width || 250 }}
+    class={props.class || 'w-[250px]'}
     fill="none"
     viewBox="445.02 375.72 133.97 16.57"
   >

@@ -27,7 +27,7 @@ export default ({ id, focus, onCreate }: Props) => {
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
       e.stopPropagation()
-      if (e.key == 'Enter') {
+      if (e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
         window.quill?.setSelection(window.quill.getSelection()?.index!, 0)
       }
@@ -85,7 +85,9 @@ export default ({ id, focus, onCreate }: Props) => {
         {task?.title}
       </div>
 
-      <div class="text-sm font-semibold text-slate-500 ml-2">{task?.short_code}</div>
+      <div class="text-sm font-semibold text-slate-500 ml-2 whitespace-nowrap">
+        {task?.short_code}
+      </div>
 
       {/* <input
           type="text"

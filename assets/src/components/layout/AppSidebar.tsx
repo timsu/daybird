@@ -35,7 +35,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
           'flex items-center h-16 flex-shrink-0 px-4'
         )}
       >
-        <LogoDark width={160} />
+        <LogoDark class="w-[160px]" />
       </div>
       <div className="flex-1 flex flex-col overflow-y-auto">
         <Links />

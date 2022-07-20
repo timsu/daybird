@@ -24,7 +24,8 @@ process.env.VITE_GIT_HASH = commitHash
 export default defineConfig({
   plugins: [preact()],
   server: {
-    origin: '//127.0.0.1:3000',
+    host: '0.0.0.0',
+    // origin: '//127.0.0.1:3000',
   },
   build: {
     outDir: '../priv/static',

@@ -1,8 +1,8 @@
 <div id="app"></div>
 <%= if Sequence.dev? do %>
-  <script type="module" src={"http://localhost:3000/src/#{@entry}.tsx"} onError="setTimeout(location.reload, 5000)"></script>
+  <%# <script type="module" src={"http://localhost:3000/src/#{@entry}.tsx"} onError="setTimeout(location.reload, 5000)"></script> %>
 <% else %>
   <%# <script type="module" src={"/assets/app.f8efe910.js"}></script>
   <link rel="stylesheet" href="assets/style.a1e6a87e.css" /> %>
-  <script src={js_path(@conn, "/js/#{@entry}.js")}></script>
 <% end %>
+<script type="module" src={js_path(@conn, @entry)} onError="setTimeout(location.reload, 5000)"></script>

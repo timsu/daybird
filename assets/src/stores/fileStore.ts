@@ -49,12 +49,17 @@ class FileStore {
     const file: File = { name, path, type: 'doc', depth: 0 }
     this.files.set([...this.files.get(), file])
 
-    route(paths.DOC + '/' + path)
+    route(paths.DOC + '/' + project.id + '/' + path)
   }
 
   newDailyFile = async () => {
     const name = moment().format('YYYY-MM-DD')
-    await this.newFile(name)
+    const existing = this.files.get().find((f) => f.name == name)
+
+    const project = projectStore.currentProject.get()
+    assertIsDefined(project, 'project is defined')
+    if (existing) route(paths.DOC + '/' + project.id + '/' + existing.path)
+    else await this.newFile(name)
   }
 }
 

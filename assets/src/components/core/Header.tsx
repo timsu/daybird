@@ -10,7 +10,7 @@ export default function () {
       <div>
         <a href={paths.ROOT} className="flex">
           <span className="sr-only">Sequence</span>
-          <Logo />
+          <Logo class="w-[150px] sm:w-[250px]" />
         </a>
       </div>
 
@@ -27,7 +27,7 @@ export default function () {
           <>
             <a
               href={paths.SIGNIN}
-              className="text-base font-medium text-gray-500 hover:text-gray-900"
+              className="text-base font-medium text-gray-500 hover:text-gray-900 mr-4"
             >
               Sign in
             </a>

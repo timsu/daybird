@@ -49,7 +49,7 @@ defmodule SequenceWeb.TasksController do
     attrs = Enum.reduce(["title", "type", "completed_at"], %{}, fn(key, acc) ->
       if Map.has_key?(params, key), do: Map.put(acc, Macro.underscore(key), params[key]), else: acc end)
 
-    with user <- Guardian.Plug.current_resource(conn),
+    with _user <- Guardian.Plug.current_resource(conn),
          {:ok, task} <- Tasks.task_by_uuid(task_uuid),
          {:ok, task} <- Tasks.update_task(task, attrs) do
 
