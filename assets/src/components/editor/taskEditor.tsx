@@ -7,21 +7,24 @@ import Quill from 'quill'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 
-const Embed = Quill.import('blots/embed')
 const BlockEmbed = Quill.import('blots/block/embed')
 
 type Data = { id: string; focus?: boolean }
 
-class SeqTaskBlot extends Embed {
+class SeqTaskBlot extends BlockEmbed {
   static create(data: Data) {
     const node = super.create(data) as HTMLDivElement
     node.dataset['id'] = data.id
 
     const onCreate = (task: Task) => {
       node.dataset['id'] = task.id
-      console.log('on create', task, node)
+
+      // re-render node with id
+      node.childNodes.forEach((n) => n.remove())
+      render(<TaskRow id={data.id} />, node)
     }
 
+    node.childNodes.forEach((n) => n.remove())
     render(<TaskRow id={data.id} focus={data.focus} onCreate={onCreate} />, node)
 
     return node
@@ -85,9 +88,8 @@ export default class TaskEditor {
     if (text == '- ') {
       const startIndex = selection.index - text.length
       setTimeout(() => {
-        this.quill.deleteText(startIndex, text.length)
-
-        this.quill.insertEmbed(startIndex, 'seqtask', { id: null, focus: true }, Quill.sources.USER)
+        this.quill.deleteText(startIndex, text.length + 1)
+        this.quill.insertEmbed(startIndex, 'seqtask', { focus: true }, Quill.sources.USER)
         this.quill.setSelection((startIndex + 1) as any, Quill.sources.SILENT)
       }, 0)
     }

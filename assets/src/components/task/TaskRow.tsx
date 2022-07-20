@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 
 import { Task } from '@/models'
 import { taskStore } from '@/stores/taskStore'
+import { classNames } from '@/utils'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
@@ -17,6 +18,8 @@ export default ({ id, focus, onCreate }: Props) => {
   useEffect(() => {
     const div = titleRef.current
     if (!div) return
+
+    // prevent navigation propagating to Quill when focused on this element
     div.addEventListener('input', (e) => e.stopPropagation())
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
@@ -31,6 +34,7 @@ export default ({ id, focus, onCreate }: Props) => {
   }, [])
 
   useEffect(() => {
+    // handle focus out -> task saving
     const div = titleRef.current
     if (!div) return
     const onFocusOut = async (e: Event) => {
@@ -57,11 +61,24 @@ export default ({ id, focus, onCreate }: Props) => {
     if (id) taskStore.loadTask(id)
   }, [id])
 
+  const toggleComplete = () => {
+    taskStore.saveTask(task, { completed_at: task.completed_at ? null : new Date().toISOString() })
+  }
+
   return (
     <div contentEditable={false} class="bg-gray-100 rounded p-2 flex flex-row items-center">
-      <input type="checkbox" class="mr-2 rounded border-gray-400" />
+      <input
+        checked={!!task?.completed_at}
+        type="checkbox"
+        class="mr-2 rounded border-gray-400"
+        onClick={toggleComplete}
+      />
 
-      <div contentEditable ref={titleRef} class="flex-grow p-1">
+      <div
+        contentEditable
+        ref={titleRef}
+        class={classNames('flex-grow p-1', task?.completed_at ? 'line-through text-gray-500' : '')}
+      >
         {task?.title}
       </div>
 

@@ -12,8 +12,11 @@ export class Task {
 
   public type: TaskType = TaskType.TASK
 
+  public completed_at: string | null = null
+
   public static fromJSON(obj: Object): Task {
     let item: Task = Object.assign(new Task(), obj)
+
     return item
   }
 }

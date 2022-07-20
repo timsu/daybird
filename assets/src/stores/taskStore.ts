@@ -40,6 +40,8 @@ class TaskStore {
   }
 
   saveTask = async (task: Task, attrs: Partial<Task>) => {
+    this.updateTask(Object.assign({}, task, attrs))
+
     const response = await API.updateTask(task.id, attrs)
     this.updateTask(response.task)
     return response.task
