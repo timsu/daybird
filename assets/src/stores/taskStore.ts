@@ -1,10 +1,8 @@
 import { action, atom, map } from 'nanostores'
-import { route } from 'preact-router'
 
 import { API } from '@/api'
-import { config, paths } from '@/config'
-import { Project, Task, User } from '@/models'
-import { authStore } from '@/stores/authStore'
+import { config } from '@/config'
+import { Task } from '@/models'
 import { projectStore } from '@/stores/projectStore'
 import { assertIsDefined, logger } from '@/utils'
 
@@ -37,6 +35,12 @@ class TaskStore {
 
     const response = await API.createTask(project, attrs)
     logger.info('TASKS - create', response)
+    this.updateTask(response.task)
+    return response.task
+  }
+
+  saveTask = async (task: Task, attrs: Partial<Task>) => {
+    const response = await API.updateTask(task.id, attrs)
     this.updateTask(response.task)
     return response.task
   }

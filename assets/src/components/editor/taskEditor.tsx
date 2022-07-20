@@ -7,11 +7,12 @@ import Quill from 'quill'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 
+const Embed = Quill.import('blots/embed')
 const BlockEmbed = Quill.import('blots/block/embed')
 
 type Data = { id: string; focus?: boolean }
 
-class SeqTaskBlot extends BlockEmbed {
+class SeqTaskBlot extends Embed {
   static create(data: Data) {
     const node = super.create(data) as HTMLDivElement
     node.dataset['id'] = data.id
@@ -32,6 +33,10 @@ class SeqTaskBlot extends BlockEmbed {
     return {
       id,
     }
+  }
+
+  update(mutations: any) {
+    // nothing to do at the moment
   }
 
   static blotName = 'seqtask'
@@ -82,14 +87,8 @@ export default class TaskEditor {
       setTimeout(() => {
         this.quill.deleteText(startIndex, text.length)
 
-        this.quill.insertEmbed(
-          startIndex + 1,
-          'seqtask',
-          { id: null, focus: true },
-          Quill.sources.USER
-        )
-        this.quill.insertText(startIndex + 2, '\n', Quill.sources.SILENT)
-        this.quill.setSelection((startIndex + 2) as any, Quill.sources.SILENT)
+        this.quill.insertEmbed(startIndex, 'seqtask', { id: null, focus: true }, Quill.sources.USER)
+        this.quill.setSelection((startIndex + 1) as any, Quill.sources.SILENT)
       }, 0)
     }
   }

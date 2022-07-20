@@ -44,28 +44,18 @@ defmodule SequenceWeb.TasksController do
     end
   end
 
-  # PUT /projects/id
-  # def update(conn, %{ "id" => project_uuid, "team" => team } = params) do
-  #   attrs = Enum.reduce(["name", "description", "cover_img_url", "cover_img_pos", "type"], %{}, fn(key, acc) ->
-  #     if Map.has_key?(params, key), do: Map.put(acc, Macro.underscore(key), params[key]), else: acc end)
+  # PUT /tasks/id
+  def update(conn, %{ "id" => task_uuid } = params) do
+    attrs = Enum.reduce(["title", "type"], %{}, fn(key, acc) ->
+      if Map.has_key?(params, key), do: Map.put(acc, Macro.underscore(key), params[key]), else: acc end)
 
-  #   with user <- Guardian.Plug.current_resource(conn),
-  #        {:ok, team} <- Teams.team_by_uuid(user.id, team),
-  #        {:ok, project} <- Projects.project_by_uuid(project_uuid),
-  #        :ok <- validate_team(project, team),
-  #        {:ok, project} <- Projects.update_project(project, attrs) do
+    with user <- Guardian.Plug.current_resource(conn),
+         {:ok, task} <- Tasks.task_by_uuid(task_uuid),
+         {:ok, project} <- Tasks.update_task(task, attrs) do
 
-  #     project = project |> Projects.re_sign_url()
-
-  #     notify_of_project_change(team, project)
-  #     render conn, "update.json", project: project, user: user
-  #   else
-  #     {:error, :project_team_mismatch} ->
-  #       {:error, :unauthorized, "You don't have access to this project"}
-  #     {:error, :not_found} -> {:error, :not_found}
-  #     fallback -> fallback
-  #   end
-  # end
+      render conn, "get.json", task: task
+    end
+  end
 
   # # POST /projects/:id/add_members
   # def add_members(conn, %{ "id" => project_uuid, "team" => team_uuid, "everyone" => everyone, "users" => user_uuids }) do
