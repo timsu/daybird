@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks'
 
 type Props = {
+  id: string
   focus?: boolean
 }
 
@@ -21,7 +22,7 @@ export default ({ focus }: Props) => {
           value={title}
           placeholder="What would you like to do?"
           onChange={(e) => setTitle((e.target as HTMLInputElement).value)}
-          ref={(elem) => focus && setTimeout(() => elem?.focus(), 20)}
+          ref={(elem) => focus && setTimeout(() => elem?.focus(), 100)}
         />
       </div>
     </form>

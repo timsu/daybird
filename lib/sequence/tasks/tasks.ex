@@ -8,6 +8,32 @@ defmodule Sequence.Tasks do
 
   alias Sequence.Tasks.Task
 
+  @spec list_tasks(User.t()) :: [Task.t()]
+  def list_tasks(project) do
+    from(t in Task, where: t.project_id == ^project.id and is_nil(t.deleted_at) and is_nil(t.archived_at))
+    |> Repo.all
+  end
+
+  @spec task_by_uuid(binary) :: {:error, :not_found} | {:ok, Task.t()}
+  def task_by_uuid(uuid) do
+    if uuid != nil and uuid != "undefined" and uuid != "" do
+      task = Repo.one(from q in Task, where: q.uuid == ^uuid)
+      if task, do: {:ok, task}, else: {:error, :not_found}
+    else
+      {:error, :not_found}
+    end
+  end
+
+  @spec task_by_short_code(binary) :: {:error, :not_found} | {:ok, Task.t()}
+  def task_by_short_code(code) do
+    if code != nil and code != "undefined" and code != "" do
+      task = Repo.one(from q in Task, where: q.short_code == ^code)
+      if task, do: {:ok, task}, else: {:error, :not_found}
+    else
+      {:error, :not_found}
+    end
+  end
+
   @doc """
   Returns the list of tasks.
 

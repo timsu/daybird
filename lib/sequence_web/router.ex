@@ -83,6 +83,7 @@ defmodule SequenceWeb.Router do
     post "/login_success", AuthController, :login_success
 
     resources "/projects", ProjectsController
+    resources "/tasks", TasksController
 
     get "/files", DocsController, :list_files
     post "/files/folder", DocsController, :create_folder

@@ -2,7 +2,7 @@ defmodule Sequence.Projects.Project do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Sequence.Repo
+  alias Sequence.{Repo, Users.User}
 
   @type t :: %__MODULE__{}
 
@@ -12,10 +12,11 @@ defmodule Sequence.Projects.Project do
     field :deleted_at, :utc_datetime
     field :meta, :map
     field :name, :string
-    field :creator_id, :id
     field :shortcode, :string
     field :next_id, :integer
     field :color, :string
+
+    belongs_to :creator, User
 
     timestamps()
   end
