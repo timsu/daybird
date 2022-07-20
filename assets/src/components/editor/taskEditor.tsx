@@ -91,6 +91,8 @@ export default class TaskEditor {
       setTimeout(() => {
         this.quill.deleteText(startIndex, text.length + 1)
         this.quill.insertEmbed(startIndex, 'seqtask', { focus: true }, Quill.sources.USER)
+        if (startIndex + 2 >= this.quill.getLength())
+          this.quill.insertText(startIndex + 2, '\n', Quill.sources.SILENT)
         this.quill.setSelection((startIndex + 1) as any, Quill.sources.SILENT)
       }, 0)
     }
