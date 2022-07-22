@@ -20,8 +20,9 @@ sequence-*.tar
 secrets/
 .deliver/releases
 
-# phoenix ignores
-/priv/static/
+# asset ignores
+/priv/static/assets
+/priv/static/manifest.json
 
 # yarn / npm
 package-lock.json
