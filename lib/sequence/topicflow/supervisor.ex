@@ -11,7 +11,7 @@ defmodule Sequence.Topicflow.Supervisor do
 
   @impl true
   def init(args) do
-    port = Application.get_env(:sequence, :topicflow_port, 5100)
+    port = Application.get_env(:sequence, :topicflow_port, 4100)
     topicflow_disabled = Application.get_env(:sequence, :topicflow_disabled, false)
 
     topic_modules = Keyword.fetch!(args, :topic_modules)
