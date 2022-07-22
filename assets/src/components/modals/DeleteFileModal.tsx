@@ -46,11 +46,11 @@ export default () => {
           </Dialog.Title>
         </div>
         <div className="mt-5 sm:mt-6 flex justify-between">
-          <Button class="bg-red-500 hover:bg-red-800" onClick={submit}>
-            Confirm Delete
-          </Button>
           <Button class="bg-gray-500" onClick={close}>
             Cancel
+          </Button>
+          <Button class="bg-red-500 hover:bg-red-800" onClick={submit}>
+            Confirm Delete
           </Button>
         </div>
 

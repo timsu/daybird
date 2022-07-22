@@ -1,7 +1,7 @@
 import { ComponentChildren, createContext, Fragment, RenderableProps } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 
-import { classNames } from '@/utils'
+import { classNames, logger } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
 
 type ContextMenuProps = {
@@ -61,8 +61,16 @@ export const ContextMenu = (props: RenderableProps<ContextMenuProps>) => {
   return <ContextMenuWithData {...rest}>{(_) => children}</ContextMenuWithData>
 }
 
-export const ContextMenuItem = (props: RenderableProps<{ onClick?: (e: MouseEvent) => void }>) => (
-  <div class="flex hover:bg-blue-400 p-2 rounded cursor-pointer" onClick={props.onClick}>
+type ContextMenuItemProps = {
+  class?: string
+  onClick?: (e: MouseEvent) => void
+}
+
+export const ContextMenuItem = (props: RenderableProps<ContextMenuItemProps>) => (
+  <div
+    class={`flex items-center hover:bg-blue-400 p-2 rounded cursor-pointer ${props.class}`}
+    onClick={props.onClick}
+  >
     {props.children}
   </div>
 )
@@ -75,9 +83,13 @@ type TriggerProps = {
 export const ContextMenuTrigger = (props: RenderableProps<TriggerProps>) => {
   const onContextMenu = (e: MouseEvent) => {
     e.preventDefault()
-    const menu = contextMenus[props.id]
-    if (!menu) return
-    menu(e.clientX, e.clientY, props.data)
+    triggerContextMenu(e.clientX, e.clientY, props.id, props.data)
   }
   return <span onContextMenu={onContextMenu}>{props.children}</span>
+}
+
+export const triggerContextMenu = (x: number, y: number, id: string, data?: any) => {
+  const menu = contextMenus[id]
+  if (!menu) logger.warn('Unknown context menu:', id)
+  else menu(x, y, data)
 }

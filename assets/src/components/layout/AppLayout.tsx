@@ -4,6 +4,7 @@ import { useEffect, useState } from 'preact/hooks'
 import LogoDark from '@/components/core/LogoDark'
 import AppSidebar from '@/components/layout/AppSidebar'
 import UserMenu from '@/components/layout/UserMenu'
+import TaskContextMenu from '@/components/task/TaskContextMenu'
 import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
@@ -126,7 +127,8 @@ export default function ({ children }: RenderableProps<{}>) {
           </div>
         </div>
 
-        <main className="flex-1">{children}</main>
+        <main className="flex flex-1">{children}</main>
+        <TaskContextMenu />
       </div>
     </>
   )

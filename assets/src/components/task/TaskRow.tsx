@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 
+import { triggerContextMenu } from '@/components/core/ContextMenu'
 import { Task } from '@/models'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
@@ -73,6 +74,12 @@ export default ({ id, focus, onCreate }: Props) => {
     taskStore.saveTask(task, { completed_at: task.completed_at ? null : new Date().toISOString() })
   }
 
+  const clickShortCode = (e: MouseEvent) => {
+    const target = e.target as HTMLDivElement
+    const rect = target.getBoundingClientRect()
+    triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
+  }
+
   return (
     <div contentEditable={false} class="bg-gray-100 rounded p-2 flex flex-row items-center">
       <input
@@ -90,7 +97,10 @@ export default ({ id, focus, onCreate }: Props) => {
         {task?.title}
       </div>
 
-      <div class="text-sm font-semibold text-slate-500 ml-2 whitespace-nowrap">
+      <div
+        class="text-sm font-semibold text-slate-500 ml-2 whitespace-nowrap cursor-pointer"
+        onClick={clickShortCode}
+      >
         {task?.short_code}
       </div>
 
