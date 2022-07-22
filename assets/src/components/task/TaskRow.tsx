@@ -29,7 +29,12 @@ export default ({ id, focus, onCreate }: Props) => {
       e.stopPropagation()
       if (e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
-        window.quill?.setSelection(window.quill.getSelection()?.index!, 0)
+        const isBeginning = window.getSelection()?.anchorOffset == 0
+        if (isBeginning) {
+          window.quill?.insertText(window.quill.getSelection()?.index!, '\n')
+        } else {
+          window.quill?.setSelection(window.quill.getSelection()?.index!, 0)
+        }
       }
     })
   }, [])

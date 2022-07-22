@@ -48,7 +48,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
 }
 
 function Links() {
-  const [projectsExpanded, setProjectsExpanded] = useState(location.pathname == paths.PROJECTS)
+  const [projectsExpanded, setProjectsExpanded] = useState(true)
 
   let navigation: NavItem[] = [
     { name: 'Dashboard', href: paths.APP, icon: HomeIcon },
@@ -85,13 +85,13 @@ function Links() {
               )}
               style={{ marginLeft: item.indent }}
             >
-              {item.href == paths.PROJECTS && (
+              {/* {item.href == paths.PROJECTS && (
                 <ProjectExpandCheck
                   url={url}
                   expanded={projectsExpanded}
                   setExpanded={setProjectsExpanded}
                 />
-              )}
+              )} */}
               {item.icon && (
                 <item.icon
                   className={classNames(
