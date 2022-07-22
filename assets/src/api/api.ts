@@ -257,6 +257,25 @@ class APIService {
     return response.data
   }
 
+  async renameFile(
+    project: Project,
+    filename: string,
+    newName: string
+  ): Promise<R.SuccessResponse> {
+    const response = await this.axios.post(`${this.endpoint}/doc/rename?project_id=${project.id}`, {
+      filename,
+      new_name: newName,
+    })
+    return response.data
+  }
+
+  async deleteFile(project: Project, filename: string): Promise<R.SuccessResponse> {
+    const response = await this.axios.post(`${this.endpoint}/doc/delete?project_id=${project.id}`, {
+      filename,
+    })
+    return response.data
+  }
+
   // tasks
 
   async listTasks(project: Project): Promise<R.TasksResponse> {

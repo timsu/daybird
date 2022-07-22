@@ -61,7 +61,7 @@ export default ({ id, focus, onCreate }: Props) => {
   }, [id, focus])
 
   useEffect(() => {
-    if (id) taskStore.loadTask(id)
+    if (id && id != 'undefined' && id != 'null') taskStore.loadTask(id)
   }, [id])
 
   const toggleComplete = () => {

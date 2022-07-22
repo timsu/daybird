@@ -59,4 +59,30 @@ defmodule SequenceWeb.DocsController do
     end
   end
 
+  # POST /doc/rename
+  def rename_doc(conn, %{ "project_id" => project_uuid, "filename" => filename, "new_name" => new_name }) do
+    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
+
+      case Docs.rename(project, filename, new_name) do
+        :ok -> json conn, %{ success: true }
+        {:error, reason} ->
+          {:error, :bad_request, "Failed to rename doc: #{reason}"}
+      end
+    end
+  end
+
+  # POST /doc/delete
+  def delete_doc(conn, %{ "project_id" => project_uuid, "filename" => filename }) do
+    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
+
+      case Docs.delete(project, filename) do
+        :ok -> json conn, %{ success: true }
+        {:error, reason} ->
+          {:error, :bad_request, "Failed to rename doc: #{reason}"}
+      end
+    end
+  end
+
 end

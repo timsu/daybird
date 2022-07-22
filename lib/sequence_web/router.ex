@@ -89,6 +89,8 @@ defmodule SequenceWeb.Router do
     post "/files/folder", DocsController, :create_folder
     get "/doc", DocsController, :get_doc
     post "/doc", DocsController, :save_doc
+    post "/doc/rename", DocsController, :rename_doc
+    post "/doc/delete", DocsController, :delete_doc
 
     resources "/teams", TeamsController
 

@@ -29,6 +29,8 @@ defmodule Sequence.Docs do
   end
 
   def new_doc(project, name) do
+    if String.contains?(name, ".."), do: throw "Invalid name"
+
     path = project_path(project)
     name = if String.ends_with?(name, @extension) do
       name
@@ -44,6 +46,8 @@ defmodule Sequence.Docs do
   end
 
   def new_folder(project, name) do
+    if String.contains?(name, ".."), do: throw "Invalid name"
+
     path = project_path(project)
     folderpath = Path.join(path, name)
 
@@ -54,17 +58,36 @@ defmodule Sequence.Docs do
   end
 
   def read_doc(project, name) do
+    if String.contains?(name, ".."), do: throw "Invalid name"
+
     filepath = file_path(project, name)
     File.read(filepath)
   end
 
   def write_doc(project, name, contents) do
+    if String.contains?(name, ".."), do: throw "Invalid name"
+
     filepath = file_path(project, name)
     path = Path.dirname(filepath)
 
     with :ok <- mkdir_if_needed(path) do
       File.write(filepath, contents)
     end
+  end
+
+  def rename(project, old_name, new_name) do
+    if String.contains?(new_name, ".."), do: throw "Invalid name"
+
+    oldpath = file_path(project, old_name)
+    newpath = file_path(project, new_name)
+
+    File.rename(oldpath, newpath)
+  end
+
+  def delete(project, name) do
+    filepath = file_path(project, name)
+
+    File.rm(filepath)
   end
 
   ### helpers

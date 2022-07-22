@@ -61,6 +61,34 @@ class FileStore {
     if (existing) route(paths.DOC + '/' + project.id + '/' + existing.path)
     else await this.newFile(name)
   }
+
+  renameFile = async (file: File) => {}
+
+  deleteFile = async (file: File) => {
+    const project = projectStore.currentProject.get()
+    assertIsDefined(project, 'project is defined')
+
+    await API.deleteFile(project, file.path)
+
+    const removeFile = (files: File[]) => {
+      if (!files) return files
+
+      if (files.find((f) => f.path == file.path)) {
+        return files.filter((f) => f.path != file.path)
+      } else {
+        files.forEach((f) => {
+          if (f.children) f.children = removeFile(f.children)
+        })
+        return files
+      }
+    }
+    this.files.set(removeFile(this.files.get()))
+    this.files.notify()
+
+    if (location.pathname.includes(file.path)) {
+      route(paths.APP)
+    }
+  }
 }
 
 export const fileStore = new FileStore()

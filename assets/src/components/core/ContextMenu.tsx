@@ -1,0 +1,83 @@
+import { ComponentChildren, createContext, Fragment, RenderableProps } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
+
+import { classNames } from '@/utils'
+import { Dialog, Transition } from '@headlessui/react'
+
+type ContextMenuProps = {
+  id: string
+  class?: string
+}
+
+type ContextMenuFunction = (x: number, y: number, data: any) => void
+
+const contextMenus: { [id: string]: ContextMenuFunction } = {}
+
+export const MenuContext = createContext<((data: any) => void) | undefined>(undefined)
+
+export const ContextMenuWithData = (
+  props: ContextMenuProps & { children: (data: any) => ComponentChildren }
+) => {
+  const [open, setOpen] = useState<{ x: number; y: number } | false>(false)
+  const [data, setData] = useState<any>()
+
+  useEffect(() => {
+    contextMenus[props.id] = (x: number, y: number, data: any) => {
+      setData(data)
+      setOpen({ x, y })
+    }
+  }, [setData])
+
+  if (!open) return null
+
+  const contents = props.children(data)
+
+  const close = () => setOpen(false)
+
+  const addHandler = (ref: HTMLDivElement | null) => {
+    if (ref) ref.addEventListener('click', close)
+  }
+
+  return (
+    <Transition.Root show={!!open} as={Fragment}>
+      <Dialog as="div" className="relative z-10" onClose={close}>
+        <div ref={addHandler} class="block fixed" style={{ top: open.y, left: open.x }}>
+          <div
+            class={classNames(
+              'bg-white w-60 border border-gray-300 rounded-lg flex flex-col text-sm p-1 text-gray-900 shadow-lg',
+              props.class || ''
+            )}
+          >
+            {contents}
+          </div>
+        </div>
+      </Dialog>
+    </Transition.Root>
+  )
+}
+
+export const ContextMenu = (props: RenderableProps<ContextMenuProps>) => {
+  const { children, ...rest } = props
+  return <ContextMenuWithData {...rest}>{(_) => children}</ContextMenuWithData>
+}
+
+export const ContextMenuItem = (props: RenderableProps<{ onClick?: (e: MouseEvent) => void }>) => (
+  <div class="flex hover:bg-blue-400 p-2 rounded cursor-pointer" onClick={props.onClick}>
+    {props.children}
+  </div>
+)
+
+type TriggerProps = {
+  id: string
+  data?: any
+}
+
+export const ContextMenuTrigger = (props: RenderableProps<TriggerProps>) => {
+  const onContextMenu = (e: MouseEvent) => {
+    e.preventDefault()
+    const menu = contextMenus[props.id]
+    if (!menu) return
+    menu(e.clientX, e.clientY, props.data)
+  }
+  return <span onContextMenu={onContextMenu}>{props.children}</span>
+}

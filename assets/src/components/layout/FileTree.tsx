@@ -1,9 +1,13 @@
+import { h } from 'preact'
 import { Link } from 'preact-router'
 import Match from 'preact-router/match'
-import { CSSTransition, TransitionGroup } from 'preact-transitioning'
 
-import { paths } from '@/config'
+import {
+    ContextMenu, ContextMenuItem, ContextMenuTrigger, ContextMenuWithData, MenuContext
+} from '@/components/core/ContextMenu'
+import { File, paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
+import { modalStore } from '@/stores/modalStore'
 import { classNames } from '@/utils'
 import { FolderIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -13,30 +17,44 @@ export default ({ projectId }: { projectId: string }) => {
 
   return (
     <nav className="flex-1 px-2 space-y-1">
+      <ContextMenuWithData id="file-tree-menu">
+        {(file: File) => (
+          <>
+            <ContextMenuItem onClick={() => modalStore.renameFileModal.set(file)}>
+              Rename File
+            </ContextMenuItem>
+            <ContextMenuItem onClick={() => modalStore.deleteFileModal.set(file)}>
+              Delete File
+            </ContextMenuItem>
+          </>
+        )}
+      </ContextMenuWithData>
       {files.map((item) => {
         if (item.type == 'doc') {
           const href = `${paths.DOC}/${projectId}/${item.path}`
           return (
-            <Match key={item.path} path={href}>
-              {({ url }: { url: string }) => {
-                const matches = url == encodeURI(href)
-                return (
-                  <Link
-                    key={item.name}
-                    href={href}
-                    className={classNames(
-                      matches
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
-                    )}
-                    style={{ marginLeft: item.depth * 20 }}
-                  >
-                    {item.name}
-                  </Link>
-                )
-              }}
-            </Match>
+            <ContextMenuTrigger id="file-tree-menu" key={item.path} data={item}>
+              <Match path={href}>
+                {({ url }: { url: string }) => {
+                  const matches = url == encodeURI(href)
+                  return (
+                    <Link
+                      key={item.name}
+                      href={href}
+                      className={classNames(
+                        matches
+                          ? 'bg-gray-900 text-white'
+                          : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                        'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
+                      )}
+                      style={{ marginLeft: item.depth * 20 }}
+                    >
+                      {item.name}
+                    </Link>
+                  )
+                }}
+              </Match>
+            </ContextMenuTrigger>
           )
         } else if (item.type == 'folder') {
           return (
