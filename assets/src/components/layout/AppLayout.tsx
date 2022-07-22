@@ -4,6 +4,7 @@ import { useEffect, useState } from 'preact/hooks'
 import LogoDark from '@/components/core/LogoDark'
 import AppSidebar from '@/components/layout/AppSidebar'
 import UserMenu from '@/components/layout/UserMenu'
+import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import TaskContextMenu from '@/components/task/TaskContextMenu'
 import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
@@ -128,7 +129,9 @@ export default function ({ children }: RenderableProps<{}>) {
         </div>
 
         <main className="flex flex-1">{children}</main>
+
         <TaskContextMenu />
+        <DeleteTaskModal />
       </div>
     </>
   )

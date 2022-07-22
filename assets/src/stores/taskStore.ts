@@ -17,7 +17,7 @@ class TaskStore {
 
   // --- actions
 
-  updateTask = action(this.taskMap, 'updateTask', (store, task: Task) => {
+  updateTaskMap = action(this.taskMap, 'updateTaskMap', (store, task: Task) => {
     task = Task.fromJSON(task)
     store.setKey(task.id, task)
   })
@@ -37,7 +37,7 @@ class TaskStore {
     if (this.taskMap.get()[id]) return
 
     const response = await API.getTask(id)
-    this.updateTask(response.task)
+    this.updateTaskMap(response.task)
   }
 
   createTask = async (attrs: Partial<Task>) => {
@@ -46,17 +46,19 @@ class TaskStore {
 
     const response = await API.createTask(project, attrs)
     logger.info('TASKS - create', response)
-    this.updateTask(response.task)
+    this.updateTaskMap(response.task)
     return response.task
   }
 
   saveTask = async (task: Task, attrs: Partial<Task>) => {
-    this.updateTask(Object.assign({}, task, attrs))
+    this.updateTaskMap(Object.assign({}, task, attrs))
 
     const response = await API.updateTask(task.id, attrs)
-    this.updateTask(response.task)
+    this.updateTaskMap(response.task)
     return response.task
   }
+
+  toggleArchived = async (task: Task) => {}
 }
 
 export const taskStore = new TaskStore()

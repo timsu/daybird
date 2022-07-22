@@ -14,6 +14,10 @@ export class Task {
 
   public completed_at: string | null = null
 
+  public archived_at: string | null = null
+
+  public deleted_at: string | null = null
+
   public static fromJSON(obj: Object): Task {
     let item: Task = Object.assign(new Task(), obj)
 
