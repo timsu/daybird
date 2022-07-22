@@ -16,6 +16,8 @@ defmodule Sequence.Docs do
   def list_docs_recursive(project, depth \\ nil) do
     path = project_path(project)
     docroot_length = String.length(path) + 1
+    mkdir_if_needed(path)
+
     case Xfile.ls(path, recursive: depth || true) do
       {:ok, stream} ->
         list = stream
@@ -23,7 +25,6 @@ defmodule Sequence.Docs do
           String.slice(item, docroot_length, 999)
         end)
         {:ok, list}
-      {:error, :enoent} -> {:ok, []}
       error -> error
     end
   end

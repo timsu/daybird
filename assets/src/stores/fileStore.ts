@@ -26,15 +26,17 @@ class FileStore {
 
   loadFiles = async (project: Project) => {
     const response = await API.listFiles(project)
-    const files: File[] = response.files.map((filename) => {
-      const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'
-      return {
-        name: type == 'doc' ? filename.slice(0, filename.length - DOC_EXT.length) : filename,
-        path: filename,
-        type,
-        depth: 0,
-      }
-    })
+    const files: File[] = response.files
+      .map((filename) => {
+        const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'
+        return {
+          name: type == 'doc' ? filename.slice(0, filename.length - DOC_EXT.length) : filename,
+          path: filename,
+          type,
+          depth: 0,
+        }
+      })
+      .sort((a, b) => a.name.localeCompare(b.name))
     logger.info('FILES - loaded files for project', project.name, files)
     this.updateFiles(files)
   }
