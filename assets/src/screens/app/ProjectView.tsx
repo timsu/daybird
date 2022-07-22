@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'preact/hooks'
 
-import Button from '@/components/core/Button'
-import NewProjectModal from '@/components/modals/NewProjectModal'
+import Helmet from '@/components/core/Helmet'
 import TaskRow from '@/components/task/TaskRow'
-import NoProjects from '@/screens/app/NoProjects'
-import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
-import { PlusIcon } from '@heroicons/react/solid'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
@@ -29,6 +25,7 @@ export default ({ id }: Props) => {
 
   return (
     <div className="py-6">
+      <Helmet title={`ListNote | ${project.name}`} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <h1 className="text-2xl font-semibold text-gray-900">
           {project.name} ({project.shortcode})

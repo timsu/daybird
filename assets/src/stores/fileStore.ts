@@ -9,7 +9,7 @@ import { projectStore } from '@/stores/projectStore'
 // import { projectStore } from '@/stores/projectStore'
 import { assertIsDefined, logger } from '@/utils'
 
-const DOC_EXT = '.seq'
+export const DOC_EXT = '.seq'
 
 class FileStore {
   // --- stores
