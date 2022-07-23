@@ -28,7 +28,7 @@ export default () => {
     e.preventDefault()
 
     try {
-      await taskStore.saveTask(task, { deleted_at: new Date().toISOString() })
+      await taskStore.deleteTask(task)
       close()
     } catch (e) {
       setError(unwrapError(e))

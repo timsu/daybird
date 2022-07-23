@@ -82,7 +82,11 @@ export default ({ id, focus, onCreate }: Props) => {
   }
 
   return (
-    <div contentEditable={false} class="bg-gray-100 rounded p-2 flex flex-row items-center">
+    <div
+      id={task ? `task-${task.id}` : ''}
+      contentEditable={false}
+      class="bg-gray-100 rounded p-2 flex flex-row items-center"
+    >
       {task?.archived_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
       ) : (

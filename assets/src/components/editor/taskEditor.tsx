@@ -38,11 +38,6 @@ class SeqTaskBlot extends BlockEmbed {
     // nothing to do at the moment
   }
 
-  deleteAt() {
-    // disallow deletion
-    return false
-  }
-
   static blotName = 'seqtask'
   static tagName = 'div'
   static className = 'seqtask'

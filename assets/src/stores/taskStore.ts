@@ -15,6 +15,8 @@ class TaskStore {
 
   taskMap = map<TaskMap>({})
 
+  deletedTask = atom<Task>()
+
   // --- actions
 
   updateTaskMap = action(this.taskMap, 'updateTaskMap', (store, task: Task) => {
@@ -62,7 +64,12 @@ class TaskStore {
     this.saveTask(task, { archived_at: task.archived_at ? null : new Date().toISOString() })
   }
 
-  deleteTask = async (task: Task) => {}
+  deleteTask = async (task: Task) => {
+    this.deletedTask.set(task)
+    this.taskList.set(this.taskList.get().filter((t) => t.id != task.id))
+
+    this.saveTask(task, { deleted_at: new Date().toISOString() })
+  }
 }
 
 export const taskStore = new TaskStore()
