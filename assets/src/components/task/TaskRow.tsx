@@ -2,20 +2,23 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import Tooltip from '@/components/core/Tooltip'
+import { paths } from '@/config'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
-import { fileStore } from '@/stores/fileStore'
+import { DOC_EXT, fileStore, getNameFromPath } from '@/stores/fileStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
+import { DocumentIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
   id: string | undefined
   focus?: boolean
+  showContextProjectId?: string
   onCreate?: (task: Task) => void
 }
 
-export default ({ id, focus, onCreate }: Props) => {
+export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
   const [savedId, setSavedId] = useState<string>()
 
   id = id || savedId
@@ -109,8 +112,20 @@ export default ({ id, focus, onCreate }: Props) => {
         {task?.title}
       </div>
 
+      {showContextProjectId && task?.doc && (
+        <a href={`${paths.DOC}/${showContextProjectId}/${task.doc}`}>
+          <div
+            class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
+              ml-3 max-w-[100px] overflow-ellipsis"
+          >
+            <DocumentIcon class="w-4 h-4 mr-1" />
+            {getNameFromPath(task.doc)}
+          </div>
+        </a>
+      )}
+
       <div
-        class="text-sm font-semibold text-slate-500 ml-2 whitespace-nowrap cursor-pointer"
+        class="text-sm font-semibold text-slate-500 ml-3 whitespace-nowrap cursor-pointer"
         onClick={clickShortCode}
       >
         {task?.short_code}

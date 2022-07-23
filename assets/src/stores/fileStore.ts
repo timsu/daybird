@@ -101,3 +101,6 @@ onMount(fileStore.files, () => {
   })
   return () => unsub()
 })
+
+export const getNameFromPath = (path: string) =>
+  path.substring(path.lastIndexOf('/') + 1).replace(DOC_EXT, '')

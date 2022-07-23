@@ -4,7 +4,7 @@ import Banner from '@/components/core/Banner'
 import Helmet from '@/components/core/Helmet'
 import Document from '@/components/editor/Document'
 import { docStore } from '@/stores/docStore'
-import { DOC_EXT } from '@/stores/fileStore'
+import { DOC_EXT, getNameFromPath } from '@/stores/fileStore'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
@@ -15,9 +15,7 @@ type Props = {
 export default (props: Props) => {
   const docError = useStore(docStore.docError)
 
-  const title = props.filename
-    ? props.filename.substring(props.filename.lastIndexOf('/')).replace(DOC_EXT, '')
-    : ''
+  const title = props.filename ? getNameFromPath(props.filename) : ''
 
   return (
     <>

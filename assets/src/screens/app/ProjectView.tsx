@@ -41,7 +41,7 @@ export default ({ id }: Props) => {
       <div className="max-w-7xl mx-auto my-4 px-4 sm:px-6 md:px-8">
         {tasks.map((t) => (
           <div key={t.id}>
-            <TaskRow id={t.id} />
+            <TaskRow id={t.id} showContextProjectId={project.id} />
           </div>
         ))}
       </div>
