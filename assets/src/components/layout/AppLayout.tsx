@@ -128,7 +128,7 @@ export default function ({ children }: RenderableProps<{}>) {
           </div>
         </div>
 
-        <main className="flex flex-1">{children}</main>
+        <main className="flex flex-1 flex-col">{children}</main>
 
         <TaskContextMenu />
         <DeleteTaskModal />

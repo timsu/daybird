@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import Tooltip from '@/components/core/Tooltip'
 import { Task } from '@/models'
+import { docStore } from '@/stores/docStore'
+import { fileStore } from '@/stores/fileStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
 import { useStore } from '@nanostores/preact'
@@ -53,7 +55,8 @@ export default ({ id, focus, onCreate }: Props) => {
       if (!dirty) return
 
       if (!task) {
-        const newTask = await taskStore.createTask({ title })
+        const doc = docStore.filename.get()
+        const newTask = await taskStore.createTask({ title, doc })
         onCreate?.(newTask)
         div.innerText = '' // need to clear div text so it gets re-populated when id comes in
         setSavedId(newTask.id)

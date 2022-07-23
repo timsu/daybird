@@ -18,6 +18,7 @@ defmodule Sequence.Tasks.Task do
     field :short_code, :string
     field :state, :string
     field :priority, :integer
+    field :doc, :string
 
     field :due_at, :utc_datetime
     field :archived_at, :utc_datetime
@@ -35,8 +36,9 @@ defmodule Sequence.Tasks.Task do
   def changeset(task, attrs) do
     task
     |> cast(attrs, [:type, :short_code, :title, :description, :state, :completed_at, :deleted_at,
-      :archived_at, :project_id, :user_id, :creator_id])
+      :archived_at, :project_id, :user_id, :creator_id, :doc])
     |> Repo.generate_uuid
     |> validate_required([:uuid, :short_code, :title, :creator_id, :project_id])
+    |> Repo.truncate(:doc, 100)
   end
 end

@@ -16,8 +16,6 @@ class FileStore {
 
   files = atom<File[]>([])
 
-  currentFile = atom<File | undefined>()
-
   // --- actions
 
   updateFiles = action(this.files, 'listFiles', (store, files: File[]) => {
