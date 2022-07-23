@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
+import Tooltip from '@/components/core/Tooltip'
 import { Task } from '@/models'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
@@ -82,12 +83,16 @@ export default ({ id, focus, onCreate }: Props) => {
 
   return (
     <div contentEditable={false} class="bg-gray-100 rounded p-2 flex flex-row items-center">
-      <input
-        checked={!!task?.completed_at}
-        type="checkbox"
-        class="mr-2 rounded border-gray-400"
-        onClick={toggleComplete}
-      />
+      {task?.archived_at ? (
+        <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
+      ) : (
+        <input
+          checked={!!task?.completed_at}
+          type="checkbox"
+          class="mr-2 rounded border-gray-400"
+          onClick={toggleComplete}
+        />
+      )}
 
       <div
         contentEditable

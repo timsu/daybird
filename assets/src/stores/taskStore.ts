@@ -58,7 +58,11 @@ class TaskStore {
     return response.task
   }
 
-  toggleArchived = async (task: Task) => {}
+  toggleArchived = async (task: Task) => {
+    this.saveTask(task, { archived_at: task.archived_at ? null : new Date().toISOString() })
+  }
+
+  deleteTask = async (task: Task) => {}
 }
 
 export const taskStore = new TaskStore()

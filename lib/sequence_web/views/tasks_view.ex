@@ -7,7 +7,9 @@ defmodule SequenceWeb.TasksView do
       id: task.uuid |> String.replace("-", ""),
       title: task.title,
       short_code: task.short_code,
-      completed_at: task.completed_at
+      completed_at: task.completed_at,
+      archived_at: task.archived_at,
+      deleted_at: task.deleted_at
     }
   end
 

@@ -46,8 +46,14 @@ defmodule SequenceWeb.TasksController do
 
   # PUT /tasks/id
   def update(conn, %{ "id" => task_uuid } = params) do
-    attrs = Enum.reduce(["title", "type", "completed_at"], %{}, fn(key, acc) ->
-      if Map.has_key?(params, key), do: Map.put(acc, Macro.underscore(key), params[key]), else: acc end)
+    attrs = Enum.reduce(["title", "type", "completed_at", "archived_at", "deleted_at"], %{}, fn(key, acc) ->
+      if Map.has_key?(params, key) do
+        value = if String.ends_with?(key, "_at") and params[key] != nil, do: Timex.now, else: params[key]
+        Map.put(acc, Macro.underscore(key), params[key])
+      else
+        acc
+      end
+    end)
 
     with _user <- Guardian.Plug.current_resource(conn),
          {:ok, task} <- Tasks.task_by_uuid(task_uuid),
