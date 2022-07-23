@@ -48,11 +48,11 @@ export default ({ id, focus, onCreate }: Props) => {
     const div = titleRef.current
     if (!div) return
     const onFocusOut = async (e: Event) => {
-      const title = titleRef.current?.innerText
+      const title = titleRef.current?.innerText?.trim()
       const task = taskStore.taskMap.get()[id!]
 
       const dirty = title != task?.title
-      if (!dirty) return
+      if (!dirty || !title) return
 
       if (!task) {
         const doc = docStore.filename.get()

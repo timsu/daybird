@@ -2,6 +2,8 @@ import Quill, { RangeStatic } from 'quill'
 import Delta from 'quill-delta'
 
 import { QuillSource } from '@/config'
+import { modalStore } from '@/stores/modalStore'
+import { taskStore } from '@/stores/taskStore'
 
 type Context = {
   // what modifier was pressed
@@ -24,7 +26,7 @@ type Context = {
   prefix?: string
 
   // what formats are present
-  format: string[] | { [format: string]: boolean | string }
+  format?: string[] | { [format: string]: boolean | string }
 }
 
 export type Keybinding = {
@@ -51,7 +53,7 @@ export type Keybinding = {
   prefix?: RegExp
 
   // what formats to trigger on (either true or false)
-  format: string[] | { [format: string]: boolean | string }
+  format?: string[] | { [format: string]: boolean | string }
 
   // return whether quill should continue handling the key
   handler: (range: RangeStatic, context: Context) => boolean
@@ -74,6 +76,31 @@ const QuillKeybindings: Keybindindings = {
         // Otherwise propogate to Quill's default
         return true
       }
+    },
+  },
+
+  // prevent backspace delete tasks
+  preventDeleteTasks: {
+    key: 'Backspace',
+    collapsed: true,
+    handler: function (this: Keyboard, range, context) {
+      const leaf = this.quill.getLeaf(range.index - 1)[0]
+      const blotName = leaf?.statics.blotName
+      if (blotName == 'seqtask') {
+        const data = leaf.value()['seqtask']
+        const id = data.id
+        console.log('consider delete task:', id)
+
+        if (id && id != 'undefined' && id != 'null') {
+          const task = taskStore.taskMap.get()[id]
+          modalStore.deleteTaskModal.set(task)
+          return !task
+        } else {
+          // new task, allow deletion
+          return true
+        }
+      }
+      return true
     },
   },
 
