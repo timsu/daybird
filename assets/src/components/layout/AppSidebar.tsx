@@ -16,8 +16,8 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
 import {
-    BriefcaseIcon, CalendarIcon, DocumentAddIcon, DocumentIcon, FolderAddIcon, FolderIcon, HomeIcon,
-    PlusIcon
+    BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, DocumentAddIcon, DocumentIcon,
+    FolderAddIcon, FolderIcon, HomeIcon, PlusIcon, ViewListIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -49,6 +49,15 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
 
 function Links() {
   const [projectsExpanded, setProjectsExpanded] = useState(true)
+  const projects = useStore(projectStore.projects)
+
+  const projectItems: NavItem[] = projectsExpanded
+    ? projects.map((p) => ({
+        name: p.name!,
+        href: paths.PROJECTS + '/' + p.id,
+        indent: 35,
+      }))
+    : []
 
   let navigation: NavItem[] = [
     { name: 'Dashboard', href: paths.APP, icon: HomeIcon },
@@ -57,17 +66,13 @@ function Links() {
       href: paths.PROJECTS,
       icon: BriefcaseIcon,
     },
+    ...projectItems,
+    {
+      name: 'Tasks',
+      href: paths.TASKS,
+      icon: ViewListIcon,
+    },
   ]
-
-  if (projectsExpanded) {
-    const projects = useStore(projectStore.projects)
-    const projectItems: NavItem[] = projects.map((p) => ({
-      name: p.name!,
-      href: paths.PROJECTS + '/' + p.id,
-      indent: 35,
-    }))
-    navigation = [...navigation, ...projectItems]
-  }
 
   return (
     <nav className="px-2 py-4 space-y-1">

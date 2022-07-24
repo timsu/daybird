@@ -20,6 +20,7 @@ type Props = {
 
 export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
   const [savedId, setSavedId] = useState<string>()
+  const [showPlaceholder, setPlaceholder] = useState<boolean>(true)
 
   id = id || savedId
   const task = useStore(taskStore.taskMap)[id!]
@@ -30,7 +31,10 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
     if (!div) return
 
     // prevent navigation propagating to Quill when focused on this element
-    div.addEventListener('input', (e) => e.stopPropagation())
+    div.addEventListener('input', (e) => {
+      e.stopPropagation()
+      setPlaceholder(false)
+    })
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
       e.stopPropagation()
@@ -108,7 +112,7 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
     <div
       id={task ? `task-${task.id}` : ''}
       contentEditable={false}
-      class="bg-gray-100 rounded p-2 flex flex-row items-center"
+      class="bg-gray-100 rounded p-2 flex flex-row items-center relative"
     >
       {task?.archived_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
@@ -121,11 +125,16 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
         />
       )}
 
+      {!task?.title && showPlaceholder && (
+        <div class="absolute left-[2.2em] pointer-events-none text-gray-400">New task</div>
+      )}
+
       <div
         contentEditable
         ref={titleRef}
         onKeyDown={onKeyDown}
         class={classNames('flex-grow p-1', task?.completed_at ? 'line-through text-gray-500' : '')}
+        placeholder="New task"
       >
         {task?.title}
       </div>

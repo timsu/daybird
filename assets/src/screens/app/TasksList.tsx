@@ -7,11 +7,10 @@ import { taskStore } from '@/stores/taskStore'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
-  id?: string
   path: string
 }
-export default ({ id }: Props) => {
-  const project = useStore(projectStore.projectMap)[id || '']
+export default (props: Props) => {
+  const project = useStore(projectStore.currentProject)
   const tasks = useStore(taskStore.taskList)
 
   useEffect(() => {
@@ -26,16 +25,28 @@ export default ({ id }: Props) => {
   return (
     <div className="py-6">
       <Helmet title={`ListNote | ${project.name}`} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="max-w-7xl px-4 sm:px-6 md:px-8">
         <h1 className="text-2xl font-semibold text-gray-900">
           {project.name} ({project.shortcode})
         </h1>
       </div>
 
-      <div className="h-8" />
+      <div class="max-w-7xl px-4 my-8 sm:px-6 md:px-8">
+        <TaskRow id={undefined} />
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="text-gray-600 italic">Settings coming soon.</div>
+      <hr />
+
+      <div class="max-w-7xl px-4 mt-4 sm:px-6 md:px-8">
+        <div class="text-sm text-gray-400 font-semibold">SORT: Old</div>
+      </div>
+
+      <div className="max-w-7xl my-4 px-4 sm:px-6 md:px-8">
+        {tasks.map((t) => (
+          <div key={t.id}>
+            <TaskRow id={t.id} showContextProjectId={project.id} />
+          </div>
+        ))}
       </div>
     </div>
   )

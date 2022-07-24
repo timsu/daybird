@@ -73,9 +73,13 @@ export function useQuill(id: string, modules: StringMap) {
       modules,
     })
     quillRef.current = quill
-    if (config.dev) (window as any)['quill'] = quill
+    window.quill = quill
 
     quill.focus()
+
+    return () => {
+      window.quill = undefined
+    }
   }, [])
 
   return quillRef
