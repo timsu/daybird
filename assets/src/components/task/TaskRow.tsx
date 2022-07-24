@@ -64,7 +64,8 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
         div.innerText = '' // need to clear div text so it gets re-populated when id comes in
         setSavedId(newTask.id)
       } else {
-        await taskStore.saveTask(task, { title })
+        const doc = task.doc ? undefined : docStore.filename.get()
+        await taskStore.saveTask(task, { title, doc })
       }
     }
 
@@ -87,6 +88,22 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
     triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
   }
 
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key == 'Backspace') {
+      const title = titleRef.current?.innerText?.trim()
+      if (title == '') {
+        // user pressed backspace on an empty task, let's delete it.
+        if (!task) {
+          id = 'delete-me'
+          titleRef.current!.id = 'task-delete-me'
+          taskStore.deletedTask.set({ id } as Task)
+        } else {
+          taskStore.deleteTask(task)
+        }
+      }
+    }
+  }
+
   return (
     <div
       id={task ? `task-${task.id}` : ''}
@@ -107,6 +124,7 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
       <div
         contentEditable
         ref={titleRef}
+        onKeyDown={onKeyDown}
         class={classNames('flex-grow p-1', task?.completed_at ? 'line-through text-gray-500' : '')}
       >
         {task?.title}
