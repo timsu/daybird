@@ -15,10 +15,11 @@ type Props = {
   id: string | undefined
   focus?: boolean
   showContextProjectId?: string
+  newTaskMode?: boolean
   onCreate?: (task: Task) => void
 }
 
-export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
+export default ({ id, focus, showContextProjectId, newTaskMode, onCreate }: Props) => {
   const [savedId, setSavedId] = useState<string>()
   const [showPlaceholder, setPlaceholder] = useState<boolean>(true)
 
@@ -33,12 +34,12 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
     // prevent navigation propagating to Quill when focused on this element
     div.addEventListener('input', (e) => {
       e.stopPropagation()
-      setPlaceholder(false)
+      setPlaceholder(!titleRef.current?.innerText)
     })
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
       e.stopPropagation()
-      if (e.key == 'Enter' && !e.shiftKey) {
+      if (!newTaskMode && e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
         const isBeginning = window.getSelection()?.anchorOffset == 0
         if (isBeginning) {
@@ -67,13 +68,26 @@ export default ({ id, focus, showContextProjectId, onCreate }: Props) => {
         onCreate?.(newTask)
         div.innerText = '' // need to clear div text so it gets re-populated when id comes in
         setSavedId(newTask.id)
+        return newTask
       } else {
         const doc = task.doc ? undefined : docStore.filename.get()
         await taskStore.saveTask(task, { title, doc })
+        return task
       }
     }
 
     div.addEventListener('focusout', onFocusOut)
+    if (newTaskMode)
+      div.addEventListener('keypress', async (e) => {
+        if (e.key == 'Enter' && !e.shiftKey) {
+          e.preventDefault()
+          const task = await onFocusOut(e)
+          if (!task) return
+          setSavedId(undefined)
+          setPlaceholder(true)
+          taskStore.taskList.set([task, ...taskStore.taskList.get()])
+        }
+      })
     if (focus && !id) div.focus()
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [id, focus])

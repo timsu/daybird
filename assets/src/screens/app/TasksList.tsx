@@ -32,13 +32,13 @@ export default (props: Props) => {
       </div>
 
       <div class="max-w-7xl px-4 my-8 sm:px-6 md:px-8">
-        <TaskRow id={undefined} />
+        <TaskRow id={undefined} newTaskMode />
       </div>
 
       <hr />
 
       <div class="max-w-7xl px-4 mt-4 sm:px-6 md:px-8">
-        <div class="text-sm text-gray-400 font-semibold">SORT: Old</div>
+        <div class="text-sm text-gray-400 font-semibold">SORT: oldest first</div>
       </div>
 
       <div className="max-w-7xl my-4 px-4 sm:px-6 md:px-8">
