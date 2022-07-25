@@ -1,5 +1,5 @@
 cd assets
-yarn
+yarn --production=false
 yarn build
 cd ..
 mix phx.digest
