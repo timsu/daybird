@@ -21,6 +21,7 @@ defmodule SequenceWeb.ErrorHandler do
         if Sequence.test? do
           render conn, "500.json", %{ message: inspect(reason) }
         else
+          Logger.warn(inspect(reason))
           render conn, "500.json"
         end
     end

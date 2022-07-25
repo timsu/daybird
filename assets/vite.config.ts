@@ -37,7 +37,8 @@ const outDir = '../priv/static'
 
 const staticPath = path.join(__dirname, 'static')
 const outPath = path.join(__dirname, outDir)
-execSync(`rm -rf ${outPath}/*`)
+execSync(`rm -rf ${outPath}`)
+execSync(`mkdir ${outPath}`)
 execSync(`cp -r ${staticPath}/* ${outPath}`)
 
 // https://vitejs.dev/config/
