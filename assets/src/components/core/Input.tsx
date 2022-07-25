@@ -6,9 +6,11 @@ export default (props: Props) => {
   const { label, ...rest } = props
   return (
     <div className="mb-2">
-      <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={props.id} className="block text-sm font-medium text-gray-700">
+          {label}
+        </label>
+      )}
       <div className="mt-1">
         <input
           {...rest}

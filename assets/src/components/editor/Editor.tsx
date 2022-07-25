@@ -24,7 +24,7 @@ export default ({ project, filename, contents, saveContents }: Props) => {
     modules: QuillConfig,
     placeholder:
       'Welcome to ListNote!\n\nStart typing to create a note.\n\n' +
-      'Type "- " to create a task.\n\nType "-- " or "* " to create a bullet list.\n\n' +
+      'Type "[] " to create a task.\n\n' +
       'Have fun!',
   })
 
@@ -64,7 +64,7 @@ export default ({ project, filename, contents, saveContents }: Props) => {
 
   useDeleteTaskListener(quillRef)
 
-  return <div id="editor" class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-10 px-4" />
+  return <div id="editor" class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-4" />
 }
 
 export function useQuill(id: string, options: QuillOptionsStatic) {

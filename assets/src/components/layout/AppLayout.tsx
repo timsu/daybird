@@ -5,9 +5,11 @@ import LogoDark from '@/components/core/LogoDark'
 import AppSidebar from '@/components/layout/AppSidebar'
 import UserMenu from '@/components/layout/UserMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
+import QuickFindModal from '@/components/modals/QuickFindModal'
 import TaskContextMenu from '@/components/task/TaskContextMenu'
+import { modalStore } from '@/stores/modalStore'
 import { uiStore } from '@/stores/uiStore'
-import { classNames } from '@/utils'
+import { classNames, ctrlOrCommand } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
 import { BellIcon, MenuAlt2Icon, XIcon } from '@heroicons/react/outline'
 import { SearchIcon } from '@heroicons/react/solid'
@@ -103,25 +105,25 @@ export default function ({ children }: RenderableProps<{}>) {
                   <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
                     <SearchIcon className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <input
-                    id="search-field"
-                    className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
-                    placeholder="Search"
-                    type="search"
-                    name="search"
-                    autoComplete="off"
-                  />
+                  <div
+                    className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-500
+                      focus:outline-none focus:placeholder-gray-400 focus:ring-0
+                      focus:border-transparent sm:text-sm cursor-pointer flex items-center"
+                    onClick={() => modalStore.quickFindModal.set(true)}
+                  >
+                    Search ({ctrlOrCommand()}+P)
+                  </div>
                 </div>
               </form>
             </div>
             <div className="ml-4 flex items-center md:ml-6">
-              <button
+              {/* <button
                 type="button"
                 className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <span className="sr-only">View notifications</span>
                 <BellIcon className="h-6 w-6" aria-hidden="true" />
-              </button>
+              </button> */}
 
               <UserMenu />
             </div>
@@ -132,6 +134,7 @@ export default function ({ children }: RenderableProps<{}>) {
 
         <TaskContextMenu />
         <DeleteTaskModal />
+        <QuickFindModal />
       </div>
     </>
   )

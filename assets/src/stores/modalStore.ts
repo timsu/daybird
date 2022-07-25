@@ -15,6 +15,8 @@ class ModalStore {
   renameFileModal = atom<File | false>(false)
 
   deleteTaskModal = atom<Task | false>(false)
+
+  quickFindModal = atom<boolean>(false)
 }
 
 export const modalStore = new ModalStore()

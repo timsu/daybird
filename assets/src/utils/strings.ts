@@ -1,4 +1,5 @@
 import { logger } from '@/utils/logger'
+import { isMac } from '@/utils/os'
 
 /** join class names */
 export function classNames(...classes: string[]) {
@@ -67,4 +68,8 @@ export function toTitleCase(str: string, delim?: string) {
     }
   })
   return title.charAt(0).toUpperCase() + title.substr(1)
+}
+
+export function ctrlOrCommand() {
+  return isMac ? '⌘' : 'ctrl'
 }
