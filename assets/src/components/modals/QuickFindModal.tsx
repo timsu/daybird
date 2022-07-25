@@ -10,12 +10,13 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
 import { isMac } from '@/utils/os'
-import { SearchIcon } from '@heroicons/react/outline'
+import { BriefcaseIcon, DocumentIcon, SearchIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type SearchResult = {
+  type: 'file' | 'project'
   name: string
-  project: string
+  desc?: string
   href: string
   score: number
 }
@@ -65,15 +66,34 @@ function QuickSearchBody({ close }: { close: () => void }) {
 
     const files = fileStore.files.get()
     const project = projectStore.currentProject.get()
+    const projects = projectStore.projects.get()
     const results: SearchResult[] = files
       .filter((f) => f.type == 'doc')
-      .map((f) => ({
-        name: f.name,
-        project: project!.name,
-        href: `${paths.DOC}/${project!.id}/${f.path}`,
-        score: stringSimilarity(searchText, f.name, substringLength),
-      }))
+      .map(
+        (f) =>
+          ({
+            type: 'file',
+            name: f.name,
+            desc: project!.name,
+            href: `${paths.DOC}/${project!.id}/${f.path}`,
+            score: stringSimilarity(searchText, f.name, substringLength),
+          } as SearchResult)
+      )
       .filter((s) => s.score > 0)
+      .concat(
+        projects
+          .map(
+            (p) =>
+              ({
+                type: 'project',
+                name: p.name,
+                desc: p.id == project?.id ? 'Current Project' : 'Project',
+                href: `${paths.PROJECTS}/${p.id}`,
+                score: stringSimilarity(searchText, p.name, substringLength),
+              } as SearchResult)
+          )
+          .filter((s) => s.score > 0)
+      )
       .sort((a, b) => b.score - a.score)
       .slice(0, 10)
 
@@ -83,6 +103,8 @@ function QuickSearchBody({ close }: { close: () => void }) {
 
   useEffect(() => {
     if (!results?.length) return
+
+    setSelected(0)
 
     const keyListener = (e: KeyboardEvent) => {
       console.log(e.key)
@@ -120,7 +142,7 @@ function QuickSearchBody({ close }: { close: () => void }) {
         <input
           class="block w-full appearance-none bg-transparent py-4 pl-4 pr-12 text-base
             text-slate-900 placeholder:text-slate-600 without-ring sm:text-sm sm:leading-6"
-          placeholder="Jump to file..."
+          placeholder="Jump to..."
           type="text"
           value={searchText}
           onChange={(e) => setSearchText((e.target as HTMLInputElement).value)}
@@ -136,16 +158,20 @@ function QuickSearchBody({ close }: { close: () => void }) {
           {results.map((r, idx) => (
             <a href={r.href} key={r.href}>
               <li
-                class={classNames(
-                  'flex items-center justify-between p-4',
-                  selected == idx ? 'bg-blue-300' : ''
-                )}
+                class={classNames('flex items-center p-4', selected == idx ? 'bg-blue-300' : '')}
                 ref={(elem) =>
                   selected == idx && elem?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
                 }
               >
-                <span class="whitespace-nowrap font-semibold text-slate-900">{r.name}</span>
-                <span class="ml-4 text-right text-xs text-slate-600">{r.project}</span>
+                {r.type == 'file' ? (
+                  <DocumentIcon class="w-4 h-4" />
+                ) : (
+                  <BriefcaseIcon class="w-4 h-4" />
+                )}
+                <span class="ml-4 whitespace-nowrap font-semibold text-slate-900 grow">
+                  {r.name}
+                </span>
+                <span class="ml-4 text-right text-xs text-slate-600">{r.desc}</span>
               </li>
             </a>
           ))}
