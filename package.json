@@ -4,6 +4,7 @@
   "author": "Tim Su <tim@tandem.chat>",
   "private": true,
   "scripts": {
+    "build": "./scripts/build.sh",
     "tsc": "cd assets && yarn tsc"
   },
   "devDependencies": {

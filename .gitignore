@@ -21,9 +21,7 @@ secrets/
 .deliver/releases
 
 # asset ignores
-/priv/static/assets
-/priv/static/js
-/priv/static/manifest.json
+/priv/static
 
 # yarn / npm
 package-lock.json

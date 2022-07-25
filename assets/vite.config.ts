@@ -35,10 +35,10 @@ const useAnalyzer = process.env.ANALYZE
 
 const outDir = '../priv/static'
 
-if (process.env.NODE_ENV == 'production') {
-  const outPath = path.join(__dirname, outDir)
-  execSync(`rm -rf ${outPath}/js ${outPath}/assets`)
-}
+const staticPath = path.join(__dirname, 'static')
+const outPath = path.join(__dirname, outDir)
+execSync(`rm -rf ${outPath}/*`)
+execSync(`cp -r ${staticPath}/* ${outPath}`)
 
 // https://vitejs.dev/config/
 export default defineConfig({
