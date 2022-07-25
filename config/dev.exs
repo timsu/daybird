@@ -1,6 +1,7 @@
 import Config
 
 serve_static = System.get_env("SERVE_STATIC")
+vite_cmd = if serve_static, do: "build", else: "dev"
 
 # Configure your database
 config :sequence, Sequence.Repo,
@@ -25,7 +26,7 @@ config :sequence, SequenceWeb.Endpoint,
   secret_key_base: "2LYN/gOfrfsIewT52XqVRFxZ/1szWHLUZmM02pzPaGaWGS4AQMhtb/dHXHTCDYtl",
   watchers: [
     # Start the esbuild watcher by calling Esbuild.install_and_run(:default, args)
-    yarn: ["vite", "dev", cd: Path.expand("../assets", __DIR__)]
+    yarn: ["vite", vite_cmd, cd: Path.expand("../assets", __DIR__)]
   ]
 
 config :sequence, serve_static: serve_static

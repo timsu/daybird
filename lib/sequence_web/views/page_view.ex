@@ -14,4 +14,8 @@ defmodule SequenceWeb.PageView do
     end
   end
 
+  def dev_server?() do
+    (Sequence.dev? or Sequence.test?) && !Application.get_env(:sequence, :serve_static)
+  end
+
 end

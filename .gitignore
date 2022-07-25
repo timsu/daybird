@@ -22,6 +22,7 @@ secrets/
 
 # asset ignores
 /priv/static/assets
+/priv/static/js
 /priv/static/manifest.json
 
 # yarn / npm

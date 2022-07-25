@@ -18,7 +18,7 @@ defmodule SequenceWeb.Router do
       Plug.Static,
       at: "/", from: :sequence,
       gzip: true,
-      only: ~w(assets favicon.ico robots.txt version.json)
+      only: ~w(assets js favicon.ico robots.txt version.json)
     )
   end
 

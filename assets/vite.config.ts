@@ -29,14 +29,18 @@ export default defineConfig({
   },
   build: {
     outDir: '../priv/static',
-    // generate manifest.json in outDir
-    manifest: true,
     cssCodeSplit: false,
+    minify: true,
     rollupOptions: {
       input: {
         landing: 'src/landing.tsx',
         auth: 'src/auth.tsx',
         app: 'src/app.tsx',
+      },
+      output: {
+        entryFileNames: 'js/[name].js',
+        chunkFileNames: 'js/[name].js',
+        assetFileNames: 'assets/[name][extname]',
       },
     },
   },
