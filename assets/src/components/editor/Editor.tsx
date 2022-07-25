@@ -64,7 +64,7 @@ export default ({ project, filename, contents, saveContents }: Props) => {
 
   useDeleteTaskListener(quillRef)
 
-  return <div id="editor" class="listnote max-w-2xl mx-auto h-full py-2 px-4" />
+  return <div id="editor" class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-10 px-4" />
 }
 
 export function useQuill(id: string, options: QuillOptionsStatic) {
