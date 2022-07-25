@@ -1,13 +1,11 @@
 import { action, atom, onMount } from 'nanostores'
 
 import { API } from '@/api'
-import { config, paths } from '@/config'
+import { config, LS_AUTH_TOKENS, paths } from '@/config'
 import { AuthTokenPair, Project, User } from '@/models'
 import { logger } from '@/utils'
 
 import { projectStore } from './projectStore'
-
-const LS_AUTH_TOKENS = 'at'
 
 class AuthStore {
   // --- stores
@@ -17,8 +15,6 @@ class AuthStore {
   authTokens = atom<AuthTokenPair | undefined>()
 
   // --- initialization
-
-  hasToken = () => !!localStorage.getItem(LS_AUTH_TOKENS)
 
   loginHelper = async (givenTokens: AuthTokenPair) => {
     const tokens = await API.exchangeAndSetAuthToken(givenTokens)

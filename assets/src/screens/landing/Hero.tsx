@@ -10,7 +10,7 @@ export default () => (
       Break free from rigid project management tools. Plan projects and collaborate on notes with
       powerful embedded tasks that can be searched and sorted.
       <div className="h-4" />
-      Work more effectively when context is paired with action.
+      Work better by working your way.
     </p>
     <div className="mt-4 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
       <div className="rounded-md shadow">

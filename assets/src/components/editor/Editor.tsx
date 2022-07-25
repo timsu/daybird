@@ -1,13 +1,10 @@
-import 'quill/dist/quill.bubble.css'
 import './quill.sequence.css'
 
 import { MutableRef, useEffect, useRef } from 'preact/hooks'
-import Quill, { QuillOptionsStatic, StringMap } from 'quill'
+import Quill, { QuillOptionsStatic } from 'quill'
 import Delta from 'quill-delta'
-import { text } from 'stream/consumers'
 
 import QuillConfig from '@/components/editor/QuillConfig'
-import { config } from '@/config'
 import { Project } from '@/models'
 import { taskStore } from '@/stores/taskStore'
 import { debounce, DebounceStyle } from '@/utils'

@@ -1,10 +1,9 @@
 import Button from '@/components/core/Button'
 import Logo from '@/components/core/Logo'
-import { paths } from '@/config'
-import { authStore } from '@/stores/authStore'
+import { hasToken, paths } from '@/config'
 
 export default function () {
-  const loggedIn = authStore.hasToken()
+  const loggedIn = hasToken()
   return (
     <div className="bg-white flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10">
       <div>
