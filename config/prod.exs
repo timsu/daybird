@@ -1,12 +1,5 @@
 import Config
 
-# Configure your database
-config :sequence, Sequence.Repo,
-  url: System.get_env("ECTO_URL"),
-  pool_size: 15,
-  charset: "utf8mb4",
-  queue_target: 5000
-
 config :sequence, staging: System.get_env("STAGING")
 
 # For production, don't forget to configure the url host
@@ -19,9 +12,6 @@ config :sequence, staging: System.get_env("STAGING")
 # which you should run after static files are built and
 # before starting your production server.
 config :sequence, SequenceWeb.Endpoint,
-  http: [port: 5001, compress: true],
-  url: [host: "listnote.co", port: 80],
-  secret_key_base: System.get_env("WEB_SECRET_KEY_BASE"),
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 
