@@ -81,7 +81,7 @@ export default class TaskEditor {
     const [line, offset] = this.quill.getLine(selection.index)
     const text = line.domNode.textContent
 
-    if (text == '- ') {
+    if (text == '[] ') {
       const startIndex = selection.index - text.length
       setTimeout(() => {
         this.quill.deleteText(startIndex, text.length + 1)

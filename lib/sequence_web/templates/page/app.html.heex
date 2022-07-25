@@ -1,7 +1,4 @@
 <div id="app"></div>
-<%= if @quill do %>
-  <link rel="stylesheet" href={Routes.static_path(@conn, "/css/quill.bubble.css")}>
-<% end %>
 <%= if !dev_server?() do %>
   <link rel="stylesheet" href={Routes.static_path(@conn, "/assets/style.css")}>
 <% end %>

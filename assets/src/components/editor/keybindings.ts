@@ -117,7 +117,7 @@ const QuillKeybindings: Keybindindings = {
       header: false,
       table: false,
     },
-    prefix: /^\s*?(1\.|\*|--)$/,
+    prefix: /^\s*?(1\.|\*|-)$/,
     handler: function (this: Keyboard, range, context) {
       const { length } = context.prefix!
       const [line, offset] = this.quill.getLine(range.index)
