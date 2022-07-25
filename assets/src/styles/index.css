@@ -21,3 +21,7 @@ body,
 .fade-exit { opacity: 1 }
 .fade-exit-active { opacity: 0 }
 .fade-exit-done { opacity: 0 }
+
+.without-ring {
+  @apply focus:ring-0 focus:ring-offset-0;
+}
