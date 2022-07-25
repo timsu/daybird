@@ -2,7 +2,7 @@ import 'quill/dist/quill.bubble.css'
 import './quill.sequence.css'
 
 import { MutableRef, useEffect, useRef } from 'preact/hooks'
-import Quill, { StringMap } from 'quill'
+import Quill, { QuillOptionsStatic, StringMap } from 'quill'
 import Delta from 'quill-delta'
 import { text } from 'stream/consumers'
 
@@ -22,7 +22,14 @@ type Props = {
 const SAVE_INTERVAL = 5_000
 
 export default ({ project, filename, contents, saveContents }: Props) => {
-  const quillRef = useQuill('#editor', QuillConfig)
+  const quillRef = useQuill('#editor', {
+    theme: 'bubble',
+    modules: QuillConfig,
+    placeholder:
+      'Welcome to ListNote!\n\nStart typing to create a note.\n\n' +
+      'Type "- " to create a task.\n\nType "-- " or "* " to create a bullet list.\n\n' +
+      'Have fun!',
+  })
 
   const currentFile = useRef<string>()
   const isDirty = useRef<boolean>()
@@ -60,22 +67,19 @@ export default ({ project, filename, contents, saveContents }: Props) => {
 
   useDeleteTaskListener(quillRef)
 
-  return <div id="editor" class="max-w-2xl mx-auto h-full py-8 px-4" />
+  return <div id="editor" class="max-w-2xl mx-auto h-full py-2 px-4" />
 }
 
-export function useQuill(id: string, modules: StringMap) {
+export function useQuill(id: string, options: QuillOptionsStatic) {
   const quillRef = useRef<Quill>()
 
   // Initialize Quill
   useEffect(() => {
-    const quill = new Quill(id, {
-      theme: 'bubble',
-      modules,
-    })
+    const quill = new Quill(id, options)
     quillRef.current = quill
     window.quill = quill
 
-    quill.focus()
+    setTimeout(() => quill.focus(), 50)
 
     return () => {
       window.quill = undefined

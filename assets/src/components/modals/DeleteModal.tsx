@@ -40,7 +40,7 @@ export default ({ label, close, performAction }: Props) => {
         </div>
         <div className="mt-3 text-center sm:mt-5">
           <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-            Delete {label}?
+            Delete “{label}”?
           </Dialog.Title>
         </div>
         <div className="mt-5 sm:mt-6 flex justify-between">

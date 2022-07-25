@@ -67,12 +67,12 @@ function Links() {
       icon: BriefcaseIcon,
     },
     ...projectItems,
-    {
+    projects.length > 0 && {
       name: 'Tasks',
       href: paths.TASKS,
       icon: ViewListIcon,
     },
-  ]
+  ].filter(Boolean) as NavItem[]
 
   return (
     <nav className="px-2 py-4 space-y-1">

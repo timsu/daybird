@@ -28,6 +28,7 @@ export default (props: Props) => {
         </div>
       </CSSTransition>
       <div class="grow bg-white w-full">
+        <h1 class="text-xl font-bold max-w-2xl mx-auto pt-6 px-8">{title}</h1>
         <Document projectId={props.projectId} filename={props.filename} />
       </div>
     </>

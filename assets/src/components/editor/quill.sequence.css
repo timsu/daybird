@@ -7,6 +7,11 @@
   padding-left: 0em;
 }
 
+.ql-editor.ql-blank::before {
+  left: 32px;
+  right: 32px;
+}
+
 .ql-editor li > .ql-ui:before {
   margin-right: 0.6em;
 }

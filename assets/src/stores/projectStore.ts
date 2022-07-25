@@ -5,6 +5,8 @@ import { API } from '@/api'
 import { config, paths } from '@/config'
 import { Project, User } from '@/models'
 import { authStore } from '@/stores/authStore'
+import { docStore } from '@/stores/docStore'
+import { fileStore } from '@/stores/fileStore'
 import { logger } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
@@ -71,7 +73,8 @@ class ProjectStore {
     const projects = [...store.get(), project]
     this.updateProjects(projects)
 
-    route(paths.PROJECTS + '/' + project.id)
+    // create a document
+    fileStore.newFile('Welcome')
   })
 }
 
