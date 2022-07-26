@@ -86,7 +86,7 @@ class FileStore {
     this.files.set(removeFile(this.files.get()))
     this.files.notify()
 
-    if (location.pathname.includes(file.path)) {
+    if (location.pathname.includes(encodeURI(file.path))) {
       route(paths.APP)
     }
   }
