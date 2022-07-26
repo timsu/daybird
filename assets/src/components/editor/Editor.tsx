@@ -76,6 +76,9 @@ export function useQuill(id: string, options: QuillOptionsStatic) {
     quillRef.current = quill
     window.quill = quill
 
+    quill.root.setAttribute('autocapitalize', 'sentences')
+    quill.root.setAttribute('spellcheck', 'true')
+
     setTimeout(() => quill.focus(), 50)
 
     return () => {

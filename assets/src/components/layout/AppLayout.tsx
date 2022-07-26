@@ -7,6 +7,8 @@ import UserMenu from '@/components/layout/UserMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
 import TaskContextMenu from '@/components/task/TaskContextMenu'
+import { paths } from '@/config'
+import useSwipe from '@/hooks/useSwipe'
 import { modalStore } from '@/stores/modalStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
@@ -23,10 +25,16 @@ export default function ({ children }: RenderableProps<{}>) {
 
   useEffect(() => {
     if (sidebarOpen) {
-      const unsub = uiStore.path.listen(() => setSidebarOpen(false))
+      const unsub = uiStore.path.listen((newPath) => {
+        if (!newPath.includes(paths.PROJECTS + '/')) setSidebarOpen(false)
+      })
       return unsub
     }
   }, [sidebarOpen])
+
+  useSwipe((dir) => {
+    setSidebarOpen(dir == 'right')
+  })
 
   return (
     <>
