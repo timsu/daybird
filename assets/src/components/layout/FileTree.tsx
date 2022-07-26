@@ -38,7 +38,6 @@ export default ({ projectId }: { projectId: string }) => {
               <Match path={href}>
                 {({ url }: { url: string }) => {
                   const matches = location.pathname == encodeURI(href)
-                  console.log('matches', matches, location.pathname, encodeURI(href))
                   return (
                     <Link
                       key={item.name}

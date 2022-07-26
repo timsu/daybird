@@ -1,5 +1,5 @@
 import { Fragment } from 'preact'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
@@ -10,20 +10,32 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { toTitleCase, unwrapError } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
-import { PlusIcon } from '@heroicons/react/outline'
+import { DocumentIcon, PlusIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default () => {
   const [name, setName] = useState<string>()
   const [error, setError] = useState<string>()
   const [submitting, setSubmitting] = useState<boolean>(false)
-  const open = useStore(modalStore.newFileModal)
+  const newFileOpen = useStore(modalStore.newFileModal)
+  const renameFileOpen = useStore(modalStore.renameFileModal)
+
+  const open = newFileOpen || renameFileOpen
 
   if (!open) return null
 
-  const noun = toTitleCase(open)
+  const isRename = !!renameFileOpen
+  const noun = toTitleCase(newFileOpen ? newFileOpen : renameFileOpen ? renameFileOpen.type : '')
 
-  const close = () => modalStore.newFileModal.set(false)
+  useEffect(() => {
+    setName(renameFileOpen ? renameFileOpen.name : '')
+    setError('')
+  }, [newFileOpen, renameFileOpen])
+
+  const close = () => {
+    modalStore.newFileModal.set(false)
+    modalStore.renameFileModal.set(false)
+  }
 
   const submit = async (e: Event) => {
     e.preventDefault()
@@ -33,9 +45,12 @@ export default () => {
 
     try {
       setSubmitting(true)
-      await fileStore.newFile(name)
-      setName('')
-      setError('')
+
+      if (renameFileOpen) {
+        await fileStore.renameFile(renameFileOpen, name)
+      } else {
+        await fileStore.newFile(name)
+      }
       close()
     } catch (e) {
       setError(unwrapError(e))
@@ -44,15 +59,22 @@ export default () => {
     }
   }
 
+  const [iconBg, iconColor] = isRename
+    ? ['bg-blue-100', 'text-blue-600']
+    : ['bg-green-100', 'text-green-600']
+  const iconClass = `h-6 w-6 ${iconColor}`
+
   return (
     <Modal open={!!open} close={close}>
       <form onSubmit={submit}>
-        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-          <PlusIcon className="h-6 w-6 text-green-600" aria-hidden="true" />
+        <div
+          className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full ${iconBg}`}
+        >
+          {isRename ? <DocumentIcon class={iconClass} /> : <PlusIcon class={iconClass} />}
         </div>
         <div className="mt-3 text-center sm:mt-5">
           <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-            New {noun}
+            {isRename ? 'Rename' : 'New'} {noun}
           </Dialog.Title>
           <div className="mt-6 text-left">
             <Input
@@ -66,7 +88,7 @@ export default () => {
           </div>
         </div>
         <div className="mt-5 sm:mt-6">
-          <Submit label={`Create ${noun}`} disabled={submitting} />
+          <Submit label={`${isRename ? 'Rename' : 'Create'} ${noun}`} disabled={submitting} />
         </div>
 
         <ErrorMessage error={error} />

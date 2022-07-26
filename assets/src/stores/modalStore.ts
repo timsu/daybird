@@ -1,6 +1,6 @@
 import { atom } from 'nanostores'
 
-import { File } from '@/config'
+import { config, File } from '@/config'
 import { Project, Task } from '@/models'
 import { uiStore } from '@/stores/uiStore'
 
@@ -23,6 +23,7 @@ class ModalStore {
 }
 
 export const modalStore = new ModalStore()
+if (config.dev) (window as any)['modalStore'] = modalStore
 
 const hideSidebar = () => uiStore.sidebarOpen.set(false)
 

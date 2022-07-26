@@ -5,6 +5,7 @@ import { route } from 'preact-router'
 import { API } from '@/api'
 import { config, File, FileType, paths } from '@/config'
 import { Project } from '@/models'
+import { docStore } from '@/stores/docStore'
 import { projectStore } from '@/stores/projectStore'
 // import { projectStore } from '@/stores/projectStore'
 import { assertIsDefined, logger } from '@/utils'
@@ -63,7 +64,23 @@ class FileStore {
     else await this.newFile(name)
   }
 
-  renameFile = async (file: File) => {}
+  renameFile = async (file: File, name: string) => {
+    const project = projectStore.currentProject.get()
+    assertIsDefined(project, 'project is defined')
+
+    const prevPath = file.path
+    const rootPath = prevPath.substring(0, prevPath.lastIndexOf('/') + 1)
+    const newPath = rootPath + name + (file.type == 'doc' ? DOC_EXT : '')
+
+    file.path = newPath
+    file.name = name
+    this.files.notify()
+
+    await API.renameFile(project, prevPath, newPath)
+    if (docStore.filename.get() == prevPath) {
+      route(`${paths.DOC}/${project.id}/${newPath}`)
+    }
+  }
 
   deleteFile = async (file: File) => {
     const project = projectStore.currentProject.get()
