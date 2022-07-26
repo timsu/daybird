@@ -6,6 +6,8 @@ class UIStore {
 
   path = atom<string>()
 
+  sidebarOpen = atom<boolean>(false)
+
   // --- actions
 
   routerOnChange = action(this.path, 'routerOnChange', (store, ctx: RouterOnChangeArgs<any>) => {

@@ -14,6 +14,7 @@ import { paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import {
     BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, DocumentAddIcon, DocumentIcon,
@@ -136,8 +137,14 @@ function CurrentProject() {
 
   if (!project) return null
 
-  const onNewFile = () => modalStore.newFileModal.set('file')
-  const onNewFolder = () => modalStore.newFileModal.set('folder')
+  const onNewFile = () => {
+    modalStore.newFileModal.set('file')
+    uiStore.sidebarOpen.set(false)
+  }
+  const onNewFolder = () => {
+    modalStore.newFileModal.set('folder')
+    uiStore.sidebarOpen.set(false)
+  }
   const onNewDailyFile = () => fileStore.newDailyFile()
 
   return (

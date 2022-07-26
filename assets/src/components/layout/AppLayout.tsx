@@ -14,9 +14,12 @@ import { isMobile } from '@/utils/os'
 import { Dialog, Transition } from '@headlessui/react'
 import { BellIcon, MenuAlt2Icon, XIcon } from '@heroicons/react/outline'
 import { SearchIcon } from '@heroicons/react/solid'
+import { useStore } from '@nanostores/preact'
 
 export default function ({ children }: RenderableProps<{}>) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const sidebarOpen = useStore(uiStore.sidebarOpen)
+
+  const setSidebarOpen = (state: boolean) => uiStore.sidebarOpen.set(state)
 
   useEffect(() => {
     if (sidebarOpen) {
