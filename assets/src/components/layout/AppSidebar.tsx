@@ -139,11 +139,9 @@ function CurrentProject() {
 
   const onNewFile = () => {
     modalStore.newFileModal.set('file')
-    uiStore.sidebarOpen.set(false)
   }
   const onNewFolder = () => {
     modalStore.newFileModal.set('folder')
-    uiStore.sidebarOpen.set(false)
   }
   const onNewDailyFile = () => fileStore.newDailyFile()
 

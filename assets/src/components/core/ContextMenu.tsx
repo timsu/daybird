@@ -40,7 +40,7 @@ export const ContextMenuWithData = (
 
   return (
     <Transition.Root show={!!open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={close}>
+      <Dialog as="div" className="relative z-50" onClose={close}>
         <div ref={addHandler} class="block fixed" style={{ top: open.y, left: open.x }}>
           <div
             class={classNames(
@@ -85,7 +85,11 @@ export const ContextMenuTrigger = (props: RenderableProps<TriggerProps>) => {
     e.preventDefault()
     triggerContextMenu(e.clientX, e.clientY, props.id, props.data)
   }
-  return <span onContextMenu={onContextMenu}>{props.children}</span>
+  return (
+    <span onContextMenu={onContextMenu} style="-webkit-touch-callout: none">
+      {props.children}
+    </span>
+  )
 }
 
 export const triggerContextMenu = (x: number, y: number, id: string, data?: any) => {

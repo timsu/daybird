@@ -43,6 +43,7 @@ class FileStore {
     const project = projectStore.currentProject.get()
     assertIsDefined(project, 'project is defined')
 
+    name = name.trim()
     const path = name.endsWith(DOC_EXT) ? name : name + DOC_EXT
     await API.writeFile(project, path, '')
     logger.info('FILES - new file', name)

@@ -3,20 +3,21 @@ import { Link } from 'preact-router'
 import Match from 'preact-router/match'
 
 import {
-    ContextMenu, ContextMenuItem, ContextMenuTrigger, ContextMenuWithData, MenuContext
+    ContextMenu, ContextMenuItem, ContextMenuTrigger, ContextMenuWithData, MenuContext,
+    triggerContextMenu
 } from '@/components/core/ContextMenu'
 import { File, paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { classNames } from '@/utils'
-import { FolderIcon } from '@heroicons/react/outline'
+import { DotsHorizontalIcon, FolderIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default ({ projectId }: { projectId: string }) => {
   const files = useStore(fileStore.files)
 
   return (
-    <nav className="flex-1 px-2 space-y-1">
+    <nav className="flex-1 px-2 space-y-1 mb-10">
       <ContextMenuWithData id="file-tree-menu">
         {(file: File) => (
           <>
@@ -50,6 +51,20 @@ export default ({ projectId }: { projectId: string }) => {
                       style={{ marginLeft: item.depth * 20 }}
                     >
                       {item.name}
+                      {matches && (
+                        <>
+                          <div class="grow" />
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              e.preventDefault()
+                              triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-menu', item)
+                            }}
+                          >
+                            <DotsHorizontalIcon class="w-4 h-4" />
+                          </div>
+                        </>
+                      )}
                     </Link>
                   )
                 }}

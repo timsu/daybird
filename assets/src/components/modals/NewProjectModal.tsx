@@ -38,11 +38,11 @@ export default () => {
   const submit = async (e: Event) => {
     e.preventDefault()
     if (!name) return setError('Name must not be blank')
-    if (!shortcode || shortcode.length > 4) return setError('Code must be 1 - 4 characters')
+    if (!shortcode || shortcode.trim().length > 4) return setError('Code must be 1 - 4 characters')
 
     try {
       setSubmitting(true)
-      await projectStore.createProject({ name, shortcode })
+      await projectStore.createProject({ name: name.trim(), shortcode: shortcode.trim() })
       close()
     } catch (e) {
       setError(unwrapError(e))

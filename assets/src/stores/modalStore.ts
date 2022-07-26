@@ -2,6 +2,7 @@ import { atom } from 'nanostores'
 
 import { File } from '@/config'
 import { Project, Task } from '@/models'
+import { uiStore } from '@/stores/uiStore'
 
 class ModalStore {
   // --- stores
@@ -22,3 +23,10 @@ class ModalStore {
 }
 
 export const modalStore = new ModalStore()
+
+const hideSidebar = () => uiStore.sidebarOpen.set(false)
+
+modalStore.newProjectModal.listen(hideSidebar)
+modalStore.newFileModal.listen(hideSidebar)
+modalStore.deleteFileModal.listen(hideSidebar)
+modalStore.renameFileModal.listen(hideSidebar)
