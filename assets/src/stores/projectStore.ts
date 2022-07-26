@@ -72,10 +72,29 @@ class ProjectStore {
     const project = Project.fromJSON(response.project)
     const projects = [...store.get(), project]
     this.updateProjects(projects)
+    this.setCurrentProject(project)
 
     // create a document
     fileStore.newFile('Welcome')
   })
+
+  deleteProject = async (project: Project) => {
+    this.updateProject(project, { deleted_at: new Date().toISOString() })
+
+    const projects = this.projects.get().filter((p) => p.id != project.id)
+    this.projects.set(projects)
+    const newCurrentProject = projects[0]
+    this.currentProject.set(newCurrentProject)
+    route(paths.PROJECTS + '/' + newCurrentProject.id)
+  }
+
+  updateProject = async (project: Project, updates: Partial<Project>) => {
+    const response = await API.updateProject(project, updates)
+    project = Project.fromJSON(response.project)
+
+    this.projects.set(this.projects.get().map((p) => (p.id == project.id ? project : p)))
+    if (this.currentProject.get()?.id == project.id) this.currentProject.set(project)
+  }
 }
 
 export const projectStore = new ProjectStore()

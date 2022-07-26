@@ -216,6 +216,11 @@ class APIService {
     return response.data
   }
 
+  async updateProject(project: Project, updates: Partial<Project>): Promise<R.ProjectResponse> {
+    const response = await this.axios.put(`${this.endpoint}/projects/${project.id}`, updates)
+    return response.data
+  }
+
   // files
 
   async listFiles(project: Project): Promise<R.FilesResponse> {

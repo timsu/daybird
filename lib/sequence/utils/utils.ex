@@ -223,4 +223,17 @@ defmodule Sequence.Utils do
       {:current_stacktrace, stacktrace} = Process.info(self(), :current_stacktrace)
       Enum.drop(stacktrace, strip)
   end
+
+  # convert allowed PUT params into fields, supporting *_at timestamps
+  def params_to_attrs(params, allowed_keys) do
+    Enum.reduce(allowed_keys, %{}, fn(key, acc) ->
+      if Map.has_key?(params, key) do
+        value = if String.ends_with?(key, "_at") and params[key] != nil, do: Timex.now, else: params[key]
+        Map.put(acc, key, value)
+      else
+        acc
+      end
+    end)
+  end
+
 end

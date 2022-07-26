@@ -1,7 +1,7 @@
 import { atom } from 'nanostores'
 
 import { File } from '@/config'
-import { Task } from '@/models'
+import { Project, Task } from '@/models'
 
 class ModalStore {
   // --- stores
@@ -15,6 +15,8 @@ class ModalStore {
   renameFileModal = atom<File | false>(false)
 
   deleteTaskModal = atom<Task | false>(false)
+
+  deleteProjectModal = atom<Project | false>(false)
 
   quickFindModal = atom<boolean>(false)
 }

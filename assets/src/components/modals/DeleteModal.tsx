@@ -1,3 +1,4 @@
+import { RenderableProps } from 'preact'
 import { useState } from 'preact/hooks'
 
 import Button from '@/components/core/Button'
@@ -13,7 +14,7 @@ type Props = {
   performAction: () => Promise<void>
 }
 
-export default ({ label, close, performAction }: Props) => {
+export default ({ label, close, children, performAction }: RenderableProps<Props>) => {
   const [error, setError] = useState<string>()
 
   const submit = async (e: Event) => {
@@ -43,6 +44,9 @@ export default ({ label, close, performAction }: Props) => {
             Delete “{label}”?
           </Dialog.Title>
         </div>
+
+        {children}
+
         <div className="mt-5 sm:mt-6 flex justify-between">
           <Button class="bg-gray-500" onClick={close} onKeyPress={close}>
             Cancel

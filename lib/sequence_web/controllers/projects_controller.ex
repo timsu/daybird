@@ -5,7 +5,7 @@ defmodule SequenceWeb.ProjectsController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Projects}
+  alias Sequence.{Projects, Utils}
 
   # GET /projects
   def index(conn, _) do
@@ -39,28 +39,17 @@ defmodule SequenceWeb.ProjectsController do
     end
   end
 
-  # PUT /projects/id
-  # def update(conn, %{ "id" => project_uuid, "team" => team } = params) do
-  #   attrs = Enum.reduce(["name", "description", "cover_img_url", "cover_img_pos", "type"], %{}, fn(key, acc) ->
-  #     if Map.has_key?(params, key), do: Map.put(acc, Macro.underscore(key), params[key]), else: acc end)
+  # PUT /tasks/id
+  def update(conn, %{ "id" => project_uuid } = params) do
+    attrs = Utils.params_to_attrs params, ["name", "shortcode", "deleted_at", "archived_at"]
 
-  #   with user <- Guardian.Plug.current_resource(conn),
-  #        {:ok, team} <- Teams.team_by_uuid(user.id, team),
-  #        {:ok, project} <- Projects.project_by_uuid(project_uuid),
-  #        :ok <- validate_team(project, team),
-  #        {:ok, project} <- Projects.update_project(project, attrs) do
+    with user <- Guardian.Plug.current_resource(conn),
+       {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid),
+       {:ok, project} <- Projects.update_project(project, attrs) do
 
-  #     project = project |> Projects.re_sign_url()
-
-  #     notify_of_project_change(team, project)
-  #     render conn, "update.json", project: project, user: user
-  #   else
-  #     {:error, :project_team_mismatch} ->
-  #       {:error, :unauthorized, "You don't have access to this project"}
-  #     {:error, :not_found} -> {:error, :not_found}
-  #     fallback -> fallback
-  #   end
-  # end
+      render conn, "get.json", project: project, user: user
+    end
+  end
 
   # # POST /projects/:id/add_members
   # def add_members(conn, %{ "id" => project_uuid, "team" => team_uuid, "everyone" => everyone, "users" => user_uuids }) do
