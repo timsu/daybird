@@ -1,6 +1,7 @@
 import { route } from 'preact-router'
 
 import Button from '@/components/core/Button'
+import Helmet from '@/components/core/Helmet'
 import { paths } from '@/config'
 import { projectStore } from '@/stores/projectStore'
 import { useStore } from '@nanostores/preact'
@@ -13,6 +14,8 @@ export default (props: Props) => {
 
   return (
     <div className="py-6">
+      <Helmet title="ListNote | Dashboard" />
+
       <div className="px-4 sm:px-6 md:px-8">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
       </div>
