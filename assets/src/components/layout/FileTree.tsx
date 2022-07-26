@@ -37,7 +37,8 @@ export default ({ projectId }: { projectId: string }) => {
             <ContextMenuTrigger id="file-tree-menu" key={item.path} data={item}>
               <Match path={href}>
                 {({ url }: { url: string }) => {
-                  const matches = encodeURI(url) == encodeURI(href)
+                  const matches = location.pathname == encodeURI(href)
+                  console.log('matches', matches, location.pathname, encodeURI(href))
                   return (
                     <Link
                       key={item.name}
