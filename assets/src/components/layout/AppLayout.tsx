@@ -10,6 +10,7 @@ import TaskContextMenu from '@/components/task/TaskContextMenu'
 import { modalStore } from '@/stores/modalStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
+import { isMobile } from '@/utils/os'
 import { Dialog, Transition } from '@headlessui/react'
 import { BellIcon, MenuAlt2Icon, XIcon } from '@heroicons/react/outline'
 import { SearchIcon } from '@heroicons/react/solid'
@@ -111,7 +112,7 @@ export default function ({ children }: RenderableProps<{}>) {
                       focus:border-transparent sm:text-sm cursor-pointer flex items-center"
                     onClick={() => modalStore.quickFindModal.set(true)}
                   >
-                    Search ({ctrlOrCommand()}+P)
+                    Search {!isMobile && `(${ctrlOrCommand()}+P)`}
                   </div>
                 </div>
               </form>

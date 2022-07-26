@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "build": "./scripts/build.sh",
+    "deploy": "./scripts/deploy.sh",
     "tsc": "cd assets && yarn tsc"
   },
   "devDependencies": {
