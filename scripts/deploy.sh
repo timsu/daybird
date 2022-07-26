@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ~/.profile
+
 set -e
 
 cd assets
@@ -8,4 +10,4 @@ cd ..
 
 git push origin HEAD:production
 
-ssh app@app.listnote.co 'cd listnote; git pull; yarn build'
+ssh app@app.listnote.co 'cd listnote; git pull; ./scripts/build.sh'

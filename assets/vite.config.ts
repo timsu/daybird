@@ -64,6 +64,7 @@ export default defineConfig({
     outDir,
     cssCodeSplit: false,
     minify: true,
+    manifest: true,
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       input: {
@@ -72,8 +73,8 @@ export default defineConfig({
         app: 'src/app.tsx',
       },
       output: {
-        entryFileNames: 'js/[name].js',
-        chunkFileNames: 'js/[name].js',
+        entryFileNames: 'js/[name]-[hash].js',
+        chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name][extname]',
         manualChunks: {
           quill: ['quill', 'quill-delta', 'parchment'],
