@@ -5,7 +5,7 @@ import { hasToken, paths } from '@/config'
 export default function () {
   const loggedIn = hasToken()
   return (
-    <div className="bg-white flex justify-between items-center px-4 py-6 sm:px-6 md:justify-start md:space-x-10">
+    <div className="bg-white flex justify-between items-center px-4 py-1 sm:px-6 md:justify-start md:space-x-10">
       <div>
         <a href={paths.ROOT} className="flex">
           <span className="sr-only">Sequence</span>
