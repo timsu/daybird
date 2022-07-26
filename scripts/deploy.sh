@@ -10,4 +10,4 @@ cd ..
 
 git push origin HEAD:production
 
-ssh app@app.listnote.co 'cd listnote; git pull; ./scripts/build.sh'
+ssh app@app.listnote.co 'cd listnote; git pull; ./scripts/build.sh; sudo systemctl start listnote'
