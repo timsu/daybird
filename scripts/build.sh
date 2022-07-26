@@ -1,3 +1,5 @@
+set -e
+
 cd assets
 yarn --production=false
 yarn build
