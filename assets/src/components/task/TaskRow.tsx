@@ -53,7 +53,7 @@ export default ({
         if (isBeginning) {
           window.quill?.insertText(window.quill.getSelection()?.index!, '\n')
         } else {
-          window.quill?.setSelection(window.quill.getSelection()?.index!, 0)
+          window.quill?.insertText(window.quill.getSelection()?.index!, '\n')
         }
       }
     })
