@@ -9,7 +9,7 @@ import { Task } from '@/models'
 
 const BlockEmbed = Quill.import('blots/block/embed')
 
-type Data = { id: string; focus?: boolean }
+type Data = { id: string; focus?: boolean; title?: string }
 
 class SeqTaskBlot extends BlockEmbed {
   static create(data: Data) {
@@ -21,7 +21,10 @@ class SeqTaskBlot extends BlockEmbed {
     }
 
     node.childNodes.forEach((n) => n.remove())
-    render(<TaskRow id={data.id} focus={data.focus} onCreate={onCreateTask} />, node)
+    render(
+      <TaskRow id={data.id} initialTitle={data.title} focus={data.focus} onCreate={onCreateTask} />,
+      node
+    )
 
     return node
   }
@@ -79,13 +82,19 @@ export default class TaskEditor {
     const selection = this.quill.getSelection()
     if (!selection) return
     const [line, offset] = this.quill.getLine(selection.index)
-    const text = line.domNode.textContent
+    const text = line.domNode.textContent as string
 
-    if (text == '[] ') {
-      const startIndex = selection.index - text.length
+    if (text.startsWith('[] ')) {
+      const remainder = text.substring(3)
+      const startIndex = selection.index - 3
       setTimeout(() => {
         this.quill.deleteText(startIndex, text.length + 1)
-        this.quill.insertEmbed(startIndex, 'seqtask', { focus: true }, Quill.sources.USER)
+        this.quill.insertEmbed(
+          startIndex,
+          'seqtask',
+          { focus: true, title: remainder },
+          Quill.sources.USER
+        )
         if (startIndex + 2 >= this.quill.getLength())
           this.quill.insertText(startIndex + 2, '\n', Quill.sources.SILENT)
         this.quill.setSelection((startIndex + 1) as any, Quill.sources.SILENT)

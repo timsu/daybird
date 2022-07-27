@@ -14,14 +14,22 @@ import { useStore } from '@nanostores/preact'
 type Props = {
   id: string | undefined
   focus?: boolean
+  initialTitle?: string
   showContextProjectId?: string
   newTaskMode?: boolean
   onCreate?: (task: Task) => void
 }
 
-export default ({ id, focus, showContextProjectId, newTaskMode, onCreate }: Props) => {
+export default ({
+  id,
+  initialTitle,
+  focus,
+  showContextProjectId,
+  newTaskMode,
+  onCreate,
+}: Props) => {
   const [savedId, setSavedId] = useState<string>()
-  const [showPlaceholder, setPlaceholder] = useState<boolean>(true)
+  const [showPlaceholder, setPlaceholder] = useState<boolean>(!id && !initialTitle)
 
   id = id || savedId
   const task = useStore(taskStore.taskMap)[id!]
@@ -150,7 +158,7 @@ export default ({ id, focus, showContextProjectId, newTaskMode, onCreate }: Prop
         class={classNames('flex-grow p-1', task?.completed_at ? 'line-through text-gray-500' : '')}
         placeholder="New task"
       >
-        {task?.title}
+        {task?.title || initialTitle}
       </div>
 
       {showContextProjectId && task?.doc && (
