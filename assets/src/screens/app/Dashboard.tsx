@@ -2,7 +2,7 @@ import { route } from 'preact-router'
 
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
-import { paths } from '@/config'
+import { config, paths } from '@/config'
 import { projectStore } from '@/stores/projectStore'
 import { useStore } from '@nanostores/preact'
 
@@ -31,7 +31,7 @@ export default (props: Props) => {
 
       <div className="px-4 sm:px-6 md:px-8 my-6 leading-10">
         <p class="mb-6">
-          ListNote status: <b>Solo MVP</b>
+          ListNote status: <b>Solo MVP</b> ({config.hash})
         </p>
 
         <p>Welcome to ListNote! </p>
