@@ -87,18 +87,10 @@ const QuillKeybindings: Keybindindings = {
       const leaf = this.quill.getLeaf(range.index - 1)[0]
       const blotName = leaf?.statics.blotName
       if (blotName == 'seqtask') {
-        const data = leaf.value()['seqtask']
-        const id = data.id
-        console.log('consider delete task:', id)
-
-        if (id && id != 'undefined' && id != 'null') {
-          const task = taskStore.taskMap.get()[id]
-          modalStore.deleteTaskModal.set(task)
-          return !task
-        } else {
-          // new task, allow deletion
-          return true
-        }
+        const taskElement = leaf!.domNode.children[0] as HTMLElement
+        if (document.activeElement == taskElement) return false
+        taskElement.focus()
+        return false
       }
       return true
     },

@@ -6,16 +6,15 @@ import AppLayout from '@/components/layout/AppLayout'
 import { paths } from '@/config'
 import AppRouter from '@/screens/app/AppRouter'
 import { authStore } from '@/stores/authStore'
+import { logger } from '@/utils'
 import { useStore } from '@nanostores/preact'
 
-const hotModuleReloadId = Math.random()
-
 export default () => {
-  useState(hotModuleReloadId)
   const user = useStore(authStore.loggedInUser)
 
   useEffect(() => {
-    if (user === null) location.href = paths.SIGNIN
+    if (user === undefined) authStore.init()
+    else if (user === null) location.href = paths.SIGNIN
   }, [user])
 
   if (!user)

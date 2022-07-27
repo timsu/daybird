@@ -48,10 +48,15 @@ export default ({ label, close, children, performAction }: RenderableProps<Props
         {children}
 
         <div className="mt-5 sm:mt-6 flex justify-between">
-          <Button class="bg-gray-500" onClick={close} onKeyPress={close}>
+          <Button class="bg-gray-500" onClick={close} onKeyPress={close} tabIndex={0}>
             Cancel
           </Button>
-          <Button class="bg-red-500 hover:bg-red-800" onClick={submit} onKeyPress={onDeletePress}>
+          <Button
+            class="bg-red-500 hover:bg-red-800"
+            onClick={submit}
+            onKeyPress={onDeletePress}
+            tabIndex={1}
+          >
             Confirm Delete
           </Button>
         </div>

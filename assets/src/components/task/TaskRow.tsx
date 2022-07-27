@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
+import Quill from 'quill'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import Tooltip from '@/components/core/Tooltip'
@@ -6,6 +7,7 @@ import { paths } from '@/config'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { DOC_EXT, fileStore, getNameFromPath } from '@/stores/fileStore'
+import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
 import { DocumentIcon } from '@heroicons/react/outline'
@@ -18,6 +20,11 @@ type Props = {
   showContextProjectId?: string
   newTaskMode?: boolean
   onCreate?: (task: Task) => void
+}
+
+const getQuillIndex = (e: Event) => {
+  const blot = Quill.find(e.target as HTMLDivElement, true)
+  return blot.offset(window.quill?.scroll)
 }
 
 export default ({
@@ -50,10 +57,16 @@ export default ({
       if (!newTaskMode && e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
         const isBeginning = window.getSelection()?.anchorOffset == 0
+        const index = getQuillIndex(e)
         if (isBeginning) {
-          window.quill?.insertText(window.quill.getSelection()?.index!, '\n')
+          window.quill?.insertText(index, '\n')
         } else {
-          window.quill?.insertText(window.quill.getSelection()?.index!, '\n')
+          // if we're at the end of the doc, insert a newline
+          // if (index + 2 >= window.quill!.getLength()) {
+          //   window.quill?.insertText(index + 1, '\n')
+          // } else {
+          window.quill?.setSelection(index + 1)
+          //}
         }
       }
     })
@@ -114,6 +127,25 @@ export default ({
     triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
   }
 
+  const onKeyDownRow = (e: KeyboardEvent) => {
+    if (e.key == 'Backspace') {
+      if (!task) {
+        id = 'delete-me'
+        titleRef.current!.id = 'task-delete-me'
+        taskStore.deletedTask.set({ id } as Task)
+      } else {
+        modalStore.deleteTaskModal.set(task)
+      }
+    } else if (e.key == 'ArrowUp' || e.key == 'ArrowLeft') {
+      // these offsets are wrong by one, but i can't seem to get quill to select the right thing
+      const index = getQuillIndex(e)
+      window.quill?.setSelection(index, 0)
+    } else if (e.key == 'ArrowDown' || e.key == 'ArrowRight') {
+      const index = getQuillIndex(e)
+      window.quill?.setSelection(index + 0.5, 0)
+    }
+  }
+
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key == 'Backspace') {
       const title = titleRef.current?.innerText?.trim()
@@ -135,6 +167,8 @@ export default ({
       id={task ? `task-${task.id}` : ''}
       contentEditable={false}
       class="bg-gray-100 rounded p-2 flex flex-row items-center relative"
+      tabIndex={0}
+      onKeyDown={onKeyDownRow}
     >
       {task?.archived_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
@@ -155,7 +189,12 @@ export default ({
         contentEditable
         ref={titleRef}
         onKeyDown={onKeyDown}
-        class={classNames('flex-grow p-1', task?.completed_at ? 'line-through text-gray-500' : '')}
+        onPaste={(e) => e.stopPropagation()}
+        class={classNames(
+          'task-title',
+          'flex-grow p-1',
+          task?.completed_at ? 'line-through text-gray-500' : ''
+        )}
         placeholder="New task"
       >
         {task?.title || initialTitle}

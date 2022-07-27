@@ -16,6 +16,17 @@ class AuthStore {
 
   // --- initialization
 
+  init = () => {
+    const tokens = localStorage.getItem(LS_AUTH_TOKENS)
+
+    if (tokens) {
+      this.loginHelper(JSON.parse(tokens)).catch((e) => {
+        logger.warn(e)
+        this.loggedInUser.set(null)
+      })
+    } else this.loggedInUser.set(null)
+  }
+
   loginHelper = async (givenTokens: AuthTokenPair) => {
     const tokens = await API.exchangeAndSetAuthToken(givenTokens)
     const { access, refresh } = tokens || {}
@@ -33,9 +44,11 @@ class AuthStore {
 
     const user = User.fromJSON(response.user)
     this.loggedInUser.set(user)
-    this.loggedInUser.notify()
     projectStore.updateProjects(response.projects.map((p) => Project.fromJSON(p)))
     projectStore.updateCurrentProject(user)
+
+    // on occasion, hot module reload doesn't update properly without timeout
+    if (config.dev) setTimeout(() => this.loggedInUser.notify(), 500)
   }
 
   saveTokens = async (tokens: AuthTokenPair) => {
@@ -84,16 +97,3 @@ class AuthStore {
 
 export const authStore = new AuthStore()
 if (config.dev) (window as any)['authStore'] = authStore
-
-// --- triggered actions
-
-onMount(authStore.loggedInUser, () => {
-  const tokens = localStorage.getItem(LS_AUTH_TOKENS)
-
-  if (tokens) {
-    authStore.loginHelper(JSON.parse(tokens)).catch((e) => {
-      logger.warn(e)
-      authStore.loggedInUser.set(null)
-    })
-  } else authStore.loggedInUser.set(null)
-})

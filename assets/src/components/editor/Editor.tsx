@@ -36,6 +36,7 @@ export default ({ project, filename, contents, saveContents }: Props) => {
     if (!quill || !filename) return
 
     quill.setContents(contents)
+    quill.getModule('history').clear()
     currentFile.current = filename
     isDirty.current = false
     const textChangeHandler = () => {
