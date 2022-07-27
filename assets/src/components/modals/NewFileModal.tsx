@@ -22,8 +22,6 @@ export default () => {
 
   const open = newFileOpen || renameFileOpen
 
-  if (!open) return null
-
   const isRename = !!renameFileOpen
   const noun = toTitleCase(newFileOpen ? newFileOpen : renameFileOpen ? renameFileOpen.type : '')
 
@@ -31,6 +29,8 @@ export default () => {
     setName(renameFileOpen ? renameFileOpen.name : '')
     setError('')
   }, [newFileOpen, renameFileOpen])
+
+  if (!open) return null
 
   const close = () => {
     modalStore.newFileModal.set(false)

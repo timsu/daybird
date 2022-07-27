@@ -78,6 +78,7 @@ class FileStore {
 
     await API.renameFile(project, prevPath, newPath)
     if (docStore.filename.get() == prevPath) {
+      docStore.document.set(undefined)
       route(`${paths.DOC}/${project.id}/${newPath}`)
     }
   }

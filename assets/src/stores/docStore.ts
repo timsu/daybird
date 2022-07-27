@@ -5,17 +5,16 @@ import Delta from 'quill-delta'
 import { API } from '@/api'
 import { config } from '@/config'
 import { Project, User } from '@/models'
-import { projectStore } from '@/stores/projectStore'
-import { assertIsDefined, logger, unwrapError } from '@/utils'
+import { logger, unwrapError } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
 
 class DocStore {
   // --- stores
 
-  filename = atom<string>()
+  filename = atom<string | undefined>()
 
-  document = atom<Delta>()
+  document = atom<Delta | undefined>()
 
   version = atom<number>(0)
 
