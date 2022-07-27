@@ -12,7 +12,7 @@ import { debounce, DebounceStyle } from '@/utils'
 type Props = {
   project: Project
   filename?: string
-  contents: Delta
+  contents?: Delta
   saveContents: (project: Project, filename: string, contents: Delta) => void
 }
 
