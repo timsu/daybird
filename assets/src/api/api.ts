@@ -303,6 +303,25 @@ class APIService {
     return response.data
   }
 
+  // user data
+
+  async getUserData(key: string, projectId?: string): Promise<{ data: any }> {
+    const projectParam = projectId ? `project=${projectId}&` : ''
+    const response = await this.axios.get(
+      `${this.endpoint}/users/data?${projectParam}key=${encodeURIComponent(key)}`
+    )
+    return response.data.data
+  }
+
+  async setUserData(key: string, data: any, projectId?: string): Promise<R.SuccessResponse> {
+    const projectParam = projectId ? `project=${projectId}&` : ''
+    const response = await this.axios.post(
+      `${this.endpoint}/users/data?${projectParam}key=${encodeURIComponent(key)}`,
+      { data }
+    )
+    return response.data
+  }
+
   // for storybooks, put API into a stub state
 
   stubMode() {

@@ -11,10 +11,17 @@ import { assertIsDefined, logger } from '@/utils'
 
 export const DOC_EXT = '.seq'
 
+const USER_DATA_EXPANDED = 'expanded'
+
+type ProjectFileMap = { [projectId: string]: File[] }
+type ExpansionMap = { [key: string]: boolean }
+
 class FileStore {
   // --- stores
 
-  files = map<{ [projectId: string]: File[] }>({})
+  files = map<ProjectFileMap>({})
+
+  expanded = map<ExpansionMap>({})
 
   // --- actions
 
@@ -103,6 +110,24 @@ class FileStore {
     if (location.pathname.includes(encodeURI(file.path))) {
       route(paths.APP)
     }
+  }
+
+  loadExpanded = async () => {
+    const response = await API.getUserData(USER_DATA_EXPANDED)
+    this.expanded.set(response.data)
+  }
+
+  setExpanded = (key: string, setting: boolean) => {
+    this.expanded.setKey(key, setting)
+
+    const expanded = this.expanded.get()
+    const data = Object.keys(expanded)
+      .filter((ex) => expanded[ex])
+      .reduce((r, v) => {
+        r[v] = true
+        return r
+      }, {} as ExpansionMap)
+    API.setUserData(USER_DATA_EXPANDED, data)
   }
 }
 

@@ -19,10 +19,10 @@ defmodule SequenceWeb.UserDataController do
   def set_user_data(conn, %{ "key" => key, "data" => data } = params) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn) do
 
-      {team, user_data} = user_data_helper(user, params, key)
+      {project, user_data} = user_data_helper(user, params, key)
 
       if !user_data do
-        Users.create_user_data(%{ user_id: user.id, team_id: team && team.id, key: key, value: data })
+        Users.create_user_data(%{ user_id: user.id, project_id: project && project.id, key: key, value: data })
       else
         if data do
           Users.update_user_data(user_data, %{ value: data })
@@ -35,12 +35,12 @@ defmodule SequenceWeb.UserDataController do
   end
 
   defp user_data_helper(user, params, key) do
-    team = if params["team"] do
-      {:ok, team} = Teams.team_by_uuid(user.id, params["team"])
-      team
+    project = if params["project"] do
+      {:ok, project} = Projects.project_by_uuid(user.id, params["project"])
+      project
     end
-    user_data = Users.get_user_data(user, team, key)
-    {team, user_data}
+    user_data = Users.get_user_data(user, project, key)
+    {project, user_data}
   end
 
 end

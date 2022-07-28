@@ -154,18 +154,18 @@ defmodule Sequence.Users do
 
   def get_user_data(user, key) do
     Repo.one(from ud in UserData, where: ud.user_id == ^user.id and ud.key == ^key and
-      is_nil(ud.team_id), limit: 1)
+      is_nil(ud.project_id), limit: 1)
   end
 
   def get_user_data(user, nil, key), do: get_user_data(user, key)
 
-  def get_user_data(user, team, key) do
+  def get_user_data(user, project, key) do
     Repo.one(from ud in UserData, where: ud.user_id == ^user.id and
-      ud.key == ^key and ud.team_id == ^team.id, limit: 1)
+      ud.key == ^key and ud.project_id == ^project.id, limit: 1)
   end
 
   def get_all_user_data(user) do
-    Repo.all(from ud in UserData, where: ud.user_id == ^user.id and is_nil(ud.team_id))
+    Repo.all(from ud in UserData, where: ud.user_id == ^user.id and is_nil(ud.project_id))
   end
 
   ### user access

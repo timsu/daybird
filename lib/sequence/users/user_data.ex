@@ -10,7 +10,7 @@ defmodule Sequence.Users.UserData do
     field :value, :map
 
     belongs_to :user, Sequence.Users.User
-    belongs_to :team, Sequence.Teams.Team
+    belongs_to :project, Sequence.Projects.Project
 
     timestamps()
   end
@@ -18,8 +18,8 @@ defmodule Sequence.Users.UserData do
   @doc false
   def changeset(user_data, attrs) do
     user_data
-    |> cast(attrs, [:user_id, :team_id, :key, :value])
+    |> cast(attrs, [:user_id, :project_id, :key, :value])
     |> validate_required([:user_id, :key, :value])
-    |> unique_constraint(:key, name: :user_data_user_id_team_id_key_index)
+    |> unique_constraint(:key, name: :user_data_user_id_project_id_key_index)
   end
 end
