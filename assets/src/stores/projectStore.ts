@@ -75,7 +75,7 @@ class ProjectStore {
     this.setCurrentProject(project)
 
     // create a document
-    fileStore.newFile('Welcome')
+    fileStore.newFile(project, 'Welcome')
   })
 
   deleteProject = async (project: Project) => {
