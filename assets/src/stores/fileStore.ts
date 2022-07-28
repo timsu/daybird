@@ -114,10 +114,11 @@ class FileStore {
 
   loadExpanded = async () => {
     const response = await API.getUserData(USER_DATA_EXPANDED)
-    this.expanded.set(response.data)
+    if (response) this.expanded.set(response)
   }
 
   setExpanded = (key: string, setting: boolean) => {
+    if (this.expanded.get()[key] == setting) return
     this.expanded.setKey(key, setting)
 
     const expanded = this.expanded.get()

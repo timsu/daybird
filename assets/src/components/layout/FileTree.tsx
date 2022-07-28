@@ -14,10 +14,12 @@ import { DotsHorizontalIcon, FolderIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default ({ projectId }: { projectId: string }) => {
-  const files = useStore(fileStore.files)
+  const files = useStore(fileStore.files)[projectId]
+
+  if (!files) return null
 
   return (
-    <nav className="flex-1 px-2 space-y-1 mb-10">
+    <nav className="px-2 space-y-1 mb-10">
       <ContextMenuWithData id="file-tree-menu">
         {(file: File) => (
           <>

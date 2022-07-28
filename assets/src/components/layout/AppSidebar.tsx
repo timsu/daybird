@@ -1,5 +1,5 @@
 import { JSX } from 'preact'
-import { Link } from 'preact-router'
+import { Link, route } from 'preact-router'
 import Match from 'preact-router/match'
 import { useEffect, useState } from 'preact/hooks'
 
@@ -11,6 +11,7 @@ import FileTree from '@/components/layout/FileTree'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
 import { paths } from '@/config'
+import { Project } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -18,7 +19,7 @@ import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import {
     BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, DocumentAddIcon, DocumentIcon,
-    FolderAddIcon, FolderIcon, HomeIcon, PlusIcon, ViewListIcon
+    DotsHorizontalIcon, FolderAddIcon, FolderIcon, HomeIcon, PlusIcon, ViewListIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -42,36 +43,24 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
       </div>
       <div className="flex-1 flex flex-col overflow-y-auto">
         <Links />
-        <CurrentProject />
+        <Projects />
       </div>
     </div>
   )
 }
 
 function Links() {
-  const [projectsExpanded, setProjectsExpanded] = useState(true)
-  const projects = useStore(projectStore.projects)
-
-  const projectItems: NavItem[] = projectsExpanded
-    ? projects.map((p) => ({
-        name: p.name!,
-        href: paths.PROJECTS + '/' + p.id,
-        indent: 35,
-      }))
-    : []
-
   let navigation: NavItem[] = [
     { name: 'Dashboard', href: paths.APP, icon: HomeIcon },
+    {
+      name: 'Tasks',
+      href: paths.TASKS,
+      icon: ViewListIcon,
+    },
     {
       name: 'Projects',
       href: paths.PROJECTS,
       icon: BriefcaseIcon,
-    },
-    ...projectItems,
-    projects.length > 0 && {
-      name: 'Tasks',
-      href: paths.TASKS,
-      icon: ViewListIcon,
     },
   ].filter(Boolean) as NavItem[]
 
@@ -91,13 +80,6 @@ function Links() {
               )}
               style={{ marginLeft: item.indent }}
             >
-              {/* {item.href == paths.PROJECTS && (
-                <ProjectExpandCheck
-                  url={url}
-                  expanded={projectsExpanded}
-                  setExpanded={setProjectsExpanded}
-                />
-              )} */}
               {item.icon && (
                 <item.icon
                   className={classNames(
@@ -116,39 +98,66 @@ function Links() {
   )
 }
 
-function ProjectExpandCheck({
-  url,
-  expanded,
-  setExpanded,
-}: {
-  url: string
-  expanded: boolean
-  setExpanded: (b: boolean) => void
-}) {
+function Projects() {
+  const projects = useStore(projectStore.projects)
+
   useEffect(() => {
-    const active = url.startsWith(paths.PROJECTS)
-    if (active != expanded) setExpanded(active)
-  }, [url, expanded])
-  return null
-}
-
-function CurrentProject() {
-  const project = useStore(projectStore.currentProject)
-
-  if (!project) return null
-
-  const onNewFile = () => {
-    modalStore.newFileModal.set('file')
-  }
-  const onNewFolder = () => {
-    modalStore.newFileModal.set('folder')
-  }
-  const onNewDailyFile = () => fileStore.newDailyFile()
+    fileStore.loadExpanded()
+  }, [])
 
   return (
     <>
-      <div class="border-t border-t-gray-500 p-4 flex flex-row items-center text-gray-400 font-semibold text-sm">
-        <div class="mr-1">{project.name.toUpperCase()}</div>
+      {projects.map((p) => (
+        <ProjectTree key={p.id} project={p} />
+      ))}
+      <NewFileModal />
+      <DeleteFileModal />
+    </>
+  )
+}
+
+function ProjectTree({ project }: { project: Project }) {
+  const expanded = useStore(fileStore.expanded)[project.id]
+
+  useEffect(() => {
+    console.log('expanded value changed', expanded)
+    if (expanded) fileStore.loadFiles(project)
+  }, [expanded])
+
+  const setExpanded = (setting: boolean) => {
+    fileStore.setExpanded(project.id, setting)
+  }
+
+  if (!project) return null
+
+  const onNewFile = (e: Event) => {
+    e.stopPropagation()
+    modalStore.newFileModal.set('file')
+  }
+  const onNewFolder = (e: Event) => {
+    e.stopPropagation()
+    modalStore.newFileModal.set('folder')
+  }
+  const onNewDailyFile = (e: Event) => {
+    e.stopPropagation()
+    fileStore.newDailyFile(project)
+  }
+  const openSettings = (e: Event) => {
+    e.stopPropagation()
+    route(paths.PROJECTS + '/' + project.id)
+  }
+
+  return (
+    <>
+      <div
+        class="border-t border-t-gray-500 p-4 flex flex-row items-center text-gray-400
+          font-semibold text-sm cursor-pressable hover:bg-gray-700 cursor-pointer"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <Tooltip message={expanded ? 'Hide Files' : 'Show Files'}>
+          <div class="mr-1 text-ellipsis max-w-[200px]">{project.name.toUpperCase()}</div>
+        </Tooltip>
+        <div class="grow" />
         <Pressable tooltip="New File" onClick={onNewFile}>
           <DocumentAddIcon class="h-4 w-4" />
         </Pressable>
@@ -159,11 +168,12 @@ function CurrentProject() {
         {/* <Pressable tooltip="New Folder" onClick={onNewFolder}>
           <FolderAddIcon class="h-4 w-4" />
         </Pressable> */}
+        <Pressable tooltip="Settings" onClick={openSettings}>
+          <DotsHorizontalIcon class="h-4 w-4" />
+        </Pressable>
       </div>
 
-      <FileTree projectId={project.id} />
-      <NewFileModal />
-      <DeleteFileModal />
+      {expanded && <FileTree projectId={project.id} />}
     </>
   )
 }

@@ -305,7 +305,7 @@ class APIService {
 
   // user data
 
-  async getUserData(key: string, projectId?: string): Promise<{ data: any }> {
+  async getUserData(key: string, projectId?: string): Promise<any> {
     const projectParam = projectId ? `project=${projectId}&` : ''
     const response = await this.axios.get(
       `${this.endpoint}/users/data?${projectParam}key=${encodeURIComponent(key)}`
