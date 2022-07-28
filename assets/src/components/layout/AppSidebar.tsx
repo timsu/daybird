@@ -132,11 +132,11 @@ function ProjectTree({ project }: { project: Project }) {
 
   const onNewFile = (e: Event) => {
     e.stopPropagation()
-    modalStore.newFileModal.set('file')
+    modalStore.newFileModal.set({ project, type: 'file' })
   }
   const onNewFolder = (e: Event) => {
     e.stopPropagation()
-    modalStore.newFileModal.set('folder')
+    modalStore.newFileModal.set({ project, type: 'folder' })
   }
   const onNewDailyFile = (e: Event) => {
     e.stopPropagation()

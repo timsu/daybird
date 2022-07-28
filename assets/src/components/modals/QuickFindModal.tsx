@@ -1,10 +1,11 @@
+import flatten from 'lodash.flatten'
 import { Fragment } from 'preact'
 import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 import { stringSimilarity } from 'string-similarity-js'
 
 import { ModalWithoutPadding } from '@/components/modals/Modal'
-import { paths } from '@/config'
+import { File, paths } from '@/config'
 import { DOC_EXT, fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -64,22 +65,27 @@ function QuickSearchBody({ close }: { close: () => void }) {
 
     const substringLength = searchText.length < 4 ? searchText.length : undefined
 
-    const files = fileStore.files.get()
-    const project = projectStore.currentProject.get()
+    const allFiles = fileStore.files.get()
     const projects = projectStore.projects.get()
-    const results: SearchResult[] = files
-      .filter((f) => f.type == 'doc')
-      .map(
-        (f) =>
-          ({
-            type: 'file',
-            name: f.name,
-            desc: project!.name,
-            href: `${paths.DOC}/${project!.id}/${f.path}`,
-            score: stringSimilarity(searchText, f.name, substringLength),
-          } as SearchResult)
-      )
-      .filter((s) => s.score > 0)
+    const results: SearchResult[] = flatten(
+      Object.keys(allFiles).map((projectId) => {
+        const projectFiles = flatten(allFiles[projectId]) as File[]
+        const project = projects.find((p) => p.id == projectId)
+        return projectFiles
+          .filter((f) => f.type == 'doc')
+          .map(
+            (f) =>
+              ({
+                type: 'file',
+                name: f.name,
+                desc: project!.name,
+                href: `${paths.DOC}/${project!.id}/${f.path}`,
+                score: stringSimilarity(searchText, f.name, substringLength),
+              } as SearchResult)
+          )
+          .filter((s) => s.score > 0)
+      })
+    )
       .concat(
         projects
           .map(
@@ -87,7 +93,7 @@ function QuickSearchBody({ close }: { close: () => void }) {
               ({
                 type: 'project',
                 name: p.name,
-                desc: p.id == project?.id ? 'Current Project' : 'Project',
+                desc: 'Project',
                 href: `${paths.PROJECTS}/${p.id}`,
                 score: stringSimilarity(searchText, p.name, substringLength),
               } as SearchResult)

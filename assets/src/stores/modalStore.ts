@@ -9,11 +9,11 @@ class ModalStore {
 
   newProjectModal = atom<boolean>(false)
 
-  newFileModal = atom<'file' | 'folder' | false>(false)
+  newFileModal = atom<{ project: Project; type: 'file' | 'folder' } | false>(false)
 
-  deleteFileModal = atom<File | false>(false)
+  deleteFileModal = atom<{ project: Project; file: File } | false>(false)
 
-  renameFileModal = atom<File | false>(false)
+  renameFileModal = atom<{ project: Project; file: File } | false>(false)
 
   deleteTaskModal = atom<Task | false>(false)
 

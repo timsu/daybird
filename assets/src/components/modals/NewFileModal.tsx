@@ -23,10 +23,12 @@ export default () => {
   const open = newFileOpen || renameFileOpen
 
   const isRename = !!renameFileOpen
-  const noun = toTitleCase(newFileOpen ? newFileOpen : renameFileOpen ? renameFileOpen.type : '')
+  const noun = toTitleCase(
+    newFileOpen ? newFileOpen.type : renameFileOpen ? renameFileOpen.file.type : ''
+  )
 
   useEffect(() => {
-    setName(renameFileOpen ? renameFileOpen.name : '')
+    setName(renameFileOpen ? renameFileOpen.file.name : '')
     setError('')
   }, [newFileOpen, renameFileOpen])
 
@@ -47,9 +49,9 @@ export default () => {
       setSubmitting(true)
 
       if (renameFileOpen) {
-        await fileStore.renameFile(renameFileOpen, name)
-      } else {
-        await fileStore.newFile(name)
+        await fileStore.renameFile(renameFileOpen.project, renameFileOpen.file, name)
+      } else if (newFileOpen) {
+        await fileStore.newFile(newFileOpen.project, name)
       }
       close()
     } catch (e) {
