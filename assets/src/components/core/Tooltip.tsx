@@ -1,23 +1,47 @@
 import { RenderableProps } from 'preact'
+import { useState } from 'preact/hooks'
+
+type Placement = 'left' | 'right' | 'top'
+
+export type TooltipProps = {
+  class?: string
+  placement?: Placement
+  width?: number
+  message: string
+}
 
 export default ({
+  class: cls,
   message,
   children,
-}: RenderableProps<{
-  message: string
-}>) => {
+  width = 75,
+  placement = 'top',
+}: RenderableProps<TooltipProps>) => {
+  const [open, setOpen] = useState(false)
+
+  const positioning =
+    placement == 'right' ? 'left-full ml-6' : placement == 'left' ? 'right-0 mr-6' : 'bottom-0 mb-5'
+
   return (
-    <div className="relative flex flex-col items-center group">
-      {children}
-      <div className="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex min-w-[75px]">
-        <span
-          className="relative z-10 p-2 text-xs leading-none text-white whitespace-no-wrap
-            font-normal bg-black shadow-lg rounded-md"
+    <div
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      className={`relative ${cls || ''} group`}
+    >
+      {open && (
+        <div
+          className={`absolute z-10 ${positioning} flex-col items-center group-hover:flex pointer-events-none`}
+          style={{ width }}
         >
-          {message}
-        </span>
-        <div className="w-3 h-3 -mt-2 rotate-45 bg-black"></div>
-      </div>
+          <span
+            className="relative p-2 text-xs leading-none text-white whitespace-no-wrap
+            font-normal bg-black shadow-lg rounded-md"
+          >
+            {message}
+          </span>
+        </div>
+      )}
+      {children}
     </div>
   )
 }

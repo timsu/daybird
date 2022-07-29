@@ -154,20 +154,23 @@ function ProjectTree({ project }: { project: Project }) {
           font-semibold text-sm cursor-pressable hover:bg-gray-700 cursor-pointer "
         onClick={() => setExpanded(!expanded)}
       >
-        <Tooltip class="grow mr-1 max-w-[200px]" message={expanded ? 'Hide Files' : 'Show Files'}>
+        <Tooltip class="grow mr-1 max-w-[200px]" message={expanded ? 'Collapse' : 'Expand'}>
           <div class="text-ellipsis">{project.name.toUpperCase()}</div>
         </Tooltip>
-        <Pressable tooltip="New File" onClick={onNewFile}>
+        <Pressable tooltip={{ message: 'New File', placement: 'left' }} onClick={onNewFile}>
           <DocumentAddIcon class="h-4 w-4" />
         </Pressable>
         <div class="mr-1" />
-        <Pressable tooltip="New File with Today's Date" tooltipWidth={200} onClick={onNewDailyFile}>
+        <Pressable
+          tooltip={{ message: "New File with Today's Date", width: 100, placement: 'left' }}
+          onClick={onNewDailyFile}
+        >
           <CalendarIcon class="h-4 w-4" />
         </Pressable>
         {/* <Pressable tooltip="New Folder" onClick={onNewFolder}>
           <FolderAddIcon class="h-4 w-4" />
         </Pressable> */}
-        <Pressable tooltip="Settings" onClick={openSettings}>
+        <Pressable tooltip={{ message: 'Settings', placement: 'left' }} onClick={openSettings}>
           <DotsHorizontalIcon class="h-4 w-4" />
         </Pressable>
       </div>
