@@ -23,6 +23,7 @@ export default () => {
   const open = newFileOpen || renameFileOpen
 
   const isRename = !!renameFileOpen
+  const project = newFileOpen ? newFileOpen.project : renameFileOpen ? renameFileOpen.project : null
   const noun = toTitleCase(
     newFileOpen ? newFileOpen.type : renameFileOpen ? renameFileOpen.file.type : ''
   )
@@ -77,6 +78,7 @@ export default () => {
         <div className="mt-3 text-center sm:mt-5">
           <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
             {isRename ? 'Rename' : 'New'} {noun}
+            {!isRename && project && ` (${project.name})`}
           </Dialog.Title>
           <div className="mt-6 text-left">
             <Input
