@@ -10,7 +10,7 @@ import { useStore } from '@nanostores/preact'
 
 // document is a higher-order component that manages the doc object
 export default ({ projectId, filename }: { projectId?: string; filename?: string }) => {
-  const project = useStore(projectStore.currentProject)
+  const project = useStore(projectStore.projectMap)[projectId!]
   const contents = useStore(docStore.document)
 
   useEffect(() => {

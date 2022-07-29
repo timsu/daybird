@@ -41,7 +41,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
       >
         <LogoDark class="w-[160px]" />
       </div>
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="flex-1 flex flex-col overflow-y-auto scrollbar">
         <Links />
         <Projects />
       </div>
@@ -150,14 +150,13 @@ function ProjectTree({ project }: { project: Project }) {
   return (
     <>
       <div
-        class="border-t border-t-gray-500 p-4 flex flex-row items-center text-gray-400
-          font-semibold text-sm cursor-pressable hover:bg-gray-700 cursor-pointer"
+        class="border-t border-t-gray-500 py-2 pl-4 pr-3 flex flex-row items-center text-gray-400
+          font-semibold text-sm cursor-pressable hover:bg-gray-700 cursor-pointer "
         onClick={() => setExpanded(!expanded)}
       >
-        <Tooltip message={expanded ? 'Hide Files' : 'Show Files'}>
-          <div class="mr-1 text-ellipsis max-w-[200px]">{project.name.toUpperCase()}</div>
+        <Tooltip class="grow mr-1 max-w-[200px]" message={expanded ? 'Hide Files' : 'Show Files'}>
+          <div class="text-ellipsis">{project.name.toUpperCase()}</div>
         </Tooltip>
-        <div class="grow" />
         <Pressable tooltip="New File" onClick={onNewFile}>
           <DocumentAddIcon class="h-4 w-4" />
         </Pressable>
