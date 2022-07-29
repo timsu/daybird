@@ -164,12 +164,19 @@ function ProjectTree({ project }: { project: Project }) {
         <Tooltip class="grow mr-1 max-w-[200px]" message={expanded ? 'Collapse' : 'Expand'}>
           <div class="text-ellipsis">{project.name.toUpperCase()}</div>
         </Tooltip>
-        <Pressable tooltip={{ message: 'New File', placement: 'left' }} onClick={onNewFile}>
+        <Pressable
+          tooltip={{ message: 'New File', placement: 'left', tooltipClass: 'min-w-[75px]' }}
+          onClick={onNewFile}
+        >
           <DocumentAddIcon class="h-4 w-4" />
         </Pressable>
         <div class="mr-1" />
         <Pressable
-          tooltip={{ message: "New File with Today's Date", width: 100, placement: 'left' }}
+          tooltip={{
+            message: "New File with Today's Date",
+            tooltipClass: 'min-w-[120px]',
+            placement: 'left',
+          }}
           onClick={onNewDailyFile}
         >
           <CalendarIcon class="h-4 w-4" />
