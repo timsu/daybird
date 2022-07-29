@@ -9,12 +9,14 @@ import {
 import { File, paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
+import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
 import { DotsHorizontalIcon, FolderIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default ({ projectId }: { projectId: string }) => {
   const files = useStore(fileStore.files)[projectId]
+  const project = useStore(projectStore.projectMap)[projectId]
 
   if (!files) return null
 
@@ -23,10 +25,10 @@ export default ({ projectId }: { projectId: string }) => {
       <ContextMenuWithData id="file-tree-menu">
         {(file: File) => (
           <>
-            <ContextMenuItem onClick={() => modalStore.renameFileModal.set(file)}>
+            <ContextMenuItem onClick={() => modalStore.renameFileModal.set({ project, file })}>
               Rename File
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => modalStore.deleteFileModal.set(file)}>
+            <ContextMenuItem onClick={() => modalStore.deleteFileModal.set({ project, file })}>
               Delete File
             </ContextMenuItem>
           </>

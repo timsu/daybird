@@ -128,7 +128,11 @@ function ProjectTree({ project }: { project: Project }) {
     fileStore.setExpanded(project.id, setting)
   }
 
+  const path = useStore(uiStore.path)
+
   if (!project) return null
+
+  const active = location.pathname == `${paths.PROJECTS}/${project.id}`
 
   const onNewFile = (e: Event) => {
     e.stopPropagation()
@@ -150,8 +154,11 @@ function ProjectTree({ project }: { project: Project }) {
   return (
     <>
       <div
-        class="border-t border-t-gray-500 py-2 pl-4 pr-3 flex flex-row items-center text-gray-400
-          font-semibold text-sm cursor-pressable hover:bg-gray-700 cursor-pointer "
+        class={classNames(
+          'border-t border-t-gray-500 py-2 pl-4 pr-3 flex flex-row items-center',
+          'text-gray-400 font-semibold text-sm cursor-pressable hover:bg-gray-700 cursor-pointer',
+          active ? 'bg-gray-900' : ''
+        )}
         onClick={() => setExpanded(!expanded)}
       >
         <Tooltip class="grow mr-1 max-w-[200px]" message={expanded ? 'Collapse' : 'Expand'}>
