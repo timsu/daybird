@@ -1,3 +1,4 @@
+import { route } from 'preact-router'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import Quill from 'quill'
 
@@ -8,6 +9,7 @@ import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { DOC_EXT, fileStore, getNameFromPath } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
+import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
 import { DocumentIcon } from '@heroicons/react/outline'
@@ -17,7 +19,7 @@ type Props = {
   id: string | undefined
   focus?: boolean
   initialTitle?: string
-  showContextProjectId?: string
+  showContext?: boolean
   newTaskMode?: boolean
   onCreate?: (task: Task) => void
 }
@@ -27,14 +29,7 @@ const getQuillIndex = (e: Event) => {
   return blot.offset(window.quill?.scroll)
 }
 
-export default ({
-  id,
-  initialTitle,
-  focus,
-  showContextProjectId,
-  newTaskMode,
-  onCreate,
-}: Props) => {
+export default ({ id, initialTitle, focus, showContext, newTaskMode, onCreate }: Props) => {
   const [savedId, setSavedId] = useState<string>()
   const [showPlaceholder, setPlaceholder] = useState<boolean>(!id && !initialTitle)
 
@@ -133,7 +128,7 @@ export default ({
         id = 'delete-me'
         titleRef.current!.id = 'task-delete-me'
         taskStore.deletedTask.set({ id } as Task)
-      } else if (showContextProjectId) {
+      } else if (showContext) {
         titleRef.current!.id = 'task-delete-me'
         taskStore.deletedTask.set({ id: 'delete-me' } as Task)
       } else {
@@ -163,6 +158,11 @@ export default ({
         }
       }
     }
+  }
+
+  const goToDoc = () => {
+    const currentProject = projectStore.currentProject.get()
+    route(`${paths.DOC}/${currentProject!.id}/${task.doc}`)
   }
 
   return (
@@ -203,16 +203,15 @@ export default ({
         {task?.title || initialTitle}
       </div>
 
-      {showContextProjectId && task?.doc && (
-        <a href={`${paths.DOC}/${showContextProjectId}/${task.doc}`}>
-          <div
-            class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
-              ml-3 max-w-[100px] overflow-ellipsis"
-          >
-            <DocumentIcon class="w-4 h-4 mr-1" />
-            {getNameFromPath(task.doc)}
-          </div>
-        </a>
+      {showContext && task?.doc && (
+        <div
+          class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
+              ml-3 max-w-[110px] overflow-ellipsis cursor-pointer"
+          onClick={goToDoc}
+        >
+          <DocumentIcon class="w-4 h-4 mr-1" />
+          {getNameFromPath(task.doc)}
+        </div>
       )}
 
       <div

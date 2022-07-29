@@ -23,7 +23,6 @@ class SeqTaskBlot extends BlockEmbed {
       node.dataset['id'] = task.id
     }
 
-    const showContextProjectId = data.ref ? projectStore.currentProject.get()?.id : undefined
     node.childNodes.forEach((n) => n.remove())
     render(
       <TaskRow
@@ -31,7 +30,7 @@ class SeqTaskBlot extends BlockEmbed {
         initialTitle={data.title}
         focus={data.focus}
         onCreate={onCreateTask}
-        showContextProjectId={showContextProjectId}
+        showContext={data.ref}
       />,
       node
     )

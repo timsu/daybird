@@ -14,9 +14,10 @@ export default ({ projectId, filename }: { projectId?: string; filename?: string
   const contents = useStore(docStore.document)
 
   useEffect(() => {
-    if (project?.id && projectId && project.id != projectId) {
-      projectStore.setCurrentProject(projectId)
-    } else if (project && filename) {
+    if (project) {
+      projectStore.setCurrentProject(project)
+    }
+    if (project && filename) {
       docStore.loadDoc(project, filename)
     }
   }, [project, projectId, filename])
