@@ -6,23 +6,33 @@ import Quill from 'quill'
 
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
+import { projectStore } from '@/stores/projectStore'
 
 const BlockEmbed = Quill.import('blots/block/embed')
 
-type Data = { id: string; focus?: boolean; title?: string }
+type Data = { id: string; focus?: boolean; title?: string; ref?: boolean }
 
 class SeqTaskBlot extends BlockEmbed {
   static create(data: Data) {
     const node = super.create(data) as HTMLDivElement
     node.dataset['id'] = data.id
+    node.dataset['ref'] = data.ref?.toString()
+    node.style.overflow = 'hidden'
 
     const onCreateTask = (task: Task) => {
       node.dataset['id'] = task.id
     }
 
+    const showContextProjectId = data.ref ? projectStore.currentProject.get()?.id : undefined
     node.childNodes.forEach((n) => n.remove())
     render(
-      <TaskRow id={data.id} initialTitle={data.title} focus={data.focus} onCreate={onCreateTask} />,
+      <TaskRow
+        id={data.id}
+        initialTitle={data.title}
+        focus={data.focus}
+        onCreate={onCreateTask}
+        showContextProjectId={showContextProjectId}
+      />,
       node
     )
 
@@ -32,9 +42,11 @@ class SeqTaskBlot extends BlockEmbed {
   static value(domNode: HTMLAnchorElement) {
     const id = domNode.dataset['id']
     if (!id) return {}
-    return {
+    const data: Data = {
       id,
     }
+    if (domNode.dataset['ref']) data.ref = true
+    return data
   }
 
   update(mutations: any) {

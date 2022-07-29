@@ -133,6 +133,9 @@ export default ({
         id = 'delete-me'
         titleRef.current!.id = 'task-delete-me'
         taskStore.deletedTask.set({ id } as Task)
+      } else if (showContextProjectId) {
+        titleRef.current!.id = 'task-delete-me'
+        taskStore.deletedTask.set({ id: 'delete-me' } as Task)
       } else {
         modalStore.deleteTaskModal.set(task)
       }

@@ -33,6 +33,7 @@ class TaskStore {
     tasks.forEach((t) => (taskMap[t.id] = t))
     this.taskMap.notify()
     this.taskList.set(tasks)
+    return tasks
   }
 
   loadTask = async (id: string) => {

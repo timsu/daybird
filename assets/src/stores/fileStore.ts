@@ -63,8 +63,10 @@ class FileStore {
     route(paths.DOC + '/' + project.id + '/' + path)
   }
 
+  dailyFileTitle = () => moment().format('YYYY-MM-DD')
+
   newDailyFile = async (project: Project) => {
-    const name = moment().format('YYYY-MM-DD')
+    const name = this.dailyFileTitle()
     const existing = this.getFilesFor(project).find((f) => f.name == name)
 
     assertIsDefined(project, 'project is defined')
