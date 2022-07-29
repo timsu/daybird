@@ -18,8 +18,9 @@ import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import {
-    BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, DocumentAddIcon, DocumentIcon,
-    DotsHorizontalIcon, FolderAddIcon, FolderIcon, HomeIcon, PlusIcon, ViewListIcon
+    BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon,
+    DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon, FolderIcon, HomeIcon,
+    PlusIcon, ViewListIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -162,7 +163,8 @@ function ProjectTree({ project }: { project: Project }) {
         onClick={() => setExpanded(!expanded)}
       >
         <Tooltip class="grow mr-1 max-w-[200px]" message={expanded ? 'Collapse' : 'Expand'}>
-          <div class="text-ellipsis">{project.name.toUpperCase()}</div>
+          {expanded ? <ChevronDownIcon class="h-4 w-4" /> : <ChevronUpIcon class="h-4 w-4" />}
+          <div class="ml-1 text-ellipsis">{project.name.toUpperCase()}</div>
         </Tooltip>
         <Pressable
           tooltip={{ message: 'New File', placement: 'left', tooltipClass: 'min-w-[75px]' }}

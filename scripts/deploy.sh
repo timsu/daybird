@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source ~/.profile
-
 set -e
 
 cd assets
