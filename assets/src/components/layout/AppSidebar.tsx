@@ -163,10 +163,10 @@ function ProjectTree({ project }: { project: Project }) {
         onClick={() => setExpanded(!expanded)}
       >
         <Tooltip
-          class="flex-row grow mr-1 max-w-[200px]"
+          class="flex-row items-center grow mr-1 max-w-[200px]"
           message={expanded ? 'Collapse' : 'Expand'}
         >
-          <div class="ml-1 text-ellipsis">{project.name.toUpperCase()}</div>
+          <div class="mr-1 text-ellipsis">{project.name.toUpperCase()}</div>
           {!expanded && <ChevronDownIcon class="h-3 w-3" />}
         </Tooltip>
         <Pressable

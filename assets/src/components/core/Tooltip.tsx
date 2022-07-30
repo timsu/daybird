@@ -37,7 +37,7 @@ export default ({
     <div
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
-      className={classNames('relative flex flex-col', cls || '')}
+      className={classNames('relative flex', cls || 'flex-row items-center')}
     >
       {open && (
         <div
