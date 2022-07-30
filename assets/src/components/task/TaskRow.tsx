@@ -196,7 +196,7 @@ export default ({
       if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = 'move'
         dragElement = e.target as HTMLElement
-        e.dataTransfer.setData('text/plain', task.id)
+        e.dataTransfer.setData('text/plain', task?.id)
       }
     } else {
       e.preventDefault()
@@ -212,7 +212,7 @@ export default ({
       window.quill!.insertEmbed(
         quillContext.range.index,
         'seqtask',
-        { id, ref: showContext },
+        { id, ref: showContext, focus: !id, title: id ? undefined : '' },
         Quill.sources.USER
       )
     }
@@ -230,7 +230,7 @@ export default ({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      {!taskList && task && <span class="-ml-2 drag-handle grippy" />}
+      {!taskList && <span class="-ml-2 drag-handle grippy" />}
 
       {task?.archived_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
