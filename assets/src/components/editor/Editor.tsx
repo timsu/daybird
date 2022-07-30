@@ -65,7 +65,14 @@ export default ({ project, filename, contents, saveContents }: Props) => {
 
   useDeleteTaskListener(quillRef)
 
-  return <div id="editor" class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-4" />
+  return (
+    <div
+      id="editor"
+      class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-4"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={() => {}}
+    />
+  )
 }
 
 export function useQuill(id: string, options: QuillOptionsStatic) {

@@ -4,6 +4,7 @@ import Quill from 'quill'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import Tooltip from '@/components/core/Tooltip'
+import { quillContextForPixelPosition } from '@/components/editor/quillUtils'
 import { paths } from '@/config'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -19,6 +20,7 @@ type Props = {
   id: string | undefined
   focus?: boolean
   initialTitle?: string
+  taskList?: boolean
   showContext?: boolean
   newTaskMode?: boolean
   onCreate?: (task: Task) => void
@@ -29,13 +31,23 @@ const getQuillIndex = (e: Event) => {
   return blot.offset(window.quill?.scroll)
 }
 
-export default ({ id, initialTitle, focus, showContext, newTaskMode, onCreate }: Props) => {
+export default ({
+  id,
+  initialTitle,
+  focus,
+  showContext,
+  newTaskMode,
+  taskList,
+  onCreate,
+}: Props) => {
   const [savedId, setSavedId] = useState<string>()
   const [showPlaceholder, setPlaceholder] = useState<boolean>(!id && !initialTitle)
 
   id = id || savedId
   const task = useStore(taskStore.taskMap)[id!]
   const titleRef = useRef<HTMLDivElement | null>(null)
+
+  // --- saving and loading
 
   useEffect(() => {
     const div = titleRef.current
@@ -112,6 +124,8 @@ export default ({ id, initialTitle, focus, showContext, newTaskMode, onCreate }:
     if (id && id != 'undefined' && id != 'null') taskStore.loadTask(id)
   }, [id])
 
+  // --- actions
+
   const toggleComplete = () => {
     taskStore.saveTask(task, { completed_at: task.completed_at ? null : new Date().toISOString() })
   }
@@ -121,6 +135,8 @@ export default ({ id, initialTitle, focus, showContext, newTaskMode, onCreate }:
     const rect = target.getBoundingClientRect()
     triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
   }
+
+  // --- task deletion handling
 
   const onKeyDownRow = (e: KeyboardEvent) => {
     if (e.key == 'Backspace') {
@@ -165,21 +181,64 @@ export default ({ id, initialTitle, focus, showContext, newTaskMode, onCreate }:
     route(`${paths.DOC}/${currentProject!.id}/${task.doc}`)
   }
 
+  // --- drag and drop handling
+
+  let isDragHandleClick = false
+  let dragElement: HTMLElement | undefined = undefined
+
+  const onTaskMouseDown = (e: MouseEvent) => {
+    isDragHandleClick = (e.target as HTMLElement).className.includes('drag-handle')
+  }
+
+  const onDragStart = (e: DragEvent) => {
+    if (isDragHandleClick) {
+      e.stopPropagation()
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move'
+        dragElement = e.target as HTMLElement
+        e.dataTransfer.setData('text/plain', task.id)
+      }
+    } else {
+      e.preventDefault()
+    }
+  }
+
+  const onDragEnd = (e: DragEvent) => {
+    const quillContext = quillContextForPixelPosition(window.quill!, e.clientX, e.clientY)
+
+    if (quillContext.line) {
+      titleRef.current!.id = 'task-delete-me'
+      taskStore.deletedTask.set({ id: 'delete-me' } as Task)
+      window.quill!.insertEmbed(
+        quillContext.range.index,
+        'seqtask',
+        { id, ref: showContext },
+        Quill.sources.USER
+      )
+    }
+  }
+
   return (
     <div
       id={task ? `task-${task.id}` : ''}
       contentEditable={false}
-      class="bg-gray-100 rounded p-2 flex flex-row items-center relative"
+      class="bg-gray-100 rounded p-2 flex flex-row items-center relative hover-parent"
       tabIndex={0}
       onKeyDown={onKeyDownRow}
+      draggable={!taskList}
+      onMouseDown={onTaskMouseDown}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
     >
+      {!taskList && task && <span class="-ml-2 drag-handle grippy" />}
+
       {task?.archived_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
       ) : (
         <input
           checked={!!task?.completed_at}
           type="checkbox"
-          class="mr-2 rounded border-gray-400"
+          class="mr-2 rounded border-gray-400 cursor-pointer"
           onClick={toggleComplete}
         />
       )}

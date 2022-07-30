@@ -26,19 +26,41 @@ body,
   @apply focus:ring-0 focus:ring-offset-0;
 }
 
-.scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-
-.scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+.scrollbar::-webkit-scrollbar { width: 5px }
+.scrollbar::-webkit-scrollbar-track { background: transparent }
 .scrollbar::-webkit-scrollbar-thumb {
   background: #888888;
   border-radius: 3px;
 }
-
 .scrollbar::-webkit-scrollbar-thumb:hover {
   background: #aaaaaa;
+}
+
+.hover-parent .hover-visible {
+  display: none;
+}
+.hover-parent:hover .hover-visible {
+  display: block;
+}
+
+span.grippy {
+  content: '....';
+  width: 10px;
+  height: 20px;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 5px;
+  padding: 3px 4px;
+  cursor: move;
+  vertical-align: middle;
+  margin-top: -.7em;
+  margin-right: .3em;
+  font-size: 12px;
+  font-family: sans-serif;
+  letter-spacing: 2px;
+  color: #cccccc;
+  text-shadow: 1px 0 1px black;
+}
+span.grippy::after {
+  content: '.. .. .. ..';
 }
