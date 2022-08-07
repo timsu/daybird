@@ -87,7 +87,9 @@ const QuillKeybindings: Keybindindings = {
       const leaf = this.quill.getLeaf(range.index - 1)[0]
       const blotName = leaf?.statics.blotName
       if (blotName == 'seqtask') {
-        const taskElement = leaf!.domNode.children[0] as HTMLElement
+        const taskElement = (leaf!.domNode as HTMLElement).getElementsByClassName(
+          'task-title'
+        )[0] as HTMLElement
         if (document.activeElement == taskElement) return false
         taskElement.focus()
         return false

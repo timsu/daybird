@@ -60,6 +60,7 @@ export default ({
     })
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
+      console.log(e)
       e.stopPropagation()
       if (!newTaskMode && e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
@@ -138,28 +139,6 @@ export default ({
 
   // --- task deletion handling
 
-  const onKeyDownRow = (e: KeyboardEvent) => {
-    if (e.key == 'Backspace') {
-      if (!task) {
-        id = 'delete-me'
-        titleRef.current!.id = 'task-delete-me'
-        taskStore.deletedTask.set({ id } as Task)
-      } else if (showContext) {
-        titleRef.current!.id = 'task-delete-me'
-        taskStore.deletedTask.set({ id: 'delete-me' } as Task)
-      } else {
-        modalStore.deleteTaskModal.set(task)
-      }
-    } else if (e.key == 'ArrowUp' || e.key == 'ArrowLeft') {
-      // these offsets are wrong by one, but i can't seem to get quill to select the right thing
-      const index = getQuillIndex(e)
-      window.quill?.setSelection(index, 0)
-    } else if (e.key == 'ArrowDown' || e.key == 'ArrowRight') {
-      const index = getQuillIndex(e)
-      window.quill?.setSelection(index + 0.5, 0)
-    }
-  }
-
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.key == 'Backspace') {
       const title = titleRef.current?.innerText?.trim()
@@ -223,8 +202,6 @@ export default ({
       id={task ? `task-${task.id}` : ''}
       contentEditable={false}
       class="bg-gray-100 rounded p-2 flex flex-row items-center relative hover-parent"
-      tabIndex={0}
-      onKeyDown={onKeyDownRow}
       draggable={!taskList}
       onMouseDown={onTaskMouseDown}
       onDragStart={onDragStart}

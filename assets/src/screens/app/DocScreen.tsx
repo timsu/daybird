@@ -18,7 +18,7 @@ type Props = {
   filename?: string
 }
 
-const LS_TASKS_INSERTED = 'dti'
+const LS_TASKS_INSERTED = 'dti:'
 
 export default (props: Props) => {
   const docError = useStore(docStore.docError)
@@ -26,7 +26,8 @@ export default (props: Props) => {
   const title = props.filename ? getNameFromPath(props.filename) : ''
 
   const isTodayJournal = title == fileStore.dailyFileTitle()
-  const uncompleteTasksInserted = isTodayJournal && localStorage.getItem(LS_TASKS_INSERTED) == title
+  const uncompleteTasksInserted =
+    isTodayJournal && localStorage.getItem(LS_TASKS_INSERTED + props.projectId) == title
 
   const insertUncompleteTasks = async (e: MouseEvent) => {
     const tasks = await taskStore.loadTasks({ id: props.projectId! } as Project)
@@ -42,7 +43,7 @@ export default (props: Props) => {
       )
     })
     if (notInThisDoc.length) window.quill?.insertText(startIndex + notInThisDoc.length, '\n')
-    localStorage.setItem(LS_TASKS_INSERTED, title)
+    localStorage.setItem(LS_TASKS_INSERTED + props.projectId, title)
     ;(e.target as HTMLDivElement).style.display = 'none'
   }
 
