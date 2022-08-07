@@ -1,5 +1,4 @@
 import { CSSTransition } from 'preact-transitioning'
-import Quill from 'quill'
 
 import Banner from '@/components/core/Banner'
 import Button from '@/components/core/Button'
@@ -34,14 +33,14 @@ export default (props: Props) => {
     const notInThisDoc = tasks.filter((t) => t.doc != props.path)
     const startIndex = 0
 
-    notInThisDoc.forEach((t, i) => {
-      window.quill?.insertEmbed(
-        startIndex + i,
-        'seqtask',
-        { id: t.id, ref: true },
-        Quill.sources.USER
-      )
-    })
+    // notInThisDoc.forEach((t, i) => {
+    //   window.quill?.insertEmbed(
+    //     startIndex + i,
+    //     'seqtask',
+    //     { id: t.id, ref: true },
+    //     Quill.sources.USER
+    //   )
+    // })
     if (notInThisDoc.length) window.quill?.insertText(startIndex + notInThisDoc.length, '\n')
     localStorage.setItem(LS_TASKS_INSERTED + props.projectId, title)
     ;(e.target as HTMLDivElement).style.display = 'none'

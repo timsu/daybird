@@ -1,6 +1,5 @@
 import { action, atom, map } from 'nanostores'
 import { Channel } from 'phoenix'
-import Delta from 'quill-delta'
 
 import { API } from '@/api'
 import { config } from '@/config'
@@ -14,7 +13,7 @@ class DocStore {
 
   filename = atom<string | undefined>()
 
-  document = atom<Delta | undefined>()
+  document = atom<any | undefined>()
 
   version = atom<number>(0)
 
@@ -43,7 +42,7 @@ class DocStore {
     }
   }
 
-  saveDoc = async (project: Project, filename: string, contents: Delta) => {
+  saveDoc = async (project: Project, filename: string, contents: any) => {
     logger.info('DOCS - saving doc', filename, contents)
     try {
       await API.writeFile(project, filename, contents)

@@ -1,15 +1,11 @@
 import { route } from 'preact-router'
 import { useEffect, useRef, useState } from 'preact/hooks'
-import Quill from 'quill'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
-import Tooltip from '@/components/core/Tooltip'
-import { quillContextForPixelPosition } from '@/components/editor/quillUtils'
 import { paths } from '@/config'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
-import { DOC_EXT, fileStore, getNameFromPath } from '@/stores/fileStore'
-import { modalStore } from '@/stores/modalStore'
+import { getNameFromPath } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
@@ -24,11 +20,6 @@ type Props = {
   showContext?: boolean
   newTaskMode?: boolean
   onCreate?: (task: Task) => void
-}
-
-const getQuillIndex = (e: Event) => {
-  const blot = Quill.find(e.target as HTMLDivElement, true)
-  return blot.offset(window.quill?.scroll)
 }
 
 export default ({
@@ -65,7 +56,7 @@ export default ({
       if (!newTaskMode && e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
         const isBeginning = window.getSelection()?.anchorOffset == 0
-        const index = getQuillIndex(e)
+        const index = -1 // getQuillIndex(e)
         if (isBeginning) {
           window.quill?.insertText(index, '\n')
         } else {
@@ -183,18 +174,17 @@ export default ({
   }
 
   const onDragEnd = (e: DragEvent) => {
-    const quillContext = quillContextForPixelPosition(window.quill!, e.clientX, e.clientY)
-
-    if (quillContext.line) {
-      titleRef.current!.id = 'task-delete-me'
-      taskStore.deletedTask.set({ id: 'delete-me' } as Task)
-      window.quill!.insertEmbed(
-        quillContext.range.index,
-        'seqtask',
-        { id, ref: showContext, focus: !id, title: id ? undefined : '' },
-        Quill.sources.USER
-      )
-    }
+    // const quillContext = quillContextForPixelPosition(window.quill!, e.clientX, e.clientY)
+    // if (quillContext.line) {
+    //   titleRef.current!.id = 'task-delete-me'
+    //   taskStore.deletedTask.set({ id: 'delete-me' } as Task)
+    //   // window.quill!.insertEmbed(
+    //   //   quillContext.range.index,
+    //   //   'seqtask',
+    //   //   { id, ref: showContext, focus: !id, title: id ? undefined : '' },
+    //   //   Quill.sources.USER
+    //   // )
+    // }
   }
 
   return (

@@ -1,6 +1,4 @@
 import { useEffect } from 'preact/hooks'
-import { DeltaOperation } from 'quill'
-import Delta from 'quill-delta'
 
 import Editor from '@/components/editor/Editor'
 import { Project } from '@/models'
@@ -22,7 +20,7 @@ export default ({ projectId, filename }: { projectId?: string; filename?: string
     }
   }, [project, projectId, filename])
 
-  const saveContents = (project: Project, filename: string, contents: Delta) => {
+  const saveContents = (project: Project, filename: string, contents: any) => {
     docStore.saveDoc(project, filename, contents)
   }
 
