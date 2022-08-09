@@ -24,8 +24,9 @@ export default ({ project, filename, contents, saveContents }: Props) => {
   })
 
   return (
-    <div class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-4">
-      <EditorContent editor={editor} />
-    </div>
+    <EditorContent
+      class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-8"
+      editor={editor}
+    />
   )
 }
