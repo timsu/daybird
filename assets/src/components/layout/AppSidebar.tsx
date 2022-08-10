@@ -121,7 +121,6 @@ function ProjectTree({ project }: { project: Project }) {
   const expanded = useStore(fileStore.expanded)[project.id]
 
   useEffect(() => {
-    console.log('expanded value changed', expanded)
     if (expanded) fileStore.loadFiles(project)
   }, [expanded])
 

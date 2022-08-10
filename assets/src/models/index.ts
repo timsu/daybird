@@ -1,3 +1,4 @@
+export * from './doc'
 export * from './project'
 export * from './task'
 export * from './team'
