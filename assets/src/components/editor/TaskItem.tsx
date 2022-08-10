@@ -1,6 +1,7 @@
 import { render } from 'preact'
 
 import TaskRow from '@/components/task/TaskRow'
+import { Task } from '@/models'
 import { mergeAttributes, Node, wrappingInputRule } from '@tiptap/core'
 
 export interface TaskItemOptions {
@@ -95,7 +96,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
           initialTitle={node.attrs.title}
           focus={node.attrs.focus}
           onCreate={onCreateTask}
-          // showContext={data.ref}
+          showContext={node.attrs.ref}
         />,
         container
       )
