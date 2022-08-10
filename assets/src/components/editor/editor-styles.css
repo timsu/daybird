@@ -56,12 +56,12 @@
 
   blockquote {
     padding-left: 1rem;
-    border-left: 2px solid rgba(#0D0D0D, 0.1);
+    border-left: 2px solid #8D8D8D;
   }
 
   hr {
     border: none;
-    border-top: 2px solid rgba(#0D0D0D, 0.1);
+    border-top: 2px solid #8D8D8D;
     margin: 2rem 0;
   }
 }

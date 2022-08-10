@@ -1,7 +1,7 @@
-import Quill from 'quill'
+import { Editor } from '@tiptap/react'
 
 declare global {
   interface Window {
-    quill?: Quill
+    editor?: Editor
   }
 }

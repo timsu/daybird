@@ -2,6 +2,7 @@ import './editor-styles.css'
 
 import { useEffect, useRef } from 'preact/hooks'
 
+import { TaskItem } from '@/components/editor/TaskItem'
 import { Doc, Project } from '@/models'
 import { debounce, DebounceStyle } from '@/utils'
 import { EditorContent, useEditor } from '@tiptap/react'
@@ -18,7 +19,7 @@ const SAVE_INTERVAL = 5_000
 
 export default ({ project, filename, contents, saveContents }: Props) => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, TaskItem],
   })
 
   const currentFile = useRef<string>()
@@ -26,6 +27,7 @@ export default ({ project, filename, contents, saveContents }: Props) => {
   useEffect(() => {
     if (!editor) return
 
+    window.editor = editor
     const legacyDoc = isDeltaDoc(contents)
     if (legacyDoc) {
       editor.commands.setContent('LEGACY DOC')
