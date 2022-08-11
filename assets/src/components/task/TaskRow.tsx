@@ -44,28 +44,23 @@ export default ({
     const div = titleRef.current
     if (!div) return
 
-    // prevent navigation propagating to Quill when focused on this element
     div.addEventListener('input', (e) => {
       e.stopPropagation()
       setPlaceholder(!titleRef.current?.innerText)
     })
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
-      console.log(e)
       e.stopPropagation()
       if (!newTaskMode && e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
-        const isBeginning = window.getSelection()?.anchorOffset == 0
-        const index = -1 // getQuillIndex(e)
-        if (isBeginning) {
-          window.quill?.insertText(index, '\n')
-        } else {
-          // if we're at the end of the doc, insert a newline
-          // if (index + 2 >= window.quill!.getLength()) {
-          //   window.quill?.insertText(index + 1, '\n')
-          // } else {
-          window.quill?.setSelection(index + 1)
-          //}
+        const pos = window.editor?.view.posAtDOM(e.target as Node, 0, 1)
+        if (pos) {
+          window.editor
+            ?.chain()
+            .setTextSelection(pos + 1)
+            .createParagraphNear()
+            .focus()
+            .run()
         }
       }
     })
@@ -151,51 +146,11 @@ export default ({
     route(`${paths.DOC}/${currentProject!.id}/${task.doc}`)
   }
 
-  // --- drag and drop handling
-
-  let isDragHandleClick = false
-  let dragElement: HTMLElement | undefined = undefined
-
-  const onTaskMouseDown = (e: MouseEvent) => {
-    isDragHandleClick = (e.target as HTMLElement).className.includes('drag-handle')
-  }
-
-  const onDragStart = (e: DragEvent) => {
-    if (isDragHandleClick) {
-      e.stopPropagation()
-      if (e.dataTransfer) {
-        e.dataTransfer.effectAllowed = 'move'
-        dragElement = e.target as HTMLElement
-        e.dataTransfer.setData('text/plain', task?.id)
-      }
-    } else {
-      e.preventDefault()
-    }
-  }
-
-  const onDragEnd = (e: DragEvent) => {
-    // const quillContext = quillContextForPixelPosition(window.quill!, e.clientX, e.clientY)
-    // if (quillContext.line) {
-    //   titleRef.current!.id = 'task-delete-me'
-    //   taskStore.deletedTask.set({ id: 'delete-me' } as Task)
-    //   // window.quill!.insertEmbed(
-    //   //   quillContext.range.index,
-    //   //   'seqtask',
-    //   //   { id, ref: showContext, focus: !id, title: id ? undefined : '' },
-    //   //   Quill.sources.USER
-    //   // )
-    // }
-  }
-
   return (
     <div
       id={task ? `task-${task.id}` : ''}
       contentEditable={false}
       class="bg-gray-100 rounded p-2 flex flex-row items-center relative hover-parent"
-      draggable={!taskList}
-      onMouseDown={onTaskMouseDown}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
     >
       {!taskList && <span class="-ml-2 drag-handle grippy" />}
 
@@ -211,7 +166,7 @@ export default ({
       )}
 
       {!task?.title && showPlaceholder && (
-        <div class="absolute left-[2.2em] pointer-events-none text-gray-400">New task</div>
+        <div class="absolute left-[2.6em] pointer-events-none text-gray-400">New task</div>
       )}
 
       <div
@@ -246,16 +201,6 @@ export default ({
       >
         {task?.short_code}
       </div>
-
-      {/* <input
-          type="text"
-          class="text-lg rounded px-1 py-0 bg-transparent border-none flex-grow"
-          value={title || task?.title || ''}
-          placeholder="What would you like to do?"
-          onChange={(e) => setTitle((e.target as HTMLInputElement).value)}
-          onBlur={onSubmit}
-          ref={(elem) => focus && setTimeout(() => elem?.focus(), 100)}
-        /> */}
     </div>
   )
 }

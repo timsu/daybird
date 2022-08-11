@@ -3,6 +3,7 @@ import { render } from 'preact'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 import { mergeAttributes, Node, wrappingInputRule } from '@tiptap/core'
+import { Editor } from '@tiptap/react'
 
 export interface TaskItemOptions {
   HTMLAttributes: Record<string, any>
@@ -58,21 +59,23 @@ export const TaskItem = Node.create<TaskItemOptions>({
     ]
   },
 
-  // addKeyboardShortcuts() {
-  //   const shortcuts = {
-  //     Enter: () => this.editor.commands.splitListItem(this.name),
-  //     'Shift-Tab': () => this.editor.commands.liftListItem(this.name),
-  //   }
+  addKeyboardShortcuts() {
+    const shortcuts = {
+      Backspace: () => {
+        const pos = this.editor.state.selection
+        const line = this.editor.state.doc.textBetween(
+          pos.from,
+          pos.to == pos.from ? pos.to + 1 : pos.to
+        )
+        if (line == '')
+          // blank line, allow delete
+          return false
+        return true
+      },
+    }
 
-  //   if (!this.options.nested) {
-  //     return shortcuts
-  //   }
-
-  //   return {
-  //     ...shortcuts,
-  //     Tab: () => this.editor.commands.sinkListItem(this.name),
-  //   }
-  // },
+    return shortcuts
+  },
 
   addNodeView() {
     return ({ node, HTMLAttributes, getPos, editor }) => {
