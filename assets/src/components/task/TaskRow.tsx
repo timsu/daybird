@@ -154,7 +154,9 @@ export default ({
     >
       {!taskList && <span class="-ml-2 drag-handle grippy" />}
 
-      {task?.archived_at ? (
+      {task?.deleted_at ? (
+        <div class="font-semibold text-sm text-gray-500 mr-2 ">DELETED</div>
+      ) : task?.archived_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
       ) : (
         <input

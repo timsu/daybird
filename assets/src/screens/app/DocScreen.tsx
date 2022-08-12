@@ -33,15 +33,17 @@ export default (props: Props) => {
     const notInThisDoc = tasks.filter((t) => t.doc != props.path)
     const startIndex = 0
 
-    // notInThisDoc.forEach((t, i) => {
-    //   window.quill?.insertEmbed(
-    //     startIndex + i,
-    //     'seqtask',
-    //     { id: t.id, ref: true },
-    //     Quill.sources.USER
-    //   )
-    // })
-    if (notInThisDoc.length) window.quill?.insertText(startIndex + notInThisDoc.length, '\n')
+    let commandChain = window.editor?.chain()
+    notInThisDoc.forEach((t, i) => {
+      commandChain = commandChain?.insertContentAt(startIndex + i, {
+        type: 'task',
+        attrs: { id: t.id, ref: true },
+      })
+    })
+    if (notInThisDoc.length)
+      commandChain = commandChain?.insertContentAt(startIndex + notInThisDoc.length, '\n')
+    commandChain?.run()
+
     localStorage.setItem(LS_TASKS_INSERTED + props.projectId, title)
     ;(e.target as HTMLDivElement).style.display = 'none'
   }

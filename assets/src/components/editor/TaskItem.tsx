@@ -2,14 +2,14 @@ import { render } from 'preact'
 
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
-import { mergeAttributes, Node, wrappingInputRule } from '@tiptap/core'
-import { Editor } from '@tiptap/react'
+import { logger } from '@/utils'
+import { mergeAttributes, Node, nodeInputRule } from '@tiptap/core'
 
 export interface TaskItemOptions {
   HTMLAttributes: Record<string, any>
 }
 
-const inputRegex = /^\s*\[\]\s$/
+const inputRegex = /^\s*\[\]\s(.*)$/
 
 export const TaskItem = Node.create<TaskItemOptions>({
   name: 'task',
@@ -22,7 +22,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
     }
   },
 
-  content: 'block+',
+  content: 'inline*',
 
   group: 'block',
 
@@ -67,6 +67,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
           pos.from,
           pos.to == pos.from ? pos.to + 1 : pos.to
         )
+        logger.info('taskitem: eat backspace?', line, pos)
         if (line == '')
           // blank line, allow delete
           return false
@@ -113,7 +114,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
 
   addInputRules() {
     return [
-      wrappingInputRule({
+      nodeInputRule({
         find: inputRegex,
         type: this.type,
         getAttributes: (match) => ({

@@ -65,6 +65,10 @@ class TaskStore {
     this.saveTask(task, { archived_at: task.archived_at ? null : new Date().toISOString() })
   }
 
+  undeleteTask = async (task: Task) => {
+    this.saveTask(task, { deleted_at: null })
+  }
+
   deleteTask = async (task: Task) => {
     this.deletedTask.set(task)
     this.taskList.set(this.taskList.get().filter((t) => t.id != task.id))
