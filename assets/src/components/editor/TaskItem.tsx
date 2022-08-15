@@ -25,7 +25,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
     }
   },
 
-  // content: 'inline*',
+  content: 'inline*',
 
   group: 'block',
 
@@ -154,6 +154,9 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       // add 'focus' as a run-time attribute
       ;(newNode.attrs as any).focus = true
 
+      if (node == state.doc.lastChild) {
+        state.tr.insertText('\n', range.from + node.nodeSize - 1)
+      }
       state.tr.replaceWith(range.from, range.from + node.nodeSize, newNode)
     },
   })
