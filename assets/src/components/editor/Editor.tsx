@@ -172,13 +172,7 @@ function useDeleteTaskListener(editor: Editor | null) {
       console.log('here we go', task, editor, element, pos)
       if (!pos) return
 
-      try {
-        editor.chain().setNodeSelection(pos).deleteNode('task').run()
-      } catch (e) {
-        console.log('fallback method')
-        editor.commands.deleteRange({ from: pos - 1, to: pos + 1 })
-      }
-      editor.commands.setTextSelection(pos - 1)
+      editor.commands.deleteRange({ from: pos - 1, to: pos + 1 })
     })
     return off
   }, [editor])

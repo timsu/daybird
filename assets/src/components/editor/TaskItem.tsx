@@ -1,12 +1,14 @@
 import { render } from 'preact'
 import { NodeType } from 'prosemirror-model'
+import { Plugin, PluginKey } from 'prosemirror-state'
+import { Step } from 'prosemirror-transform'
 
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
+import { modalStore } from '@/stores/modalStore'
+import { taskStore } from '@/stores/taskStore'
 import { logger } from '@/utils'
-import {
-    ExtendedRegExpMatchArray, InputRule, InputRuleFinder, mergeAttributes, Node
-} from '@tiptap/core'
+import { InputRule, InputRuleFinder, mergeAttributes, Node } from '@tiptap/core'
 
 export interface TaskItemOptions {
   HTMLAttributes: Record<string, any>
@@ -65,28 +67,6 @@ export const TaskItem = Node.create<TaskItemOptions>({
     ]
   },
 
-  addKeyboardShortcuts() {
-    const shortcuts = {
-      Backspace: () => {
-        const pos = this.editor.state.selection
-        const line = this.editor.state.doc.textBetween(
-          pos.from,
-          pos.to == pos.from ? pos.to + 1 : pos.to
-        )
-
-        logger.info('taskitem: eat backspace?', line, pos)
-        // if (line == '')
-        //   // blank line, allow delete
-        //   return false
-        // return true
-
-        return false
-      },
-    }
-
-    return shortcuts
-  },
-
   addNodeView() {
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const container = document.createElement('div')
@@ -125,6 +105,43 @@ export const TaskItem = Node.create<TaskItemOptions>({
       taskInputRule({
         find: inputRegex,
         type: this.type,
+      }),
+    ]
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey('taskDeleteHandler'),
+        filterTransaction: (transaction, state) => {
+          let result = true // true for keep, false for stop transaction
+          const replaceSteps: number[] = []
+          transaction.steps.forEach((step, index) => {
+            if ((step as any).jsonID === 'replace') {
+              replaceSteps.push(index)
+            }
+          })
+
+          replaceSteps.forEach((index) => {
+            const map = transaction.mapping.maps[index] as any
+            const oldStart = map.ranges[0]
+            const oldEnd = map.ranges[0] + map.ranges[1]
+            state.doc.nodesBetween(oldStart, oldEnd, (node) => {
+              if (node.type.name === 'task') {
+                // prevent deleting of tasks
+                logger.info('prosemirror attempt delete', node)
+                const id = node.attrs.id
+                const taskToDelete = taskStore.deletedTask.get()
+                if (id && id != taskToDelete?.id) {
+                  result = false
+                  const task = taskStore.taskMap.get()[id]
+                  modalStore.deleteTaskModal.set(task)
+                }
+              }
+            })
+          })
+          return result
+        },
       }),
     ]
   },
