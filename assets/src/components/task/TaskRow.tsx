@@ -8,7 +8,7 @@ import { docStore } from '@/stores/docStore'
 import { getNameFromPath } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
-import { classNames } from '@/utils'
+import { classNames, logger } from '@/utils'
 import { DocumentIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -55,6 +55,7 @@ export default ({
         e.preventDefault()
         const pos = window.editor?.view.posAtDOM(e.target as Node, 0, 1)
         if (pos) {
+          console.log('enter pressed')
           window.editor
             ?.chain()
             .setTextSelection(pos + 1)
@@ -71,6 +72,7 @@ export default ({
     const div = titleRef.current
     if (!div) return
     const onFocusOut = async (e: Event) => {
+      console.log('on focus out')
       const title = titleRef.current?.innerText?.trim()
       const task = taskStore.taskMap.get()[id!]
 
@@ -103,7 +105,10 @@ export default ({
           taskStore.taskList.set([task, ...taskStore.taskList.get()])
         }
       })
-    if (focus && !id) div.focus()
+    if (focus && !id) {
+      logger.info('focusing on new task')
+      div.focus()
+    }
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [id, focus])
 

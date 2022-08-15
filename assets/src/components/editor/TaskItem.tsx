@@ -41,9 +41,6 @@ export const TaskItem = Node.create<TaskItemOptions>({
           'data-id': attributes.id,
         }),
       },
-      focus: {
-        default: false,
-      },
       title: {
         default: undefined,
       },
@@ -94,9 +91,6 @@ export const TaskItem = Node.create<TaskItemOptions>({
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const container = document.createElement('div')
 
-      const isNew = !node.attrs.id
-      let initialTitle = node.attrs.title
-
       const onCreateTask = (task: Task) => {
         if (typeof getPos != 'function') return
         editor.commands.command(({ tr }) => {
@@ -111,7 +105,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
       const listItem = render(
         <TaskRow
           id={node.attrs.id}
-          initialTitle={initialTitle}
+          initialTitle={node.attrs.title}
           focus={node.attrs.focus}
           onCreate={onCreateTask}
           showContext={node.attrs.ref}
@@ -156,7 +150,11 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
         title,
       }
 
-      state.tr.replaceWith(range.from, range.from + node.nodeSize, config.type.create(attributes))
+      const newNode = config.type.create(attributes)
+      // add 'focus' as a run-time attribute
+      ;(newNode.attrs as any).focus = true
+
+      state.tr.replaceWith(range.from, range.from + node.nodeSize, newNode)
     },
   })
 }
