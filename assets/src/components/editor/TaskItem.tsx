@@ -1,15 +1,18 @@
 import { render } from 'preact'
+import { NodeType } from 'prosemirror-model'
 
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 import { logger } from '@/utils'
-import { mergeAttributes, Node, nodeInputRule } from '@tiptap/core'
+import {
+    ExtendedRegExpMatchArray, InputRule, InputRuleFinder, mergeAttributes, Node
+} from '@tiptap/core'
 
 export interface TaskItemOptions {
   HTMLAttributes: Record<string, any>
 }
 
-const inputRegex = /^\s*\[\]\s(.*)$/
+const inputRegex = /^\[\]\s(.*)$/
 
 export const TaskItem = Node.create<TaskItemOptions>({
   name: 'task',
@@ -22,7 +25,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
     }
   },
 
-  content: 'inline*',
+  // content: 'inline*',
 
   group: 'block',
 
@@ -37,6 +40,12 @@ export const TaskItem = Node.create<TaskItemOptions>({
         renderHTML: (attributes) => ({
           'data-id': attributes.id,
         }),
+      },
+      focus: {
+        default: false,
+      },
+      title: {
+        default: undefined,
       },
     }
   },
@@ -67,11 +76,14 @@ export const TaskItem = Node.create<TaskItemOptions>({
           pos.from,
           pos.to == pos.from ? pos.to + 1 : pos.to
         )
+
         logger.info('taskitem: eat backspace?', line, pos)
-        if (line == '')
-          // blank line, allow delete
-          return false
-        return true
+        // if (line == '')
+        //   // blank line, allow delete
+        //   return false
+        // return true
+
+        return false
       },
     }
 
@@ -82,11 +94,13 @@ export const TaskItem = Node.create<TaskItemOptions>({
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const container = document.createElement('div')
 
+      const isNew = !node.attrs.id
+      let initialTitle = node.attrs.title
+
       const onCreateTask = (task: Task) => {
         if (typeof getPos != 'function') return
         editor.commands.command(({ tr }) => {
           const position = getPos()
-          const currentNode = tr.doc.nodeAt(position)
           tr.setNodeMarkup(position, undefined, {
             id: task.id,
           })
@@ -97,7 +111,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
       const listItem = render(
         <TaskRow
           id={node.attrs.id}
-          initialTitle={node.attrs.title}
+          initialTitle={initialTitle}
           focus={node.attrs.focus}
           onCreate={onCreateTask}
           showContext={node.attrs.ref}
@@ -114,14 +128,35 @@ export const TaskItem = Node.create<TaskItemOptions>({
 
   addInputRules() {
     return [
-      nodeInputRule({
+      taskInputRule({
         find: inputRegex,
         type: this.type,
-        getAttributes: (match) => ({
-          focus: true,
-          title: match,
-        }),
       }),
     ]
   },
 })
+
+/**
+ * Build an input rule that changes the type of a textblock when the
+ * matched text is typed into it. When using a regular expresion you’ll
+ * probably want the regexp to start with `^`, so that the pattern can
+ * only occur at the start of a textblock.
+ */
+function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
+  return new InputRule({
+    find: config.find,
+    handler: ({ state, range, match }) => {
+      const $start = state.doc.resolve(range.from)
+      const node = $start.node()
+
+      const fullText = node.textContent
+      const title = fullText.replace(/^\[\]\s*/, '')
+      const attributes = {
+        focus: true,
+        title,
+      }
+
+      state.tr.replaceWith(range.from, range.from + node.nodeSize, config.type.create(attributes))
+    },
+  })
+}

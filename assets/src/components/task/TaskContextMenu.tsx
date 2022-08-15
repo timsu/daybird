@@ -15,6 +15,13 @@ export default () => {
       {(task: Task) =>
         task.deleted_at ? (
           <>
+            {isDoc && (
+              <ContextMenuItem onClick={() => taskStore.deletedTask.set(task)}>
+                <EyeOffIcon class="h-4 w-4 mr-2 text-gray-500" />
+                Remove from page
+              </ContextMenuItem>
+            )}
+
             <ContextMenuItem onClick={() => taskStore.undeleteTask(task)}>
               <TrashIcon class="h-4 w-4 mr-2 text-red-500" />
               Un-delete Task

@@ -5,8 +5,9 @@ import { useEffect, useRef } from 'preact/hooks'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { Doc, Project } from '@/models'
 import { docStore } from '@/stores/docStore'
+import { taskStore } from '@/stores/taskStore'
 import { debounce, DebounceStyle } from '@/utils'
-import { EditorContent, JSONContent, useEditor } from '@tiptap/react'
+import { Editor, EditorContent, JSONContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 type Props = {
@@ -22,6 +23,7 @@ export default ({ project, filename, contents, saveContents }: Props) => {
   const editor = useEditor({
     extensions: [StarterKit, TaskItem],
   })
+  useDeleteTaskListener(editor)
 
   const currentFile = useRef<string>()
   const isDirty = useRef<boolean>()
@@ -156,4 +158,28 @@ function migrateDelta(doc: DeltaDoc): Doc {
     type: 'doc',
     content,
   }
+}
+
+function useDeleteTaskListener(editor: Editor | null) {
+  useEffect(() => {
+    const off = taskStore.deletedTask.listen((task) => {
+      if (!task || !editor) return
+      // remove all references to this item in the quill document
+      const element = document.getElementById('task-' + task.id)
+      if (!element) return
+
+      const pos = editor.view.posAtDOM(element, 0)
+      console.log('here we go', task, editor, element, pos)
+      if (!pos) return
+
+      try {
+        editor.chain().setNodeSelection(pos).deleteNode('task').run()
+      } catch (e) {
+        console.log('fallback method')
+        editor.commands.deleteRange({ from: pos - 1, to: pos + 1 })
+      }
+      editor.commands.setTextSelection(pos - 1)
+    })
+    return off
+  }, [editor])
 }
