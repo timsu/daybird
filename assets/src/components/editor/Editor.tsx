@@ -127,22 +127,26 @@ function migrateDelta(doc: DeltaDoc): Doc {
     } else if (typeof op.insert === 'string') {
       let type = 'paragraph'
       const text = op.insert.replace(/\n$/, '').replace(/^\n+/, '')
-      if (text == '' || text == '\n') return content.push({ type })
-
       const marks: { type: string }[] | undefined = op.attributes ? [] : undefined
       if (op.attributes?.bold) marks?.push({ type: 'bold' })
       if (op.attributes?.italic) marks?.push({ type: 'italic' })
       if (op.attributes?.underline) marks?.push({ type: 'underline' })
 
-      content.push({
-        type,
-        content: [
-          {
-            type: 'text',
-            text,
-            marks,
-          },
-        ],
+      text.split('\n').forEach((line) => {
+        const body =
+          line == '' || line == '\n'
+            ? undefined
+            : [
+                {
+                  type: 'text',
+                  text: line,
+                  marks,
+                },
+              ]
+        content.push({
+          type,
+          content: body,
+        })
       })
     } else if (op.insert?.seqtask) {
       content.push({
@@ -169,7 +173,6 @@ function useDeleteTaskListener(editor: Editor | null) {
       if (!element) return
 
       const pos = editor.view.posAtDOM(element, 0)
-      console.log('here we go', task, editor, element, pos)
       if (!pos) return
 
       editor.commands.deleteRange({ from: pos - 1, to: pos + 1 })
