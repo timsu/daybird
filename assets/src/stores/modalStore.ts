@@ -1,6 +1,6 @@
 import { atom } from 'nanostores'
 
-import { config, File } from '@/config'
+import { config, File, FileType } from '@/config'
 import { Project, Task } from '@/models'
 import { uiStore } from '@/stores/uiStore'
 
@@ -9,7 +9,7 @@ class ModalStore {
 
   newProjectModal = atom<boolean>(false)
 
-  newFileModal = atom<{ project: Project; type: 'file' | 'folder' } | false>(false)
+  newFileModal = atom<{ project: Project; type: FileType } | false>(false)
 
   deleteFileModal = atom<{ project: Project; file: File } | false>(false)
 

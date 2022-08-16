@@ -35,32 +35,42 @@ class FileStore {
 
   loadFiles = async (project: Project) => {
     const response = await API.listFiles(project)
-    const files: File[] = response.files
-      .map((filename) => {
-        const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'
-        return {
-          name: type == 'doc' ? filename.slice(0, filename.length - DOC_EXT.length) : filename,
-          path: filename,
-          type,
-          depth: 0,
-        }
-      })
-      .sort((a, b) => a.name.localeCompare(b.name))
-    logger.info('FILES - loaded files for project', project.name, files)
+    const files: File[] = response.files.map((filename) => {
+      const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'
+      return {
+        name: type == 'doc' ? filename.slice(0, filename.length - DOC_EXT.length) : filename,
+        path: filename,
+        type,
+        depth: 0,
+      }
+    })
+
+    logger.info('FILES - loaded files for project', project.name, sortFiles(files))
     this.updateFiles(project.id, files)
   }
 
-  newFile = async (project: Project, name: string) => {
+  newFile = async (project: Project, name: string, type: FileType) => {
     name = name.trim()
-    const path = name.endsWith(DOC_EXT) ? name : name + DOC_EXT
-    await API.writeFile(project, path, '')
-    logger.info('FILES - new file', name)
-    const file: File = { name, path, type: 'doc', depth: 0 }
+
+    let newFile: File | undefined
+    if (type == 'doc') {
+      const path = name.endsWith(DOC_EXT) ? name : name + DOC_EXT
+      await API.writeFile(project, path, '')
+      logger.info('FILES - new file', name)
+      newFile = { name, path, type, depth: 0 }
+    } else if (type == 'folder') {
+      await API.createFolder(project, name)
+      logger.info('FILES - new folder', name)
+      newFile = { name, path: name, type, depth: 0 }
+    }
+
+    if (!newFile) return
 
     const files = this.files.get()[project.id] || []
-    this.updateFiles(project.id, [...files, file])
+    const newFiles = sortFiles([...files, newFile])
+    this.updateFiles(project.id, newFiles)
 
-    route(paths.DOC + '/' + project.id + '/' + path)
+    if (type == 'doc') route(paths.DOC + '/' + project.id + '/' + newFile.path)
   }
 
   dailyFileTitle = () => moment().format('YYYY-MM-DD')
@@ -71,7 +81,7 @@ class FileStore {
 
     assertIsDefined(project, 'project is defined')
     if (existing) route(paths.DOC + '/' + project.id + '/' + existing.path)
-    else await this.newFile(project, name)
+    else await this.newFile(project, name, 'doc')
   }
 
   renameFile = async (project: Project, file: File, name: string) => {
@@ -139,3 +149,8 @@ if (config.dev) (window as any)['fileStore'] = fileStore
 
 export const getNameFromPath = (path: string) =>
   path.substring(path.lastIndexOf('/') + 1).replace(DOC_EXT, '')
+
+const sortFiles = (files: File[]) =>
+  files.sort((a, b) =>
+    a.type == b.type ? a.name.localeCompare(b.name) : b.type.localeCompare(a.type)
+  )

@@ -10,7 +10,7 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { toTitleCase, unwrapError } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
-import { DocumentIcon, PlusIcon } from '@heroicons/react/outline'
+import { DocumentIcon, FolderIcon, PlusIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default () => {
@@ -52,7 +52,7 @@ export default () => {
       if (renameFileOpen) {
         await fileStore.renameFile(renameFileOpen.project, renameFileOpen.file, name)
       } else if (newFileOpen) {
-        await fileStore.newFile(newFileOpen.project, name)
+        await fileStore.newFile(newFileOpen.project, name, newFileOpen.type)
       }
       close()
     } catch (e) {
@@ -73,7 +73,7 @@ export default () => {
         <div
           className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full ${iconBg}`}
         >
-          {isRename ? <DocumentIcon class={iconClass} /> : <PlusIcon class={iconClass} />}
+          {noun == 'File' ? <DocumentIcon class={iconClass} /> : <FolderIcon class={iconClass} />}
         </div>
         <div className="mt-3 text-center sm:mt-5">
           <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">

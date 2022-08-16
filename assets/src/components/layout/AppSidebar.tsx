@@ -136,7 +136,7 @@ function ProjectTree({ project }: { project: Project }) {
 
   const onNewFile = (e: Event) => {
     e.stopPropagation()
-    modalStore.newFileModal.set({ project, type: 'file' })
+    modalStore.newFileModal.set({ project, type: 'doc' })
   }
   const onNewFolder = (e: Event) => {
     e.stopPropagation()
@@ -145,10 +145,6 @@ function ProjectTree({ project }: { project: Project }) {
   const onNewDailyFile = (e: Event) => {
     e.stopPropagation()
     fileStore.newDailyFile(project)
-  }
-  const openSettings = (e: Event) => {
-    e.stopPropagation()
-    route(paths.PROJECTS + '/' + project.id)
   }
 
   return (
@@ -185,11 +181,11 @@ function ProjectTree({ project }: { project: Project }) {
         >
           <CalendarIcon class="h-4 w-4" />
         </Pressable>
-        {/* <Pressable tooltip="New Folder" onClick={onNewFolder}>
+        <Pressable
+          tooltip={{ message: 'New Folder', placement: 'left', tooltipClass: 'min-w-[100px]' }}
+          onClick={onNewFolder}
+        >
           <FolderAddIcon class="h-4 w-4" />
-        </Pressable> */}
-        <Pressable tooltip={{ message: 'Settings', placement: 'left' }} onClick={openSettings}>
-          <DotsHorizontalIcon class="h-4 w-4" />
         </Pressable>
       </div>
 

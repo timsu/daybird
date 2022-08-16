@@ -72,7 +72,6 @@ export default ({
     const div = titleRef.current
     if (!div) return
     const onFocusOut = async (e: Event) => {
-      console.log('on focus out')
       const title = titleRef.current?.innerText?.trim()
       const task = taskStore.taskMap.get()[id!]
 

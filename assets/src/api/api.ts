@@ -228,10 +228,10 @@ class APIService {
     return response.data
   }
 
-  async createFolder(project: Project, name: string): Promise<R.ProjectResponse> {
+  async createFolder(project: Project, path: string): Promise<R.ProjectResponse> {
     const response = await this.axios.post(
       `${this.endpoint}/files/folder?project_id=${project.id}`,
-      { name }
+      { path }
     )
     return response.data
   }
