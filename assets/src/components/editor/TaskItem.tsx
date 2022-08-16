@@ -1,7 +1,6 @@
 import { render } from 'preact'
 import { NodeType } from 'prosemirror-model'
 import { Plugin, PluginKey } from 'prosemirror-state'
-import { Step } from 'prosemirror-transform'
 
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
@@ -15,6 +14,12 @@ export interface TaskItemOptions {
 }
 
 const inputRegex = /^\[\]\s(.*)$/
+
+declare module 'prosemirror-state' {
+  interface EditorState {
+    deleting: boolean
+  }
+}
 
 export const TaskItem = Node.create<TaskItemOptions>({
   name: 'task',
@@ -113,7 +118,23 @@ export const TaskItem = Node.create<TaskItemOptions>({
     return [
       new Plugin({
         key: new PluginKey('taskDeleteHandler'),
+
+        props: {
+          handleKeyDown: (view, event) => {
+            if (event.which === 8 || event.which === 46) {
+              view.state.deleting = true
+            }
+
+            return false
+          },
+        },
+
         filterTransaction: (transaction, state) => {
+          if (!state.deleting) {
+            return true
+          }
+          state.deleting = false
+
           let result = true // true for keep, false for stop transaction
           const replaceSteps: number[] = []
           transaction.steps.forEach((step, index) => {
