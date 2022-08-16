@@ -175,7 +175,11 @@ function useDeleteTaskListener(editor: Editor | null) {
       const pos = editor.view.posAtDOM(element, 0)
       if (!pos) return
 
-      editor.commands.deleteRange({ from: pos - 1, to: pos + 1 })
+      editor
+        .chain()
+        .deleteRange({ from: pos - 1, to: pos + 1 })
+        .focus()
+        .run()
     })
     return off
   }, [editor])

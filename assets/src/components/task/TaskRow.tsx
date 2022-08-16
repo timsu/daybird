@@ -106,7 +106,6 @@ export default ({
         }
       })
     if (focus && !id) {
-      logger.info('focusing on new task')
       div.focus()
     }
     return () => div.removeEventListener('focusout', onFocusOut)
