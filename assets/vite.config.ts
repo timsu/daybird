@@ -77,7 +77,7 @@ export default defineConfig({
         chunkFileNames: 'js/[name]-[hash].js',
         assetFileNames: 'assets/[name][extname]',
         manualChunks: {
-          quill: ['quill', 'quill-delta', 'parchment'],
+          tiptap: ['@tiptap/core'],
           preact: ['preact', 'preact-router', 'preact/compat'],
           moment: ['moment-mini'],
         },
