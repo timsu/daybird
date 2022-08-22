@@ -33,6 +33,7 @@ class DocStore {
     // this.docChannel.join()
 
     try {
+      this.document.set(undefined)
       const response = await API.readFile(project, filename)
       logger.info('DOCS - doc loaded', filename, response)
 
