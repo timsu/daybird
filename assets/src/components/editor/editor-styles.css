@@ -7,6 +7,14 @@
 .ProseMirror {
   height: 100%;
 
+  p.is-editor-empty:first-child::before {
+    color: #adb5bd;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
   ul, ol {
     padding: 0 1rem;
     list-style: revert;

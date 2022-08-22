@@ -7,6 +7,7 @@ import { Doc, Project } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { taskStore } from '@/stores/taskStore'
 import { debounce, DebounceStyle } from '@/utils'
+import Placeholder from '@tiptap/extension-placeholder'
 import { Editor, EditorContent, JSONContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
@@ -20,9 +21,7 @@ type Props = {
 const SAVE_INTERVAL = 5_000
 
 export default ({ project, filename, contents, saveContents }: Props) => {
-  const editor = useEditor({
-    extensions: [StarterKit, TaskItem],
-  })
+  const editor = useListNoteEditor()
   useDeleteTaskListener(editor)
 
   const currentFile = useRef<string>()
@@ -71,6 +70,21 @@ export default ({ project, filename, contents, saveContents }: Props) => {
       editor={editor}
     />
   )
+}
+
+const useListNoteEditor = () => {
+  return useEditor({
+    extensions: [
+      StarterKit,
+      TaskItem,
+      Placeholder.configure({
+        placeholder:
+          'Welcome to ListNote!\n\nStart typing to create a note.\n\n' +
+          'Type "[] " to create a task.\n\n' +
+          'Have fun!',
+      }),
+    ],
+  })
 }
 
 type DeltaDoc = { ops: Delta[] }
