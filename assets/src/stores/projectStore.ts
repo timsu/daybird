@@ -76,6 +76,7 @@ class ProjectStore {
 
     // create a document
     fileStore.newFile(project, 'Welcome')
+    fileStore.setExpanded(project.id, true)
   })
 
   deleteProject = async (project: Project) => {
