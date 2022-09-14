@@ -40,7 +40,7 @@ export function unwrapError(error: any, defaultMessage?: string) {
       const otherKeys = Object.keys(response.data.error).filter(
         (k) => k != 'message' && k != 'resend'
       )
-      if (otherKeys.length > 0) {
+      if (message && otherKeys.length > 0) {
         return message + ': ' + otherKeys.map((k) => `${k} ${response.data.error[k]}`).join(', ')
       } else {
         return message
