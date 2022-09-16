@@ -55,6 +55,7 @@ defmodule Sequence.Docs do
     with :ok <- mkdir_if_needed(path),
          :ok <- file_not_exists(folderpath) do
       File.mkdir(folderpath)
+      File.write(folderpath <> "/.folder", "")
     end
   end
 

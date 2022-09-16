@@ -12,7 +12,7 @@ defmodule SequenceWeb.DocsController do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
 
-      case Docs.list_docs(project) do
+      case Docs.list_docs_recursive(project) do
         {:ok, list} -> json conn, %{ files: list }
         {:error, reason} ->
           {:error, :bad_request, "Failed to list docs: #{reason}"}
