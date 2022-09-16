@@ -48,6 +48,7 @@ export default ({
       e.stopPropagation()
       setPlaceholder(!titleRef.current?.innerText)
     })
+    div.addEventListener('mousedown', (e) => e.preventDefault())
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
       e.stopPropagation()
@@ -105,7 +106,7 @@ export default ({
         }
       })
     if (focus && !id) {
-      div.focus()
+      requestAnimationFrame(() => div.focus())
     }
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [id, focus])

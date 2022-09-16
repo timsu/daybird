@@ -192,10 +192,11 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       // add 'focus' as a run-time attribute
       ;(newNode.attrs as any).focus = true
 
+      const from = range.from - 1
       if (node == state.doc.lastChild) {
-        state.tr.insertText('\n', range.from + node.nodeSize - 1)
+        state.tr.insertText('\n', from + node.nodeSize)
       }
-      state.tr.replaceWith(range.from, range.from + node.nodeSize, newNode)
+      state.tr.replaceWith(from - 1, from - 1 + node.nodeSize, newNode)
     },
   })
 }

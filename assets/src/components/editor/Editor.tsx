@@ -1,6 +1,7 @@
 import './editor-styles.css'
 
 import { useEffect, useRef } from 'preact/hooks'
+import { WebrtcProvider } from 'y-webrtc'
 
 import { TaskItem } from '@/components/editor/TaskItem'
 import { Doc, Project } from '@/models'
