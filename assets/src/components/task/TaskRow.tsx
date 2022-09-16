@@ -9,6 +9,7 @@ import { getNameFromPath } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames, logger } from '@/utils'
+import { isSafari } from '@/utils/os'
 import { DocumentIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -48,7 +49,7 @@ export default ({
       e.stopPropagation()
       setPlaceholder(!titleRef.current?.innerText)
     })
-    div.addEventListener('mousedown', (e) => e.preventDefault())
+
     div.addEventListener('keydown', (e) => e.stopPropagation())
     div.addEventListener('keypress', (e) => {
       e.stopPropagation()
@@ -153,10 +154,9 @@ export default ({
   return (
     <div
       id={task ? `task-${task.id}` : ''}
-      contentEditable={false}
       class="bg-gray-100 rounded p-2 flex flex-row items-center relative hover-parent"
     >
-      {!taskList && <span class="-ml-2 drag-handle grippy" />}
+      {!taskList && !isSafari && <span class="-ml-2 drag-handle grippy" />}
 
       {task?.deleted_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">DELETED</div>
