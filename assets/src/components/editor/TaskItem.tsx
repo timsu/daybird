@@ -193,11 +193,15 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       // add 'focus' as a run-time attribute
       ;(newNode.attrs as any).focus = true
 
-      const from = range.from - 1
+      const from = Math.max(1, range.from - 1)
+      const to = Math.min(from - 1 + node.nodeSize, state.doc.nodeSize - 1)
+
+      console.log('meowy', from, to, state.doc.nodeSize)
+
       if (node == state.doc.lastChild) {
-        state.tr.insertText('\n', from + node.nodeSize)
+        state.tr.insertText('\n', to)
       }
-      state.tr.replaceWith(from - 1, from - 1 + node.nodeSize, newNode)
+      state.tr.replaceWith(from - 1, to, newNode)
     },
   })
 }
