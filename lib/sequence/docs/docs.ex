@@ -8,10 +8,10 @@ defmodule Sequence.Docs do
 
   alias Sequence.Docs.Doc
 
-  @spec list_user_projects(Project.t()) :: [Doc.t()]
+  @spec list_docs(Project.t()) :: [Doc.t()]
   def list_docs(project) do
     Repo.all(from d in Doc, where: d.project_id == ^project.id
-      and is_nil(p.deleted_at) and is_nil(p.archived_at))
+      and is_nil(d.deleted_at) and is_nil(d.archived_at))
   end
 
   @spec doc_by_uuid(Project.t(), binary) :: {:error, :not_found} | {:ok, Doc.t()}

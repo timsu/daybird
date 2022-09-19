@@ -4,8 +4,9 @@ defmodule Sequence.Repo.Migrations.CreateDocs do
   def change do
     create table(:docs) do
       add :uuid, :uuid
-      add :name, :string
-      add :path, :string
+      add :parent, :uuid
+      add :name, :string, size: 100
+      add :type, :integer
       add :archived_at, :utc_datetime
       add :deleted_at, :utc_datetime
       add :creator_id, references(:users, on_delete: :nothing)
@@ -14,6 +15,7 @@ defmodule Sequence.Repo.Migrations.CreateDocs do
       timestamps()
     end
 
+    create index(:docs, [:uuid])
     create index(:docs, [:creator_id])
     create index(:docs, [:project_id])
   end

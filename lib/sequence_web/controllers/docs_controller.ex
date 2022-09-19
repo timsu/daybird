@@ -5,27 +5,25 @@ defmodule SequenceWeb.DocsController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Docs, Projects}
+  alias Sequence.{Docs, DocContents, Projects}
 
   # GET /files
   def list_files(conn, %{ "project_id" => project_uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
 
-      case Docs.list_docs_recursive(project) do
-        {:ok, list} -> json conn, %{ files: list }
-        {:error, reason} ->
-          {:error, :bad_request, "Failed to list docs: #{reason}"}
-      end
+      list = Docs.list_docs(project)
+      render "docs.json", docs: list
     end
   end
 
   # GET /doc
-  def get_doc(conn, %{ "project_id" => project_uuid, "filename" => filename }) do
+  def get_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, _doc} <- Docs.doc_by_uuid(project, uuid) do
 
-      case Docs.read_doc(project, filename) do
+      case DocContents.get_doc(uuid) do
         {:ok, data} -> text conn, data
         {:error, reason} ->
           {:error, :bad_request, "Failed to read doc: #{reason}"}
@@ -34,11 +32,12 @@ defmodule SequenceWeb.DocsController do
   end
 
   # POST /doc/save
-  def save_doc(conn, %{ "project_id" => project_uuid, "filename" => filename, "contents" => contents }) do
+  def save_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "contents" => contents }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, _doc} <- Docs.doc_by_uuid(project, uuid) do
 
-      case Docs.write_doc(project, filename, contents) do
+      case DocContents.set_doc(uuid, contents) do
         :ok -> json conn, %{ success: true }
         {:error, reason} ->
           {:error, :bad_request, "Failed to save doc: #{reason}"}
@@ -46,42 +45,57 @@ defmodule SequenceWeb.DocsController do
     end
   end
 
-  # POST /files/folder
-  def create_folder(conn, %{ "project_id" => project_uuid, "path" => path }) do
+  # POST /files
+  def create_file(conn, %{ "project_id" => project_uuid, "parent" => parent, "name" => name, "type" => type }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, _doc} <- validate_parent(project, parent),
+         {:ok, doc} <- Docs.create_doc(%{
+            parent: parent,
+            name: name,
+            type: type,
+            creator_id: user.id,
+            project_id: project.id
+          }) do
 
-      case Docs.new_folder(project, path) do
-        :ok -> json conn, %{ success: true }
-        {:error, reason} ->
-          {:error, :bad_request, "Failed to list docs: #{reason}"}
-      end
+      render "doc.json", doc: doc
     end
   end
 
-  # POST /doc/rename
-  def rename_doc(conn, %{ "project_id" => project_uuid, "filename" => filename, "new_name" => new_name }) do
-    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
+  defp validate_parent(project, parent) do
+    if parent, do: Docs.doc_by_uuid(project, parent), else: {:ok, nil}
+  end
 
-      case Docs.rename(project, filename, new_name) do
-        :ok -> json conn, %{ success: true }
-        {:error, reason} ->
-          {:error, :bad_request, "Failed to rename doc: #{reason}"}
-      end
+  # POST /files/rename
+  def rename_file(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "new_name" => new_name }) do
+    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
+         {:ok, doc} <- Docs.update_doc(doc, %{ name: new_name }) do
+
+      render "doc.json", doc: doc
     end
   end
 
-  # POST /doc/delete
-  def delete_doc(conn, %{ "project_id" => project_uuid, "filename" => filename }) do
+  # POST /files/archive
+  def archive_file(conn, %{ "project_id" => project_uuid, "uuid" => uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
+         {:ok, doc} <- Docs.update_doc(doc, %{ archived_at: Timex.now }) do
 
-      case Docs.delete(project, filename) do
-        :ok -> json conn, %{ success: true }
-        {:error, reason} ->
-          {:error, :bad_request, "Failed to rename doc: #{reason}"}
-      end
+      render "doc.json", doc: doc
+    end
+  end
+
+  # POST /files/delete
+  def delete_file(conn, %{ "project_id" => project_uuid, "uuid" => uuid }) do
+    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
+         {:ok, doc} <- Docs.update_doc(doc, %{ archived_at: Timex.now }) do
+
+      render "doc.json", doc: doc
     end
   end
 

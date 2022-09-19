@@ -4,15 +4,19 @@ defmodule Sequence.Docs.Doc do
 
   alias Sequence.{Repo, Users.User, Projects.Project}
 
+  def type_doc, do: 0
+  def type_folder, do: 1
+
   @type t :: %__MODULE__{}
 
   schema "docs" do
     field :uuid, Ecto.UUID
+    field :parent, Ecto.UUID
 
     field :archived_at, :utc_datetime
     field :deleted_at, :utc_datetime
     field :name, :string
-    field :path, :string
+    field :type, :integer
 
     belongs_to :creator, User
     belongs_to :project, Project
@@ -23,7 +27,8 @@ defmodule Sequence.Docs.Doc do
   @doc false
   def changeset(doc, attrs) do
     doc
-    |> cast(attrs, [:uuid, :name, :path, :archived_at, :deleted_at, :creator_id, :project_id])
-    |> validate_required([:uuid, :name, :path, :project_id, :creator_id])
+    |> cast(attrs, [:uuid, :parent, :name, :type, :path, :archived_at, :deleted_at, :creator_id, :project_id])
+    |> Repo.generate_uuid
+    |> validate_required([:uuid, :name, :type, :path, :project_id, :creator_id])
   end
 end
