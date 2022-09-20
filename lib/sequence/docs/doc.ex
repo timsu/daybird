@@ -27,8 +27,9 @@ defmodule Sequence.Docs.Doc do
   @doc false
   def changeset(doc, attrs) do
     doc
-    |> cast(attrs, [:uuid, :parent, :name, :type, :path, :archived_at, :deleted_at, :creator_id, :project_id])
+    |> cast(attrs, [:uuid, :parent, :name, :type, :archived_at, :deleted_at, :creator_id, :project_id])
     |> Repo.generate_uuid
-    |> validate_required([:uuid, :name, :type, :path, :project_id, :creator_id])
+    |> validate_required([:uuid, :name, :type, :project_id, :creator_id])
+    |> Repo.truncate(:name, 100)
   end
 end

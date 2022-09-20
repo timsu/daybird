@@ -8,7 +8,7 @@ defmodule Sequence.DocsTest do
 
     import Sequence.DocsFixtures
 
-    @invalid_attrs %{archived_at: nil, deleted_at: nil, name: nil, path: nil, uuid: nil}
+    @invalid_attrs %{archived_at: nil, deleted_at: nil, name: nil, type: nil, parent: nil, uuid: nil}
 
     test "list_docs/0 returns all docs" do
       doc = doc_fixture()
@@ -21,13 +21,14 @@ defmodule Sequence.DocsTest do
     end
 
     test "create_doc/1 with valid data creates a doc" do
-      valid_attrs = %{archived_at: ~U[2022-09-15 23:44:00Z], deleted_at: ~U[2022-09-15 23:44:00Z], name: "some name", path: "some path", uuid: "7488a646-e31f-11e4-aace-600308960662"}
+      valid_attrs = %{creator_id: 1, project_id: 1,
+        name: "some name", type: 0, uuid: "7488a646-e31f-11e4-aace-600308960662"}
 
       assert {:ok, %Doc{} = doc} = Docs.create_doc(valid_attrs)
-      assert doc.archived_at == ~U[2022-09-15 23:44:00Z]
-      assert doc.deleted_at == ~U[2022-09-15 23:44:00Z]
+      assert doc.creator_id == 1
+      assert doc.project_id == 1
       assert doc.name == "some name"
-      assert doc.path == "some path"
+      assert doc.type == 0
       assert doc.uuid == "7488a646-e31f-11e4-aace-600308960662"
     end
 
@@ -37,13 +38,13 @@ defmodule Sequence.DocsTest do
 
     test "update_doc/2 with valid data updates the doc" do
       doc = doc_fixture()
-      update_attrs = %{archived_at: ~U[2022-09-16 23:44:00Z], deleted_at: ~U[2022-09-16 23:44:00Z], name: "some updated name", path: "some updated path", uuid: "7488a646-e31f-11e4-aace-600308960668"}
+      update_attrs = %{archived_at: ~U[2022-09-16 23:44:00Z], deleted_at: ~U[2022-09-16 23:44:00Z], name: "some updated name", type: 1, uuid: "7488a646-e31f-11e4-aace-600308960668"}
 
       assert {:ok, %Doc{} = doc} = Docs.update_doc(doc, update_attrs)
       assert doc.archived_at == ~U[2022-09-16 23:44:00Z]
       assert doc.deleted_at == ~U[2022-09-16 23:44:00Z]
       assert doc.name == "some updated name"
-      assert doc.path == "some updated path"
+      assert doc.type == 1
       assert doc.uuid == "7488a646-e31f-11e4-aace-600308960668"
     end
 

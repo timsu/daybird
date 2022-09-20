@@ -13,7 +13,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
 
       list = Docs.list_docs(project)
-      render "docs.json", docs: list
+      render "list.json", files: list
     end
   end
 
@@ -58,7 +58,7 @@ defmodule SequenceWeb.DocsController do
             project_id: project.id
           }) do
 
-      render "doc.json", doc: doc
+      render "get.json", file: doc
     end
   end
 
@@ -73,7 +73,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
          {:ok, doc} <- Docs.update_doc(doc, %{ name: new_name }) do
 
-      render "doc.json", doc: doc
+      render "get.json", file: doc
     end
   end
 
@@ -84,7 +84,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
          {:ok, doc} <- Docs.update_doc(doc, %{ archived_at: Timex.now }) do
 
-      render "doc.json", doc: doc
+      render "get.json", file: doc
     end
   end
 
@@ -95,7 +95,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
          {:ok, doc} <- Docs.update_doc(doc, %{ archived_at: Timex.now }) do
 
-      render "doc.json", doc: doc
+      render "get.json", file: doc
     end
   end
 

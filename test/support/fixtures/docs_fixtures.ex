@@ -14,8 +14,10 @@ defmodule Sequence.DocsFixtures do
         archived_at: ~U[2022-09-15 23:44:00Z],
         deleted_at: ~U[2022-09-15 23:44:00Z],
         name: "some name",
-        path: "some path",
-        uuid: "7488a646-e31f-11e4-aace-600308960662"
+        type: 0,
+        uuid: "7488a646-e31f-11e4-aace-600308960662",
+        project_id: 1,
+        creator_id: 1
       })
       |> Sequence.Docs.create_doc()
 
