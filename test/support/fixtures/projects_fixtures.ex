@@ -13,7 +13,9 @@ defmodule Sequence.ProjectsFixtures do
       |> Enum.into(%{
         archived_at: ~U[2022-07-13 06:12:00Z],
         meta: %{},
-        name: "some name"
+        name: "some name",
+        shortcode: "SN",
+        creator_id: 1,
       })
       |> Sequence.Projects.create_project()
 
@@ -27,8 +29,9 @@ defmodule Sequence.ProjectsFixtures do
     {:ok, user_project} =
       attrs
       |> Enum.into(%{
-        left_at: ~U[2022-07-13 06:14:00Z],
-        role: "some role"
+        role: "some role",
+        project_id: 1,
+        user_id: 1,
       })
       |> Sequence.Projects.create_user_project()
 

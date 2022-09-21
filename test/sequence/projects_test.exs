@@ -12,7 +12,7 @@ defmodule Sequence.ProjectsTest do
 
     test "list_projects/0 returns all projects" do
       project = project_fixture()
-      assert Projects.list_projects() == [project]
+      assert Enum.find Projects.list_projects(), fn p -> p.id == project.id end
     end
 
     test "get_project!/1 returns the project with given id" do
@@ -21,7 +21,8 @@ defmodule Sequence.ProjectsTest do
     end
 
     test "create_project/1 with valid data creates a project" do
-      valid_attrs = %{archived_at: ~U[2022-07-13 06:12:00Z], meta: %{}, name: "some name"}
+      valid_attrs = %{archived_at: ~U[2022-07-13 06:12:00Z], meta: %{}, name: "some name",
+        shortcode: "PR", creator_id: 1}
 
       assert {:ok, %Project{} = project} = Projects.create_project(valid_attrs)
       assert project.archived_at == ~U[2022-07-13 06:12:00Z]
@@ -79,10 +80,11 @@ defmodule Sequence.ProjectsTest do
     end
 
     test "create_user_project/1 with valid data creates a user_project" do
-      valid_attrs = %{left_at: ~U[2022-07-13 06:14:00Z], role: "some role"}
+      valid_attrs = %{user_id: 1, project_id: 1, role: "some role"}
 
       assert {:ok, %UserProject{} = user_project} = Projects.create_user_project(valid_attrs)
-      assert user_project.left_at == ~U[2022-07-13 06:14:00Z]
+      assert user_project.user_id == 1
+      assert user_project.project_id == 1
       assert user_project.role == "some role"
     end
 

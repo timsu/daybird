@@ -27,3 +27,6 @@ config :logger, level: :warn
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :sequence, topicflow_port: 7001
+config :sequence, topicflow_disabled: true
