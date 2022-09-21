@@ -196,8 +196,6 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       const from = Math.max(1, range.from - 1)
       const to = Math.min(from - 1 + node.nodeSize, state.doc.nodeSize - 1)
 
-      console.log('meowy', from, to, state.doc.nodeSize)
-
       if (node == state.doc.lastChild) {
         state.tr.insertText('\n', to)
       }
