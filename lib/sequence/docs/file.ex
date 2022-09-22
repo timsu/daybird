@@ -1,4 +1,4 @@
-defmodule Sequence.Docs.Doc do
+defmodule Sequence.Docs.File do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -9,7 +9,7 @@ defmodule Sequence.Docs.Doc do
 
   @type t :: %__MODULE__{}
 
-  schema "docs" do
+  schema "files" do
     field :uuid, Ecto.UUID
     field :parent, Ecto.UUID
 
@@ -25,8 +25,8 @@ defmodule Sequence.Docs.Doc do
   end
 
   @doc false
-  def changeset(doc, attrs) do
-    doc
+  def changeset(file, attrs) do
+    file
     |> cast(attrs, [:uuid, :parent, :name, :type, :archived_at, :deleted_at, :creator_id, :project_id])
     |> Repo.generate_uuid
     |> validate_required([:uuid, :name, :type, :project_id, :creator_id])

@@ -5,10 +5,10 @@ defmodule Sequence.DocsFixtures do
   """
 
   @doc """
-  Generate a doc.
+  Generate a file.
   """
-  def doc_fixture(attrs \\ %{}) do
-    {:ok, doc} =
+  def file_fixture(attrs \\ %{}) do
+    {:ok, file} =
       attrs
       |> Enum.into(%{
         archived_at: ~U[2022-09-15 23:44:00Z],
@@ -19,8 +19,8 @@ defmodule Sequence.DocsFixtures do
         project_id: 1,
         creator_id: 1
       })
-      |> Sequence.Docs.create_doc()
+      |> Sequence.Docs.create_file()
 
-    doc
+    file
   end
 end

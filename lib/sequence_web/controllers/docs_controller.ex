@@ -5,14 +5,14 @@ defmodule SequenceWeb.DocsController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Docs, DocContents, Projects}
+  alias Sequence.{Docs, Projects}
 
   # GET /files
   def list_files(conn, %{ "project_id" => project_uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
 
-      list = Docs.list_docs(project)
+      list = Docs.list_files(project)
       render "list.json", files: list
     end
   end
@@ -21,13 +21,13 @@ defmodule SequenceWeb.DocsController do
   def get_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, _doc} <- Docs.doc_by_uuid(project, uuid) do
+         {:ok, _doc} <- Docs.file_by_uuid(project, uuid) do
 
-      case DocContents.get_doc(uuid) do
-        {:ok, data} -> text conn, data
-        {:error, reason} ->
-          {:error, :bad_request, "Failed to read doc: #{reason}"}
-      end
+      # case DocContents.get_doc(uuid) do
+      #   {:ok, data} -> text conn, data
+      #   {:error, reason} ->
+      #     {:error, :bad_request, "Failed to read doc: #{reason}"}
+      # end
     end
   end
 
@@ -35,13 +35,13 @@ defmodule SequenceWeb.DocsController do
   def save_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "contents" => contents }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, _doc} <- Docs.doc_by_uuid(project, uuid) do
+         {:ok, _doc} <- Docs.file_by_uuid(project, uuid) do
 
-      case DocContents.set_doc(uuid, contents) do
-        :ok -> json conn, %{ success: true }
-        {:error, reason} ->
-          {:error, :bad_request, "Failed to save doc: #{reason}"}
-      end
+      # case DocContents.set_doc(uuid, contents) do
+      #   :ok -> json conn, %{ success: true }
+      #   {:error, reason} ->
+      #     {:error, :bad_request, "Failed to save doc: #{reason}"}
+      # end
     end
   end
 
@@ -50,7 +50,7 @@ defmodule SequenceWeb.DocsController do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
          {:ok, _doc} <- validate_parent(project, parent),
-         {:ok, doc} <- Docs.create_doc(%{
+         {:ok, doc} <- Docs.create_file(%{
             parent: parent,
             name: name,
             type: type,
@@ -63,15 +63,15 @@ defmodule SequenceWeb.DocsController do
   end
 
   defp validate_parent(project, parent) do
-    if parent, do: Docs.doc_by_uuid(project, parent), else: {:ok, nil}
+    if parent, do: Docs.file_by_uuid(project, parent), else: {:ok, nil}
   end
 
   # POST /files/rename
   def rename_file(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "new_name" => new_name }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
-         {:ok, doc} <- Docs.update_doc(doc, %{ name: new_name }) do
+         {:ok, doc} <- Docs.file_by_uuid(project, uuid),
+         {:ok, doc} <- Docs.update_file(doc, %{ name: new_name }) do
 
       render "get.json", file: doc
     end
@@ -81,8 +81,8 @@ defmodule SequenceWeb.DocsController do
   def archive_file(conn, %{ "project_id" => project_uuid, "uuid" => uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
-         {:ok, doc} <- Docs.update_doc(doc, %{ archived_at: Timex.now }) do
+         {:ok, doc} <- Docs.file_by_uuid(project, uuid),
+         {:ok, doc} <- Docs.update_file(doc, %{ archived_at: Timex.now }) do
 
       render "get.json", file: doc
     end
@@ -92,8 +92,8 @@ defmodule SequenceWeb.DocsController do
   def delete_file(conn, %{ "project_id" => project_uuid, "uuid" => uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, doc} <- Docs.doc_by_uuid(project, uuid),
-         {:ok, doc} <- Docs.update_doc(doc, %{ archived_at: Timex.now }) do
+         {:ok, doc} <- Docs.file_by_uuid(project, uuid),
+         {:ok, doc} <- Docs.update_file(doc, %{ archived_at: Timex.now }) do
 
       render "get.json", file: doc
     end
