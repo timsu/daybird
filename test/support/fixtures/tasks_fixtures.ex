@@ -16,7 +16,10 @@ defmodule Sequence.TasksFixtures do
         description: "some description",
         short_id: 42,
         state: "some state",
-        title: "some title"
+        title: "some title",
+        short_code: "T-1",
+        creator_id: 1,
+        project_id: 1
       })
       |> Sequence.Tasks.create_task()
 

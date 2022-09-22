@@ -9,3 +9,14 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+user = Sequence.Repo.insert!(%Sequence.Users.User{
+  name: "Bob Cat",
+  email: "bob@cat.com"
+})
+
+_project = Sequence.Repo.insert!(%Sequence.Projects.Project{
+  creator_id: user.id,
+  name: "Work Stuff",
+  shortcode: "WS"
+})

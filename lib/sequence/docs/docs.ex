@@ -1,120 +1,120 @@
 defmodule Sequence.Docs do
+  @moduledoc """
+  The Docs context.
+  """
 
-  @doc_root Application.get_env(:sequence, :docroot, "docs")
+  import Ecto.Query, warn: false
+  alias Sequence.{Projects.Project, Repo}
 
-  @extension ".seq"
+  alias Sequence.Docs.Doc
 
+  @spec list_docs(Project.t()) :: [Doc.t()]
   def list_docs(project) do
-    path = project_path(project)
-    case File.ls(path) do
-      {:ok, list} -> {:ok, list}
-      {:error, :enoent} -> {:ok, []}
-      error -> error
-    end
+    Repo.all(from d in Doc, where: d.project_id == ^project.id
+      and is_nil(d.deleted_at) and is_nil(d.archived_at))
   end
 
-  def list_docs_recursive(project, depth \\ nil) do
-    path = project_path(project)
-    docroot_length = String.length(path) + 1
-    mkdir_if_needed(path)
-
-    case Xfile.ls(path, recursive: depth || true) do
-      {:ok, stream} ->
-        list = stream
-        |> Enum.map(fn item ->
-          String.slice(item, docroot_length, 999)
-        end)
-        {:ok, list}
-      error -> error
-    end
-  end
-
-  def new_doc(project, name) do
-    if String.contains?(name, ".."), do: throw "Invalid name"
-
-    path = project_path(project)
-    name = if String.ends_with?(name, @extension) do
-      name
+  @spec doc_by_uuid(Project.t(), binary) :: {:error, :not_found} | {:ok, Doc.t()}
+  def doc_by_uuid(project, uuid) do
+    if uuid != nil and uuid != "undefined" and uuid != "" do
+      doc = Repo.one(from q in Doc, where: q.project_id == ^project.id and q.uuid == ^Base.decode16!(String.upcase(uuid)))
+      if doc, do: {:ok, doc}, else: {:error, :not_found}
     else
-      name <> @extension
-    end
-    filepath = Path.join(path, name)
-
-    with :ok <- mkdir_if_needed(path),
-         :ok <- file_not_exists(filepath) do
-      File.write(filepath, "")
+      {:error, :not_found}
     end
   end
 
-  def new_folder(project, name) do
-    if String.contains?(name, ".."), do: throw "Invalid name"
+  @doc """
+  Returns the list of docs.
 
-    path = project_path(project)
-    folderpath = Path.join(path, name)
+  ## Examples
 
-    with :ok <- mkdir_if_needed(path),
-         :ok <- file_not_exists(folderpath) do
-      File.mkdir(folderpath)
-      File.write(folderpath <> "/.folder", "")
-    end
+      iex> list_docs()
+      [%Doc{}, ...]
+
+  """
+  def list_docs do
+    Repo.all(Doc)
   end
 
-  def read_doc(project, name) do
-    if String.contains?(name, ".."), do: throw "Invalid name"
+  @doc """
+  Gets a single doc.
 
-    filepath = file_path(project, name)
-    File.read(filepath)
+  Raises `Ecto.NoResultsError` if the Doc does not exist.
+
+  ## Examples
+
+      iex> get_doc!(123)
+      %Doc{}
+
+      iex> get_doc!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_doc!(id), do: Repo.get!(Doc, id)
+
+  @doc """
+  Creates a doc.
+
+  ## Examples
+
+      iex> create_doc(%{field: value})
+      {:ok, %Doc{}}
+
+      iex> create_doc(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_doc(attrs \\ %{}) do
+    %Doc{}
+    |> Doc.changeset(attrs)
+    |> Repo.insert()
   end
 
-  def write_doc(project, name, contents) do
-    if String.contains?(name, ".."), do: throw "Invalid name"
+  @doc """
+  Updates a doc.
 
-    filepath = file_path(project, name)
-    path = Path.dirname(filepath)
+  ## Examples
 
-    with :ok <- mkdir_if_needed(path) do
-      File.write(filepath, contents)
-    end
+      iex> update_doc(doc, %{field: new_value})
+      {:ok, %Doc{}}
+
+      iex> update_doc(doc, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_doc(%Doc{} = doc, attrs) do
+    doc
+    |> Doc.changeset(attrs)
+    |> Repo.update()
   end
 
-  def rename(project, old_name, new_name) do
-    if String.contains?(new_name, ".."), do: throw "Invalid name"
+  @doc """
+  Deletes a doc.
 
-    oldpath = file_path(project, old_name)
-    newpath = file_path(project, new_name)
+  ## Examples
 
-    File.rename(oldpath, newpath)
+      iex> delete_doc(doc)
+      {:ok, %Doc{}}
+
+      iex> delete_doc(doc)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_doc(%Doc{} = doc) do
+    Repo.delete(doc)
   end
 
-  def delete(project, name) do
-    filepath = file_path(project, name)
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking doc changes.
 
-    File.rm(filepath)
+  ## Examples
+
+      iex> change_doc(doc)
+      %Ecto.Changeset{data: %Doc{}}
+
+  """
+  def change_doc(%Doc{} = doc, attrs \\ %{}) do
+    Doc.changeset(doc, attrs)
   end
-
-  ### helpers
-
-  def file_not_exists(path) do
-    case File.exists?(path) do
-      true -> {:error, :already_exists}
-      false -> :ok
-    end
-  end
-
-  def mkdir_if_needed(path) do
-    case File.dir?(path) do
-      true -> :ok
-      false -> File.mkdir_p(path)
-    end
-  end
-
-  def project_path(project) do
-    Path.join(@doc_root, to_string(project.id))
-  end
-
-  def file_path(project, filename) do
-    project_path(project)
-    |> Path.join(filename)
-  end
-
 end
