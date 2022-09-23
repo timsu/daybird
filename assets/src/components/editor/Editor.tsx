@@ -6,9 +6,13 @@ import * as Y from 'yjs'
 
 import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { taskStore } from '@/stores/taskStore'
 import { debounce, DebounceStyle } from '@/utils'
+import { getUniqueColorObjectForId } from '@/utils/colorScale'
+import { useStore } from '@nanostores/preact'
 import Collaboration from '@tiptap/extension-collaboration'
+import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Editor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -34,31 +38,31 @@ export default ({ project, id, contents, saveContents }: Props) => {
     window.editor = editor
     editor.chain().setContent(contents).focus().run()
 
-    currentFile.current = id
-    isDirty.current = false
-    const textChangeHandler = () => {
-      isDirty.current = true
-      debounce(
-        'save-' + id,
-        () => {
-          if (id != currentFile.current) return
-          saveContents(project, id!, editor.getJSON())
-          isDirty.current = false
-        },
-        SAVE_INTERVAL,
-        DebounceStyle.RESET_ON_NEW
-      )
-    }
-    editor.on('update', textChangeHandler)
-    window.onbeforeunload = () => {
-      if (isDirty.current) saveContents(project, id!, editor.getJSON())
-    }
+    // currentFile.current = id
+    // isDirty.current = false
+    // const textChangeHandler = () => {
+    //   isDirty.current = true
+    //   debounce(
+    //     'save-' + id,
+    //     () => {
+    //       if (id != currentFile.current) return
+    //       saveContents(project, id!, editor.getJSON())
+    //       isDirty.current = false
+    //     },
+    //     SAVE_INTERVAL,
+    //     DebounceStyle.RESET_ON_NEW
+    //   )
+    // }
+    // editor.on('update', textChangeHandler)
+    // window.onbeforeunload = () => {
+    //   if (isDirty.current) saveContents(project, id!, editor.getJSON())
+    // }
 
-    return () => {
-      editor.off('update', textChangeHandler)
-      if (isDirty.current) saveContents(project, id!, editor.getJSON())
-      window.onbeforeunload = null
-    }
+    // return () => {
+    //   editor.off('update', textChangeHandler)
+    //   if (isDirty.current) saveContents(project, id!, editor.getJSON())
+    //   window.onbeforeunload = null
+    // }
   }, [editor, contents])
 
   return (
@@ -76,6 +80,8 @@ const useListNoteEditor = (id: string | undefined) => {
     const ydoc = new Y.Doc()
     const provider = new WebrtcProvider(id, ydoc)
 
+    const user = authStore.loggedInUser.get()!
+
     const editor = new Editor({
       extensions: [
         StarterKit.configure({
@@ -91,6 +97,13 @@ const useListNoteEditor = (id: string | undefined) => {
         }),
         Collaboration.configure({
           document: ydoc,
+        }),
+        CollaborationCursor.configure({
+          provider: provider,
+          user: {
+            name: user.name,
+            color: getUniqueColorObjectForId(user.id),
+          },
         }),
       ],
     })
