@@ -28,7 +28,7 @@ defmodule SequenceWeb.DocsController do
     end
   end
 
-  # POST /doc/save
+  # POST /doc
   def save_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "contents" => contents }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
@@ -39,12 +39,12 @@ defmodule SequenceWeb.DocsController do
   end
 
   # POST /files
-  def create_file(conn, %{ "project_id" => project_uuid, "parent" => parent, "name" => name, "type" => type }) do
+  def create_file(conn, %{ "project_id" => project_uuid, "name" => name, "type" => type } = params) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, _doc} <- validate_parent(project, parent),
+         {:ok, _doc} <- validate_parent(project, params["parent"]),
          {:ok, doc} <- Docs.create_file(%{
-            parent: parent,
+            parent: params["parent"],
             name: name,
             type: type,
             creator_id: user.id,
