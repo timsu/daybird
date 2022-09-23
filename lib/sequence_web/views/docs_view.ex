@@ -2,12 +2,14 @@
 defmodule SequenceWeb.DocsView do
   use SequenceWeb, :view
 
+  alias Sequence.Utils
+
   def render_doc(doc) do
     %{
-      id: doc.uuid |> String.replace("-", ""),
+      id: Utils.no_dash(doc.uuid),
       name: doc.name,
       type: doc.type,
-      parent: doc.parent,
+      parent: if(doc.parent, do: Utils.no_dash(doc.parent)),
       archived_at: doc.archived_at,
       deleted_at: doc.deleted_at
     }

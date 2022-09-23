@@ -4,7 +4,7 @@ defmodule SequenceWeb.ProjectsView do
 
   def render_project(project, _user) do
     %{
-      id: project.uuid |> String.replace("-", ""),
+      id: Sequence.Utils.no_dash(project.uuid),
       name: project.name,
       shortcode: project.shortcode
     }

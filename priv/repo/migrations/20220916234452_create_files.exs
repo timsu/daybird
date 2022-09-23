@@ -1,8 +1,8 @@
-defmodule Sequence.Repo.Migrations.CreateDocs do
+defmodule Sequence.Repo.Migrations.CreateFiles do
   use Ecto.Migration
 
   def change do
-    create table(:docs) do
+    create table(:files) do
       add :uuid, :uuid
       add :parent, :uuid
       add :name, :string, size: 100
@@ -15,8 +15,8 @@ defmodule Sequence.Repo.Migrations.CreateDocs do
       timestamps()
     end
 
-    create index(:docs, [:uuid])
-    create index(:docs, [:creator_id])
-    create index(:docs, [:project_id])
+    create unique_index(:files, [:uuid])
+    create index(:files, [:creator_id])
+    create index(:files, [:project_id])
   end
 end

@@ -71,7 +71,7 @@ defmodule Sequence.ProjectsTest do
 
     test "list_user_projects/0 returns all user_projects" do
       user_project = user_project_fixture()
-      assert Projects.list_user_projects() == [user_project]
+      assert Enum.find Projects.list_user_projects(), fn p -> p.id == user_project.id end
     end
 
     test "get_user_project!/1 returns the user_project with given id" do

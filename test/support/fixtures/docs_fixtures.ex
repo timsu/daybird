@@ -5,19 +5,31 @@ defmodule Sequence.DocsFixtures do
   """
 
   @doc """
+  Generate a file.
+  """
+  def file_fixture(attrs \\ %{}) do
+    {:ok, file} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        type: 0,
+        project_id: 1,
+        creator_id: 1
+      })
+      |> Sequence.Docs.create_file()
+
+    file
+  end
+
+  @doc """
   Generate a doc.
   """
   def doc_fixture(attrs \\ %{}) do
     {:ok, doc} =
       attrs
       |> Enum.into(%{
-        archived_at: ~U[2022-09-15 23:44:00Z],
-        deleted_at: ~U[2022-09-15 23:44:00Z],
-        name: "some name",
-        type: 0,
-        uuid: "7488a646-e31f-11e4-aace-600308960662",
+        contents: "some contents",
         project_id: 1,
-        creator_id: 1
       })
       |> Sequence.Docs.create_doc()
 

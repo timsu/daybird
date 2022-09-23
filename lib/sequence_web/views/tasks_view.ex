@@ -4,7 +4,7 @@ defmodule SequenceWeb.TasksView do
 
   def render_task(task) do
     %{
-      id: task.uuid |> String.replace("-", ""),
+      id: Sequence.Utils.no_dash(task.uuid),
       title: task.title,
       doc: task.doc,
       short_code: task.short_code,

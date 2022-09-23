@@ -4,6 +4,14 @@ defmodule Sequence.Utils do
 
   @dialyzer [{:nowarn_function, free_email_domain?: 1}]
 
+  def no_dash(uuid) do
+    uuid |> String.replace("-", "")
+  end
+
+  def uuid_to_base16(uuid) do
+    uuid |> String.upcase() |> String.replace("-", "") |> Base.decode16!()
+  end
+
   # convert int, float, and decimal to float
   def to_float(num) do
     case num do
