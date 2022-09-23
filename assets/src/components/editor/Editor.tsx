@@ -1,15 +1,16 @@
 import './editor-styles.css'
 
-import { useEffect, useRef } from 'preact/hooks'
+import { useEffect, useMemo, useRef } from 'preact/hooks'
 import { WebrtcProvider } from 'y-webrtc'
+import * as Y from 'yjs'
 
 import { TaskItem } from '@/components/editor/TaskItem'
-import { Doc, Project } from '@/models'
-import { docStore } from '@/stores/docStore'
+import { Project } from '@/models'
 import { taskStore } from '@/stores/taskStore'
 import { debounce, DebounceStyle } from '@/utils'
+import Collaboration from '@tiptap/extension-collaboration'
 import Placeholder from '@tiptap/extension-placeholder'
-import { Editor, EditorContent, JSONContent, useEditor } from '@tiptap/react'
+import { Editor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 type Props = {
@@ -22,7 +23,7 @@ type Props = {
 const SAVE_INTERVAL = 5_000
 
 export default ({ project, id, contents, saveContents }: Props) => {
-  const editor = useListNoteEditor()
+  const editor = useListNoteEditor(id)
   useDeleteTaskListener(editor)
 
   const currentFile = useRef<string>()
@@ -31,12 +32,7 @@ export default ({ project, id, contents, saveContents }: Props) => {
     if (!editor) return
 
     window.editor = editor
-    const legacyDoc = isDeltaDoc(contents)
-    editor.chain().setContent(checkContents(contents)).focus().run()
-
-    if (legacyDoc) {
-      docStore.docError.set('Note: legacy doc, saving will use new format.')
-    }
+    editor.chain().setContent(contents).focus().run()
 
     currentFile.current = id
     isDirty.current = false
@@ -73,110 +69,33 @@ export default ({ project, id, contents, saveContents }: Props) => {
   )
 }
 
-const useListNoteEditor = () => {
-  return useEditor({
-    extensions: [
-      StarterKit,
-      TaskItem,
-      Placeholder.configure({
-        placeholder:
-          'Welcome to ListNote!\n\nStart typing to create a note.\n\n' +
-          'Type "[] " to create a task.\n\n' +
-          'Have fun!',
-      }),
-    ],
-  })
-}
+const useListNoteEditor = (id: string | undefined) => {
+  return useMemo(() => {
+    if (!id) return null
 
-type DeltaDoc = { ops: Delta[] }
+    const ydoc = new Y.Doc()
+    const provider = new WebrtcProvider(id, ydoc)
 
-type Delta = {
-  insert?: string | { seqtask: { id: string } }
-  attributes?: {
-    list?: 'bullet' | 'ordered'
-    bold?: boolean
-    italic?: boolean
-    underline?: boolean
-  }
-}
-
-function isDeltaDoc(doc: Doc | DeltaDoc | undefined): doc is DeltaDoc {
-  return !!(doc as DeltaDoc)?.ops
-}
-
-function checkContents(contents: Doc | DeltaDoc): Doc | null {
-  if (!contents) return null
-
-  if (isDeltaDoc(contents)) {
-    return migrateDelta(contents)
-  } else {
-    return contents
-  }
-}
-
-function migrateDelta(doc: DeltaDoc): Doc {
-  // phase 1 - replace bullets
-  const content: JSONContent[] = []
-
-  doc.ops.forEach((op) => {
-    // this needs to apply to the previous insert operation
-    if (op.attributes?.list) {
-      const listType = op.attributes?.list + 'List'
-
-      const lastNode = content[content.length - 1]
-      const prevNode = content[content.length - 2]
-
-      const listItem = {
-        type: 'listItem',
-        content: lastNode.content,
-      }
-
-      // append to list
-      if (prevNode && prevNode.type == listType) {
-        content.pop()
-        prevNode.content?.push(listItem)
-      } else {
-        lastNode.type = listType
-        lastNode.content = [listItem]
-      }
-    } else if (typeof op.insert === 'string') {
-      let type = 'paragraph'
-      const text = op.insert.replace(/\n$/, '').replace(/^\n+/, '')
-      const marks: { type: string }[] | undefined = op.attributes ? [] : undefined
-      if (op.attributes?.bold) marks?.push({ type: 'bold' })
-      if (op.attributes?.italic) marks?.push({ type: 'italic' })
-      if (op.attributes?.underline) marks?.push({ type: 'underline' })
-
-      text.split('\n').forEach((line) => {
-        const body =
-          line == '' || line == '\n'
-            ? undefined
-            : [
-                {
-                  type: 'text',
-                  text: line,
-                  marks,
-                },
-              ]
-        content.push({
-          type,
-          content: body,
-        })
-      })
-    } else if (op.insert?.seqtask) {
-      content.push({
-        type: 'task',
-        attrs: op.insert.seqtask,
-      })
-    } else {
-      content.push({ type: 'paragraph' })
-    }
-  })
-
-  return {
-    type: 'doc',
-    content,
-  }
+    const editor = new Editor({
+      extensions: [
+        StarterKit.configure({
+          // The Collaboration extension comes with its own history handling
+          history: false,
+        }),
+        TaskItem,
+        Placeholder.configure({
+          placeholder:
+            'Welcome to ListNote!\n\nStart typing to create a note.\n\n' +
+            'Type "[] " to create a task.\n\n' +
+            'Have fun!',
+        }),
+        Collaboration.configure({
+          document: ydoc,
+        }),
+      ],
+    })
+    return editor
+  }, [id])
 }
 
 function useDeleteTaskListener(editor: Editor | null) {
