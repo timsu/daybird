@@ -23,4 +23,20 @@ defmodule Sequence.DocsFixtures do
 
     file
   end
+
+  @doc """
+  Generate a doc.
+  """
+  def doc_fixture(attrs \\ %{}) do
+    {:ok, doc} =
+      attrs
+      |> Enum.into(%{
+        contents: "some contents",
+        uuid: "7488a646-e31f-11e4-aace-600308960662",
+        project_id: 1,
+      })
+      |> Sequence.Docs.create_doc()
+
+    doc
+  end
 end

@@ -65,4 +65,60 @@ defmodule Sequence.DocsTest do
       assert %Ecto.Changeset{} = Docs.change_file(file)
     end
   end
+
+  describe "docs" do
+    alias Sequence.Docs.Doc
+
+    import Sequence.DocsFixtures
+
+    @invalid_attrs %{contents: nil, uuid: nil}
+
+    test "list_docs/0 returns all docs" do
+      doc = doc_fixture()
+      assert Docs.list_docs() == [doc]
+    end
+
+    test "get_doc!/1 returns the doc with given id" do
+      doc = doc_fixture()
+      assert Docs.get_doc!(doc.id) == doc
+    end
+
+    test "create_doc/1 with valid data creates a doc" do
+      valid_attrs = %{project_id: 1, contents: "some contents", uuid: "7488a646-e31f-11e4-aace-600308960662"}
+
+      assert {:ok, %Doc{} = doc} = Docs.create_doc(valid_attrs)
+      assert doc.contents == "some contents"
+      assert doc.uuid == "7488a646-e31f-11e4-aace-600308960662"
+    end
+
+    test "create_doc/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Docs.create_doc(@invalid_attrs)
+    end
+
+    test "update_doc/2 with valid data updates the doc" do
+      doc = doc_fixture()
+      update_attrs = %{contents: "some updated contents", uuid: "7488a646-e31f-11e4-aace-600308960668"}
+
+      assert {:ok, %Doc{} = doc} = Docs.update_doc(doc, update_attrs)
+      assert doc.contents == "some updated contents"
+      assert doc.uuid == "7488a646-e31f-11e4-aace-600308960668"
+    end
+
+    test "update_doc/2 with invalid data returns error changeset" do
+      doc = doc_fixture()
+      assert {:error, %Ecto.Changeset{}} = Docs.update_doc(doc, @invalid_attrs)
+      assert doc == Docs.get_doc!(doc.id)
+    end
+
+    test "delete_doc/1 deletes the doc" do
+      doc = doc_fixture()
+      assert {:ok, %Doc{}} = Docs.delete_doc(doc)
+      assert_raise Ecto.NoResultsError, fn -> Docs.get_doc!(doc.id) end
+    end
+
+    test "change_doc/1 returns a doc changeset" do
+      doc = doc_fixture()
+      assert %Ecto.Changeset{} = Docs.change_doc(doc)
+    end
+  end
 end
