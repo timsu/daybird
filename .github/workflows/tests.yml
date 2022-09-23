@@ -81,7 +81,5 @@ jobs:
         mix deps.get
     - name: Compile
       run: mix compile
-    - name: Run Dialyzer
-      run: mix dialyzer
     - name: Run Tests
       run: make test
