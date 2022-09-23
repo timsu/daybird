@@ -1,0 +1,87 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [master, production]
+  push:
+    branches: [master, production]
+
+env:
+  MIX_ENV: test
+  ECTO_TEST_URL: "pg://postgres:postgres@localhost:5432/listnote_test"
+  ELIXIR_VERSION: 1.12.3
+  OTP_VERSION: 24.0.6
+
+jobs:
+
+  # frontend javascript compiling / tests
+  frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Cancel ongoing deployments
+      uses: styfle/cancel-workflow-action@0.5.0
+      with:
+        access_token: ${{ github.token }}
+    - uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+        cache: 'yarn'
+    - name: Check for console.log
+      run: |
+        ! grep -r 'console\..*(' assets/src
+    - name: Install JS dependencies (workspace)
+      run: |
+        yarn install --immutable --mode=skip-build
+    - name: Typescript Compile
+      run: yarn tsc
+
+  backend:
+    name: Elixir Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:12
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DATABASE: listnote_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install lcov and openssl
+      run: sudo apt-get install -y lcov openssl
+    - name: Setup elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: ${{ env.ELIXIR_VERSION }}
+        otp-version: ${{ env.OTP_VERSION }}
+        experimental-otp: true
+    - uses: actions/cache@v2
+      id: deps-cache
+      with:
+        path: deps
+        key: ${{ runner.os }}-deps-${{ env.OTP_VERSION }}-${{ env.ELIXIR_VERSION }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-v1
+    - uses: actions/cache@v2
+      id: build-cache
+      with:
+        path: _build
+        key: ${{ runner.os }}-build-${{ env.OTP_VERSION }}-${{ env.ELIXIR_VERSION }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}-v1
+    - name: Install Mix Dependencies
+      run: |
+        mix local.rebar --force
+        mix local.hex --force
+        mix deps.get
+    - name: Compile
+      run: mix compile
+    - name: Run Dialyzer
+      run: mix dialyzer
+    - name: Run Tests
+      run: make test
