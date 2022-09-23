@@ -28,6 +28,26 @@ defmodule SequenceWeb.ConnCase do
 
       # The default endpoint for testing
       @endpoint SequenceWeb.Endpoint
+
+      alias Sequence.{Auth, Projects, Users, Utils}
+
+      def auth(conn, user) do
+        {:ok, token, _claims} = Auth.Guardian.full_token(user)
+        put_req_header(conn, "authorization", "Bearer #{token}")
+      end
+
+      def auth_guest(conn, invite) do
+        token = Auth.gen_guest_token(invite)
+        put_req_header(conn, "authorization", "Bearer #{token}")
+      end
+
+      def user_project do
+        user = Users.get_user! 1
+        project = Projects.get_project! 1
+        project_uuid = Utils.no_dash(project.uuid)
+        {user, project, project_uuid}
+      end
+
     end
   end
 

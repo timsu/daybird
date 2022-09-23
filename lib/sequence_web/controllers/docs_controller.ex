@@ -11,23 +11,20 @@ defmodule SequenceWeb.DocsController do
   def list_files(conn, %{ "project_id" => project_uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
-
       list = Docs.list_files(project)
-      render "list.json", files: list
+      render conn, "list.json", files: list
     end
   end
 
   # GET /doc
   def get_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, _doc} <- Docs.file_by_uuid(project, uuid) do
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
 
-      # case DocContents.get_doc(uuid) do
-      #   {:ok, data} -> text conn, data
-      #   {:error, reason} ->
-      #     {:error, :bad_request, "Failed to read doc: #{reason}"}
-      # end
+      case Docs.doc_by_uuid(project, uuid) do
+        {:ok, doc} -> text conn, doc.contents
+        {:error, :not_found} -> text conn, ""
+      end
     end
   end
 
@@ -35,13 +32,9 @@ defmodule SequenceWeb.DocsController do
   def save_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "contents" => contents }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, _doc} <- Docs.file_by_uuid(project, uuid) do
+         {:ok, _doc} <- Docs.set_doc_contents(project, uuid, contents) do
 
-      # case DocContents.set_doc(uuid, contents) do
-      #   :ok -> json conn, %{ success: true }
-      #   {:error, reason} ->
-      #     {:error, :bad_request, "Failed to save doc: #{reason}"}
-      # end
+      :ok
     end
   end
 
@@ -58,7 +51,7 @@ defmodule SequenceWeb.DocsController do
             project_id: project.id
           }) do
 
-      render "get.json", file: doc
+      render conn, "get.json", file: doc
     end
   end
 
@@ -73,7 +66,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, doc} <- Docs.file_by_uuid(project, uuid),
          {:ok, doc} <- Docs.update_file(doc, %{ name: new_name }) do
 
-      render "get.json", file: doc
+      render conn, "get.json", file: doc
     end
   end
 
@@ -84,7 +77,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, doc} <- Docs.file_by_uuid(project, uuid),
          {:ok, doc} <- Docs.update_file(doc, %{ archived_at: Timex.now }) do
 
-      render "get.json", file: doc
+      render conn, "get.json", file: doc
     end
   end
 
@@ -95,7 +88,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, doc} <- Docs.file_by_uuid(project, uuid),
          {:ok, doc} <- Docs.update_file(doc, %{ archived_at: Timex.now }) do
 
-      render "get.json", file: doc
+      render conn, "get.json", file: doc
     end
   end
 

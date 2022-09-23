@@ -10,6 +10,7 @@ defmodule Sequence.Repo.Migrations.CreateDocs do
       timestamps()
     end
 
+    create unique_index(:docs, [:uuid])
     create index(:docs, [:project_id])
   end
 end

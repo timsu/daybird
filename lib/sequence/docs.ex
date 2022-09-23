@@ -6,7 +6,7 @@ defmodule Sequence.Docs do
   import Ecto.Query, warn: false
   alias Sequence.{Projects.Project, Repo}
 
-  alias Sequence.Docs.File
+  alias Sequence.Docs.{File, Doc}
 
   @spec list_files(Project.t()) :: [File.t()]
   def list_files(project) do
@@ -19,6 +19,34 @@ defmodule Sequence.Docs do
     if uuid != nil and uuid != "undefined" and uuid != "" do
       file = Repo.one(from q in File, where: q.project_id == ^project.id and q.uuid == ^Base.decode16!(String.upcase(uuid)))
       if file, do: {:ok, file}, else: {:error, :not_found}
+    else
+      {:error, :not_found}
+    end
+  end
+
+  @spec doc_by_uuid(Project.t(), binary) :: {:error, :not_found} | {:ok, Doc.t()}
+  def doc_by_uuid(project, uuid) do
+    if uuid != nil and uuid != "undefined" and uuid != "" do
+      doc = Repo.one(from q in Doc, where: q.project_id == ^project.id and q.uuid == ^Base.decode16!(String.upcase(uuid)))
+      if doc, do: {:ok, doc}, else: {:error, :not_found}
+    else
+      {:error, :not_found}
+    end
+  end
+
+  @spec set_doc_contents(Project.t(), binary, binary) :: {:ok, Doc.t()}
+  def set_doc_contents(project, uuid, contents) do
+    if uuid != nil and uuid != "undefined" and uuid != "" do
+      doc = Repo.one(from q in Doc, select: [:id], where: q.project_id == ^project.id and q.uuid == ^Base.decode16!(String.upcase(uuid)))
+      if doc do
+        update_doc(doc, %{ contents: contents })
+      else
+        create_doc(%{
+          uuid: uuid,
+          project_id: project.id,
+          contents: contents
+        })
+      end
     else
       {:error, :not_found}
     end
@@ -117,8 +145,6 @@ defmodule Sequence.Docs do
   def change_file(%File{} = file, attrs \\ %{}) do
     File.changeset(file, attrs)
   end
-
-  alias Sequence.Docs.Doc
 
   @doc """
   Returns the list of docs.

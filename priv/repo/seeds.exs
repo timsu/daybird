@@ -15,8 +15,15 @@ user = Sequence.Repo.insert!(%Sequence.Users.User{
   email: "bob@cat.com"
 })
 
-_project = Sequence.Repo.insert!(%Sequence.Projects.Project{
+project = Sequence.Repo.insert!(%Sequence.Projects.Project{
   creator_id: user.id,
+  uuid: Ecto.UUID.generate,
   name: "Work Stuff",
   shortcode: "WS"
+})
+
+Sequence.Repo.insert!(%Sequence.Projects.UserProject{
+  user_id: user.id,
+  project_id: project.id,
+  role: "admin"
 })

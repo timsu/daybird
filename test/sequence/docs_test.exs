@@ -71,7 +71,7 @@ defmodule Sequence.DocsTest do
 
     import Sequence.DocsFixtures
 
-    @invalid_attrs %{contents: nil, uuid: nil}
+    @invalid_attrs %{project_id: nil, contents: nil, uuid: nil}
 
     test "list_docs/0 returns all docs" do
       doc = doc_fixture()

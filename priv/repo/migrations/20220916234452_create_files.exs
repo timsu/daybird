@@ -15,7 +15,7 @@ defmodule Sequence.Repo.Migrations.CreateFiles do
       timestamps()
     end
 
-    create index(:files, [:uuid])
+    create unique_index(:files, [:uuid])
     create index(:files, [:creator_id])
     create index(:files, [:project_id])
   end
