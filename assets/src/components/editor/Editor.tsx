@@ -14,14 +14,14 @@ import StarterKit from '@tiptap/starter-kit'
 
 type Props = {
   project: Project
-  filename?: string
+  id?: string
   contents?: any
-  saveContents: (project: Project, filename: string, contents: any) => void
+  saveContents: (project: Project, id: string, contents: any) => void
 }
 
 const SAVE_INTERVAL = 5_000
 
-export default ({ project, filename, contents, saveContents }: Props) => {
+export default ({ project, id, contents, saveContents }: Props) => {
   const editor = useListNoteEditor()
   useDeleteTaskListener(editor)
 
@@ -38,15 +38,15 @@ export default ({ project, filename, contents, saveContents }: Props) => {
       docStore.docError.set('Note: legacy doc, saving will use new format.')
     }
 
-    currentFile.current = filename
+    currentFile.current = id
     isDirty.current = false
     const textChangeHandler = () => {
       isDirty.current = true
       debounce(
-        'save-' + filename,
+        'save-' + id,
         () => {
-          if (filename != currentFile.current) return
-          saveContents(project, filename!, editor.getJSON())
+          if (id != currentFile.current) return
+          saveContents(project, id!, editor.getJSON())
           isDirty.current = false
         },
         SAVE_INTERVAL,
@@ -55,12 +55,12 @@ export default ({ project, filename, contents, saveContents }: Props) => {
     }
     editor.on('update', textChangeHandler)
     window.onbeforeunload = () => {
-      if (isDirty.current) saveContents(project, filename!, editor.getJSON())
+      if (isDirty.current) saveContents(project, id!, editor.getJSON())
     }
 
     return () => {
       editor.off('update', textChangeHandler)
-      if (isDirty.current) saveContents(project, filename!, editor.getJSON())
+      if (isDirty.current) saveContents(project, id!, editor.getJSON())
       window.onbeforeunload = null
     }
   }, [editor, contents])

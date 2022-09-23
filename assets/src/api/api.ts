@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 import { config, OAuthProvider } from '@/config'
-import { AuthToken, AuthTokenPair, Project, Task, Team, User } from '@/models'
+import { AuthToken, AuthTokenPair, File, FileType, Project, Task, Team, User } from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
 import * as R from './types'
@@ -228,30 +228,27 @@ class APIService {
     return response.data
   }
 
-  async createFolder(project: Project, path: string): Promise<R.ProjectResponse> {
-    const response = await this.axios.post(
-      `${this.endpoint}/files/folder?project_id=${project.id}`,
-      { path }
-    )
+  async createFile(
+    project: Project,
+    file: { name: string; type: FileType; parent?: string }
+  ): Promise<R.FileResponse> {
+    const response = await this.axios.post(`${this.endpoint}/files?project_id=${project.id}`, file)
     return response.data
   }
 
-  async readFile(project: Project, filename: string): Promise<any> {
-    const encodedName = encodeURIComponent(filename)
+  async readFile(project: Project, uuid: string): Promise<any> {
     const response = await this.axios.get(
-      `${this.endpoint}/doc?project_id=${project.id}&filename=${encodedName}`
+      `${this.endpoint}/doc?project_id=${project.id}&uuid=${uuid}`
     )
     return response.data
   }
 
-  async writeFile(project: Project, filename: string, contents: any): Promise<R.ProjectResponse> {
-    const encodedName = encodeURIComponent(filename)
-
+  async writeFile(project: Project, uuid: string, contents: any): Promise<R.SuccessResponse> {
     const data = new FormData()
     data.append('contents', JSON.stringify(contents))
 
     const response = await this.axios.post(
-      `${this.endpoint}/doc?project_id=${project.id}&filename=${encodedName}`,
+      `${this.endpoint}/doc?project_id=${project.id}&uuid=${uuid}`,
       data,
       {
         headers: {
@@ -262,22 +259,11 @@ class APIService {
     return response.data
   }
 
-  async renameFile(
-    project: Project,
-    filename: string,
-    newName: string
-  ): Promise<R.SuccessResponse> {
-    const response = await this.axios.post(`${this.endpoint}/doc/rename?project_id=${project.id}`, {
-      filename,
-      new_name: newName,
-    })
-    return response.data
-  }
-
-  async deleteFile(project: Project, filename: string): Promise<R.SuccessResponse> {
-    const response = await this.axios.post(`${this.endpoint}/doc/delete?project_id=${project.id}`, {
-      filename,
-    })
+  async updateFile(project: Project, id: string, updates: Partial<File>): Promise<R.FileResponse> {
+    const response = await this.axios.post(
+      `${this.endpoint}/doc/${id}?project_id=${project.id}`,
+      updates
+    )
     return response.data
   }
 

@@ -81,14 +81,14 @@ export default ({
       if (!dirty || !title) return
 
       if (!task) {
-        const doc = docStore.filename.get()
+        const doc = docStore.id.get()
         const newTask = await taskStore.createTask({ title, doc })
         onCreate?.(newTask)
         div.innerText = '' // need to clear div text so it gets re-populated when id comes in
         setSavedId(newTask.id)
         return newTask
       } else {
-        const doc = task.doc ? undefined : docStore.filename.get()
+        const doc = task.doc ? undefined : docStore.id.get()
         await taskStore.saveTask(task, { title, doc })
         return task
       }

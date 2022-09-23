@@ -11,7 +11,7 @@ import FileTree from '@/components/layout/FileTree'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
 import { paths } from '@/config'
-import { Project } from '@/models'
+import { FileType, Project } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -136,11 +136,11 @@ function ProjectTree({ project }: { project: Project }) {
 
   const onNewFile = (e: Event) => {
     e.stopPropagation()
-    modalStore.newFileModal.set({ project, type: 'doc' })
+    modalStore.newFileModal.set({ project, type: FileType.DOC })
   }
   const onNewFolder = (e: Event) => {
     e.stopPropagation()
-    modalStore.newFileModal.set({ project, type: 'folder' })
+    modalStore.newFileModal.set({ project, type: FileType.FOLDER })
   }
   const onNewDailyFile = (e: Event) => {
     e.stopPropagation()

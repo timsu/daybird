@@ -3,7 +3,7 @@ import { route } from 'preact-router'
 
 import { API } from '@/api'
 import { config, paths } from '@/config'
-import { Project, User } from '@/models'
+import { FileType, Project, User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
@@ -75,7 +75,7 @@ class ProjectStore {
     this.setCurrentProject(project)
 
     // create a document
-    fileStore.newFile(project, 'Welcome', 'doc')
+    fileStore.newFile(project, 'Welcome', FileType.DOC)
     fileStore.setExpanded(project.id, true)
   })
 

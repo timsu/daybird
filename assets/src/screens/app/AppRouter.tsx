@@ -14,6 +14,6 @@ export default () => (
     <ProjectsList path={paths.PROJECTS} />
     <ProjectView path={paths.PROJECTS + '/:id'} />
     <TasksList path={paths.TASKS} />
-    <DocScreen path={paths.DOC + '/:projectId/:filename'} />
+    <DocScreen path={paths.DOC + '/:projectId/:id'} />
   </Router>
 )

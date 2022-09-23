@@ -5,6 +5,7 @@ import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
 import Submit from '@/components/core/Submit'
 import Modal from '@/components/modals/Modal'
+import { FileType } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -24,9 +25,12 @@ export default () => {
 
   const isRename = !!renameFileOpen
   const project = newFileOpen ? newFileOpen.project : renameFileOpen ? renameFileOpen.project : null
-  const noun = toTitleCase(
-    newFileOpen ? newFileOpen.type : renameFileOpen ? renameFileOpen.file.type : ''
-  )
+  const type = newFileOpen
+    ? newFileOpen.type
+    : renameFileOpen
+    ? renameFileOpen.file.type
+    : FileType.DOC
+  const noun = type == FileType.FOLDER ? 'Folder' : 'Note'
 
   useEffect(() => {
     setName(renameFileOpen ? renameFileOpen.file.name : '')
@@ -73,7 +77,7 @@ export default () => {
         <div
           className={`mx-auto flex items-center justify-center h-12 w-12 rounded-full ${iconBg}`}
         >
-          {noun == 'File' ? <DocumentIcon class={iconClass} /> : <FolderIcon class={iconClass} />}
+          {noun == 'Note' ? <DocumentIcon class={iconClass} /> : <FolderIcon class={iconClass} />}
         </div>
         <div className="mt-3 text-center sm:mt-5">
           <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">

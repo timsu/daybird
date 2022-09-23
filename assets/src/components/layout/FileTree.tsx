@@ -6,7 +6,8 @@ import {
     ContextMenu, ContextMenuItem, ContextMenuTrigger, ContextMenuWithData, MenuContext,
     triggerContextMenu
 } from '@/components/core/ContextMenu'
-import { File, paths } from '@/config'
+import { paths } from '@/config'
+import { File, FileType } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -34,11 +35,12 @@ export default ({ projectId }: { projectId: string }) => {
           </>
         )}
       </ContextMenuWithData>
+      {files.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
       {files.map((item) => {
-        if (item.type == 'doc') {
-          const href = `${paths.DOC}/${projectId}/${item.path}`
+        if (item.type == FileType.DOC) {
+          const href = `${paths.DOC}/${projectId}/${item.id}`
           return (
-            <ContextMenuTrigger id="file-tree-menu" key={item.path} data={item}>
+            <ContextMenuTrigger id="file-tree-menu" key={item.id} data={item}>
               <Match path={href}>
                 {({ url }: { url: string }) => {
                   const matches = location.pathname == encodeURI(href)
@@ -52,7 +54,7 @@ export default ({ projectId }: { projectId: string }) => {
                           : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
                       )}
-                      style={{ marginLeft: item.depth * 20 }}
+                      style={{ marginLeft: 0 * 20 }}
                     >
                       {item.name}
                       {matches && (
@@ -75,12 +77,12 @@ export default ({ projectId }: { projectId: string }) => {
               </Match>
             </ContextMenuTrigger>
           )
-        } else if (item.type == 'folder') {
+        } else if (item.type == FileType.FOLDER) {
           return (
             <div
               className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
                     items-center px-2 py-2 text-sm font-medium rounded-md transition-all"
-              style={{ marginLeft: item.depth * 20 }}
+              style={{ marginLeft: 0 * 20 }}
             >
               <FolderIcon
                 className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6"

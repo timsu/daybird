@@ -5,7 +5,8 @@ import { useEffect, useState } from 'preact/hooks'
 import { stringSimilarity } from 'string-similarity-js'
 
 import { ModalWithoutPadding } from '@/components/modals/Modal'
-import { File, paths } from '@/config'
+import { paths } from '@/config'
+import { File, FileType } from '@/models'
 import { DOC_EXT, fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -72,14 +73,14 @@ function QuickSearchBody({ close }: { close: () => void }) {
         const projectFiles = flatten(allFiles[projectId]) as File[]
         const project = projects.find((p) => p.id == projectId)
         return projectFiles
-          .filter((f) => f.type == 'doc')
+          .filter((f) => f.type == FileType.DOC)
           .map(
             (f) =>
               ({
                 type: 'file',
                 name: f.name,
                 desc: project!.name,
-                href: `${paths.DOC}/${project!.id}/${f.path}`,
+                href: `${paths.DOC}/${project!.id}/${f.id}`,
                 score: stringSimilarity(searchText, f.name, substringLength),
               } as SearchResult)
           )

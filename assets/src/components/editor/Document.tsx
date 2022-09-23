@@ -7,7 +7,7 @@ import { projectStore } from '@/stores/projectStore'
 import { useStore } from '@nanostores/preact'
 
 // document is a higher-order component that manages the doc object
-export default ({ projectId, filename }: { projectId?: string; filename?: string }) => {
+export default ({ projectId, id }: { projectId?: string; id?: string }) => {
   const project = useStore(projectStore.projectMap)[projectId!]
   const contents = useStore(docStore.document)
 
@@ -15,18 +15,16 @@ export default ({ projectId, filename }: { projectId?: string; filename?: string
     if (project) {
       projectStore.setCurrentProject(project)
     }
-    if (project && filename) {
-      docStore.loadDoc(project, filename)
+    if (project && id) {
+      docStore.loadDoc(project, id)
     }
-  }, [project, projectId, filename])
+  }, [project, projectId, id])
 
-  const saveContents = (project: Project, filename: string, contents: any) => {
-    docStore.saveDoc(project, filename, contents)
+  const saveContents = (project: Project, id: string, contents: any) => {
+    docStore.saveDoc(project, id, contents)
   }
 
   if (!project) return null
 
-  return (
-    <Editor project={project} filename={filename} contents={contents} saveContents={saveContents} />
-  )
+  return <Editor project={project} id={id} contents={contents} saveContents={saveContents} />
 }
