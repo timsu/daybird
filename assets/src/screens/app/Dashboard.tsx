@@ -31,13 +31,14 @@ export default (props: Props) => {
 
       <div className="px-4 sm:px-6 md:px-8 my-6 leading-10">
         <p class="mb-6">
-          ListNote status: <b>Solo MVP</b> ({config.hash})
+          ListNote status: <b>Collaborative MVP</b> ({config.hash})
         </p>
 
         <p>Welcome to ListNote! </p>
 
         <p>
-          Currently, you can work on notes and tasks by yourself - collaboration is coming soon.
+          I've moved all documents into the database. If you need the contents of your previous
+          notes please let me know, they are still around.
         </p>
 
         <p>
