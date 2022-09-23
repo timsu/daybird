@@ -14,19 +14,18 @@ import { useStore } from '@nanostores/preact'
 type Props = {
   path: string
   projectId?: string
-  filename?: string
+  id?: string
 }
 
 const LS_TASKS_INSERTED = 'dti:'
 
 export default (props: Props) => {
   const docError = useStore(docStore.docError)
-
-  const title = props.filename ? getNameFromPath(props.filename) : ''
+  const title = useStore(docStore.title)
 
   const isTodayJournal = title == fileStore.dailyFileTitle()
   const uncompleteTasksInserted =
-    isTodayJournal && localStorage.getItem(LS_TASKS_INSERTED + props.projectId) == title
+    isTodayJournal && localStorage.getItem(LS_TASKS_INSERTED + props.projectId) == props.id
 
   const insertUncompleteTasks = async (e: MouseEvent) => {
     const tasks = await taskStore.loadTasks({ id: props.projectId! } as Project)
@@ -44,13 +43,13 @@ export default (props: Props) => {
       commandChain = commandChain?.insertContentAt(startIndex + notInThisDoc.length, '\n')
     commandChain?.run()
 
-    localStorage.setItem(LS_TASKS_INSERTED + props.projectId, title)
+    localStorage.setItem(LS_TASKS_INSERTED + props.projectId, props.id || '')
     ;(e.target as HTMLDivElement).style.display = 'none'
   }
 
   return (
     <>
-      <Helmet title={title} />
+      <Helmet title={title || 'Loading'} />
       <CSSTransition appear in={!!docError} classNames="fade" duration={500}>
         <div class="relative bg-red-500">
           <Banner onClose={() => docStore.docError.set(undefined)}>
@@ -72,7 +71,7 @@ export default (props: Props) => {
             </Tooltip>
           )}
         </div>
-        <Document projectId={props.projectId} filename={props.filename} />
+        <Document projectId={props.projectId} id={props.id} />
       </div>
     </>
   )

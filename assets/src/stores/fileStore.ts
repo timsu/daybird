@@ -1,12 +1,10 @@
 import moment from 'moment-mini'
-import { action, atom, map, onMount } from 'nanostores'
+import { action, map } from 'nanostores'
 import { route } from 'preact-router'
 
 import { API } from '@/api'
-import { config, File, FileType, paths } from '@/config'
-import { Project } from '@/models'
-import { docStore } from '@/stores/docStore'
-import { projectStore } from '@/stores/projectStore'
+import { config, paths } from '@/config'
+import { File, FileType, Project } from '@/models'
 import { assertIsDefined, logger } from '@/utils'
 
 export const DOC_EXT = '.seq'
@@ -14,12 +12,15 @@ export const DOC_EXT = '.seq'
 const USER_DATA_EXPANDED = 'expanded'
 
 type ProjectFileMap = { [projectId: string]: File[] }
+type FileMap = { [id: string]: File }
 type ExpansionMap = { [key: string]: boolean }
 
 class FileStore {
   // --- stores
 
   files = map<ProjectFileMap>({})
+
+  idToFile = map<FileMap>({})
 
   expanded = map<ExpansionMap>({})
 
@@ -31,46 +32,29 @@ class FileStore {
 
   updateFiles = action(this.files, 'listFiles', (store, projectId: string, files: File[]) => {
     store.setKey(projectId, files)
+
+    const fileMap = this.idToFile.get()
+    files.forEach((f) => (fileMap[f.id] = f))
+    this.idToFile.notify()
   })
 
   loadFiles = async (project: Project) => {
     const response = await API.listFiles(project)
-    const files: File[] = response.files.map((filename) => {
-      const type: FileType = filename.endsWith(DOC_EXT) ? 'doc' : 'folder'
-      return {
-        name: type == 'doc' ? filename.slice(0, filename.length - DOC_EXT.length) : filename,
-        path: filename,
-        type,
-        depth: 0,
-      }
-    })
+    const files: File[] = response.files.map(File.fromJSON)
 
     logger.info('FILES - loaded files for project', project.name, sortFiles(files))
     this.updateFiles(project.id, files)
   }
 
-  newFile = async (project: Project, name: string, type: FileType) => {
+  newFile = async (project: Project, name: string, type: FileType, parent?: string) => {
     name = name.trim()
 
-    let newFile: File | undefined
-    if (type == 'doc') {
-      const path = name.endsWith(DOC_EXT) ? name : name + DOC_EXT
-      await API.writeFile(project, path, '')
-      logger.info('FILES - new file', name)
-      newFile = { name, path, type, depth: 0 }
-    } else if (type == 'folder') {
-      await API.createFolder(project, name)
-      logger.info('FILES - new folder', name)
-      newFile = { name, path: name, type, depth: 0 }
-    }
-
-    if (!newFile) return
-
+    const response = await API.createFile(project, { name, type, parent })
     const files = this.files.get()[project.id] || []
-    const newFiles = sortFiles([...files, newFile])
+    const newFiles = sortFiles([...files, response.file])
     this.updateFiles(project.id, newFiles)
 
-    if (type == 'doc') route(paths.DOC + '/' + project.id + '/' + newFile.path)
+    if (type == FileType.DOC) route(paths.DOC + '/' + project.id + '/' + response.file.id)
   }
 
   dailyFileTitle = () => moment().format('YYYY-MM-DD')
@@ -80,46 +64,28 @@ class FileStore {
     const existing = this.getFilesFor(project).find((f) => f.name == name)
 
     assertIsDefined(project, 'project is defined')
-    if (existing) route(paths.DOC + '/' + project.id + '/' + existing.path)
-    else await this.newFile(project, name, 'doc')
+    if (existing) route(paths.DOC + '/' + project.id + '/' + existing.id)
+    else await this.newFile(project, name, FileType.DOC)
   }
 
   renameFile = async (project: Project, file: File, name: string) => {
-    const prevPath = file.path
-    const rootPath = prevPath.substring(0, prevPath.lastIndexOf('/') + 1)
-    const newPath = rootPath + name + (file.type == 'doc' ? DOC_EXT : '')
-
-    file.path = newPath
     file.name = name
     this.files.notify()
 
-    await API.renameFile(project, prevPath, newPath)
-    if (docStore.filename.get() == prevPath) {
-      docStore.document.set(undefined)
-      route(`${paths.DOC}/${project.id}/${newPath}`)
-    }
+    await API.updateFile(project, file.id, { name })
   }
 
   deleteFile = async (project: Project, file: File) => {
-    await API.deleteFile(project, file.path)
+    await API.updateFile(project, file.id, { deleted_at: new Date().toISOString() })
 
-    const removeFile = (files: File[]) => {
-      if (!files) return files
-
-      if (files.find((f) => f.path == file.path)) {
-        return files.filter((f) => f.path != file.path)
-      } else {
-        files.forEach((f) => {
-          if (f.children) f.children = removeFile(f.children)
-        })
-        return files
-      }
-    }
     const files = this.getFilesFor(project)
-    this.updateFiles(project.id, removeFile(files))
+    this.updateFiles(
+      project.id,
+      files.filter((f) => f.id != file.id)
+    )
     this.files.notify()
 
-    if (location.pathname.includes(encodeURI(file.path))) {
+    if (location.pathname.includes(encodeURI(file.id))) {
       route(paths.APP)
     }
   }
@@ -151,6 +117,4 @@ export const getNameFromPath = (path: string) =>
   path.substring(path.lastIndexOf('/') + 1).replace(DOC_EXT, '')
 
 const sortFiles = (files: File[]) =>
-  files.sort((a, b) =>
-    a.type == b.type ? a.name.localeCompare(b.name) : b.type.localeCompare(a.type)
-  )
+  files.sort((a, b) => (a.type == b.type ? a.name.localeCompare(b.name) : b.type - a.type))

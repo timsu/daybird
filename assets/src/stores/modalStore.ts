@@ -1,7 +1,7 @@
 import { atom } from 'nanostores'
 
-import { config, File, FileType } from '@/config'
-import { Project, Task } from '@/models'
+import { config } from '@/config'
+import { File, FileType, Project, Task } from '@/models'
 import { uiStore } from '@/stores/uiStore'
 
 class ModalStore {
