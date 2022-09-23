@@ -7,7 +7,7 @@ import Tooltip from '@/components/core/Tooltip'
 import Document from '@/components/editor/Document'
 import { Project } from '@/models'
 import { docStore } from '@/stores/docStore'
-import { DOC_EXT, fileStore, getNameFromPath } from '@/stores/fileStore'
+import { fileStore } from '@/stores/fileStore'
 import { taskStore } from '@/stores/taskStore'
 import { useStore } from '@nanostores/preact'
 
