@@ -102,7 +102,7 @@ const useListNoteEditor = (id: string | undefined) => {
           provider: provider,
           user: {
             name: user.name,
-            color: getUniqueColorObjectForId(user.id),
+            color: getUniqueColorObjectForId(user.id).bg,
           },
         }),
       ],

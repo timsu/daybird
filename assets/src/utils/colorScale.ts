@@ -74,9 +74,6 @@ const getIndexesForColorScale = () => Array.from(Array(COLOR_SCALE_BASE.length).
 let unusedColorsByIndex: number[] = getIndexesForColorScale()
 
 export function getUniqueColorObjectForId(id: string = ''): ColorSet {
-  // in storybook, don't rotate colors for consistent testing
-  if (process.env.STORYBOOK) return COLOR_SCALE[getHash(id) % COLOR_SCALE.length]
-
   // use keyd colors based on id for quick and safe retreival
   if (savedIdsToColorIndex[id] != null) {
     return COLOR_SCALE[savedIdsToColorIndex[id]]
