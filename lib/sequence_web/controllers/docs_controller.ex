@@ -5,7 +5,7 @@ defmodule SequenceWeb.DocsController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Docs, Projects}
+  alias Sequence.{Docs, Projects, Utils}
 
   # GET /files
   def list_files(conn, %{ "project_id" => project_uuid }) do
