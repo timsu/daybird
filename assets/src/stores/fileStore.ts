@@ -111,6 +111,8 @@ class FileStore {
     })
     const newFiles = sortFiles([...files, response.file])
     this.updateFiles(project.id, newFiles)
+
+    route(paths.DOC + '/' + project.id + '/' + response.file.id)
   }
 
   renameFile = async (project: Project, file: File, name: string) => {

@@ -42,9 +42,9 @@ defmodule SequenceWeb.DocsController do
   def create_file(conn, %{ "project_id" => project_uuid, "name" => name, "type" => type } = params) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
-         {:ok, _doc} <- validate_parent(project, params["parent"]),
+         parent <- validate_parent(project, params["parent"]),
          {:ok, doc} <- Docs.create_file(%{
-            parent: params["parent"],
+            parent: parent,
             name: name,
             type: type,
             creator_id: user.id,
@@ -55,8 +55,10 @@ defmodule SequenceWeb.DocsController do
     end
   end
 
-  defp validate_parent(project, parent) do
-    if parent, do: Docs.file_by_uuid(project, parent), else: {:ok, nil}
+  defp validate_parent(_project, nil), do: nil
+
+  defp validate_parent(_project, parent) do
+    Sequence.Utils.uuid_to_base16(parent)
   end
 
   # PUT /files/id
