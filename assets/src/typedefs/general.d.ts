@@ -1,4 +1,4 @@
-import { Editor } from '@tiptap/react'
+import { Editor } from '@tiptap/core'
 
 declare global {
   interface Window {

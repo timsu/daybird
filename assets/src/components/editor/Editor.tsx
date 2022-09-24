@@ -1,6 +1,8 @@
 import './editor-styles.css'
 
 import { useEffect, useMemo, useRef } from 'preact/hooks'
+import { Transaction } from 'prosemirror-state'
+import { ySyncPluginKey } from 'y-prosemirror'
 import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
 
@@ -10,11 +12,11 @@ import { authStore } from '@/stores/authStore'
 import { taskStore } from '@/stores/taskStore'
 import { debounce, DebounceStyle } from '@/utils'
 import { getUniqueColorObjectForId } from '@/utils/colorScale'
-import { useStore } from '@nanostores/preact'
-import Collaboration from '@tiptap/extension-collaboration'
+import { Editor } from '@tiptap/core'
+import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import Placeholder from '@tiptap/extension-placeholder'
-import { Editor, EditorContent } from '@tiptap/react'
+import { EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 type Props = {
@@ -38,31 +40,42 @@ export default ({ project, id, contents, saveContents }: Props) => {
     window.editor = editor
     editor.chain().setContent(contents).focus().run()
 
-    // currentFile.current = id
-    // isDirty.current = false
-    // const textChangeHandler = () => {
-    //   isDirty.current = true
-    //   debounce(
-    //     'save-' + id,
-    //     () => {
-    //       if (id != currentFile.current) return
-    //       saveContents(project, id!, editor.getJSON())
-    //       isDirty.current = false
-    //     },
-    //     SAVE_INTERVAL,
-    //     DebounceStyle.RESET_ON_NEW
-    //   )
-    // }
-    // editor.on('update', textChangeHandler)
-    // window.onbeforeunload = () => {
-    //   if (isDirty.current) saveContents(project, id!, editor.getJSON())
-    // }
+    currentFile.current = id
+    isDirty.current = false
+    const textChangeHandler = ({
+      editor,
+      transaction,
+    }: {
+      editor: Editor
+      transaction: Transaction
+    }) => {
+      // ignore non-local changes
+      console.log('meow', transaction)
+      if (transaction && isChangeOrigin(transaction)) return
+      console.log('local one')
 
-    // return () => {
-    //   editor.off('update', textChangeHandler)
-    //   if (isDirty.current) saveContents(project, id!, editor.getJSON())
-    //   window.onbeforeunload = null
-    // }
+      isDirty.current = true
+      debounce(
+        'save-' + id,
+        () => {
+          if (id != currentFile.current) return
+          saveContents(project, id!, editor.getJSON())
+          isDirty.current = false
+        },
+        SAVE_INTERVAL,
+        DebounceStyle.RESET_ON_NEW
+      )
+    }
+    editor.on('update', textChangeHandler)
+    window.onbeforeunload = () => {
+      if (isDirty.current) saveContents(project, id!, editor.getJSON())
+    }
+
+    return () => {
+      editor.off('update', textChangeHandler)
+      if (isDirty.current) saveContents(project, id!, editor.getJSON())
+      window.onbeforeunload = null
+    }
   }, [editor, contents])
 
   return (
