@@ -50,9 +50,7 @@ export default ({ project, id, contents, saveContents }: Props) => {
       transaction: Transaction
     }) => {
       // ignore non-local changes
-      console.log('meow', transaction)
       if (transaction && isChangeOrigin(transaction)) return
-      console.log('local one')
 
       isDirty.current = true
       debounce(
@@ -87,7 +85,13 @@ export default ({ project, id, contents, saveContents }: Props) => {
 }
 
 const useListNoteEditor = (id: string | undefined) => {
+  const prevEditor = useRef<Editor>()
+  const prevDoc = useRef<Y.Doc>()
+
   return useMemo(() => {
+    if (prevEditor.current) prevEditor.current.destroy()
+    if (prevDoc.current) prevDoc.current.destroy()
+
     if (!id) return null
 
     const ydoc = new Y.Doc()
@@ -120,6 +124,8 @@ const useListNoteEditor = (id: string | undefined) => {
         }),
       ],
     })
+    prevEditor.current = editor
+    prevDoc.current = ydoc
     return editor
   }, [id])
 }

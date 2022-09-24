@@ -29,7 +29,7 @@ export default (props: Props) => {
 
   const insertUncompleteTasks = async (e: MouseEvent) => {
     const tasks = await taskStore.loadTasks({ id: props.projectId! } as Project)
-    const notInThisDoc = tasks.filter((t) => t.doc != props.path)
+    const notInThisDoc = tasks.filter((t) => t.doc != props.id)
     const startIndex = 0
 
     let commandChain = window.editor?.chain()

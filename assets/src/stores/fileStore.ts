@@ -4,7 +4,9 @@ import { route } from 'preact-router'
 
 import { API } from '@/api'
 import { config, paths } from '@/config'
-import { File, FileType, Project } from '@/models'
+import {
+    File, fileListToTree, FileType, makeTreeFile, Project, sortFiles, TreeFile
+} from '@/models'
 import { assertIsDefined, logger } from '@/utils'
 
 export const DOC_EXT = '.seq'
@@ -12,6 +14,7 @@ export const DOC_EXT = '.seq'
 const USER_DATA_EXPANDED = 'expanded'
 
 type ProjectFileMap = { [projectId: string]: File[] }
+type ProjectFileTree = { [projectId: string]: TreeFile[] }
 type FileMap = { [id: string]: File }
 type ExpansionMap = { [key: string]: boolean }
 
@@ -20,6 +23,8 @@ class FileStore {
 
   files = map<ProjectFileMap>({})
 
+  fileTree = map<ProjectFileTree>({})
+
   idToFile = map<FileMap>({})
 
   expanded = map<ExpansionMap>({})
@@ -27,7 +32,7 @@ class FileStore {
   // --- actions
 
   getFilesFor = (project: Project) => {
-    return this.files.get()[project.id] || []
+    return this.fileTree.get()[project.id] || []
   }
 
   updateFiles = action(this.files, 'listFiles', (store, projectId: string, files: File[]) => {
@@ -36,6 +41,9 @@ class FileStore {
     const fileMap = this.idToFile.get()
     files.forEach((f) => (fileMap[f.id] = f))
     this.idToFile.notify()
+
+    const tree = fileListToTree(files)
+    this.fileTree.setKey(projectId, tree)
   })
 
   loadFiles = async (project: Project) => {
@@ -60,12 +68,51 @@ class FileStore {
   dailyFileTitle = () => moment().format('YYYY-MM-DD')
 
   newDailyFile = async (project: Project) => {
-    const name = this.dailyFileTitle()
-    const existing = this.getFilesFor(project).find((f) => f.name == name)
-
     assertIsDefined(project, 'project is defined')
-    if (existing) route(paths.DOC + '/' + project.id + '/' + existing.id)
-    else await this.newFile(project, name, FileType.DOC)
+
+    const projectFiles = this.getFilesFor(project)
+    const files = this.files.get()[project.id] || []
+
+    const yearName = moment().format('YYYY')
+    let yearFolder: TreeFile | undefined = projectFiles.find(
+      (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
+    )
+    if (!yearFolder) {
+      const response = await API.createFile(project, { name: yearName, type: FileType.FOLDER })
+      yearFolder = makeTreeFile(response.file)
+      files.push(response.file)
+    }
+
+    const monthName = moment().format('MM')
+    let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
+      (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
+    )
+    if (!monthFolder) {
+      const response = await API.createFile(project, {
+        name: monthName,
+        type: FileType.FOLDER,
+        parent: yearFolder.file.id,
+      })
+      monthFolder = makeTreeFile(response.file)
+      files.push(response.file)
+    }
+
+    const name = this.dailyFileTitle()
+    let file: TreeFile | undefined = monthFolder.nodes!.find((f) => f.file.name == name)
+    if (file) {
+      route(paths.DOC + '/' + project.id + '/' + file.file.id)
+      return
+    }
+
+    const response = await API.createFile(project, {
+      name,
+      type: FileType.DOC,
+      parent: monthFolder.file.id,
+    })
+    const newFiles = sortFiles([...files, response.file])
+    this.updateFiles(project.id, newFiles)
+
+    route(paths.DOC + '/' + project.id + '/' + response.file.id)
   }
 
   renameFile = async (project: Project, file: File, name: string) => {
@@ -78,12 +125,9 @@ class FileStore {
   deleteFile = async (project: Project, file: File) => {
     await API.updateFile(project, file.id, { deleted_at: new Date().toISOString() })
 
-    const files = this.getFilesFor(project)
-    this.updateFiles(
-      project.id,
-      files.filter((f) => f.id != file.id)
-    )
-    this.files.notify()
+    const files = this.files.get()[project.id]
+    const newFiles = files.filter((f) => f.id != file.id)
+    this.updateFiles(project.id, newFiles)
 
     if (location.pathname.includes(encodeURI(file.id))) {
       route(paths.APP)
@@ -112,6 +156,3 @@ class FileStore {
 
 export const fileStore = new FileStore()
 if (config.dev) (window as any)['fileStore'] = fileStore
-
-const sortFiles = (files: File[]) =>
-  files.sort((a, b) => (a.type == b.type ? a.name.localeCompare(b.name) : b.type - a.type))

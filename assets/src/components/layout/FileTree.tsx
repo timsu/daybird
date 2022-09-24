@@ -7,16 +7,16 @@ import {
     triggerContextMenu
 } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
-import { File, FileType } from '@/models'
+import { File, FileType, TreeFile } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
-import { DotsHorizontalIcon, FolderIcon } from '@heroicons/react/outline'
+import { DotsHorizontalIcon, FolderIcon, FolderOpenIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default ({ projectId }: { projectId: string }) => {
-  const files = useStore(fileStore.files)[projectId]
+  const files = useStore(fileStore.fileTree)[projectId]
   const project = useStore(projectStore.projectMap)[projectId]
 
   if (!files) return null
@@ -36,7 +36,24 @@ export default ({ projectId }: { projectId: string }) => {
         )}
       </ContextMenuWithData>
       {files.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
-      {files.map((item) => {
+      <FileTree projectId={projectId} nodes={files} indent={0} />
+    </nav>
+  )
+}
+
+function FileTree({
+  nodes,
+  indent,
+  projectId,
+}: {
+  nodes: TreeFile[]
+  indent: number
+  projectId: string
+}) {
+  return (
+    <>
+      {nodes.map((node) => {
+        const item = node.file
         if (item.type == FileType.DOC) {
           const href = `${paths.DOC}/${projectId}/${item.id}`
           return (
@@ -54,7 +71,7 @@ export default ({ projectId }: { projectId: string }) => {
                           : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
                       )}
-                      style={{ marginLeft: 0 * 20 }}
+                      style={{ marginLeft: indent * 20 }}
                     >
                       {item.name}
                       {matches && (
@@ -78,23 +95,50 @@ export default ({ projectId }: { projectId: string }) => {
             </ContextMenuTrigger>
           )
         } else if (item.type == FileType.FOLDER) {
-          return (
-            <div
-              className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
-                    items-center px-2 py-2 text-sm font-medium rounded-md transition-all"
-              style={{ marginLeft: 0 * 20 }}
-            >
-              <FolderIcon
-                className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6"
-                aria-hidden="true"
-              />
-              {item.name}
-            </div>
-          )
+          return <FolderNode {...{ indent, node, projectId }} />
         } else {
           return null
         }
       })}
-    </nav>
+    </>
+  )
+}
+
+function FolderNode({
+  indent,
+  node,
+  projectId,
+}: {
+  indent: number
+  node: TreeFile
+  projectId: string
+}) {
+  const item = node.file
+
+  const expansionKey = projectId + '/' + item.id
+  const expanded = useStore(fileStore.expanded)[expansionKey]
+
+  const setExpanded = (setting: boolean) => {
+    fileStore.setExpanded(expansionKey, setting)
+  }
+
+  const Icon = expanded ? FolderOpenIcon : FolderIcon
+
+  return (
+    <>
+      <div
+        className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
+        items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
+        style={{ marginLeft: indent * 20 }}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <Icon
+          className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6"
+          aria-hidden="true"
+        />
+        {item.name}
+      </div>
+      {expanded && <FileTree nodes={node.nodes!} indent={indent + 1} projectId={projectId} />}
+    </>
   )
 }
