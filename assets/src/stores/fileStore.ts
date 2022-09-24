@@ -4,7 +4,9 @@ import { route } from 'preact-router'
 
 import { API } from '@/api'
 import { config, paths } from '@/config'
-import { File, FileType, Project, TreeFile } from '@/models'
+import {
+    File, fileListToTree, FileType, makeTreeFile, Project, sortFiles, TreeFile
+} from '@/models'
 import { assertIsDefined, logger } from '@/utils'
 
 export const DOC_EXT = '.seq'
@@ -39,6 +41,9 @@ class FileStore {
     const fileMap = this.idToFile.get()
     files.forEach((f) => (fileMap[f.id] = f))
     this.idToFile.notify()
+
+    const tree = fileListToTree(files)
+    this.fileTree.setKey(projectId, tree)
   })
 
   loadFiles = async (project: Project) => {
@@ -74,12 +79,12 @@ class FileStore {
     )
     if (!yearFolder) {
       const response = await API.createFile(project, { name: yearName, type: FileType.FOLDER })
-      yearFolder = { file: response.file, children: [] }
+      yearFolder = makeTreeFile(response.file)
       files.push(response.file)
     }
 
     const monthName = moment().format('MM')
-    let monthFolder: TreeFile | undefined = yearFolder.children!.find(
+    let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
       (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
     )
     if (!monthFolder) {
@@ -88,12 +93,12 @@ class FileStore {
         type: FileType.FOLDER,
         parent: yearFolder.file.id,
       })
-      monthFolder = { file: response.file, children: [] }
+      monthFolder = makeTreeFile(response.file)
       files.push(response.file)
     }
 
     const name = this.dailyFileTitle()
-    let file: TreeFile | undefined = monthFolder.children!.find((f) => f.file.name == name)
+    let file: TreeFile | undefined = monthFolder.nodes!.find((f) => f.file.name == name)
     if (file) {
       route(paths.DOC + '/' + project.id + '/' + file.file.id)
       return
@@ -149,6 +154,3 @@ class FileStore {
 
 export const fileStore = new FileStore()
 if (config.dev) (window as any)['fileStore'] = fileStore
-
-const sortFiles = (files: File[]) =>
-  files.sort((a, b) => (a.type == b.type ? a.name.localeCompare(b.name) : b.type - a.type))
