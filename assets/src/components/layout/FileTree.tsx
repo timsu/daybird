@@ -12,7 +12,7 @@ import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
-import { DotsHorizontalIcon, FolderIcon } from '@heroicons/react/outline'
+import { DotsHorizontalIcon, FolderIcon, FolderOpenIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default ({ projectId }: { projectId: string }) => {
@@ -95,26 +95,50 @@ function FileTree({
             </ContextMenuTrigger>
           )
         } else if (item.type == FileType.FOLDER) {
-          return (
-            <>
-              <div
-                className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
-                items-center px-2 py-2 text-sm font-medium rounded-md transition-all"
-                style={{ marginLeft: indent * 20 }}
-              >
-                <FolderIcon
-                  className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6"
-                  aria-hidden="true"
-                />
-                {item.name}
-              </div>
-              <FileTree nodes={node.nodes!} indent={indent + 1} projectId={projectId} />
-            </>
-          )
+          return <FolderNode {...{ indent, node, projectId }} />
         } else {
           return null
         }
       })}
+    </>
+  )
+}
+
+function FolderNode({
+  indent,
+  node,
+  projectId,
+}: {
+  indent: number
+  node: TreeFile
+  projectId: string
+}) {
+  const item = node.file
+
+  const expansionKey = projectId + '/' + item.id
+  const expanded = useStore(fileStore.expanded)[expansionKey]
+
+  const setExpanded = (setting: boolean) => {
+    fileStore.setExpanded(expansionKey, setting)
+  }
+
+  const Icon = expanded ? FolderOpenIcon : FolderIcon
+
+  return (
+    <>
+      <div
+        className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
+        items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
+        style={{ marginLeft: indent * 20 }}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <Icon
+          className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6"
+          aria-hidden="true"
+        />
+        {item.name}
+      </div>
+      {expanded && <FileTree nodes={node.nodes!} indent={indent + 1} projectId={projectId} />}
     </>
   )
 }

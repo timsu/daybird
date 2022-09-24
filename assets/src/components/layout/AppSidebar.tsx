@@ -128,8 +128,6 @@ function ProjectTree({ project }: { project: Project }) {
     fileStore.setExpanded(project.id, setting)
   }
 
-  const path = useStore(uiStore.path)
-
   if (!project) return null
 
   const active = location.pathname == `${paths.PROJECTS}/${project.id}`
