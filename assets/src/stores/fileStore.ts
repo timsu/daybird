@@ -113,8 +113,5 @@ class FileStore {
 export const fileStore = new FileStore()
 if (config.dev) (window as any)['fileStore'] = fileStore
 
-export const getNameFromPath = (path: string) =>
-  path.substring(path.lastIndexOf('/') + 1).replace(DOC_EXT, '')
-
 const sortFiles = (files: File[]) =>
   files.sort((a, b) => (a.type == b.type ? a.name.localeCompare(b.name) : b.type - a.type))

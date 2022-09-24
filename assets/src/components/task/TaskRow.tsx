@@ -5,7 +5,7 @@ import { triggerContextMenu } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
-import { getNameFromPath } from '@/stores/fileStore'
+import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames, logger } from '@/utils'
@@ -197,7 +197,7 @@ export default ({
           onClick={goToDoc}
         >
           <DocumentIcon class="w-4 h-4 mr-1" />
-          {getNameFromPath(task.doc)}
+          {fileStore.idToFile.get()[task.doc]?.name}
         </div>
       )}
 
