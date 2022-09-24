@@ -10,10 +10,14 @@ import { paths } from '@/config'
 import { File, FileType, TreeFile } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
-import { projectStore } from '@/stores/projectStore'
+import { getProject, projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
-import { DotsHorizontalIcon, FolderIcon, FolderOpenIcon } from '@heroicons/react/outline'
+import {
+    ChevronDownIcon, ChevronRightIcon, DotsHorizontalIcon, FolderIcon, FolderOpenIcon
+} from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
+
+type ContextMenuArgs = { file: File; projectId: string }
 
 export default ({ projectId }: { projectId: string }) => {
   const files = useStore(fileStore.fileTree)[projectId]
@@ -23,18 +27,6 @@ export default ({ projectId }: { projectId: string }) => {
 
   return (
     <nav className="px-2 space-y-1 mb-10">
-      <ContextMenuWithData id="file-tree-menu">
-        {(file: File) => (
-          <>
-            <ContextMenuItem onClick={() => modalStore.renameFileModal.set({ project, file })}>
-              Rename File
-            </ContextMenuItem>
-            <ContextMenuItem onClick={() => modalStore.deleteFileModal.set({ project, file })}>
-              Delete File
-            </ContextMenuItem>
-          </>
-        )}
-      </ContextMenuWithData>
       {files.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
       <FileTree projectId={projectId} nodes={files} indent={0} />
     </nav>
@@ -57,7 +49,11 @@ function FileTree({
         if (item.type == FileType.DOC) {
           const href = `${paths.DOC}/${projectId}/${item.id}`
           return (
-            <ContextMenuTrigger id="file-tree-menu" key={item.id} data={item}>
+            <ContextMenuTrigger
+              id="file-tree-doc"
+              key={item.id}
+              data={{ file: item, projectId: projectId }}
+            >
               <Match path={href}>
                 {({ url }: { url: string }) => {
                   const matches = location.pathname == encodeURI(href)
@@ -71,7 +67,7 @@ function FileTree({
                           : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
                       )}
-                      style={{ marginLeft: indent * 20 }}
+                      style={{ marginLeft: indent * 10 }}
                     >
                       {item.name}
                       {matches && (
@@ -122,23 +118,94 @@ function FolderNode({
     fileStore.setExpanded(expansionKey, setting)
   }
 
-  const Icon = expanded ? FolderOpenIcon : FolderIcon
+  const Icon = expanded ? ChevronDownIcon : ChevronRightIcon
 
   return (
     <>
-      <div
-        className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
-        items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
-        style={{ marginLeft: indent * 20 }}
-        onClick={() => setExpanded(!expanded)}
+      <ContextMenuTrigger
+        id="file-tree-folder"
+        key={item.id}
+        data={{ file: item, projectId: projectId }}
       >
-        <Icon
-          className="text-gray-400 group-hover:text-gray-300 mr-3 flex-shrink-0 h-6 w-6"
-          aria-hidden="true"
-        />
-        {item.name}
-      </div>
+        <div
+          className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
+        items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
+          style={{ marginLeft: indent * 10 }}
+          onClick={() => setExpanded(!expanded)}
+        >
+          <Icon
+            className="text-gray-400 group-hover:text-gray-300 mr-2 flex-shrink-0 h-4 w-4"
+            aria-hidden="true"
+          />
+          {item.name}
+        </div>
+      </ContextMenuTrigger>
       {expanded && <FileTree nodes={node.nodes!} indent={indent + 1} projectId={projectId} />}
+    </>
+  )
+}
+
+export function FileContextMenu() {
+  return (
+    <>
+      <ContextMenuWithData id="file-tree-doc">
+        {({ file, projectId }: ContextMenuArgs) => (
+          <>
+            <ContextMenuItem
+              onClick={() =>
+                modalStore.renameFileModal.set({
+                  project: getProject(projectId),
+                  file,
+                })
+              }
+            >
+              Rename File
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() =>
+                modalStore.deleteFileModal.set({ project: getProject(projectId), file })
+              }
+            >
+              Delete File
+            </ContextMenuItem>
+          </>
+        )}
+      </ContextMenuWithData>
+      <ContextMenuWithData id="file-tree-folder">
+        {({ file, projectId }: ContextMenuArgs) => (
+          <>
+            <ContextMenuItem
+              onClick={() =>
+                modalStore.newFileModal.set({
+                  project: getProject(projectId),
+                  type: FileType.DOC,
+                  parent: file.id,
+                })
+              }
+            >
+              New File
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() =>
+                modalStore.newFileModal.set({
+                  project: getProject(projectId),
+                  type: FileType.FOLDER,
+                  parent: file.id,
+                })
+              }
+            >
+              New Folder
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() =>
+                modalStore.deleteFileModal.set({ project: getProject(projectId), file })
+              }
+            >
+              Delete Folder
+            </ContextMenuItem>
+          </>
+        )}
+      </ContextMenuWithData>
     </>
   )
 }

@@ -260,8 +260,8 @@ class APIService {
   }
 
   async updateFile(project: Project, id: string, updates: Partial<File>): Promise<R.FileResponse> {
-    const response = await this.axios.post(
-      `${this.endpoint}/doc/${id}?project_id=${project.id}`,
+    const response = await this.axios.put(
+      `${this.endpoint}/files/${id}?project_id=${project.id}`,
       updates
     )
     return response.data

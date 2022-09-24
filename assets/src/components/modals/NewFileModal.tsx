@@ -56,7 +56,7 @@ export default () => {
       if (renameFileOpen) {
         await fileStore.renameFile(renameFileOpen.project, renameFileOpen.file, name)
       } else if (newFileOpen) {
-        await fileStore.newFile(newFileOpen.project, name, newFileOpen.type)
+        await fileStore.newFile(newFileOpen.project, name, newFileOpen.type, newFileOpen.parent)
       }
       close()
     } catch (e) {

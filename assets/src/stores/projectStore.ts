@@ -100,3 +100,5 @@ class ProjectStore {
 
 export const projectStore = new ProjectStore()
 if (config.dev) (window as any)['projectStore'] = projectStore
+
+export const getProject = (projectId: string) => projectStore.projectMap.get()[projectId]

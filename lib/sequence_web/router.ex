@@ -87,8 +87,7 @@ defmodule SequenceWeb.Router do
 
     get "/files", DocsController, :list_files
     post "/files", DocsController, :create_file
-    post "/files/rename", DocsController, :rename_file
-    post "/files/delete", DocsController, :delete_file
+    put "/files/:id", DocsController, :update_file
 
     get "/doc", DocsController, :get_doc
     post "/doc", DocsController, :save_doc
