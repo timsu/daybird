@@ -50,9 +50,7 @@ export default ({ project, id, contents, saveContents }: Props) => {
       transaction: Transaction
     }) => {
       // ignore non-local changes
-      console.log('meow', transaction)
       if (transaction && isChangeOrigin(transaction)) return
-      console.log('local one')
 
       isDirty.current = true
       debounce(
