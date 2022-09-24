@@ -77,7 +77,7 @@ function FileTree({
                             onClick={(e) => {
                               e.stopPropagation()
                               e.preventDefault()
-                              triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-menu', item)
+                              triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-doc', item)
                             }}
                           >
                             <DotsHorizontalIcon class="w-4 h-4" />
