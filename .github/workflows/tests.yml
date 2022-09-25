@@ -54,6 +54,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+      memcached:
+        image: memcached
+        ports:
+          - 11211:11211
     steps:
     - uses: actions/checkout@v2
     - name: Install lcov and openssl
@@ -79,7 +83,5 @@ jobs:
         mix local.rebar --force
         mix local.hex --force
         mix deps.get
-    - name: Compile
-      run: mix compile
     - name: Run Tests
-      run: make test
+      run: make test-ci

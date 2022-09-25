@@ -9,7 +9,7 @@ class ModalStore {
 
   newProjectModal = atom<boolean>(false)
 
-  newFileModal = atom<{ project: Project; type: FileType } | false>(false)
+  newFileModal = atom<{ project: Project; type: FileType; parent?: string } | false>(false)
 
   deleteFileModal = atom<{ project: Project; file: File } | false>(false)
 
