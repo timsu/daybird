@@ -7,7 +7,7 @@ import { isTokenExpired } from '@/api'
 import LogoDark from '@/components/core/LogoDark'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
-import FileTree from '@/components/layout/FileTree'
+import FileTree, { FileContextMenu } from '@/components/layout/FileTree'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
 import { paths } from '@/config'
@@ -113,6 +113,7 @@ function Projects() {
       ))}
       <NewFileModal />
       <DeleteFileModal />
+      <FileContextMenu />
     </>
   )
 }

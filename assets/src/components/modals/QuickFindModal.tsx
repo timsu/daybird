@@ -10,7 +10,7 @@ import { File, FileType } from '@/models'
 import { DOC_EXT, fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
-import { classNames } from '@/utils'
+import { classNames, logger } from '@/utils'
 import { isMac } from '@/utils/os'
 import { BriefcaseIcon, DocumentIcon, SearchIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -114,7 +114,6 @@ function QuickSearchBody({ close }: { close: () => void }) {
     setSelected(0)
 
     const keyListener = (e: KeyboardEvent) => {
-      console.log(e.key)
       if (e.key == 'ArrowDown') {
         e.preventDefault()
         setSelected((prev) => {
@@ -131,6 +130,7 @@ function QuickSearchBody({ close }: { close: () => void }) {
         e.preventDefault()
         setSelected((val) => {
           const item = results[val ?? 0]
+          logger.info('Routing to', item)
           if (item) {
             route(item.href)
             close()
