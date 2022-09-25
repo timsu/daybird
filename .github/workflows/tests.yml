@@ -34,9 +34,9 @@ jobs:
         ! grep -r 'console\..*(' assets/src
     - name: Install JS dependencies (workspace)
       run: |
-        yarn install --immutable --mode=skip-build
+        cd assets && yarn install --immutable --mode=skip-build
     - name: Typescript Compile
-      run: yarn tsc
+      run: cd assets && yarn tsc
 
   backend:
     name: Elixir Tests
