@@ -123,9 +123,16 @@ class FileStore {
   }
 
   deleteFile = async (project: Project, file: File) => {
+    const files = this.files.get()[project.id]
+    if (file.type == FileType.FOLDER) {
+      const children = files.filter((f) => f.parent == file.id)
+      children.forEach((child) => {
+        API.updateFile(project, child.id, { parent: file.parent })
+      })
+    }
+
     await API.updateFile(project, file.id, { deleted_at: new Date().toISOString() })
 
-    const files = this.files.get()[project.id]
     const newFiles = files.filter((f) => f.id != file.id)
     this.updateFiles(project.id, newFiles)
 

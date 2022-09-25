@@ -1,4 +1,5 @@
 import DeleteModal from '@/components/modals/DeleteModal'
+import { FileType } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { useStore } from '@nanostores/preact'
@@ -17,5 +18,13 @@ export default () => {
     await fileStore.deleteFile(project, file)
   }
 
-  return <DeleteModal close={close} performAction={submit} label={file.name} />
+  return (
+    <DeleteModal close={close} performAction={submit} label={file.name}>
+      {file.type == FileType.FOLDER && (
+        <div className="text-center my-3">
+          Any nested files and folders will be moved to the parent folder.
+        </div>
+      )}
+    </DeleteModal>
+  )
 }
