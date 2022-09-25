@@ -57,7 +57,6 @@ export default ({
         e.preventDefault()
         const pos = window.editor?.view.posAtDOM(e.target as Node, 0, 1)
         if (pos) {
-          console.log('enter pressed')
           window.editor
             ?.chain()
             .setTextSelection(pos + 1)

@@ -6,7 +6,7 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :sequence, Sequence.Repo,
-  url: "pg://localhost/sequence_test",
+  url: System.get_env("ECTO_TEST_URL") || "pg://localhost/sequence_test",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool: Ecto.Adapters.SQL.Sandbox,
