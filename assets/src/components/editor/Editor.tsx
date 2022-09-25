@@ -10,7 +10,7 @@ import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { taskStore } from '@/stores/taskStore'
-import { debounce, DebounceStyle } from '@/utils'
+import { debounce, DebounceStyle, logger } from '@/utils'
 import { getUniqueColorObjectForId } from '@/utils/colorScale'
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
@@ -88,15 +88,22 @@ const useListNoteEditor = (id: string | undefined) => {
   const prevEditor = useRef<Editor>()
   const prevDoc = useRef<Y.Doc>()
 
+  useEffect(() => {
+    // clean up on unmount
+    return () => {
+      logger.info('cleaning up editors')
+      if (prevEditor.current) prevEditor.current.destroy()
+      if (prevDoc.current) prevDoc.current.destroy()
+    }
+  }, [])
+
   return useMemo(() => {
     if (prevEditor.current) prevEditor.current.destroy()
     if (prevDoc.current) prevDoc.current.destroy()
-
     if (!id) return null
 
     const ydoc = new Y.Doc()
     const provider = new WebrtcProvider(id, ydoc)
-
     const user = authStore.loggedInUser.get()!
 
     const editor = new Editor({
@@ -124,6 +131,7 @@ const useListNoteEditor = (id: string | undefined) => {
         }),
       ],
     })
+
     prevEditor.current = editor
     prevDoc.current = ydoc
     return editor
