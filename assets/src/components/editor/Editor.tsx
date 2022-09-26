@@ -29,6 +29,7 @@ type Props = {
 const SAVE_INTERVAL = 5_000
 
 export default ({ project, id, contents, saveContents }: Props) => {
+  const editorRef = useRef<HTMLDivElement | null>(null)
   const editor = useListNoteEditor(id)
   useDeleteTaskListener(editor)
 
@@ -39,6 +40,10 @@ export default ({ project, id, contents, saveContents }: Props) => {
 
     window.editor = editor
     editor.chain().setContent(contents).focus().run()
+    if (editorRef.current && !editorRef.current.children.length) {
+      const proseMirror = editor.options.element.querySelector('.ProseMirror')
+      editorRef.current.appendChild(proseMirror!)
+    }
 
     currentFile.current = id
     isDirty.current = false
@@ -77,10 +82,7 @@ export default ({ project, id, contents, saveContents }: Props) => {
   }, [editor, contents])
 
   return (
-    <EditorContent
-      class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-8"
-      editor={editor}
-    />
+    <div ref={editorRef} class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-8" />
   )
 }
 
