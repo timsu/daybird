@@ -37,4 +37,21 @@ defmodule Sequence.ProjectsFixtures do
 
     user_project
   end
+
+  @doc """
+  Generate a project_invite.
+  """
+  def project_invite_fixture(attrs \\ %{}) do
+    {:ok, project_invite} =
+      attrs
+      |> Enum.into(%{
+        project_id: 1,
+        creator_id: 1,
+        code: "some code",
+        email: "some email",
+      })
+      |> Sequence.Projects.create_project_invite()
+
+    project_invite
+  end
 end

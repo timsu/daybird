@@ -118,4 +118,65 @@ defmodule Sequence.ProjectsTest do
       assert %Ecto.Changeset{} = Projects.change_user_project(user_project)
     end
   end
+
+  describe "project_invites" do
+    alias Sequence.Projects.ProjectInvite
+
+    import Sequence.ProjectsFixtures
+
+    @invalid_attrs %{creator_id: nil, project_id: nil, code: nil, deleted_at: nil, email: nil, joined_at: nil}
+
+    test "list_project_invites/0 returns all project_invites" do
+      project_invite = project_invite_fixture()
+      assert Projects.list_project_invites() == [project_invite]
+    end
+
+    test "get_project_invite!/1 returns the project_invite with given id" do
+      project_invite = project_invite_fixture()
+      assert Projects.get_project_invite!(project_invite.id) == project_invite
+    end
+
+    test "create_project_invite/1 with valid data creates a project_invite" do
+      valid_attrs = %{project_id: 1, creator_id: 1, code: "some code", deleted_at: ~U[2022-09-25 01:21:00Z],
+        email: "some email", joined_at: ~U[2022-09-25 01:21:00Z]}
+
+      assert {:ok, %ProjectInvite{} = project_invite} = Projects.create_project_invite(valid_attrs)
+      assert project_invite.code == "some code"
+      assert project_invite.deleted_at == ~U[2022-09-25 01:21:00Z]
+      assert project_invite.email == "some email"
+      assert project_invite.joined_at == ~U[2022-09-25 01:21:00Z]
+    end
+
+    test "create_project_invite/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Projects.create_project_invite(@invalid_attrs)
+    end
+
+    test "update_project_invite/2 with valid data updates the project_invite" do
+      project_invite = project_invite_fixture()
+      update_attrs = %{code: "some updated code", deleted_at: ~U[2022-09-26 01:21:00Z], email: "some updated email", joined_at: ~U[2022-09-26 01:21:00Z]}
+
+      assert {:ok, %ProjectInvite{} = project_invite} = Projects.update_project_invite(project_invite, update_attrs)
+      assert project_invite.code == "some updated code"
+      assert project_invite.deleted_at == ~U[2022-09-26 01:21:00Z]
+      assert project_invite.email == "some updated email"
+      assert project_invite.joined_at == ~U[2022-09-26 01:21:00Z]
+    end
+
+    test "update_project_invite/2 with invalid data returns error changeset" do
+      project_invite = project_invite_fixture()
+      assert {:error, %Ecto.Changeset{}} = Projects.update_project_invite(project_invite, @invalid_attrs)
+      assert project_invite == Projects.get_project_invite!(project_invite.id)
+    end
+
+    test "delete_project_invite/1 deletes the project_invite" do
+      project_invite = project_invite_fixture()
+      assert {:ok, %ProjectInvite{}} = Projects.delete_project_invite(project_invite)
+      assert_raise Ecto.NoResultsError, fn -> Projects.get_project_invite!(project_invite.id) end
+    end
+
+    test "change_project_invite/1 returns a project_invite changeset" do
+      project_invite = project_invite_fixture()
+      assert %Ecto.Changeset{} = Projects.change_project_invite(project_invite)
+    end
+  end
 end
