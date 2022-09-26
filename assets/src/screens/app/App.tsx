@@ -6,6 +6,7 @@ import AppLayout from '@/components/layout/AppLayout'
 import { paths } from '@/config'
 import AppRouter from '@/screens/app/AppRouter'
 import { authStore } from '@/stores/authStore'
+import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 import { useStore } from '@nanostores/preact'
 
@@ -15,6 +16,9 @@ export default () => {
   useEffect(() => {
     if (user === undefined) authStore.init()
     else if (user === null) location.href = paths.SIGNIN
+    else {
+      uiStore.initLoggedInUser(user)
+    }
   }, [user])
 
   if (!user)
