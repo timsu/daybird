@@ -1,4 +1,5 @@
 import { CSSTransition } from 'preact-transitioning'
+import { useCallback } from 'preact/hooks'
 
 import Banner from '@/components/core/Banner'
 import Button from '@/components/core/Button'
@@ -27,25 +28,28 @@ export default (props: Props) => {
   const uncompleteTasksInserted =
     isTodayJournal && localStorage.getItem(LS_TASKS_INSERTED + props.projectId) == props.id
 
-  const insertUncompleteTasks = async (e: MouseEvent) => {
-    const tasks = await taskStore.loadTasks({ id: props.projectId! } as Project)
-    const notInThisDoc = tasks.filter((t) => t.doc != props.id)
-    const startIndex = 0
+  const insertUncompleteTasks = useCallback(
+    async (e: MouseEvent) => {
+      const tasks = await taskStore.loadTasks({ id: props.projectId! } as Project)
+      const notInThisDoc = tasks.filter((t) => t.doc != props.id)
+      const startIndex = 0
 
-    let commandChain = window.editor?.chain()
-    notInThisDoc.forEach((t, i) => {
-      commandChain = commandChain?.insertContentAt(startIndex + i, {
-        type: 'task',
-        attrs: { id: t.id, ref: true },
+      let commandChain = window.editor?.chain()
+      notInThisDoc.forEach((t, i) => {
+        commandChain = commandChain?.insertContentAt(startIndex + i, {
+          type: 'task',
+          attrs: { id: t.id, ref: true },
+        })
       })
-    })
-    if (notInThisDoc.length)
-      commandChain = commandChain?.insertContentAt(startIndex + notInThisDoc.length, '\n')
-    commandChain?.run()
+      if (notInThisDoc.length)
+        commandChain = commandChain?.insertContentAt(startIndex + notInThisDoc.length, '\n')
+      commandChain?.run()
 
-    localStorage.setItem(LS_TASKS_INSERTED + props.projectId, props.id || '')
-    ;(e.target as HTMLDivElement).style.display = 'none'
-  }
+      localStorage.setItem(LS_TASKS_INSERTED + props.projectId, props.id || '')
+      ;(e.target as HTMLDivElement).style.display = 'none'
+    },
+    [props.projectId, props.id]
+  )
 
   return (
     <>
