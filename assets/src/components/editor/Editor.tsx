@@ -86,9 +86,16 @@ export default ({ project, id, contents, saveContents }: Props) => {
   )
 }
 
+declare module '@tiptap/core' {
+  interface Editor {
+    id?: string
+  }
+}
+
 const useListNoteEditor = (id: string | undefined) => {
   const prevEditor = useRef<Editor>()
   const prevDoc = useRef<Y.Doc>()
+  const prevProvider = useRef<any>()
 
   useEffect(() => {
     // clean up on unmount
@@ -104,11 +111,19 @@ const useListNoteEditor = (id: string | undefined) => {
     if (prevDoc.current) prevDoc.current.destroy()
     if (!id) return null
 
-    const ydoc = new Y.Doc()
-    const provider = new WebrtcProvider(id, ydoc)
-    const user = authStore.loggedInUser.get()!
+    if (prevEditor.current?.id == id) return prevEditor.current
 
-    const editor = new Editor({
+    let ydoc: Y.Doc | undefined
+    let provider: WebrtcProvider | undefined
+
+    try {
+      ydoc = prevDoc.current = new Y.Doc()
+      provider = prevProvider.current = new WebrtcProvider(id, ydoc)
+    } catch (e) {
+      logger.error(e)
+    }
+    const user = authStore.loggedInUser.get()!
+    const editor = (prevEditor.current = new Editor({
       extensions: [
         StarterKit.configure({
           // The Collaboration extension comes with its own history handling
@@ -132,10 +147,9 @@ const useListNoteEditor = (id: string | undefined) => {
           },
         }),
       ],
-    })
+    }))
+    editor.id = id
 
-    prevEditor.current = editor
-    prevDoc.current = ydoc
     return editor
   }, [id])
 }
