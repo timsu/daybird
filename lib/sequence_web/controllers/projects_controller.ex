@@ -19,9 +19,10 @@ defmodule SequenceWeb.ProjectsController do
   # GET /projects/id
   def show(conn, %{"id" => project_uuid}) do
     with user <- Guardian.Plug.current_resource(conn),
-       {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid) do
+       {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid),
+       members <- Projects.list_project_members(project) do
 
-      render conn, "get.json", project: project, user: user
+      render conn, "get.json", project: project, user: user, members: members
     end
   end
 
@@ -39,7 +40,7 @@ defmodule SequenceWeb.ProjectsController do
     end
   end
 
-  # PUT /tasks/id
+  # PUT /projects/id
   def update(conn, %{ "id" => project_uuid } = params) do
     attrs = Utils.params_to_attrs params, ["name", "shortcode", "deleted_at", "archived_at"]
 

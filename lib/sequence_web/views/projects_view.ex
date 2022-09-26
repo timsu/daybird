@@ -17,9 +17,10 @@ defmodule SequenceWeb.ProjectsView do
     }
   end
 
-  def render("get.json", %{project: project, user: user}) do
+  def render("get.json", %{project: project, user: user, members: members}) do
     %{
-      project: render_project(project, user)
+      project: render_project(project, user),
+      members: members
     }
   end
 

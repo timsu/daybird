@@ -33,6 +33,15 @@ export type ProjectResponse = {
   project: Project
 }
 
+export type ProjectWithMembersResponse = ProjectResponse & {
+  members: {
+    id?: string
+    name?: string
+    email?: string
+    role: string
+  }[]
+}
+
 export type FilesResponse = {
   files: File[]
 }

@@ -3,8 +3,9 @@ defmodule Sequence.Repo.Migrations.CreateProjectInvites do
 
   def change do
     create table(:project_invites) do
-      add :email, :string
-      add :code, :string
+      add :email, :string, size: 30
+      add :code, :string, size: 20
+      add :role, :string, size: 10
       add :joined_at, :utc_datetime
       add :deleted_at, :utc_datetime
       add :creator_id, references(:users, on_delete: :nothing)

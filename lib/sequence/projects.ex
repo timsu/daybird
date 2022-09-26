@@ -7,7 +7,7 @@ defmodule Sequence.Projects do
   alias Sequence.Repo
 
   alias Sequence.{Users.User}
-  alias Sequence.Projects.{Project, UserProject}
+  alias Sequence.Projects.{Project, UserProject, ProjectInvite}
 
   @spec list_user_projects(User.t()) :: [Project.t()]
   def list_user_projects(user, include_archived \\ false) do
@@ -91,6 +91,22 @@ defmodule Sequence.Projects do
     end)
     "#{project.shortcode}-#{next_id}"
   end
+
+  @spec list_project_members(Project.t()) :: [%{ id: binary, name: binary, email: binary, role: binary }]
+  def list_project_members(project) do
+    ups = Repo.all(from up in UserProject, where: up.project_id == ^project.id and is_nil(up.left_at))
+    |> Repo.preload(:user)
+
+    invites = Repo.all(from pi in ProjectInvite, where: pi.project_id == ^project.id and
+      is_nil(pi.deleted_at) and is_nil(pi.joined_at))
+
+    Enum.map(ups, fn up ->
+      %{ id: up.user.id, name: up.user.name, role: up.role }
+    end) ++ Enum.map(invites, fn pi ->
+      %{ email: pi.email, role: pi.role }
+    end)
+  end
+
 
   @doc """
   Returns the list of projects.
@@ -279,8 +295,6 @@ defmodule Sequence.Projects do
   def change_user_project(%UserProject{} = user_project, attrs \\ %{}) do
     UserProject.changeset(user_project, attrs)
   end
-
-  alias Sequence.Projects.ProjectInvite
 
   @doc """
   Returns the list of project_invites.
