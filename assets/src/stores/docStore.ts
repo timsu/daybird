@@ -39,7 +39,7 @@ class DocStore {
     this.fileListener?.()
     this.fileListener = fileStore.idToFile.subscribe((fileMap) => {
       const file = fileMap[id]
-      if (file) this.title.set(file.name)
+      if (file) setTimeout(() => this.title.set(file.name), 0)
     })
 
     try {
