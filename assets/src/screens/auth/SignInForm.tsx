@@ -15,6 +15,10 @@ export default () => {
 
   const onSubmit = (e: Event) => {
     e.preventDefault()
+
+    // read directly from elements due to password manager auto-fill
+    const email = (document.querySelector('#email') as HTMLInputElement).value
+    const password = (document.querySelector('#password') as HTMLInputElement).value
     if (!email) return setError('Email is required')
     if (!password) return setError('Password is required')
 
