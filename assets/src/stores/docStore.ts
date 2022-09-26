@@ -1,13 +1,16 @@
 import { action, atom, map } from 'nanostores'
 import { Channel } from 'phoenix'
+import { route } from 'preact-router'
 
 import { API } from '@/api'
-import { config } from '@/config'
+import { config, paths } from '@/config'
 import { Project, User } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { logger, unwrapError } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
+
+export const LS_LAST_DOC = 'ld'
 
 class DocStore {
   // --- stores
@@ -48,8 +51,10 @@ class DocStore {
       logger.info('DOCS - doc loaded', id, response)
 
       this.document.set(response)
+      localStorage.setItem(LS_LAST_DOC, project.id + '/' + id)
     } catch (e) {
       this.docError.set(unwrapError(e))
+      localStorage.removeItem(LS_LAST_DOC)
     }
   }
 
