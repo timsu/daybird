@@ -9,6 +9,7 @@ import Document from '@/components/editor/Document'
 import { Project } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
+import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { useStore } from '@nanostores/preact'
 import { JSONContent } from '@tiptap/react'
@@ -24,6 +25,7 @@ const LS_TASKS_INSERTED = 'dti:'
 export default (props: Props) => {
   const docError = useStore(docStore.docError)
   const title = useStore(docStore.title)
+  const project = useStore(projectStore.projectMap)[props.projectId!]
 
   const isTodayJournal = title == fileStore.dailyFileTitle()
   const uncompleteTasksInserted =
@@ -50,7 +52,7 @@ export default (props: Props) => {
 
   return (
     <>
-      <Helmet title={title || 'Loading'} />
+      <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
       <CSSTransition appear in={!!docError} classNames="fade" duration={500}>
         <div class="relative bg-red-500">
           <Banner onClose={() => docStore.docError.set(undefined)}>
