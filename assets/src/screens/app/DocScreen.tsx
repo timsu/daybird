@@ -11,6 +11,7 @@ import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { taskStore } from '@/stores/taskStore'
 import { useStore } from '@nanostores/preact'
+import { JSONContent } from '@tiptap/react'
 
 type Props = {
   path: string
@@ -34,16 +35,12 @@ export default (props: Props) => {
       const notInThisDoc = tasks.filter((t) => t.doc != props.id)
       const startIndex = 0
 
-      let commandChain = window.editor?.chain()
-      notInThisDoc.forEach((t, i) => {
-        commandChain = commandChain?.insertContentAt(startIndex + i, {
-          type: 'task',
-          attrs: { id: t.id, ref: true },
-        })
-      })
-      if (notInThisDoc.length)
-        commandChain = commandChain?.insertContentAt(startIndex + notInThisDoc.length, '\n')
-      commandChain?.run()
+      const content = notInThisDoc.map((t, i) => ({
+        type: 'task',
+        attrs: { id: t.id, ref: true },
+      }))
+
+      window.editor?.commands.insertContentAt(startIndex, content)
 
       localStorage.setItem(LS_TASKS_INSERTED + props.projectId, props.id || '')
       ;(e.target as HTMLDivElement).style.display = 'none'
