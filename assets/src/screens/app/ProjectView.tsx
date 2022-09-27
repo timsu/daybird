@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'preact/hooks'
 
+import { API } from '@/api'
 import Alphatar from '@/components/core/Alphatar'
 import DeleteButton from '@/components/core/DeleteButton'
+import ErrorMessage from '@/components/core/ErrorMessage'
 import Helmet from '@/components/core/Helmet'
 import Input from '@/components/core/Input'
+import Pressable from '@/components/core/Pressable'
 import DeleteProjectModal from '@/components/modals/DeleteProjectModal'
-import { Project, ProjectRole } from '@/models'
+import { Project, ProjectMember, ProjectRole } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
+import { unwrapError } from '@/utils'
 import { MailIcon } from '@heroicons/react/solid'
 import { useStore } from '@nanostores/preact'
 
@@ -45,6 +49,8 @@ export default ({ id }: Props) => {
 
       <Members {...projectArgs} />
 
+      <InviteCollaborator {...projectArgs} />
+
       <div className="h-8" />
 
       {isAdmin && (
@@ -68,17 +74,18 @@ type ProjectArgs = {
 }
 
 function Members({ project, isAdmin }: ProjectArgs) {
+  const user = useStore(authStore.loggedInUser)
   if (!project.members) return null
+
+  const removeMember = (member: ProjectMember) => {
+    API.projectRemoveMember(project, member.email, member.id).then(projectStore.onProjectUpdated)
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-xl font-semibold text-gray-900">Collaborators</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Invite people to this project to collaborate on notes and tasks. Members have full
-            access to all notes in this project.
-          </p>
         </div>
       </div>
       <div className="mt-8 flex flex-col">
@@ -101,7 +108,7 @@ function Members({ project, isAdmin }: ProjectArgs) {
                       Role
                     </th>
                     {isAdmin && (
-                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6 w-20">
                         <span className="sr-only">Edit</span>
                       </th>
                     )}
@@ -120,8 +127,9 @@ function Members({ project, isAdmin }: ProjectArgs) {
                             )}
                           </div>
                           <div className="ml-4">
-                            <div className="font-medium text-gray-900">{member.name}</div>
-                            <div className="text-gray-500">{member.email}</div>
+                            <div className="font-medium text-gray-900">
+                              {member.name || member.email}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -130,9 +138,14 @@ function Members({ project, isAdmin }: ProjectArgs) {
                       </td>
                       {isAdmin && (
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                          {/* <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                          Edit<span className="sr-only">, {member.name}</span>
-                        </a> */}
+                          {member.id != user!.id && (
+                            <div className="text-indigo-600 hover:text-indigo-900">
+                              <Pressable onClick={() => removeMember(member)}>
+                                Remove
+                                <span className="sr-only">, {member.name || member.email}</span>
+                              </Pressable>
+                            </div>
+                          )}
                         </td>
                       )}
                     </tr>
@@ -143,51 +156,78 @@ function Members({ project, isAdmin }: ProjectArgs) {
           </div>
         </div>
       </div>
-      <InviteCollaborator />
     </div>
   )
 }
 
-function InviteCollaborator() {
+function InviteCollaborator({ project }: ProjectArgs) {
   const [email, setEmail] = useState<string>()
-  const [role, setRole] = useState<string>()
+  const [role, setRole] = useState<ProjectRole>(ProjectRole.MEMBER)
+  const [error, setError] = useState<string>()
+  const [submitting, setSubmitting] = useState<boolean>(false)
+
+  const onSubmit = async (e: Event) => {
+    e.preventDefault()
+
+    if (!email) return setError('Email is required')
+
+    try {
+      setSubmitting(true)
+      setError(undefined)
+      const response = await API.projectAddMember(project, email, role)
+      projectStore.onProjectUpdated(response)
+      setEmail(undefined)
+    } catch (e) {
+      setError(unwrapError(e))
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
-    <div className="bg-white shadow sm:rounded-lg mt-8">
-      <div className="px-4 py-5 sm:p-6">
-        <h3 className="text-lg font-medium leading-6 text-gray-900">Invite Collaborator</h3>
-        <div className="mt-2 text-sm text-gray-500">
-          <p>
-            You can invite new or existing users. No emails are sent, invited users will need to
-            sign in to see the project.
-          </p>
-        </div>
-        <form className="mt-5 sm:flex sm:items-center">
-          <input
-            type="email"
-            label="Email address"
-            required
-            className="max-w-xs w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            value={email}
-            placeholder="you@example.com"
-            onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
-          />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="bg-white shadow sm:rounded-lg mt-8">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">Invite Collaborator</h3>
+          <div className="mt-2 text-sm text-gray-500">
+            <p>
+              <b>Note:</b> No emails are sent, invited users will need to sign in to see the
+              project.
+            </p>
+            <p className="mt-4">
+              Members have access to all notes and can add other members. Admins can remove members,
+              manage billing, and archive or delete the project.
+            </p>
+          </div>
+          <ErrorMessage error={error} />
 
-          <select
-            value={role}
-            onChange={(e) => setRole((e.target as HTMLInputElement).value)}
-            className="ml-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          >
-            <option label="Member" value={ProjectRole.MEMBER} />
-            <option label="Admin" value={ProjectRole.ADMIN} />
-          </select>
-          <button
-            type="submit"
-            className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-          >
-            Add
-          </button>
-        </form>
+          <form className="mt-5 sm:flex sm:items-center" onSubmit={onSubmit}>
+            <input
+              type="email"
+              label="Email address"
+              className="max-w-xs w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={email}
+              placeholder="you@example.com"
+              onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
+            />
+
+            <select
+              value={role}
+              onChange={(e) => setRole((e.target as HTMLInputElement).value as ProjectRole)}
+              className="ml-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              <option label="Member" value={ProjectRole.MEMBER} />
+              <option label="Admin" value={ProjectRole.ADMIN} />
+            </select>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Add
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )

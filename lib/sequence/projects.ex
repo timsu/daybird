@@ -107,6 +107,12 @@ defmodule Sequence.Projects do
     end)
   end
 
+  @spec find_project_invite(Project.t(), binary) :: ProjectInvite.t() | nil
+  def find_project_invite(project, email) do
+    Repo.one(from pi in ProjectInvite, where: pi.project_id == ^project.id and
+      is_nil(pi.deleted_at) and is_nil(pi.joined_at) and pi.email == ^email, limit: 1)
+  end
+
 
   @doc """
   Returns the list of projects.

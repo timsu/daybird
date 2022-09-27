@@ -23,7 +23,7 @@ defmodule Sequence.Projects.ProjectInvite do
   @doc false
   def changeset(project_invite, attrs) do
     project_invite
-    |> cast(attrs, [:creator_id, :project_id, :email, :code, :joined_at, :deleted_at])
-    |> validate_required([:creator_id, :project_id])
+    |> cast(attrs, [:creator_id, :project_id, :role, :email, :code, :joined_at, :deleted_at])
+    |> validate_required([:creator_id, :project_id, :role])
   end
 end

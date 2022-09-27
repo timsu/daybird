@@ -1,7 +1,7 @@
 import { action, atom, map } from 'nanostores'
 import { route } from 'preact-router'
 
-import { API } from '@/api'
+import { API, ProjectResponse, ProjectWithMembersResponse } from '@/api'
 import { config, paths } from '@/config'
 import { FileType, Project, User } from '@/models'
 import { authStore } from '@/stores/authStore'
@@ -104,16 +104,28 @@ class ProjectStore {
 
   updateProject = async (project: Project, updates: Partial<Project>) => {
     const response = await API.updateProject(project, updates)
-    project = Project.fromJSON(response.project)
+    this.onProjectUpdated(response)
+  }
+
+  onProjectUpdated = (response: ProjectResponse | ProjectWithMembersResponse) => {
+    logger.info('on project updated', response)
+    const project = Project.fromJSON(response.project)
 
     this.projects.set(this.projects.get().map((p) => (p.id == project.id ? project : p)))
 
     const currentProject = this.currentProject.get()
     if (currentProject?.id == project.id) {
-      if (!project.members) project.members = currentProject.members
+      if (hasMembers(response)) project.members = response.members
+      else project.members = currentProject.members
       this.currentProject.set(project)
     }
   }
+}
+
+function hasMembers(
+  response: ProjectResponse | ProjectWithMembersResponse
+): response is ProjectWithMembersResponse {
+  return !!(response as ProjectWithMembersResponse).members
 }
 
 export const projectStore = new ProjectStore()

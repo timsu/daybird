@@ -5,7 +5,7 @@ defmodule SequenceWeb.ProjectsController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Projects, Utils}
+  alias Sequence.{Projects, Users, Utils}
 
   # GET /projects
   def index(conn, _) do
@@ -52,76 +52,87 @@ defmodule SequenceWeb.ProjectsController do
     end
   end
 
-  # # POST /projects/:id/add_members
-  # def add_members(conn, %{ "id" => project_uuid, "team" => team_uuid, "everyone" => everyone, "users" => user_uuids }) do
-  #   with user <- Guardian.Plug.current_resource(conn),
-  #        {:ok, team} <- Teams.team_by_uuid(user.id, team_uuid),
-  #        {:ok, project} <- Projects.project_by_uuid(project_uuid),
-  #        :ok <- validate_team(project, team) do
+  # POST /projects/:id/add_members
+  def add_member(conn, %{ "id" => project_uuid, "email" => email, "role" => role }) do
+    with user <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid),
+         :ok <- validate_role(role) do
 
-  #     {other_members, num} = if everyone do
+      result = case Users.find_by_email(email) do
+        {:ok, existing} ->
+          case Projects.get_user_project(existing, project, false) do
+            nil ->
+              Projects.create_user_project(%{
+                role: role,
+                user_id: existing.id,
+                project_id: project.id
+              })
+            existing_up ->
+              if existing_up.left_at do
+                Projects.update_user_project(existing_up, %{ left_at: nil })
+              else
+                {:error, :bad_request, "Already a member"}
+              end
+          end
+        _ ->
+          if String.contains?(email, "@") do
+            case Projects.find_project_invite(project, email) do
+              nil ->
+                Projects.create_project_invite(%{
+                  role: role,
+                  email: email,
+                  creator_id: user.id,
+                  project_id: project.id
+                })
+              _ ->
+                {:error, :bad_request, "This email has already been invited"}
+            end
+          else
+            {:error, :bad_request, "Invalid email given"}
+          end
+      end
 
-  #       {:ok, _} = change_project_default(project, true)
+      with {:ok, _} <- result,
+           members <- Projects.list_project_members(project) do
+        render conn, "get.json", project: project, user: user, members: members
+      end
+    end
+  end
 
-  #       notify_of_project_change(team, project, user)
+  def validate_role(role) do
+    case role do
+      "admin" -> :ok
+      "member" -> :ok
+      _ -> {:error, :bad_request, "Invalid role supplied"}
+    end
+  end
 
-  #       {_user_roles, members} = Teams.list_team_members(team)
-  #       members = members |> Enum.reject(fn member -> member.uuid == user.uuid end)
+  # POST /projects/:id/remove_member
+  def remove_member(conn, %{ "id" => project_uuid } = params) do
+    with user <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user.id, project_uuid) do
 
-  #       {members, length(members)}
-  #     else
-  #       users = user_uuids |> Users.get_users_by_uuid_in_team(team) # Just ignore any users not in this team
-  #       {num, nil} = users |> Projects.upsert_user_projects(project, member: true)
+      if params["email"] do
+        case Projects.find_project_invite(project, params["email"]) do
+          nil -> :ok
+          invite ->
+            Projects.update_project_invite(invite, %{ deleted_at: Timex.now })
+        end
+      else
+        case Users.by_uuid(params["user"]) do
+          nil -> :ok
+          user ->
+            case Projects.get_user_project(user, project) do
+              nil -> :ok
+              existing_up ->
+                Projects.update_user_project(existing_up, %{ left_at: Timex.now })
+            end
+        end
+      end
 
-  #       {users, num}
-  #     end
-
-  #     last_user_calls = other_members
-  #     |> Enum.map(fn u -> u.id end)
-  #     |> CallLogs.user_calls_last_72_hours(team.id)
-
-  #     other_members |>
-  #     Enum.each(fn recipient ->
-  #       if !everyone, do: notify_of_project_change(recipient, project, user)
-
-  #       if Timex.after?(recipient.inserted_at, Timex.shift(Timex.now, weeks: -2)) and !last_user_calls[recipient.id] do
-  #         Emails.project_invite(recipient, project, team, user, Enum.reject(other_members, fn u -> u.uuid == recipient.uuid end))
-  #         |> Mailer.deliver_later()
-  #       end
-  #     end)
-
-  #     ProjectsTopic.update_project(team.uuid, project.uuid)
-  #     json conn, %{ success: true, count: num }
-  #   else
-  #     {:error, :project_team_mismatch} ->
-  #       {:error, :unauthorized, "You don't have access to this project"}
-  #     {:error, :not_found} -> {:error, :not_found}
-  #   end
-  # end
-
-  # # POST /projects/:id/remove_member
-  # def remove_member(conn, %{ "id" => project_uuid, "team" => team_uuid, "user" => user_uuid }) do
-  #   with admin when is_map(admin) <- Guardian.Plug.current_resource(conn),
-  #       {:ok, _team} <- Teams.team_by_uuid(admin.id, team_uuid),
-  #       {:ok, user} <- Users.find_by_uuid(user_uuid),
-  #       {:ok, team} <- Teams.team_by_uuid(user.id, team_uuid),
-  #       {:ok, project} <- Projects.project_by_uuid(project_uuid),
-  #       :ok <- validate_team(project, team) do
-
-  #     case Projects.leave_project(user, project) do
-  #       {:ok, _user_project} ->
-  #         ProjectsTopic.update_project(team.uuid, project.uuid)
-  #         notify_of_project_change(user, project)
-  #         json conn, %{ success: true }
-  #       {:error, %Ecto.Changeset{errors: errors}} -> json conn, %{ success: false, errors: errors }
-  #     end
-
-  #   else
-  #     {:error, :project_team_mismatch} ->
-  #       {:error, :unauthorized, "You don't have access to this project"}
-  #     {:error, :not_found} -> {:error, :not_found}
-  #     nil -> {:error, :unauthorized}
-  #   end
-  # end
+      members = Projects.list_project_members(project)
+      render conn, "get.json", project: project, user: user, members: members
+    end
+  end
 
 end

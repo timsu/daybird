@@ -1,7 +1,9 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 import { config, OAuthProvider } from '@/config'
-import { AuthToken, AuthTokenPair, File, FileType, Project, Task, Team, User } from '@/models'
+import {
+    AuthToken, AuthTokenPair, File, FileType, Project, ProjectRole, Task, Team, User
+} from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
 import * as R from './types'
@@ -223,6 +225,30 @@ class APIService {
 
   async updateProject(project: Project, updates: Partial<Project>): Promise<R.ProjectResponse> {
     const response = await this.axios.put(`${this.endpoint}/projects/${project.id}`, updates)
+    return response.data
+  }
+
+  async projectAddMember(
+    project: Project,
+    email: string,
+    role: ProjectRole
+  ): Promise<R.ProjectResponse> {
+    const response = await this.axios.post(`${this.endpoint}/projects/${project.id}/add_member`, {
+      email,
+      role,
+    })
+    return response.data
+  }
+
+  async projectRemoveMember(
+    project: Project,
+    email: string | undefined,
+    user: string | undefined
+  ): Promise<R.ProjectResponse> {
+    const response = await this.axios.post(
+      `${this.endpoint}/projects/${project.id}/remove_member`,
+      { email, user }
+    )
     return response.data
   }
 
