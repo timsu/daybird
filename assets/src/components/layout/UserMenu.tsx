@@ -1,6 +1,7 @@
 import { Fragment } from 'preact'
 
-import business_cat from '@/images/business-cat.jpg'
+import Alphatar from '@/components/core/Alphatar'
+import Avatar from '@/components/core/Avatar'
 import { authStore } from '@/stores/authStore'
 import { classNames } from '@/utils'
 import { Menu, Transition } from '@headlessui/react'
@@ -22,7 +23,7 @@ export default () => {
       <div>
         <Menu.Button className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
           <span className="sr-only">Open user menu</span>
-          <img className="h-8 w-8 rounded-full" src={business_cat} alt="" />
+          <Alphatar id={user.id} text={user.name} />
         </Menu.Button>
       </div>
       <Transition

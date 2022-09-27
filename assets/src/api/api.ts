@@ -212,7 +212,7 @@ class APIService {
   }
 
   async getProject(id: string): Promise<R.ProjectWithMembersResponse> {
-    const response = await this.axios.get(`${this.endpoint}/project/${id}`)
+    const response = await this.axios.get(`${this.endpoint}/projects/${id}`)
     return response.data
   }
 
