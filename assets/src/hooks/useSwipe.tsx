@@ -13,6 +13,7 @@ export default (onSwipe: (direction: 'left' | 'right') => void, el?: HTMLElement
     function touchStart(e: TouchEvent) {
       touchStartX = e.changedTouches[0].screenX
       touchStartTime = Date.now()
+      e.preventDefault()
     }
 
     function touchEnd(e: TouchEvent) {
