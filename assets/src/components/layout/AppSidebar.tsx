@@ -19,7 +19,7 @@ import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import {
     BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon,
-    DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon, FolderIcon, HomeIcon,
+    CogIcon, DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon, FolderIcon, HomeIcon,
     PlusIcon, ViewListIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -163,32 +163,45 @@ function ProjectTree({ project }: { project: Project }) {
           <div class="mr-1 text-ellipsis">{project.name.toUpperCase()}</div>
           {!expanded && <ChevronDownIcon class="h-3 w-3" />}
         </Tooltip>
-        <Pressable
-          tooltip={{ message: 'New File', placement: 'left', tooltipClass: 'min-w-[75px]' }}
-          onClick={onNewFile}
-        >
-          <DocumentAddIcon class="h-4 w-4" />
-        </Pressable>
-        <div class="mr-1" />
-        <Pressable
-          tooltip={{
-            message: "New File with Today's Date",
-            tooltipClass: 'min-w-[120px]',
-            placement: 'left',
-          }}
-          onClick={onNewDailyFile}
-        >
-          <CalendarIcon class="h-4 w-4" />
-        </Pressable>
-        <Pressable
-          tooltip={{ message: 'New Folder', placement: 'left', tooltipClass: 'min-w-[100px]' }}
-          onClick={onNewFolder}
-        >
-          <FolderAddIcon class="h-4 w-4" />
-        </Pressable>
       </div>
 
-      {expanded && <FileTree projectId={project.id} />}
+      {expanded && (
+        <>
+          <div className="flex m-2 gap-2 text-gray-400">
+            <Pressable
+              tooltip={{ message: 'New File', tooltipClass: 'min-w-[75px]' }}
+              onClick={onNewFile}
+            >
+              <DocumentAddIcon class="h-6 w-6" />
+            </Pressable>
+
+            <Pressable
+              tooltip={{
+                message: "New File with Today's Date",
+                tooltipClass: 'min-w-[120px]',
+              }}
+              onClick={onNewDailyFile}
+            >
+              <CalendarIcon class="h-6 w-6" />
+            </Pressable>
+
+            <Pressable
+              tooltip={{ message: 'New Folder', tooltipClass: 'min-w-[100px]' }}
+              onClick={onNewFolder}
+            >
+              <FolderAddIcon class="h-6 w-6" />
+            </Pressable>
+
+            <Pressable
+              tooltip={{ message: 'Settings & Members', tooltipClass: 'min-w-[100px]' }}
+              onClick={() => route(paths.PROJECTS + '/' + project.id)}
+            >
+              <CogIcon class="h-6 w-6" />
+            </Pressable>
+          </div>
+          <FileTree projectId={project.id} />
+        </>
+      )}
     </>
   )
 }

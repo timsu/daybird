@@ -30,7 +30,6 @@ class UIStore {
   checkForSleep = () => {
     let lastCheck = Date.now()
     let needsRefresh = false
-    let isVisible = true
 
     setInterval(() => {
       if (Date.now() - lastCheck > 5 * SLEEP_CHECK_INTERVAL) {
