@@ -18,9 +18,9 @@ import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import {
-    BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon,
-    CogIcon, DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon, FolderIcon, HomeIcon,
-    PlusIcon, ViewListIcon
+    BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronRightIcon,
+    ChevronUpIcon, CogIcon, DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon,
+    FolderIcon, HomeIcon, PlusIcon, ViewListIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -33,7 +33,7 @@ type NavItem = {
 
 export default ({ darkHeader }: { darkHeader?: boolean }) => {
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-gray-800 select-none">
+    <div className="flex-1 flex flex-col min-h-0  select-none">
       <div
         className={classNames(
           darkHeader ? 'bg-gray-900' : '',
@@ -75,8 +75,8 @@ function Links() {
               href={item.href}
               className={classNames(
                 url == item.href
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                  ? 'bg-gray-300 text-gray-900'
+                  : 'text-gray-700 hover:bg-gray-400 hover:text-white',
                 'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
               )}
               style={{ marginLeft: item.indent }}
@@ -84,7 +84,7 @@ function Links() {
               {item.icon && (
                 <item.icon
                   className={classNames(
-                    url == item.href ? 'text-gray-300' : 'text-gray-400 group-hover:text-gray-300',
+                    url == item.href ? 'text-gray-700' : 'text-gray-800 group-hover:text-gray-300',
                     'mr-3 flex-shrink-0 h-6 w-6'
                   )}
                   aria-hidden="true"
@@ -150,9 +150,8 @@ function ProjectTree({ project }: { project: Project }) {
     <>
       <div
         class={classNames(
-          'border-t border-t-gray-500 py-2 pl-4 pr-3 flex flex-row items-center',
-          'text-gray-400 font-semibold text-sm cursor-pressable hover:bg-gray-700 cursor-pointer',
-          active ? 'bg-gray-900' : ''
+          'rounded-md py-2 pl-4 pr-3 flex flex-row items-center bg-gray-200',
+          'text-gray-700 font-semibold text-sm cursor-pressable hover:bg-gray-300 cursor-pointer'
         )}
         onClick={() => setExpanded(!expanded)}
       >
@@ -161,13 +160,13 @@ function ProjectTree({ project }: { project: Project }) {
           message={expanded ? 'Collapse' : 'Expand'}
         >
           <div class="mr-1 text-ellipsis">{project.name.toUpperCase()}</div>
-          {!expanded && <ChevronDownIcon class="h-3 w-3" />}
+          {expanded ? <ChevronDownIcon class="h-3 w-3" /> : <ChevronRightIcon class="h-3 w-3" />}
         </Tooltip>
       </div>
 
       {expanded && (
         <>
-          <div className="flex m-2 gap-2 text-gray-400">
+          <div className="flex m-2 gap-2 text-gray-500">
             <Pressable
               tooltip={{ message: 'New File', tooltipClass: 'min-w-[75px]' }}
               onClick={onNewFile}
@@ -202,6 +201,8 @@ function ProjectTree({ project }: { project: Project }) {
           <FileTree projectId={project.id} />
         </>
       )}
+
+      <div className="h-5" />
     </>
   )
 }

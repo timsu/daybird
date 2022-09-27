@@ -82,7 +82,11 @@ export default ({ project, id, contents, saveContents }: Props) => {
   }, [editor, contents])
 
   return (
-    <div ref={editorRef} class="listnote max-w-2xl mx-auto w-full h-auto grow pt-2 pb-20 px-8" />
+    <div
+      ref={editorRef}
+      class="listnote max-w-2xl mx-auto w-full h-auto grow
+        pt-4 pb-20 px-8 bg-white rounded-md mt-4"
+    />
   )
 }
 
