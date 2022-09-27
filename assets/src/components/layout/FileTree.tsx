@@ -62,10 +62,8 @@ function FileTree({
                       key={item.name}
                       href={href}
                       className={classNames(
-                        matches
-                          ? 'bg-gray-900 text-white'
-                          : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                        'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
+                        matches ? 'bg-blue-200 ' : ' hover:bg-blue-300 ',
+                        'text-gray-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
                       )}
                       style={{ marginLeft: indent * 10 }}
                     >
@@ -128,15 +126,12 @@ function FolderNode({
         data={{ file: item, projectId: projectId }}
       >
         <div
-          className="text-gray-300 hover:bg-gray-700 hover:text-white group flex
+          className="text-gray-700 hover:bg-gray-300 group flex
         items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
           style={{ marginLeft: indent * 10 }}
           onClick={() => setExpanded(!expanded)}
         >
-          <Icon
-            className="text-gray-400 group-hover:text-gray-300 mr-2 flex-shrink-0 h-4 w-4"
-            aria-hidden="true"
-          />
+          <Icon className="text-gray-500  mr-2 flex-shrink-0 h-4 w-4" aria-hidden="true" />
           {item.name}
         </div>
       </ContextMenuTrigger>

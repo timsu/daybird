@@ -60,7 +60,7 @@ export default (props: Props) => {
           </Banner>
         </div>
       </CSSTransition>
-      <div class="flex flex-col grow bg-white w-full">
+      <div class="flex flex-col grow  w-full">
         <div class="w-full max-w-2xl mx-auto pt-6 px-8 flex items-center">
           <h1 class="text-xl font-bold ">{title}</h1>
           {isTodayJournal && !uncompleteTasksInserted && (

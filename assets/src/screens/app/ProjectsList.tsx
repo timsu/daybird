@@ -1,3 +1,5 @@
+import uniqolor from 'uniqolor'
+
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
 import NewProjectModal from '@/components/modals/NewProjectModal'
@@ -50,15 +52,13 @@ type ProjectItem = {
   bgColor: string
 }
 
-const COLORS = ['bg-pink-600', 'bg-blue-600', 'bg-purple-600', 'bg-yellow-500', 'bg-green-500']
-
 function ProjectList({ projects }: { projects: Project[] }) {
   const projectItems: ProjectItem[] = projects.map((p, i) => ({
     name: p.name,
     initials: p.shortcode,
     href: paths.PROJECTS + '/' + p.id,
     members: 1,
-    bgColor: COLORS[i % COLORS.length],
+    bgColor: uniqolor(p.id).color,
   }))
 
   return (
@@ -70,9 +70,9 @@ function ProjectList({ projects }: { projects: Project[] }) {
             <li key={project.name} className="col-span-1 flex shadow-sm rounded-md">
               <div
                 className={classNames(
-                  project.bgColor,
                   'flex-shrink-0 flex items-center justify-center w-16 text-white text-sm font-medium rounded-l-md'
                 )}
+                style={{ background: project.bgColor }}
               >
                 {project.initials}
               </div>
