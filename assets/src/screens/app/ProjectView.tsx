@@ -3,8 +3,10 @@ import { useEffect, useState } from 'preact/hooks'
 import Alphatar from '@/components/core/Alphatar'
 import DeleteButton from '@/components/core/DeleteButton'
 import Helmet from '@/components/core/Helmet'
+import Input from '@/components/core/Input'
 import DeleteProjectModal from '@/components/modals/DeleteProjectModal'
-import { Project } from '@/models'
+import { Project, ProjectRole } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { MailIcon } from '@heroicons/react/solid'
@@ -15,6 +17,7 @@ type Props = {
   path: string
 }
 export default ({ id }: Props) => {
+  const user = useStore(authStore.loggedInUser)
   const project = useStore(projectStore.currentProject)
 
   useEffect(() => {
@@ -24,6 +27,10 @@ export default ({ id }: Props) => {
   }, [id])
 
   if (!project || project?.id != id) return null
+
+  const isAdmin = project.members?.find((m) => m.id == user!.id)?.role == ProjectRole.ADMIN
+
+  const projectArgs = { project, isAdmin }
 
   return (
     <div className="py-6">
@@ -36,42 +43,31 @@ export default ({ id }: Props) => {
 
       <div className="h-8" />
 
-      <Members project={project} />
+      <Members {...projectArgs} />
 
       <div className="h-8" />
 
-      <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
-        <h1 className="text-xl font-semibold text-gray-900 mb-5">Dangerous Stuff</h1>
-        <div className="flex gap-8">
-          <ArchiveProject project={project} />
-          <DeleteProject project={project} />
+      {isAdmin && (
+        <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
+          <h1 className="text-xl font-semibold text-gray-900 mb-5">Dangerous Stuff</h1>
+          <div className="flex gap-8">
+            <ArchiveProject {...projectArgs} />
+            <DeleteProject {...projectArgs} />
+          </div>
         </div>
-      </div>
+      )}
 
       <DeleteProjectModal />
     </div>
   )
 }
 
-/* This example requires Tailwind CSS v2.0+ */
-const people = [
-  {
-    name: 'Lindsay Walton',
-    title: 'Front-end Developer',
-    department: 'Optimization',
-    email: 'lindsay.walton@example.com',
-    role: 'Member',
-    image:
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  // More people...
-]
-
 type ProjectArgs = {
   project: Project
+  isAdmin: boolean
 }
 
-function Members({ project }: ProjectArgs) {
+function Members({ project, isAdmin }: ProjectArgs) {
   if (!project.members) return null
 
   return (
@@ -104,9 +100,11 @@ function Members({ project }: ProjectArgs) {
                     >
                       Role
                     </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Edit</span>
-                    </th>
+                    {isAdmin && (
+                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        <span className="sr-only">Edit</span>
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
@@ -130,11 +128,13 @@ function Members({ project }: ProjectArgs) {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {member.role}
                       </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        {/* <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                      {isAdmin && (
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          {/* <a href="#" className="text-indigo-600 hover:text-indigo-900">
                           Edit<span className="sr-only">, {member.name}</span>
                         </a> */}
-                      </td>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -149,6 +149,9 @@ function Members({ project }: ProjectArgs) {
 }
 
 function InviteCollaborator() {
+  const [email, setEmail] = useState<string>()
+  const [role, setRole] = useState<string>()
+
   return (
     <div className="bg-white shadow sm:rounded-lg mt-8">
       <div className="px-4 py-5 sm:p-6">
@@ -160,18 +163,24 @@ function InviteCollaborator() {
           </p>
         </div>
         <form className="mt-5 sm:flex sm:items-center">
-          <div className="w-full sm:max-w-xs">
-            <label htmlFor="email" className="sr-only">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder="you@example.com"
-            />
-          </div>
+          <input
+            type="email"
+            label="Email address"
+            required
+            className="max-w-xs w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            value={email}
+            placeholder="you@example.com"
+            onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
+          />
+
+          <select
+            value={role}
+            onChange={(e) => setRole((e.target as HTMLInputElement).value)}
+            className="ml-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          >
+            <option label="Member" value={ProjectRole.MEMBER} />
+            <option label="Admin" value={ProjectRole.ADMIN} />
+          </select>
           <button
             type="submit"
             className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
