@@ -101,7 +101,7 @@ defmodule Sequence.Projects do
       is_nil(pi.deleted_at) and is_nil(pi.joined_at))
 
     Enum.map(ups, fn up ->
-      %{ id: up.user.id, name: up.user.name, role: up.role }
+      %{ id: up.user.uuid, name: up.user.name, role: up.role }
     end) ++ Enum.map(invites, fn pi ->
       %{ email: pi.email, role: pi.role }
     end)

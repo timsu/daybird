@@ -68,6 +68,7 @@ class ProjectStore {
     if (project) this.currentProject.set(project)
 
     const response = await API.getProject(id)
+    logger.info('loaded project details', response)
     response.project.members = response.members
     this.currentProject.set(response.project)
   }

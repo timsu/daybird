@@ -1,4 +1,4 @@
-import { getUniqueColorObjectForId } from '@/utils/colorScale'
+import uniqolor from 'uniqolor'
 
 export type AlphatarProps = {
   id: string
@@ -11,7 +11,7 @@ export default function (props: Props) {
   const { text } = props
   if (!text) return null
 
-  const { bg, textColor } = getUniqueColorObjectForId(props.id)
+  const color = uniqolor(props.id)
 
   const letters = text
     .split(' ', 2)
@@ -22,9 +22,12 @@ export default function (props: Props) {
   return (
     <span
       className="inline-flex h-8 w-8 items-center justify-center rounded-full"
-      style={{ background: bg }}
+      style={{ background: color.color }}
     >
-      <span className="text-sm font-medium leading-none" style={{ color: textColor }}>
+      <span
+        className="text-sm font-medium leading-none"
+        style={{ color: color.isLight ? 'black' : 'white' }}
+      >
         {letters}
       </span>
     </span>
