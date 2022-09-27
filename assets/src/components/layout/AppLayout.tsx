@@ -62,7 +62,7 @@ export default function ({ children }: RenderableProps<{}>) {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <Dialog.Panel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-800">
+              <Dialog.Panel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-100">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
