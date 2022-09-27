@@ -138,7 +138,7 @@ defmodule Sequence.ProjectsTest do
 
     test "create_project_invite/1 with valid data creates a project_invite" do
       valid_attrs = %{project_id: 1, creator_id: 1, code: "some code", deleted_at: ~U[2022-09-25 01:21:00Z],
-        email: "some email", joined_at: ~U[2022-09-25 01:21:00Z]}
+        email: "some email", joined_at: ~U[2022-09-25 01:21:00Z], role: "abc"}
 
       assert {:ok, %ProjectInvite{} = project_invite} = Projects.create_project_invite(valid_attrs)
       assert project_invite.code == "some code"

@@ -49,6 +49,7 @@ defmodule Sequence.ProjectsFixtures do
         creator_id: 1,
         code: "some code",
         email: "some email",
+        role: "member"
       })
       |> Sequence.Projects.create_project_invite()
 
