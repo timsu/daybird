@@ -2,6 +2,7 @@ import { JSX } from 'preact'
 import { Link, route } from 'preact-router'
 import Match from 'preact-router/match'
 import { useEffect, useState } from 'preact/hooks'
+import uniqolor from 'uniqolor'
 
 import { isTokenExpired } from '@/api'
 import LogoDark from '@/components/core/LogoDark'
@@ -75,7 +76,7 @@ function Links() {
               href={item.href}
               className={classNames(
                 url == item.href
-                  ? 'bg-gray-300 text-gray-900'
+                  ? 'bg-blue-300 text-gray-900'
                   : 'text-gray-700 hover:bg-gray-400 hover:text-white',
                 'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
               )}
@@ -150,13 +151,21 @@ function ProjectTree({ project }: { project: Project }) {
     <>
       <div
         class={classNames(
-          'rounded-md py-2 pl-4 pr-3 flex flex-row items-center bg-gray-200',
+          'rounded-md flex bg-gray-200 mx-2',
           'text-gray-700 font-semibold text-sm cursor-pressable hover:bg-gray-300 cursor-pointer'
         )}
         onClick={() => setExpanded(!expanded)}
       >
+        {/* <div
+          className={classNames(
+            'flex-shrink-0 flex items-center justify-center w-16 text-white text-sm font-medium rounded-l-md'
+          )}
+          style={{ background: uniqolor(project.id).color }}
+        >
+          {project.shortcode}
+        </div> */}
         <Tooltip
-          class="flex-row items-center grow mr-1 max-w-[200px]"
+          class="py-2 px-2 flex-row items-center grow mr-1 max-w-[200px]"
           message={expanded ? 'Collapse' : 'Expand'}
         >
           <div class="mr-1 text-ellipsis">{project.name.toUpperCase()}</div>
