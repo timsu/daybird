@@ -6,7 +6,8 @@ defmodule SequenceWeb.ProjectsView do
     %{
       id: Sequence.Utils.no_dash(project.uuid),
       name: project.name,
-      shortcode: project.shortcode
+      shortcode: project.shortcode,
+      archived_at: project.archived_at
     }
   end
 
@@ -21,6 +22,12 @@ defmodule SequenceWeb.ProjectsView do
     %{
       project: render_project(project, user),
       members: members
+    }
+  end
+
+  def render("get.json", %{project: project, user: user}) do
+    %{
+      project: render_project(project, user),
     }
   end
 

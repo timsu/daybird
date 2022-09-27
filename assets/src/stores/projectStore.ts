@@ -107,7 +107,12 @@ class ProjectStore {
     project = Project.fromJSON(response.project)
 
     this.projects.set(this.projects.get().map((p) => (p.id == project.id ? project : p)))
-    if (this.currentProject.get()?.id == project.id) this.currentProject.set(project)
+
+    const currentProject = this.currentProject.get()
+    if (currentProject?.id == project.id) {
+      if (!project.members) project.members = currentProject.members
+      this.currentProject.set(project)
+    }
   }
 }
 

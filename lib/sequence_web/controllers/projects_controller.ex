@@ -10,7 +10,7 @@ defmodule SequenceWeb.ProjectsController do
   # GET /projects
   def index(conn, _) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
-         projects <- Projects.list_user_projects(user) do
+         projects <- Projects.list_user_projects(user, true) do
 
       render conn, "list.json", projects: projects, user: user
     end

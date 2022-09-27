@@ -44,20 +44,17 @@ export default (props: Props) => {
   )
 }
 
-type ProjectItem = {
-  name: string
-  initials: string
+type ProjectItem = Project & {
   href: string
-  members: number
+  memberCount: number
   bgColor: string
 }
 
 function ProjectList({ projects }: { projects: Project[] }) {
   const projectItems: ProjectItem[] = projects.map((p, i) => ({
-    name: p.name,
-    initials: p.shortcode,
+    ...p,
     href: paths.PROJECTS + '/' + p.id,
-    members: 1,
+    memberCount: 1,
     bgColor: uniqolor(p.id).color,
   }))
 
@@ -74,17 +71,25 @@ function ProjectList({ projects }: { projects: Project[] }) {
                 )}
                 style={{ background: project.bgColor }}
               >
-                {project.initials}
+                {project.shortcode}
               </div>
               <div
                 className="flex-1 flex items-center justify-between border-t border-r border-b
                  border-gray-200 bg-white rounded-r-md truncate hover:bg-gray-200"
               >
                 <div className="flex-1 px-4 py-2 text-sm truncate">
-                  <div className="text-gray-900 font-medium hover:text-gray-600">
+                  <div
+                    className={classNames(
+                      project.archived_at ? 'text-gray-500' : 'text-gray-900',
+                      'font-medium hover:text-gray-600'
+                    )}
+                  >
                     {project.name}
+                    {project.archived_at ? ' (archived)' : null}
                   </div>
-                  <p className="text-gray-500">{pluralizeWithCount('member', project.members)}</p>
+                  <p className="text-gray-500">
+                    {pluralizeWithCount('member', project.memberCount)}
+                  </p>
                 </div>
               </div>
             </li>

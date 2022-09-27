@@ -185,19 +185,25 @@ function InviteCollaborator() {
 }
 
 function ArchiveProject({ project }: ProjectArgs) {
+  const toggleArchive = () => {
+    projectStore.updateProject(project, {
+      archived_at: project.archived_at ? null : new Date().toISOString(),
+    })
+  }
   return (
     <div className="flex-1 bg-white shadow sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">
         <h3 className="text-lg font-medium leading-6 text-gray-900">Archive Project</h3>
         <div className="mt-2 max-w-xl text-sm text-gray-500">
-          <p>Archive this project to hide it from the sidebar.</p>
+          <p>Hide project from the sidebar.</p>
         </div>
         <div className="mt-5">
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-yellow-100 px-4 py-2 font-medium text-yellow-700 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 sm:text-sm"
+            onClick={toggleArchive}
           >
-            Archive {project.name}
+            {project.archived_at ? 'Un-Archive' : 'Archive'} {project.name}
           </button>
         </div>
       </div>
