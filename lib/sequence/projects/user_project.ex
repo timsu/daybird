@@ -2,13 +2,16 @@ defmodule Sequence.Projects.UserProject do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Sequence.{Users.User, Projects.Project}
+
   @type t :: %__MODULE__{}
 
   schema "user_projects" do
-    field :left_at, :utc_datetime
     field :role, :string
-    field :user_id, :id
-    field :project_id, :id
+    field :left_at, :utc_datetime
+
+    belongs_to :user, User
+    belongs_to :project, Project
 
     timestamps()
   end

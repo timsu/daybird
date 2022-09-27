@@ -29,15 +29,32 @@ class UIStore {
 
   checkForSleep = () => {
     let lastCheck = Date.now()
+    let needsRefresh = false
+    let isVisible = true
+
     setInterval(() => {
-      if (Date.now() - lastCheck > 2 * SLEEP_CHECK_INTERVAL) this.resumeFromSleep()
+      if (Date.now() - lastCheck > 5 * SLEEP_CHECK_INTERVAL) {
+        logger.info(
+          'resume from sleep detected',
+          Date.now() - lastCheck,
+          document.visibilityState,
+          navigator.onLine ? 'online' : 'offline'
+        )
+        if (document.visibilityState == 'visible' && navigator.onLine) this.resumeFromSleep()
+        else needsRefresh = true
+      }
       lastCheck = Date.now()
     }, SLEEP_CHECK_INTERVAL)
+
+    document.addEventListener('visibilitychange', () => {
+      if (needsRefresh && navigator.onLine) {
+        this.resumeFromSleep()
+        needsRefresh = false
+      }
+    })
   }
 
   resumeFromSleep = () => {
-    logger.info('resume from sleep detected', navigator.onLine ? 'online' : 'offline')
-    if (!navigator.onLine) return
     const projects = projectStore.projects.get()
     projects.forEach((p) => {
       fileStore.loadFiles(p)

@@ -52,13 +52,26 @@ class ProjectStore {
         const project = this.projects.get().find((p) => p.id == projectId)
         if (project) {
           store.set(project)
-          authStore.updateUser({ meta: { lp: project.id } })
+          const user = authStore.loggedInUser.get()
+          if (user?.meta?.lp != project.id) {
+            authStore.updateUser({ meta: { lp: project.id } })
+          }
 
           return project
         }
       }
     }
   )
+
+  fetchProjectDetails = async (id: string) => {
+    const project = this.projectMap.get()[id]
+    if (project) this.currentProject.set(project)
+
+    const response = await API.getProject(id)
+    logger.info('loaded project details', response)
+    response.project.members = response.members
+    this.currentProject.set(response.project)
+  }
 
   updateProjectMap = action(this.projectMap, 'updateProjectMap', (store, projects: Project[]) => {
     const projectMap: ProjectMap = {}
