@@ -41,9 +41,11 @@ export default ({ id }: Props) => {
       <div className="h-8" />
 
       <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
-        <DeleteButton onClick={() => modalStore.deleteProjectModal.set(project)}>
-          Delete Project
-        </DeleteButton>
+        <h1 className="text-xl font-semibold text-gray-900 mb-5">Dangerous Stuff</h1>
+        <div className="flex gap-8">
+          <ArchiveProject project={project} />
+          <DeleteProject project={project} />
+        </div>
       </div>
 
       <DeleteProjectModal />
@@ -65,7 +67,11 @@ const people = [
   // More people...
 ]
 
-function Members({ project }: { project: Project }) {
+type ProjectArgs = {
+  project: Project
+}
+
+function Members({ project }: ProjectArgs) {
   if (!project.members) return null
 
   return (
@@ -77,14 +83,6 @@ function Members({ project }: { project: Project }) {
             Invite people to this project to collaborate on notes and tasks. Members have full
             access to all notes in this project.
           </p>
-        </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-          >
-            Add user
-          </button>
         </div>
       </div>
       <div className="mt-8 flex flex-col">
@@ -143,6 +141,86 @@ function Members({ project }: { project: Project }) {
               </table>
             </div>
           </div>
+        </div>
+      </div>
+      <InviteCollaborator />
+    </div>
+  )
+}
+
+function InviteCollaborator() {
+  return (
+    <div className="bg-white shadow sm:rounded-lg mt-8">
+      <div className="px-4 py-5 sm:p-6">
+        <h3 className="text-lg font-medium leading-6 text-gray-900">Invite Collaborator</h3>
+        <div className="mt-2 text-sm text-gray-500">
+          <p>
+            You can invite new or existing users. No emails are sent, invited users will need to
+            sign in to see the project.
+          </p>
+        </div>
+        <form className="mt-5 sm:flex sm:items-center">
+          <div className="w-full sm:max-w-xs">
+            <label htmlFor="email" className="sr-only">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="you@example.com"
+            />
+          </div>
+          <button
+            type="submit"
+            className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          >
+            Add
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function ArchiveProject({ project }: ProjectArgs) {
+  return (
+    <div className="flex-1 bg-white shadow sm:rounded-lg">
+      <div className="px-4 py-5 sm:p-6">
+        <h3 className="text-lg font-medium leading-6 text-gray-900">Archive Project</h3>
+        <div className="mt-2 max-w-xl text-sm text-gray-500">
+          <p>Archive this project to hide it from the sidebar.</p>
+        </div>
+        <div className="mt-5">
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-yellow-100 px-4 py-2 font-medium text-yellow-700 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 sm:text-sm"
+          >
+            Archive {project.name}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function DeleteProject({ project }: ProjectArgs) {
+  return (
+    <div className="flex-1 bg-white placeholder:bg-white shadow sm:rounded-lg">
+      <div className="px-4 py-5 sm:p-6">
+        <h3 className="text-lg font-medium leading-6 text-gray-900">Delete Project</h3>
+        <div className="mt-2 max-w-xl text-sm text-gray-500">
+          <p>Deleting projects is permanent.</p>
+        </div>
+        <div className="mt-5">
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:text-sm"
+            onClick={() => modalStore.deleteProjectModal.set(project)}
+          >
+            Delete {project.name}
+          </button>
         </div>
       </div>
     </div>
