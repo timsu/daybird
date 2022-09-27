@@ -62,7 +62,7 @@ export default function ({ children }: RenderableProps<{}>) {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <Dialog.Panel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-800">
+              <Dialog.Panel className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-100">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
@@ -98,7 +98,7 @@ export default function ({ children }: RenderableProps<{}>) {
         <AppSidebar darkHeader />
       </div>
       <div className="md:pl-64 flex flex-col h-full">
-        <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
+        <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white">
           <button
             type="button"
             className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
