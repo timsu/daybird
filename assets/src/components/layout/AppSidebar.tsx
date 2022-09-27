@@ -35,12 +35,7 @@ type NavItem = {
 export default ({ darkHeader }: { darkHeader?: boolean }) => {
   return (
     <div className="flex-1 flex flex-col min-h-0  select-none">
-      <div
-        className={classNames(
-          darkHeader ? 'bg-gray-900' : '',
-          'flex items-center h-16 flex-shrink-0 px-4'
-        )}
-      >
+      <div className={classNames('flex items-center h-16 flex-shrink-0 px-4')}>
         <LogoDark class="w-[160px]" />
       </div>
       <div className="flex-1 flex flex-col overflow-y-auto scrollbar">
