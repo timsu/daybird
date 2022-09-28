@@ -153,7 +153,7 @@ export default ({
   return (
     <div
       id={task ? `task-${task.id}` : ''}
-      class="bg-gray-100 rounded p-2 flex flex-row items-center relative hover-parent"
+      class="border rounded-md p-2 flex flex-row items-center relative hover-parent"
     >
       {!taskList && !isSafari && <span class="-ml-2 drag-handle grippy" />}
 
