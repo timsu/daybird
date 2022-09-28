@@ -15,6 +15,7 @@ import { debounce, DebounceStyle, logger } from '@/utils'
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
+import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import { EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -135,6 +136,9 @@ const useListNoteEditor = (id: string | undefined) => {
           history: false,
         }),
         TaskItem,
+        Link.configure({
+          linkOnPaste: true,
+        }),
         Placeholder.configure({
           placeholder:
             'Welcome to ListNote!\n\nStart typing to create a note.\n\n' +
