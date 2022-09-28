@@ -117,15 +117,15 @@ const useListNoteEditor = (id: string | undefined) => {
 
     if (prevEditor.current?.id == id) return prevEditor.current
 
-    let ydoc: Y.Doc | undefined
-    let provider: WebrtcProvider | undefined
+    // let ydoc: Y.Doc | undefined
+    // let provider: WebrtcProvider | undefined
 
-    try {
-      ydoc = prevDoc.current = new Y.Doc()
-      provider = prevProvider.current = new WebrtcProvider(id, ydoc)
-    } catch (e) {
-      logger.error(e)
-    }
+    // try {
+    //   ydoc = prevDoc.current = new Y.Doc()
+    //   provider = prevProvider.current = new WebrtcProvider(id, ydoc)
+    // } catch (e) {
+    //   logger.error(e)
+    // }
 
     const user = authStore.loggedInUser.get()!
     const editor = (prevEditor.current = new Editor({
@@ -141,16 +141,16 @@ const useListNoteEditor = (id: string | undefined) => {
             'Type "[] " to create a task.\n\n' +
             'Have fun!',
         }),
-        Collaboration.configure({
-          document: ydoc,
-        }),
-        CollaborationCursor.configure({
-          provider: provider,
-          user: {
-            name: user.name,
-            color: uniqolor(user.id, { lightness: [70, 85] }).color,
-          },
-        }),
+        // Collaboration.configure({
+        //   document: ydoc,
+        // }),
+        // CollaborationCursor.configure({
+        //   provider: provider,
+        //   user: {
+        //     name: user.name,
+        //     color: uniqolor(user.id, { lightness: [70, 85] }).color,
+        //   },
+        // }),
       ],
     }))
     editor.id = id
