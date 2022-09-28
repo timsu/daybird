@@ -96,7 +96,7 @@ function Links() {
 }
 
 function Projects() {
-  const projects = useStore(projectStore.projects)
+  const projects = useStore(projectStore.projects).filter((p) => !p.archived_at)
 
   useEffect(() => {
     fileStore.loadExpanded()

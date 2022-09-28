@@ -126,6 +126,7 @@ const useListNoteEditor = (id: string | undefined) => {
     } catch (e) {
       logger.error(e)
     }
+
     const user = authStore.loggedInUser.get()!
     const editor = (prevEditor.current = new Editor({
       extensions: [
@@ -147,7 +148,7 @@ const useListNoteEditor = (id: string | undefined) => {
           provider: provider,
           user: {
             name: user.name,
-            color: uniqolor(user.id).color,
+            color: uniqolor(user.id, { lightness: [70, 85] }).color,
           },
         }),
       ],

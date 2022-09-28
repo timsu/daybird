@@ -10,7 +10,9 @@ export class Project {
 
   public shortcode: string = ''
 
-  public deleted_at?: string
+  public archived_at?: string | null
+
+  public deleted_at?: string | null
 
   public members?: ProjectMember[]
 

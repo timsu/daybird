@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'preact/hooks'
 
+import { API } from '@/api'
 import Alphatar from '@/components/core/Alphatar'
 import DeleteButton from '@/components/core/DeleteButton'
+import ErrorMessage from '@/components/core/ErrorMessage'
 import Helmet from '@/components/core/Helmet'
+import Input from '@/components/core/Input'
+import Pressable from '@/components/core/Pressable'
 import DeleteProjectModal from '@/components/modals/DeleteProjectModal'
-import { Project } from '@/models'
+import { Project, ProjectMember, ProjectRole } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
+import { unwrapError } from '@/utils'
 import { MailIcon } from '@heroicons/react/solid'
 import { useStore } from '@nanostores/preact'
 
@@ -15,6 +21,7 @@ type Props = {
   path: string
 }
 export default ({ id }: Props) => {
+  const user = useStore(authStore.loggedInUser)
   const project = useStore(projectStore.currentProject)
 
   useEffect(() => {
@@ -24,6 +31,10 @@ export default ({ id }: Props) => {
   }, [id])
 
   if (!project || project?.id != id) return null
+
+  const isAdmin = project.members?.find((m) => m.id == user!.id)?.role == ProjectRole.ADMIN
+
+  const projectArgs = { project, isAdmin }
 
   return (
     <div className="py-6">
@@ -36,55 +47,45 @@ export default ({ id }: Props) => {
 
       <div className="h-8" />
 
-      <Members project={project} />
+      <Members {...projectArgs} />
+
+      <InviteCollaborator {...projectArgs} />
 
       <div className="h-8" />
 
-      <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
-        <DeleteButton onClick={() => modalStore.deleteProjectModal.set(project)}>
-          Delete Project
-        </DeleteButton>
-      </div>
+      {isAdmin && (
+        <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
+          <h1 className="text-xl font-semibold text-gray-900 mb-5">Dangerous Stuff</h1>
+          <div className="flex gap-8">
+            <ArchiveProject {...projectArgs} />
+            <DeleteProject {...projectArgs} />
+          </div>
+        </div>
+      )}
 
       <DeleteProjectModal />
     </div>
   )
 }
 
-/* This example requires Tailwind CSS v2.0+ */
-const people = [
-  {
-    name: 'Lindsay Walton',
-    title: 'Front-end Developer',
-    department: 'Optimization',
-    email: 'lindsay.walton@example.com',
-    role: 'Member',
-    image:
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  // More people...
-]
+type ProjectArgs = {
+  project: Project
+  isAdmin: boolean
+}
 
-function Members({ project }: { project: Project }) {
+function Members({ project, isAdmin }: ProjectArgs) {
+  const user = useStore(authStore.loggedInUser)
   if (!project.members) return null
+
+  const removeMember = (member: ProjectMember) => {
+    API.projectRemoveMember(project, member.email, member.id).then(projectStore.onProjectUpdated)
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-xl font-semibold text-gray-900">Collaborators</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Invite people to this project to collaborate on notes and tasks. Members have full
-            access to all notes in this project.
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-          >
-            Add user
-          </button>
         </div>
       </div>
       <div className="mt-8 flex flex-col">
@@ -106,9 +107,11 @@ function Members({ project }: { project: Project }) {
                     >
                       Role
                     </th>
-                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Edit</span>
-                    </th>
+                    {isAdmin && (
+                      <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6 w-20">
+                        <span className="sr-only">Edit</span>
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
@@ -124,25 +127,155 @@ function Members({ project }: { project: Project }) {
                             )}
                           </div>
                           <div className="ml-4">
-                            <div className="font-medium text-gray-900">{member.name}</div>
-                            <div className="text-gray-500">{member.email}</div>
+                            <div className="font-medium text-gray-900">
+                              {member.name || member.email}
+                            </div>
                           </div>
                         </div>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         {member.role}
                       </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        {/* <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                          Edit<span className="sr-only">, {member.name}</span>
-                        </a> */}
-                      </td>
+                      {isAdmin && (
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          {member.id != user!.id && (
+                            <div className="text-indigo-600 hover:text-indigo-900">
+                              <Pressable onClick={() => removeMember(member)}>
+                                Remove
+                                <span className="sr-only">, {member.name || member.email}</span>
+                              </Pressable>
+                            </div>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function InviteCollaborator({ project }: ProjectArgs) {
+  const [email, setEmail] = useState<string>()
+  const [role, setRole] = useState<ProjectRole>(ProjectRole.MEMBER)
+  const [error, setError] = useState<string>()
+  const [submitting, setSubmitting] = useState<boolean>(false)
+
+  const onSubmit = async (e: Event) => {
+    e.preventDefault()
+
+    if (!email) return setError('Email is required')
+
+    try {
+      setSubmitting(true)
+      setError(undefined)
+      const response = await API.projectAddMember(project, email, role)
+      projectStore.onProjectUpdated(response)
+      setEmail(undefined)
+    } catch (e) {
+      setError(unwrapError(e))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="bg-white shadow sm:rounded-lg mt-8">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">Invite Collaborator</h3>
+          <div className="mt-2 text-sm text-gray-500">
+            <p>
+              <b>Note:</b> No emails are sent, invited users will need to sign in to see the
+              project.
+            </p>
+            <p className="mt-4">
+              Members have access to all notes and can add other members. Admins can remove members,
+              manage billing, and archive or delete the project.
+            </p>
+          </div>
+          <ErrorMessage error={error} />
+
+          <form className="mt-5 sm:flex sm:items-center" onSubmit={onSubmit}>
+            <input
+              type="email"
+              label="Email address"
+              className="max-w-xs w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={email}
+              placeholder="you@example.com"
+              onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
+            />
+
+            <select
+              value={role}
+              onChange={(e) => setRole((e.target as HTMLInputElement).value as ProjectRole)}
+              className="ml-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              <option label="Member" value={ProjectRole.MEMBER} />
+              <option label="Admin" value={ProjectRole.ADMIN} />
+            </select>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Add
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ArchiveProject({ project }: ProjectArgs) {
+  const toggleArchive = () => {
+    projectStore.updateProject(project, {
+      archived_at: project.archived_at ? null : new Date().toISOString(),
+    })
+  }
+  return (
+    <div className="flex-1 bg-white shadow sm:rounded-lg">
+      <div className="px-4 py-5 sm:p-6">
+        <h3 className="text-lg font-medium leading-6 text-gray-900">Archive Project</h3>
+        <div className="mt-2 max-w-xl text-sm text-gray-500">
+          <p>Hide project from the sidebar.</p>
+        </div>
+        <div className="mt-5">
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-yellow-100 px-4 py-2 font-medium text-yellow-700 hover:bg-yellow-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 sm:text-sm"
+            onClick={toggleArchive}
+          >
+            {project.archived_at ? 'Un-Archive' : 'Archive'} {project.name}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function DeleteProject({ project }: ProjectArgs) {
+  return (
+    <div className="flex-1 bg-white placeholder:bg-white shadow sm:rounded-lg">
+      <div className="px-4 py-5 sm:p-6">
+        <h3 className="text-lg font-medium leading-6 text-gray-900">Delete Project</h3>
+        <div className="mt-2 max-w-xl text-sm text-gray-500">
+          <p>Deleting projects is permanent.</p>
+        </div>
+        <div className="mt-5">
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 font-medium text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:text-sm"
+            onClick={() => modalStore.deleteProjectModal.set(project)}
+          >
+            Delete {project.name}
+          </button>
         </div>
       </div>
     </div>
