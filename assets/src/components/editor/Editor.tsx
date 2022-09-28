@@ -12,11 +12,11 @@ import { authStore } from '@/stores/authStore'
 import { taskStore } from '@/stores/taskStore'
 import { debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
 import { Editor } from '@tiptap/core'
+import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import { EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 type Props = {
@@ -82,11 +82,14 @@ export default ({ project, id, contents, saveContents }: Props) => {
   }, [editor, contents])
 
   return (
-    <div
-      ref={editorRef}
-      class="listnote max-w-2xl mx-auto w-full h-auto grow
+    <>
+      <div
+        ref={editorRef}
+        class="listnote max-w-2xl mx-auto w-full h-auto grow
         pt-4 pb-20 px-8 bg-white rounded-md mt-4 shadow"
-    />
+      />
+      {editor && <FormattingMenu editor={editor} />}
+    </>
   )
 }
 
@@ -144,6 +147,10 @@ const useListNoteEditor = (id: string | undefined) => {
             'Type "[] " to create a task.\n\n' +
             'Have fun!',
         }),
+        BubbleMenu.configure({
+          element: document.querySelector('.bubblemenu') as HTMLElement,
+        }),
+
         // Collaboration.configure({
         //   document: ydoc,
         // }),
@@ -181,4 +188,29 @@ function useDeleteTaskListener(editor: Editor | null) {
     })
     return off
   }, [editor])
+}
+
+function FormattingMenu({ editor }: { editor: Editor }) {
+  return (
+    <div className="bubblemenu">
+      <button
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={editor.isActive('bold') ? 'is-active' : ''}
+      >
+        bold
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={editor.isActive('italic') ? 'is-active' : ''}
+      >
+        italic
+      </button>
+      <button
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        className={editor.isActive('strike') ? 'is-active' : ''}
+      >
+        strike
+      </button>
+    </div>
+  )
 }
