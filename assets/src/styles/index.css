@@ -26,7 +26,8 @@ body,
   @apply focus:ring-0 focus:ring-offset-0;
 }
 
-.scrollbar::-webkit-scrollbar { width: 5px }
+/*
+.scrollbar::-webkit-scrollbar { width: 5px; }
 .scrollbar::-webkit-scrollbar-track { background: transparent }
 .scrollbar::-webkit-scrollbar-thumb {
   background: #888888;
@@ -35,6 +36,7 @@ body,
 .scrollbar::-webkit-scrollbar-thumb:hover {
   background: #aaaaaa;
 }
+*/
 
 .hover-parent .hover-visible {
   display: none;
