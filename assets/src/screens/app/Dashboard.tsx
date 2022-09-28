@@ -3,7 +3,9 @@ import { route } from 'preact-router'
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
 import { config, paths } from '@/config'
+import shareIcon from '@/images/share-apple.svg'
 import { projectStore } from '@/stores/projectStore'
+import { getOS, isMobile } from '@/utils/os'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
@@ -19,6 +21,24 @@ export default (props: Props) => {
       <div className="px-4 sm:px-6 md:px-8">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
       </div>
+
+      {isMobile && (
+        <div className="bg-yellow-500 p-4 mt-10 mb-8">
+          <div className="font-bold">Add ListNote to your home screen!</div>
+          {getOS() == 'ios' ? (
+            <div>
+              Use the Share button in Safari{' '}
+              <img src={shareIcon} width={26} height={26} className="inline align-middle" />
+              to add ListNote to your Home Screen.
+            </div>
+          ) : (
+            <div>
+              Use the menu in your browser to add ListNote to your home screen and get quick access
+              to your notes.
+            </div>
+          )}
+        </div>
+      )}
 
       {!hasProjects && (
         <div className="px-4 sm:px-6 md:px-8 my-6 bg-yellow-100 p-4 rounded">
