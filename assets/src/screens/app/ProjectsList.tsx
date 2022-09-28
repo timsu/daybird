@@ -1,5 +1,3 @@
-import uniqolor from 'uniqolor'
-
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
 import NewProjectModal from '@/components/modals/NewProjectModal'
@@ -8,7 +6,7 @@ import { Project } from '@/models'
 import NoProjects from '@/screens/app/NoProjects'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
-import { classNames, makeInitials, pluralizeWithCount } from '@/utils'
+import { classNames, makeInitials, mediumColorFor, pluralizeWithCount } from '@/utils'
 import { DotsVerticalIcon, PlusIcon } from '@heroicons/react/solid'
 import { useStore } from '@nanostores/preact'
 
@@ -55,7 +53,7 @@ function ProjectList({ projects }: { projects: Project[] }) {
     ...p,
     href: paths.PROJECTS + '/' + p.id,
     memberCount: 1,
-    bgColor: uniqolor(p.id).color,
+    bgColor: mediumColorFor(p.id),
   }))
 
   return (

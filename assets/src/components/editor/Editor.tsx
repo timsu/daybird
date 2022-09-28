@@ -2,7 +2,6 @@ import './editor-styles.css'
 
 import { useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
-import uniqolor from 'uniqolor'
 import { ySyncPluginKey } from 'y-prosemirror'
 import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
@@ -11,7 +10,7 @@ import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { taskStore } from '@/stores/taskStore'
-import { debounce, DebounceStyle, logger } from '@/utils'
+import { debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
@@ -152,7 +151,7 @@ const useListNoteEditor = (id: string | undefined) => {
         //   provider: provider,
         //   user: {
         //     name: user.name,
-        //     color: uniqolor(user.id, { lightness: [70, 85] }).color,
+        //     color: lightColorFor(user.id),
         //   },
         // }),
       ],
