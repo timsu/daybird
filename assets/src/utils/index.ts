@@ -1,3 +1,4 @@
+export * from './colors'
 export * from './debounce'
 export * from './logger'
 export * from './strings'

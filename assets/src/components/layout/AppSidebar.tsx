@@ -2,9 +2,7 @@ import { JSX } from 'preact'
 import { Link, route } from 'preact-router'
 import Match from 'preact-router/match'
 import { useEffect, useState } from 'preact/hooks'
-import uniqolor from 'uniqolor'
 
-import { isTokenExpired } from '@/api'
 import LogoDark from '@/components/core/LogoDark'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
@@ -16,7 +14,6 @@ import { FileType, Project } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
-import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import {
     BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronRightIcon,
