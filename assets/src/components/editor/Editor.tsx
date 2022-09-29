@@ -167,7 +167,6 @@ function useAutosave(
       debounce(
         'save-' + id,
         () => {
-          console.log('saving ydoc')
           if (id != currentFile.current) return
           saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
           isDirty.current = false
