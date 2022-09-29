@@ -125,7 +125,10 @@ function FileNode({ indent, node, projectId }: ChildProps) {
                     onClick={(e) => {
                       e.stopPropagation()
                       e.preventDefault()
-                      triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-doc', item)
+                      triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-doc', {
+                        file: item,
+                        projectId: projectId,
+                      })
                     }}
                   >
                     <DotsHorizontalIcon class="w-4 h-4" />
@@ -186,7 +189,7 @@ export function FileContextMenu() {
   return (
     <>
       <ContextMenuWithData id="file-tree-doc">
-        {({ file, projectId }: ContextMenuArgs) => (
+        {({ file, projectId, ...rest }: ContextMenuArgs) => (
           <>
             <ContextMenuItem
               onClick={() =>

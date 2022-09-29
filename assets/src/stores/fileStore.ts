@@ -134,6 +134,8 @@ class FileStore {
     file.name = name
     this.files.notify()
 
+    if (file.id == docStore.id.get()) docStore.title.set(name)
+
     try {
       await API.updateFile(projectId, file.id, { name })
     } catch (e) {
