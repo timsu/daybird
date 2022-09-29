@@ -81,6 +81,31 @@ defmodule SequenceWeb.DocsControllerTest do
       assert doc.contents == "hi bob"
     end
 
+    test "save doc contents bindata", %{conn: conn} do
+      {user, _project, project_uuid} = user_project()
+
+      file = file_fixture(%{ name: "joe", type: File.type_doc })
+      uuid = Utils.no_dash(file.uuid)
+
+      bindata = Base.encode64("secret code")
+
+      _response = conn
+      |> auth(user)
+      |> post("/api/v1/doc?project_id=#{project_uuid}", %{
+        uuid: uuid,
+        bindata: bindata
+      })
+      |> json_response(200)
+
+      response = conn
+      |> auth(user)
+      |> get("/api/v1/doc?project_id=#{project_uuid}&uuid=#{uuid}")
+      |> text_response(200)
+
+      {:ok, decoded} = Base.decode64(response)
+      assert decoded
+    end
+
     test "update doc contents", %{conn: conn} do
       {user, project, project_uuid} = user_project()
 
@@ -97,6 +122,41 @@ defmodule SequenceWeb.DocsControllerTest do
 
       {:ok, doc} = Docs.doc_by_uuid project, uuid
       assert doc.contents == "def 456"
+    end
+
+  end
+
+
+  describe "get_doc/2" do
+
+    test "get text contents", %{conn: conn} do
+      {user, project, project_uuid} = user_project()
+
+      {:ok, doc} = Docs.create_doc(%{
+        project_id: project.id,
+        uuid: Ecto.UUID.generate,
+        contents: "hello world"
+      })
+      uuid = Utils.no_dash(doc.uuid)
+
+      response = conn
+      |> auth(user)
+      |> get("/api/v1/doc?project_id=#{project_uuid}&uuid=#{uuid}")
+      |> text_response(200)
+
+      assert response == "hello world"
+    end
+
+    test "get empty contents", %{conn: conn} do
+      {user, _project, project_uuid} = user_project()
+      uuid = Ecto.UUID.generate
+
+      response = conn
+      |> auth(user)
+      |> get("/api/v1/doc?project_id=#{project_uuid}&uuid=#{uuid}")
+      |> text_response(200)
+
+      assert response == ""
     end
 
   end
