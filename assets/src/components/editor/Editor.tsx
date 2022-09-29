@@ -136,6 +136,7 @@ const useListNoteEditor = (id: string | undefined) => {
         }),
         TaskItem,
         Link.configure({
+          autolink: false,
           linkOnPaste: true,
         }),
         Placeholder.configure({
