@@ -42,7 +42,7 @@ export default (props: Props) => {
         <div class="text-sm text-gray-400 font-semibold">SORT: oldest first</div>
       </div>
 
-      <div className="max-w-7xl my-4 px-4 sm:px-6 md:px-8">
+      <div className="max-w-7xl my-4 px-4 sm:px-6 md:px-8 rounded-md bg-white">
         {tasks.map((t) => (
           <div key={t.id}>
             <TaskRow id={t.id} showContext taskList />

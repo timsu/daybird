@@ -153,7 +153,10 @@ export default ({
   return (
     <div
       id={task ? `task-${task.id}` : ''}
-      class="border rounded-md p-2 flex flex-row items-center relative hover-parent"
+      className={classNames(
+        'rounded-md p-2 flex flex-row items-center relative hover-parent',
+        taskList ? '' : 'border'
+      )}
     >
       {!taskList && !isSafari && <span class="-ml-2 drag-handle grippy" />}
 
