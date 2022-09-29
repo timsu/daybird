@@ -10,7 +10,7 @@ export class File {
 
   public type: FileType = FileType.DOC
 
-  public parent?: string
+  public parent?: string | null
 
   public archived_at?: string | null
 
