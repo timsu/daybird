@@ -191,7 +191,7 @@ function ProjectTree({ project }: { project: Project }) {
               tooltip={{ message: 'Tasks' }}
               onClick={() => route(paths.TASKS + '/' + project.id)}
             >
-              <CheckCircleIcon class="h-6 w-6" />
+              <CheckIcon class="h-6 w-6" />
             </Pressable>
 
             <Pressable

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'preact/hooks'
 
 import { classNames } from '@/utils'
-import { CheckCircleIcon, ViewListIcon } from '@heroicons/react/outline'
+import { CheckCircleIcon, CheckIcon, ViewListIcon } from '@heroicons/react/outline'
 import { Editor } from '@tiptap/core'
 
 export const MenuBar = ({ editor }: { editor: Editor }) => {
@@ -24,7 +24,7 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
         className={editor.isActive('task') ? 'is-active' : ''}
         title="Insert Task"
       >
-        <CheckCircleIcon />
+        <CheckIcon />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
