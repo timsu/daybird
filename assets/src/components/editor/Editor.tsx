@@ -1,7 +1,7 @@
 import './editor-styles.css'
 
 import { decode, encode } from 'base64-arraybuffer'
-import { useEffect, useMemo, useRef } from 'preact/hooks'
+import { MutableRef, useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
 import { ySyncPluginKey } from 'y-prosemirror'
 import { WebrtcProvider } from 'y-webrtc'
@@ -30,58 +30,13 @@ type Props = {
 
 const SAVE_INTERVAL = 5_000
 
-export default ({ project, id, contents, saveContents }: Props) => {
+export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
-  const editor = useListNoteEditor(id, contents)
+
+  const { id, contents } = props
+  const { editor, ydoc } = useListNoteEditor(id, contents)
+  useAutosave(props, editor, ydoc, editorRef)
   useDeleteTaskListener(editor)
-
-  const currentFile = useRef<string>()
-  const isDirty = useRef<boolean>()
-  useEffect(() => {
-    if (!editor) return
-
-    window.editor = editor
-    if (editorRef.current && !editorRef.current.children.length) {
-      const proseMirror = editor.options.element.querySelector('.ProseMirror')
-      editorRef.current.appendChild(proseMirror!)
-    }
-
-    currentFile.current = id
-    isDirty.current = false
-    const textChangeHandler = ({
-      editor,
-      transaction,
-    }: {
-      editor: Editor
-      transaction: Transaction
-    }) => {
-      // ignore non-local changes
-      if (transaction && isChangeOrigin(transaction)) return
-      console.log('i am DRRTY')
-
-      isDirty.current = true
-      // debounce(
-      //   'save-' + id,
-      //   () => {
-      //     if (id != currentFile.current) return
-      //     saveContents(project, id!, editor.getJSON())
-      //     isDirty.current = false
-      //   },
-      //   SAVE_INTERVAL,
-      //   DebounceStyle.RESET_ON_NEW
-      // )
-    }
-    editor.on('update', textChangeHandler)
-    window.onbeforeunload = () => {
-      if (isDirty.current) saveContents(project, id!, editor.getJSON())
-    }
-
-    return () => {
-      editor.off('update', textChangeHandler)
-      if (isDirty.current) saveContents(project, id!, editor.getJSON())
-      window.onbeforeunload = null
-    }
-  }, [editor])
 
   return (
     <div class="max-w-2xl mx-auto w-full h-auto grow pt-4 pb-20 px-8 bg-white rounded-md mt-4 shadow">
@@ -91,16 +46,11 @@ export default ({ project, id, contents, saveContents }: Props) => {
   )
 }
 
-declare module '@tiptap/core' {
-  interface Editor {
-    id?: string
-  }
-}
+// hook to initialize the editor
 
-const useListNoteEditor = (id: string | undefined, initialContent?: string) => {
+const useListNoteEditor = (id: string | undefined, initialContent: any) => {
   const prevEditor = useRef<Editor>()
   const prevDoc = useRef<Y.Doc>()
-  const prevProvider = useRef<any>()
 
   // clean up on unmount
   useEffect(() => {
@@ -114,34 +64,25 @@ const useListNoteEditor = (id: string | undefined, initialContent?: string) => {
   return useMemo(() => {
     if (prevEditor.current) prevEditor.current.destroy()
     if (prevDoc.current) prevDoc.current.destroy()
-    if (!id) return null
+    if (!id) return { editor: null, ydoc: null }
 
     prevDoc.current = prevEditor.current = undefined
 
-    // doc is loading
-    if (!initialContent)
-      return new Editor({
-        editable: false,
-        extensions: [
-          Placeholder.configure({
-            placeholder: 'Loading...',
-          }),
-        ],
-      })
-
-    console.log('loading doc', initialContent)
-
     const ydoc = (prevDoc.current = window.ydoc = new Y.Doc())
 
+    const contentType = initialContent.type || initialContent.charAt(0) == '{' ? 'json' : 'ydoc'
+
     try {
-      if (typeof initialContent == 'string' && initialContent.length > 0) {
-        Y.applyUpdate(ydoc, new Uint8Array(decode(initialContent)))
+      if (contentType == 'ydoc') {
+        const array = new Uint8Array(decode(initialContent))
+
+        Y.applyUpdate(ydoc, array)
       }
     } catch (e) {
       logger.error('error loading', e)
     }
 
-    const provider = (prevProvider.current = new WebrtcProvider(id, ydoc))
+    const provider = new WebrtcProvider(id, ydoc)
 
     const user = authStore.loggedInUser.get()!
     const editor = (prevEditor.current = new Editor({
@@ -161,32 +102,90 @@ const useListNoteEditor = (id: string | undefined, initialContent?: string) => {
             'Type "[] " to create a task.\n\n' +
             'Have fun!',
         }),
-        // Collaboration.configure({
-        //   document: ydoc,
-        // }),
-        // CollaborationCursor.configure({
-        //   provider: provider,
-        //   user: {
-        //     name: user.name,
-        //     color: lightColorFor(user.id),
-        //   },
-        // }),
+        Collaboration.configure({
+          document: ydoc,
+        }),
+        CollaborationCursor.configure({
+          provider: provider,
+          user: {
+            name: user.name,
+            color: lightColorFor(user.id),
+          },
+        }),
       ],
     }))
-    editor.id = id
 
     try {
-      if (typeof initialContent == 'object') {
+      if (contentType == 'json' && typeof initialContent == 'object') {
         editor.chain().setContent(initialContent).focus().run()
       }
     } catch (e) {
       logger.info(e)
     }
 
-    return editor
-  }, [id, initialContent])
+    return { editor, ydoc }
+  }, [id])
 }
 
+// hook to autosave when doc is modified
+function useAutosave(
+  props: Props,
+  editor: Editor | null,
+  ydoc: Y.Doc | null,
+  editorRef: MutableRef<HTMLDivElement | null>
+) {
+  const { id, project, saveContents } = props
+  const currentFile = useRef<string>()
+  const isDirty = useRef<boolean>()
+
+  useEffect(() => {
+    if (!editor || !ydoc) return
+
+    window.editor = editor
+    if (editorRef.current && !editorRef.current.children.length) {
+      const proseMirror = editor.options.element.querySelector('.ProseMirror')
+      editorRef.current.appendChild(proseMirror!)
+    }
+
+    currentFile.current = id
+    isDirty.current = false
+    const textChangeHandler = ({
+      editor,
+      transaction,
+    }: {
+      editor: Editor
+      transaction: Transaction
+    }) => {
+      // ignore non-local changes
+      if (transaction && isChangeOrigin(transaction)) return
+
+      isDirty.current = true
+      debounce(
+        'save-' + id,
+        () => {
+          console.log('saving ydoc')
+          if (id != currentFile.current) return
+          saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+          isDirty.current = false
+        },
+        SAVE_INTERVAL,
+        DebounceStyle.RESET_ON_NEW
+      )
+    }
+    editor.on('update', textChangeHandler)
+    window.onbeforeunload = () => {
+      if (isDirty.current) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+    }
+
+    return () => {
+      editor.off('update', textChangeHandler)
+      if (isDirty.current) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+      window.onbeforeunload = null
+    }
+  }, [editor])
+}
+
+// hook to look for deleted tasks and remove from the document
 function useDeleteTaskListener(editor: Editor | null) {
   useEffect(() => {
     const off = taskStore.deletedTask.listen((task) => {
