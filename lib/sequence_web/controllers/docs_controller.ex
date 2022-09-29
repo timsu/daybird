@@ -22,7 +22,13 @@ defmodule SequenceWeb.DocsController do
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid) do
 
       case Docs.doc_by_uuid(project, uuid) do
-        {:ok, doc} -> text conn, doc.contents
+        {:ok, doc} ->
+          if doc.bindata do
+            encoded = Base.encode64(doc.bindata)
+            text conn, encoded
+          else
+            text conn, doc.contents
+          end
         {:error, :not_found} -> text conn, ""
       end
     end
@@ -33,6 +39,16 @@ defmodule SequenceWeb.DocsController do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
          {:ok, _doc} <- Docs.set_doc_contents(project, uuid, contents) do
+
+      :ok
+    end
+  end
+
+  def save_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "bindata" => bindata }) do
+    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, decoded} <- Base.decode64(bindata),
+         {:ok, _doc} <- Docs.set_doc_bindata(project, uuid, decoded) do
 
       :ok
     end

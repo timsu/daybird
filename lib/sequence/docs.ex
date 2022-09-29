@@ -54,6 +54,26 @@ defmodule Sequence.Docs do
     end
   end
 
+  @spec set_doc_bindata(Project.t(), binary, binary) :: {:ok, Doc.t()}
+  def set_doc_bindata(project, uuid, contents) do
+    if uuid != nil and uuid != "undefined" and uuid != "" do
+      doc = Repo.one(from q in Doc, select: [:id], where: q.project_id == ^project.id and q.uuid == ^Sequence.Utils.uuid_to_base16(uuid))
+      if doc do
+        doc
+        |> Ecto.Changeset.cast(%{ bindata: contents }, [:bindata])
+        |> Repo.update()
+      else
+        create_doc(%{
+          uuid: Sequence.Utils.uuid_to_base16(uuid),
+          project_id: project.id,
+          bindata: contents
+        })
+      end
+    else
+      {:error, :not_found}
+    end
+  end
+
   @doc """
   Returns the list of files.
 

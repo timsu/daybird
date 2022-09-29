@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
+import { encode } from 'base64-arraybuffer'
 
 import { config, OAuthProvider } from '@/config'
 import {
@@ -274,9 +275,9 @@ class APIService {
     return response.data
   }
 
-  async writeFile(project: Project, uuid: string, contents: any): Promise<R.SuccessResponse> {
+  async writeFile(project: Project, uuid: string, bindata: any): Promise<R.SuccessResponse> {
     const data = new FormData()
-    data.append('contents', JSON.stringify(contents))
+    data.append('bindata', encode(bindata.buffer))
 
     const response = await this.axios.post(
       `${this.endpoint}/doc?project_id=${project.id}&uuid=${uuid}`,
