@@ -64,6 +64,7 @@ export default defineConfig({
     outDir,
     cssCodeSplit: false,
     minify: true,
+    manifest: true,
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       input: {
