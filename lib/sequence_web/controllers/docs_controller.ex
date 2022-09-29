@@ -37,6 +37,14 @@ defmodule SequenceWeb.DocsController do
       :ok
     end
   end
+  def save_doc(conn, %{ "project_id" => project_uuid, "uuid" => uuid, "bindata" => bindata }) do
+    with user when is_map(user) <- Guardian.Plug.current_resource(conn),
+         {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
+         {:ok, _doc} <- Docs.set_doc_bindata(project, uuid, bindata) do
+
+      :ok
+    end
+  end
 
   # POST /files
   def create_file(conn, %{ "project_id" => project_uuid, "name" => name, "type" => type } = params) do
