@@ -212,24 +212,30 @@ export function FileContextMenu() {
         {({ file, projectId }: ContextMenuArgs) => (
           <>
             <ContextMenuItem
-              onClick={() =>
+              onClick={() => {
+                const expansionKey = projectId + '/' + file.id
+                fileStore.setExpanded(expansionKey, true)
+
                 modalStore.newFileModal.set({
                   project: getProject(projectId),
                   type: FileType.DOC,
                   parent: file.id,
                 })
-              }
+              }}
             >
               New File
             </ContextMenuItem>
             <ContextMenuItem
-              onClick={() =>
+              onClick={() => {
+                const expansionKey = projectId + '/' + file.id
+                fileStore.setExpanded(expansionKey, true)
+
                 modalStore.newFileModal.set({
                   project: getProject(projectId),
                   type: FileType.FOLDER,
                   parent: file.id,
                 })
-              }
+              }}
             >
               New Folder
             </ContextMenuItem>
