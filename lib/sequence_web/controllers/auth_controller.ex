@@ -2,7 +2,7 @@ defmodule SequenceWeb.AuthController do
   use SequenceWeb, :controller
   require Logger
 
-  alias Sequence.{Auth, Auth.OAuth, Teams, Invites, Users, Users.User, Utils}
+  alias Sequence.{Auth, Auth.OAuth, Teams, Invites, Projects, Users, Users.User, Utils}
 
   action_fallback SequenceWeb.FallbackController
 
@@ -34,6 +34,7 @@ defmodule SequenceWeb.AuthController do
           origin_type: params["origin_type"] || "create"
         }
         with {:ok, user} <- Users.create_user(user_attrs) do
+          Projects.user_joined(user)
           sign_in_success(conn, user)
         end
     end

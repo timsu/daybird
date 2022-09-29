@@ -21,9 +21,14 @@ defmodule Sequence.Projects do
     end |> Repo.all
   end
 
-  @spec list_user_projects(User.t()) :: [UserProject.t()]
+  @spec list_user_project_ids(User.t()) :: [integer]
   def list_user_project_ids(user) do
     Repo.all(from up in UserProject, select: up.project_id, where: up.user_id == ^user.id and is_nil(up.left_at))
+  end
+
+  @spec list_all_user_project(User.t()) :: [UserProject.t()]
+  def list_all_user_project(user) do
+    Repo.all(from up in UserProject, where: up.user_id == ^user.id)
   end
 
   @spec get_user_project(User.t() | binary, Team.t() | binary, boolean) :: UserTeam.t() | nil
@@ -113,6 +118,18 @@ defmodule Sequence.Projects do
       is_nil(pi.deleted_at) and is_nil(pi.joined_at) and pi.email == ^email, limit: 1)
   end
 
+  def user_joined(user) do
+    invites = Repo.all(from pi in ProjectInvite, where: is_nil(pi.deleted_at) and pi.email == ^user.email)
+
+    Enum.each(invites, fn invite ->
+      update_project_invite(invite, %{ joined_at: Timex.now })
+      create_user_project(%{
+        project_id: invite.project_id,
+        role: invite.role,
+        user_id: user.id
+      })
+    end)
+  end
 
   @doc """
   Returns the list of projects.

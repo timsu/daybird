@@ -7,7 +7,8 @@ import { config, paths } from '@/config'
 import {
     File, fileListToTree, FileType, makeTreeFile, Project, sortFiles, TreeFile
 } from '@/models'
-import { assertIsDefined, logger } from '@/utils'
+import { docStore } from '@/stores/docStore'
+import { assertIsDefined, logger, unwrapError } from '@/utils'
 
 export const DOC_EXT = '.seq'
 
@@ -115,11 +116,31 @@ class FileStore {
     route(paths.DOC + '/' + project.id + '/' + response.file.id)
   }
 
-  renameFile = async (project: Project, file: File, name: string) => {
+  moveFile = async (projectId: string, file: File, newParent: string | null) => {
+    if (newParent == file.parent) return
+    logger.info('set new file parent', file, newParent)
+    file.parent = newParent
+    const files = this.files.get()[projectId] || []
+    this.updateFiles(projectId, files)
+
+    try {
+      await API.updateFile(projectId, file.id, { parent: newParent })
+    } catch (e) {
+      docStore.docError.set(unwrapError(e))
+    }
+  }
+
+  renameFile = async (projectId: string, file: File, name: string) => {
     file.name = name
     this.files.notify()
 
-    await API.updateFile(project, file.id, { name })
+    if (file.id == docStore.id.get()) docStore.title.set(name)
+
+    try {
+      await API.updateFile(projectId, file.id, { name })
+    } catch (e) {
+      docStore.docError.set(unwrapError(e))
+    }
   }
 
   deleteFile = async (project: Project, file: File) => {
@@ -127,11 +148,11 @@ class FileStore {
     if (file.type == FileType.FOLDER) {
       const children = files.filter((f) => f.parent == file.id)
       children.forEach((child) => {
-        API.updateFile(project, child.id, { parent: file.parent })
+        API.updateFile(project.id, child.id, { parent: file.parent })
       })
     }
 
-    await API.updateFile(project, file.id, { deleted_at: new Date().toISOString() })
+    await API.updateFile(project.id, file.id, { deleted_at: new Date().toISOString() })
 
     const newFiles = files.filter((f) => f.id != file.id)
     this.updateFiles(project.id, newFiles)

@@ -179,4 +179,44 @@ defmodule Sequence.ProjectsTest do
       assert %Ecto.Changeset{} = Projects.change_project_invite(project_invite)
     end
   end
+
+  describe "projects methods" do
+    import Sequence.ProjectsFixtures
+    import Sequence.UsersFixtures
+
+    test "user_joined with no invites" do
+      user = user_fixture()
+      Projects.user_joined(user)
+    end
+
+    test "user_joined with invites" do
+      project = project_fixture()
+
+      project_invite_fixture(%{ project_id: project.id, email: "foo@bar.com", role: "admin" })
+      user = user_fixture(%{ email: "foo@bar.com" })
+
+      Projects.user_joined(user)
+
+      ups = Projects.list_all_user_project(user)
+      assert length(ups) == 1
+      [up] = ups
+      assert up.project_id == project.id
+      assert up.role == "admin"
+    end
+
+    test "user_joined with deleted invite" do
+      project = project_fixture()
+
+      project_invite_fixture(%{ project_id: project.id, email: "foo@bar.com",
+        role: "admin", deleted_at: Timex.now })
+      user = user_fixture(%{ email: "foo@bar.com" })
+
+      Projects.user_joined(user)
+
+      ups = Projects.list_all_user_project(user)
+      assert length(ups) == 0
+    end
+
+  end
+
 end

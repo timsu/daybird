@@ -78,14 +78,21 @@ export const TaskItem = Node.create<TaskItemOptions>({
       const container = document.createElement('div')
 
       const onCreateTask = (task: Task) => {
-        if (typeof getPos != 'function') return
-        editor.commands.command(({ tr }) => {
-          const position = getPos()
-          tr.setNodeMarkup(position, undefined, {
-            id: task.id,
-          })
-          return true
-        })
+        const { view } = editor
+        if (typeof getPos === 'function') {
+          // … dispatch a transaction, for the current position in the document …
+          view.dispatch(
+            view.state.tr.setNodeMarkup(getPos(), undefined, {
+              id: task.id,
+            })
+          )
+        }
+        return true
+      }
+
+      if (node.attrs.id == 'focus') {
+        ;(node.attrs as any).id = null
+        ;(node.attrs as any).focus = true
       }
 
       const listItem = render(

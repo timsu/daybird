@@ -79,7 +79,8 @@ defmodule SequenceWeb.DocsController do
 
   # PUT /files/id
   def update_file(conn, %{ "project_id" => project_uuid, "id" => uuid } = params) do
-    attrs = Utils.params_to_attrs params, ["name", "parent", "archived_at", "deleted_at"]
+    attrs = Utils.params_to_attrs params, ["name", "archived_at", "deleted_at"]
+    attrs = if params["parent"], do: Map.put(attrs, "parent", Utils.uuid_to_base16(params["parent"])), else: attrs
 
     with user when is_map(user) <- Guardian.Plug.current_resource(conn),
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),

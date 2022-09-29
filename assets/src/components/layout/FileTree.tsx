@@ -7,17 +7,19 @@ import {
     triggerContextMenu
 } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
-import { File, FileType, TreeFile } from '@/models'
+import { File, FileType, Project, TreeFile } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { getProject, projectStore } from '@/stores/projectStore'
-import { classNames } from '@/utils'
+import { classNames, logger } from '@/utils'
 import {
     ChevronDownIcon, ChevronRightIcon, DotsHorizontalIcon, FolderIcon, FolderOpenIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type ContextMenuArgs = { file: File; projectId: string }
+
+const DRAG_FILE_PREFIX = 'file:'
 
 export default ({ projectId }: { projectId: string }) => {
   const files = useStore(fileStore.fileTree)[projectId]
@@ -26,9 +28,10 @@ export default ({ projectId }: { projectId: string }) => {
   if (!files) return null
 
   return (
-    <nav className="px-2 space-y-1 mb-10">
+    <nav className="px-2 space-y-1">
       {files.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
       <FileTree projectId={projectId} nodes={files} indent={0} />
+      <RootFolderDropZone projectId={projectId} />
     </nav>
   )
 }
@@ -47,47 +50,7 @@ function FileTree({
       {nodes.map((node) => {
         const item = node.file
         if (item.type == FileType.DOC) {
-          const href = `${paths.DOC}/${projectId}/${item.id}`
-          return (
-            <ContextMenuTrigger
-              id="file-tree-doc"
-              key={item.id}
-              data={{ file: item, projectId: projectId }}
-            >
-              <Match path={href}>
-                {({ url }: { url: string }) => {
-                  const matches = location.pathname == encodeURI(href)
-                  return (
-                    <Link
-                      key={item.name}
-                      href={href}
-                      className={classNames(
-                        matches ? 'bg-blue-200 ' : ' hover:bg-blue-300 ',
-                        'text-gray-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
-                      )}
-                      style={{ marginLeft: indent * 10 }}
-                    >
-                      {item.name}
-                      {matches && (
-                        <>
-                          <div class="grow" />
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              e.preventDefault()
-                              triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-doc', item)
-                            }}
-                          >
-                            <DotsHorizontalIcon class="w-4 h-4" />
-                          </div>
-                        </>
-                      )}
-                    </Link>
-                  )
-                }}
-              </Match>
-            </ContextMenuTrigger>
-          )
+          return <FileNode {...{ indent, node, projectId }} />
         } else if (item.type == FileType.FOLDER) {
           return <FolderNode {...{ indent, node, projectId }} />
         } else {
@@ -98,15 +61,89 @@ function FileTree({
   )
 }
 
-function FolderNode({
-  indent,
-  node,
-  projectId,
-}: {
+function allowDrop(ev: DragEvent) {
+  ev.preventDefault()
+}
+
+function dragHandler(itemId: string) {
+  return function drag(ev: DragEvent) {
+    if (!ev.dataTransfer) return
+    ev.dataTransfer.setData('text', DRAG_FILE_PREFIX + itemId)
+    ev.dataTransfer.effectAllowed = 'move'
+  }
+}
+
+function dropHandler(projectId: string, parentId: string | null) {
+  return function onDrop(ev: DragEvent) {
+    const data = ev.dataTransfer?.getData('text')
+    if (!data?.startsWith(DRAG_FILE_PREFIX)) return
+    const id = data.substring(DRAG_FILE_PREFIX.length)
+
+    const file = fileStore.idToFile.get()[id]
+    fileStore.moveFile(projectId, file, parentId)
+  }
+}
+
+type ChildProps = {
   indent: number
   node: TreeFile
   projectId: string
-}) {
+}
+
+function FileNode({ indent, node, projectId }: ChildProps) {
+  const item = node.file
+  const href = `${paths.DOC}/${projectId}/${item.id}`
+
+  return (
+    <ContextMenuTrigger
+      id="file-tree-doc"
+      key={item.id}
+      data={{ file: item, projectId: projectId }}
+    >
+      <Match path={href}>
+        {({ url }: { url: string }) => {
+          const matches = location.pathname == encodeURI(href)
+          return (
+            <Link
+              draggable
+              key={item.name}
+              href={href}
+              onDragOver={allowDrop}
+              onDragStart={dragHandler(item.id)}
+              onDrop={dropHandler(projectId, item.parent!)}
+              className={classNames(
+                matches ? 'bg-blue-200 ' : ' hover:bg-blue-300 ',
+                'text-gray-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
+              )}
+              style={{ marginLeft: indent * 10 }}
+            >
+              {item.name}
+              {matches && (
+                <>
+                  <div class="grow" />
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-doc', {
+                        file: item,
+                        projectId: projectId,
+                      })
+                    }}
+                  >
+                    <DotsHorizontalIcon class="w-4 h-4" />
+                  </div>
+                </>
+              )}
+            </Link>
+          )
+        }}
+      </Match>
+    </ContextMenuTrigger>
+  )
+}
+
+function FolderNode({ indent, node, projectId }: ChildProps) {
   const item = node.file
 
   const expansionKey = projectId + '/' + item.id
@@ -126,6 +163,10 @@ function FolderNode({
         data={{ file: item, projectId: projectId }}
       >
         <div
+          draggable
+          onDragOver={allowDrop}
+          onDragStart={dragHandler(item.id)}
+          onDrop={dropHandler(projectId, item.id)}
           className="text-gray-700 hover:bg-gray-300 group flex
         items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
           style={{ marginLeft: indent * 10 }}
@@ -140,11 +181,15 @@ function FolderNode({
   )
 }
 
+function RootFolderDropZone({ projectId }: { projectId: string }) {
+  return <div className="h-10" onDragOver={allowDrop} onDrop={dropHandler(projectId, null)}></div>
+}
+
 export function FileContextMenu() {
   return (
     <>
       <ContextMenuWithData id="file-tree-doc">
-        {({ file, projectId }: ContextMenuArgs) => (
+        {({ file, projectId, ...rest }: ContextMenuArgs) => (
           <>
             <ContextMenuItem
               onClick={() =>
@@ -170,24 +215,30 @@ export function FileContextMenu() {
         {({ file, projectId }: ContextMenuArgs) => (
           <>
             <ContextMenuItem
-              onClick={() =>
+              onClick={() => {
+                const expansionKey = projectId + '/' + file.id
+                fileStore.setExpanded(expansionKey, true)
+
                 modalStore.newFileModal.set({
                   project: getProject(projectId),
                   type: FileType.DOC,
                   parent: file.id,
                 })
-              }
+              }}
             >
               New File
             </ContextMenuItem>
             <ContextMenuItem
-              onClick={() =>
+              onClick={() => {
+                const expansionKey = projectId + '/' + file.id
+                fileStore.setExpanded(expansionKey, true)
+
                 modalStore.newFileModal.set({
                   project: getProject(projectId),
                   type: FileType.FOLDER,
                   parent: file.id,
                 })
-              }
+              }}
             >
               New Folder
             </ContextMenuItem>

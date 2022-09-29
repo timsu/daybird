@@ -54,7 +54,7 @@ export default () => {
       setSubmitting(true)
 
       if (renameFileOpen) {
-        await fileStore.renameFile(renameFileOpen.project, renameFileOpen.file, name)
+        await fileStore.renameFile(renameFileOpen.project.id, renameFileOpen.file, name)
       } else if (newFileOpen) {
         await fileStore.newFile(newFileOpen.project, name, newFileOpen.type, newFileOpen.parent)
       }

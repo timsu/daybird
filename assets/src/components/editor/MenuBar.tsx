@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 
+import { TaskItem } from '@/components/editor/TaskItem'
 import { classNames } from '@/utils'
 import { CheckCircleIcon, CheckIcon, ViewListIcon } from '@heroicons/react/outline'
 import { Editor } from '@tiptap/core'
@@ -16,11 +17,20 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
     return null
   }
 
+  const createTask = () => {
+    const newNode = {
+      type: 'task',
+      attrs: { id: 'focus' },
+    }
+
+    editor.commands.insertContent(newNode)
+  }
+
   return (
-    <div className="menubar flex overflow-hidden fixed bg-white sm:relative bottom-0 z-10 sm:z-0">
+    <div className="menubar flex overflow-hidden fixed bg-white sm:relative top-[10px] z-20 sm:z-0">
       <button
-        onClick={() => editor.chain().focus().toggleNode('task', 'task').run()}
-        disabled={!editor.can().chain().focus().toggleNode('task', 'task').run()}
+        onClick={createTask}
+        disabled={!editor.can().chain().toggleNode('task', 'task').run()}
         className={editor.isActive('task') ? 'is-active' : ''}
         title="Insert Task"
       >

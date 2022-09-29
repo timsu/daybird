@@ -154,7 +154,7 @@ export default ({
     <div
       id={task ? `task-${task.id}` : ''}
       className={classNames(
-        'rounded-md p-2 flex flex-row items-center relative hover-parent',
+        'rounded-md -mt-[1px] p-2 flex flex-row items-center relative hover-parent',
         taskList ? '' : 'border'
       )}
     >
