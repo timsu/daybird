@@ -8,10 +8,10 @@ import { useStore } from '@nanostores/preact'
 
 type Props = {
   path: string
-  projectId: string
+  projectId?: string
 }
 export default (props: Props) => {
-  const project = useStore(projectStore.projectMap)[props.projectId]
+  const project = useStore(projectStore.projectMap)[props.projectId!]
   const tasks = useStore(taskStore.taskList)
 
   useEffect(() => {

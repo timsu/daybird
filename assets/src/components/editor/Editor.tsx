@@ -6,6 +6,7 @@ import { ySyncPluginKey } from 'y-prosemirror'
 import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
 
+import { MenuBar } from '@/components/editor/MenuBar'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
@@ -82,11 +83,10 @@ export default ({ project, id, contents, saveContents }: Props) => {
   }, [editor, contents])
 
   return (
-    <div
-      ref={editorRef}
-      class="listnote max-w-2xl mx-auto w-full h-auto grow
-        pt-4 pb-20 px-8 bg-white rounded-md mt-4 shadow"
-    />
+    <div class="max-w-2xl mx-auto w-full h-auto grow pt-4 pb-20 px-8 bg-white rounded-md mt-4 shadow">
+      {editor && <MenuBar editor={editor} />}
+      <div ref={editorRef} class="listnote mt-4" />
+    </div>
   )
 }
 
@@ -136,6 +136,7 @@ const useListNoteEditor = (id: string | undefined) => {
         }),
         TaskItem,
         Link.configure({
+          autolink: false,
           linkOnPaste: true,
         }),
         Placeholder.configure({
