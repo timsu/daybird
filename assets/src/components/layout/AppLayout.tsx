@@ -14,12 +14,13 @@ import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { isMobile } from '@/utils/os'
 import { Dialog, Transition } from '@headlessui/react'
-import { BellIcon, MenuAlt2Icon, XIcon } from '@heroicons/react/outline'
+import { BellIcon, ChevronLeftIcon, MenuAlt2Icon, XIcon } from '@heroicons/react/outline'
 import { SearchIcon } from '@heroicons/react/solid'
 import { useStore } from '@nanostores/preact'
 
 export default function ({ children }: RenderableProps<{}>) {
   const sidebarOpen = useStore(uiStore.sidebarOpen)
+  const [desktopSidebarHidden, setDesktopSidebarHidden] = useState(false)
 
   const setSidebarOpen = (state: boolean) => uiStore.sidebarOpen.set(state)
 
@@ -95,19 +96,33 @@ export default function ({ children }: RenderableProps<{}>) {
       </Transition.Root>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <AppSidebar darkHeader />
-      </div>
-      <div className="md:pl-64 flex flex-col h-full">
-        <div className="sticky top-0 z-20 flex-shrink-0 flex h-16 bg-white">
+      {!desktopSidebarHidden && (
+        <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 relative">
           <button
             type="button"
-            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
-            onClick={() => setSidebarOpen(true)}
+            className="absolute right-1 top-6 text-gray-400"
+            onClick={() => setDesktopSidebarHidden(true)}
           >
-            <span className="sr-only">Open sidebar</span>
-            <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
+            <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
           </button>
+          <AppSidebar darkHeader />
+        </div>
+      )}
+      <div className={classNames(!desktopSidebarHidden ? 'md:pl-64' : '', 'flex flex-col h-full')}>
+        <div className="sticky top-0 z-20 flex-shrink-0 flex h-16 bg-white">
+          {(!sidebarOpen || desktopSidebarHidden) && (
+            <button
+              type="button"
+              className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+              style={{ display: desktopSidebarHidden ? 'block' : undefined }}
+              onClick={(e) =>
+                desktopSidebarHidden ? setDesktopSidebarHidden(false) : setSidebarOpen(true)
+              }
+            >
+              <span className="sr-only">Open sidebar</span>
+              <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          )}
           <div className="flex-1 px-4 flex justify-between">
             <div className="flex-1 flex">
               <form className="w-full flex md:ml-0" action="#" method="GET">
