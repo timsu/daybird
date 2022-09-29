@@ -1,10 +1,8 @@
-import { action, atom, map } from 'nanostores'
-import { Channel } from 'phoenix'
-import { route } from 'preact-router'
+import { atom } from 'nanostores'
 
 import { API } from '@/api'
-import { config, paths } from '@/config'
-import { Project, User } from '@/models'
+import { config } from '@/config'
+import { Project } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { logger, unwrapError } from '@/utils'
 
@@ -29,11 +27,7 @@ class DocStore {
 
   // --- actions
 
-  docChannel?: Channel
-
   loadDoc = async (project: Project, id: string) => {
-    if (this.docChannel) this.docChannel.leave()
-
     this.id.set(id)
     this.title.set(undefined)
     this.document.set(undefined)
@@ -46,7 +40,6 @@ class DocStore {
     })
 
     try {
-      this.document.set(undefined)
       const response = await API.readFile(project, id)
       logger.info('DOCS - doc loaded', id, response)
 

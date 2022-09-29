@@ -1,5 +1,6 @@
 import './editor-styles.css'
 
+import { decode, encode } from 'base64-arraybuffer'
 import { useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
 import { ySyncPluginKey } from 'y-prosemirror'
@@ -31,7 +32,7 @@ const SAVE_INTERVAL = 5_000
 
 export default ({ project, id, contents, saveContents }: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
-  const editor = useListNoteEditor(id)
+  const editor = useListNoteEditor(id, contents)
   useDeleteTaskListener(editor)
 
   const currentFile = useRef<string>()
@@ -40,7 +41,6 @@ export default ({ project, id, contents, saveContents }: Props) => {
     if (!editor) return
 
     window.editor = editor
-    editor.chain().setContent(contents).focus().run()
     if (editorRef.current && !editorRef.current.children.length) {
       const proseMirror = editor.options.element.querySelector('.ProseMirror')
       editorRef.current.appendChild(proseMirror!)
@@ -57,18 +57,19 @@ export default ({ project, id, contents, saveContents }: Props) => {
     }) => {
       // ignore non-local changes
       if (transaction && isChangeOrigin(transaction)) return
+      console.log('i am DRRTY')
 
       isDirty.current = true
-      debounce(
-        'save-' + id,
-        () => {
-          if (id != currentFile.current) return
-          saveContents(project, id!, editor.getJSON())
-          isDirty.current = false
-        },
-        SAVE_INTERVAL,
-        DebounceStyle.RESET_ON_NEW
-      )
+      // debounce(
+      //   'save-' + id,
+      //   () => {
+      //     if (id != currentFile.current) return
+      //     saveContents(project, id!, editor.getJSON())
+      //     isDirty.current = false
+      //   },
+      //   SAVE_INTERVAL,
+      //   DebounceStyle.RESET_ON_NEW
+      // )
     }
     editor.on('update', textChangeHandler)
     window.onbeforeunload = () => {
@@ -80,7 +81,7 @@ export default ({ project, id, contents, saveContents }: Props) => {
       if (isDirty.current) saveContents(project, id!, editor.getJSON())
       window.onbeforeunload = null
     }
-  }, [editor, contents])
+  }, [editor])
 
   return (
     <div class="max-w-2xl mx-auto w-full h-auto grow pt-4 pb-20 px-8 bg-white rounded-md mt-4 shadow">
@@ -96,13 +97,13 @@ declare module '@tiptap/core' {
   }
 }
 
-const useListNoteEditor = (id: string | undefined) => {
+const useListNoteEditor = (id: string | undefined, initialContent?: string) => {
   const prevEditor = useRef<Editor>()
   const prevDoc = useRef<Y.Doc>()
   const prevProvider = useRef<any>()
 
+  // clean up on unmount
   useEffect(() => {
-    // clean up on unmount
     return () => {
       logger.info('cleaning up editors')
       if (prevEditor.current) prevEditor.current.destroy()
@@ -115,17 +116,32 @@ const useListNoteEditor = (id: string | undefined) => {
     if (prevDoc.current) prevDoc.current.destroy()
     if (!id) return null
 
-    if (prevEditor.current?.id == id) return prevEditor.current
+    prevDoc.current = prevEditor.current = undefined
 
-    // let ydoc: Y.Doc | undefined
-    // let provider: WebrtcProvider | undefined
+    // doc is loading
+    if (!initialContent)
+      return new Editor({
+        editable: false,
+        extensions: [
+          Placeholder.configure({
+            placeholder: 'Loading...',
+          }),
+        ],
+      })
 
-    // try {
-    //   ydoc = prevDoc.current = new Y.Doc()
-    //   provider = prevProvider.current = new WebrtcProvider(id, ydoc)
-    // } catch (e) {
-    //   logger.error(e)
-    // }
+    console.log('loading doc', initialContent)
+
+    const ydoc = (prevDoc.current = window.ydoc = new Y.Doc())
+
+    try {
+      if (typeof initialContent == 'string' && initialContent.length > 0) {
+        Y.applyUpdate(ydoc, new Uint8Array(decode(initialContent)))
+      }
+    } catch (e) {
+      logger.error('error loading', e)
+    }
+
+    const provider = (prevProvider.current = new WebrtcProvider(id, ydoc))
 
     const user = authStore.loggedInUser.get()!
     const editor = (prevEditor.current = new Editor({
@@ -159,8 +175,16 @@ const useListNoteEditor = (id: string | undefined) => {
     }))
     editor.id = id
 
+    try {
+      if (typeof initialContent == 'object') {
+        editor.chain().setContent(initialContent).focus().run()
+      }
+    } catch (e) {
+      logger.info(e)
+    }
+
     return editor
-  }, [id])
+  }, [id, initialContent])
 }
 
 function useDeleteTaskListener(editor: Editor | null) {
