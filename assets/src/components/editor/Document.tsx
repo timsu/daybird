@@ -1,5 +1,6 @@
 import { useEffect } from 'preact/hooks'
 
+import Loader from '@/components/core/Loader'
 import Editor from '@/components/editor/Editor'
 import { Project } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -25,6 +26,13 @@ export default ({ projectId, id }: { projectId?: string; id?: string }) => {
   }
 
   if (!project) return null
+
+  if (contents === undefined)
+    return (
+      <div className="flex justify-center mt-10">
+        <Loader size={40} />
+      </div>
+    )
 
   return <Editor project={project} id={id} contents={contents} saveContents={saveContents} />
 }

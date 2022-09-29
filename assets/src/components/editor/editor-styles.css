@@ -81,6 +81,20 @@
   }
 }
 
+.menubar button {
+  height: 35px;
+  min-width: 30px;
+  border-radius: 8px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  margin: 0 4px 4px 0;
+}
+
+.menubar button.is-active {
+  background: #111;
+  color: white;
+}
+
 /* Give a remote user a caret */
 .collaboration-cursor__caret {
   border-left: 1px solid #0d0d0d;
