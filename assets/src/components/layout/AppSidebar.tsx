@@ -47,11 +47,6 @@ function Links() {
   let navigation: NavItem[] = [
     { name: 'Dashboard', href: paths.APP, icon: HomeIcon },
     {
-      name: 'Tasks',
-      href: paths.TASKS,
-      icon: ViewListIcon,
-    },
-    {
       name: 'Projects',
       href: paths.PROJECTS,
       icon: BriefcaseIcon,
@@ -190,6 +185,13 @@ function ProjectTree({ project }: { project: Project }) {
               onClick={onNewFolder}
             >
               <FolderAddIcon class="h-6 w-6" />
+            </Pressable>
+
+            <Pressable
+              tooltip={{ message: 'Tasks' }}
+              onClick={() => route(paths.TASKS + '/' + project.id)}
+            >
+              <CheckCircleIcon class="h-6 w-6" />
             </Pressable>
 
             <Pressable
