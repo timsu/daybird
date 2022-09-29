@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 
+import { classNames } from '@/utils'
 import { CheckCircleIcon, ViewListIcon } from '@heroicons/react/outline'
 import { Editor } from '@tiptap/core'
 
@@ -16,7 +17,7 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
   }
 
   return (
-    <div className="menubar flex">
+    <div className="menubar flex overflow-hidden fixed bg-white sm:relative bottom-0 z-10 sm:z-0">
       <button
         onClick={() => editor.chain().focus().toggleNode('task', 'task').run()}
         disabled={!editor.can().chain().focus().toggleNode('task', 'task').run()}
@@ -65,7 +66,10 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
+        className={classNames(
+          'hidden sm:block',
+          editor.isActive('heading', { level: 3 }) ? 'is-active' : ''
+        )}
         title="Heading 3"
       >
         H3
@@ -86,14 +90,17 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
       </button>
       <button
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        className={'font-mono ' + (editor.isActive('codeBlock') ? 'is-active' : '')}
+        className={classNames(
+          'hidden sm:block font-mono',
+          editor.isActive('codeBlock') ? 'is-active' : ''
+        )}
         title="Code Block"
       >
         code
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        className={editor.isActive('blockquote') ? 'is-active' : ''}
+        className={classNames('hidden sm:block', editor.isActive('blockquote') ? 'is-active' : '')}
         title="Block Quote"
       >
         &raquo;
