@@ -155,7 +155,7 @@ export default ({
       id={task ? `task-${task.id}` : ''}
       className={classNames(
         'rounded-md -mt-[1px] p-2 flex flex-row items-center relative hover-parent',
-        taskList ? '' : 'border border-transparent hover:border-gray-200'
+        taskList ? '' : 'border border-transparent hover:border-gray-200 -ml-4'
       )}
     >
       {!taskList && !isSafari && <span class="-ml-2 drag-handle grippy hover-visible" />}
