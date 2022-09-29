@@ -11,6 +11,7 @@ import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
+import { isMobile } from '@/utils/os'
 import { useStore } from '@nanostores/preact'
 import { JSONContent } from '@tiptap/react'
 
@@ -68,8 +69,8 @@ export default (props: Props) => {
               message="Adds all uncompleted tasks from this project to today's journal"
               placement="bottom"
             >
-              <Button onClick={insertUncompleteTasks} class="ml-4 py-1">
-                Insert Uncomplete Tasks
+              <Button onClick={insertUncompleteTasks} class="ml-4 py-1 px-1 sm:px-4">
+                {isMobile ? 'Insert Tasks' : 'Insert Uncomplete Tasks'}
               </Button>
             </Tooltip>
           )}

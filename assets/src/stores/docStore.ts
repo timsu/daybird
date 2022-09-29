@@ -52,7 +52,7 @@ class DocStore {
   }
 
   saveDoc = async (project: Project, id: string, contents: any) => {
-    logger.info('DOCS - saving doc', id, contents)
+    logger.info('DOCS - saving doc', id, typeof contents)
     try {
       await API.writeFile(project, id, contents)
     } catch (e) {
