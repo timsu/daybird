@@ -42,7 +42,7 @@ class DocStore {
 
     try {
       const response = (await API.readFile(project, id)) as string
-      logger.info('DOCS - doc loaded', id, response)
+      logger.info('DOCS - doc loaded', id, typeof response)
       this.document.set(response)
       localStorage.setItem(LS_LAST_DOC, project.id + '/' + id)
     } catch (e) {

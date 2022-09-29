@@ -70,11 +70,7 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
 
     const ydoc = (prevDoc.current = window.ydoc = new Y.Doc())
 
-    const contentType = !initialContent
-      ? 'empty'
-      : initialContent.type || initialContent.charAt(0) == '{'
-      ? 'json'
-      : 'ydoc'
+    const contentType = !initialContent ? 'empty' : initialContent.type ? 'json' : 'ydoc'
 
     try {
       if (contentType == 'ydoc') {
@@ -120,8 +116,8 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
     }))
 
     try {
-      if (contentType == 'json' && typeof initialContent == 'object') {
-        editor.chain().setContent(initialContent).focus().run()
+      if (contentType == 'json') {
+        setTimeout(() => editor.chain().setContent(initialContent).focus().run(), 0)
       }
     } catch (e) {
       logger.info(e)
