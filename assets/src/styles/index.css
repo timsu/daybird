@@ -39,10 +39,10 @@ body,
 */
 
 .hover-parent .hover-visible {
-  display: none;
+  opacity: 0;
 }
 .hover-parent:hover .hover-visible {
-  display: block;
+  opacity: 1;
 }
 
 span.grippy {
