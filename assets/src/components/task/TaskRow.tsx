@@ -155,10 +155,10 @@ export default ({
       id={task ? `task-${task.id}` : ''}
       className={classNames(
         'rounded-md -mt-[1px] p-2 flex flex-row items-center relative hover-parent',
-        taskList ? '' : 'border'
+        taskList ? '' : 'border border-transparent hover:border-gray-200'
       )}
     >
-      {!taskList && !isSafari && <span class="-ml-2 drag-handle grippy" />}
+      {!taskList && !isSafari && <span class="-ml-2 drag-handle grippy hover-visible" />}
 
       {task?.deleted_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">DELETED</div>

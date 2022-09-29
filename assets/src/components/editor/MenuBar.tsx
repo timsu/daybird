@@ -27,7 +27,10 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
   }
 
   return (
-    <div className="menubar flex overflow-hidden fixed bg-white sm:relative top-[10px] z-20 sm:z-0">
+    <div
+      className="menubar flex overflow-hidden fixed bg-white sm:relative
+        top-[15px] left-[70px] sm:top-0 sm:left-0 z-20 sm:z-0"
+    >
       <button
         onClick={createTask}
         disabled={!editor.can().chain().toggleNode('task', 'task').run()}

@@ -7,6 +7,10 @@ import { logger } from '@/utils'
 
 import { projectStore } from './projectStore'
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/serviceworker.js')
+}
+
 class AuthStore {
   // --- stores
 
