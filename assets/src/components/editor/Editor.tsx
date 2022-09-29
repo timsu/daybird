@@ -70,7 +70,11 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
 
     const ydoc = (prevDoc.current = window.ydoc = new Y.Doc())
 
-    const contentType = initialContent.type || initialContent.charAt(0) == '{' ? 'json' : 'ydoc'
+    const contentType = !initialContent
+      ? 'empty'
+      : initialContent.type || initialContent.charAt(0) == '{'
+      ? 'json'
+      : 'ydoc'
 
     try {
       if (contentType == 'ydoc') {
