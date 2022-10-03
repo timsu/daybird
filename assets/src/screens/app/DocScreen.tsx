@@ -1,5 +1,5 @@
 import { CSSTransition } from 'preact-transitioning'
-import { useCallback } from 'preact/hooks'
+import { useCallback, useEffect } from 'preact/hooks'
 
 import Banner from '@/components/core/Banner'
 import Button from '@/components/core/Button'
@@ -50,6 +50,14 @@ export default (props: Props) => {
     },
     [props.projectId, props.id]
   )
+
+  useEffect(() => {
+    // start listening for task changes on this project
+    if (props.projectId) {
+      projectStore.setCurrentProject(props.projectId)
+      setTimeout(() => taskStore.initTopic(props.projectId!), 500)
+    }
+  }, [props.projectId])
 
   return (
     <>

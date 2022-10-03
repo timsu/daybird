@@ -22,7 +22,7 @@ type FileMap = { [id: string]: File }
 type ExpansionMap = { [key: string]: boolean }
 
 const KEY_TREECHANGE = 'treechange'
-const KEY_RENAME = 'rename:'
+const KEY_RENAME = 'rename|'
 
 class FileStore {
   // --- topics
@@ -198,6 +198,7 @@ class FileStore {
   }
 
   initTopic = (project: Project) => {
+    if (this.topics[project.id]) return
     const topicName = `files:${project.id}`
     const topic = topicStore.initEphemeralTopic(topicName)
     this.topics[project.id] = topic
