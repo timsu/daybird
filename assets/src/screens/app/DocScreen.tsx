@@ -55,14 +55,6 @@ export default (props: Props) => {
     [props.projectId, props.id]
   )
 
-  useEffect(() => {
-    // start listening for task changes on this project
-    if (props.projectId) {
-      projectStore.setCurrentProject(props.projectId)
-      setTimeout(() => taskStore.initTopic(props.projectId!), 500)
-    }
-  }, [props.projectId])
-
   return (
     <>
       <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
