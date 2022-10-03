@@ -126,7 +126,7 @@ export default function ({ children }: RenderableProps<{}>) {
             <div className="flex-1 flex">
               <form className="w-full flex md:ml-0" action="#" method="GET">
                 <label htmlFor="search-field" className="sr-only">
-                  Search
+                  Navigate
                 </label>
                 <div className="relative w-full text-gray-400 focus-within:text-gray-600">
                   <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
@@ -138,7 +138,7 @@ export default function ({ children }: RenderableProps<{}>) {
                       focus:border-transparent sm:text-sm cursor-pointer flex items-center"
                     onClick={() => modalStore.quickFindModal.set(true)}
                   >
-                    Search {!isMobile && `(${ctrlOrCommand()}+P)`}
+                    Navigate {!isMobile && `(${ctrlOrCommand()}+P)`}
                   </div>
                 </div>
               </form>
