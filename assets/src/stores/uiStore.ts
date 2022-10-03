@@ -1,12 +1,9 @@
 import { action, atom } from 'nanostores'
 import { RouterOnChangeArgs } from 'preact-router'
 
-import { config, paths } from '@/config'
+import { config } from '@/config'
 import { User } from '@/models'
-import { docStore } from '@/stores/docStore'
-import { fileStore } from '@/stores/fileStore'
-import { projectStore } from '@/stores/projectStore'
-import { logger } from '@/utils'
+import { topicStore } from '@/stores/topicStore'
 
 const SLEEP_CHECK_INTERVAL = 30_000
 
@@ -24,40 +21,7 @@ class UIStore {
   })
 
   initLoggedInUser = (user: User) => {
-    this.checkForSleep()
-  }
-
-  checkForSleep = () => {
-    let lastCheck = Date.now()
-    let needsRefresh = false
-
-    setInterval(() => {
-      if (Date.now() - lastCheck > 5 * SLEEP_CHECK_INTERVAL) {
-        logger.info(
-          'resume from sleep detected',
-          Date.now() - lastCheck,
-          document.visibilityState,
-          navigator.onLine ? 'online' : 'offline'
-        )
-        if (document.visibilityState == 'visible' && navigator.onLine) this.resumeFromSleep()
-        else needsRefresh = true
-      }
-      lastCheck = Date.now()
-    }, SLEEP_CHECK_INTERVAL)
-
-    document.addEventListener('visibilitychange', () => {
-      if (needsRefresh && navigator.onLine) {
-        this.resumeFromSleep()
-        needsRefresh = false
-      }
-    })
-  }
-
-  resumeFromSleep = () => {
-    const projects = projectStore.projects.get()
-    projects.forEach((p) => {
-      fileStore.loadFiles(p)
-    })
+    topicStore.initTopicflow()
   }
 }
 

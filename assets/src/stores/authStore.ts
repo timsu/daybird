@@ -1,4 +1,5 @@
 import { action, atom, onMount } from 'nanostores'
+import { v4 as uuid } from 'uuid'
 
 import { API } from '@/api'
 import { config, LS_AUTH_TOKENS, paths } from '@/config'
@@ -13,6 +14,8 @@ if ('serviceWorker' in navigator) {
 
 class AuthStore {
   // --- stores
+
+  clientId = uuid()
 
   loggedInUser = atom<User | null | undefined>()
 
@@ -33,6 +36,8 @@ class AuthStore {
 
   loginHelper = async (givenTokens: AuthTokenPair) => {
     const tokens = await API.exchangeAndSetAuthToken(givenTokens)
+    this.authTokens.set(tokens)
+
     const { access, refresh } = tokens || {}
     if (!tokens?.access) throw 'Tokens were invalid'
 

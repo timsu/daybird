@@ -24,7 +24,7 @@ function getTopicflowUrl(origin_url: string) {
   if (!origin_url) return ''
   if (origin_url.lastIndexOf(':') > 5) {
     const base = origin_url.replace(/https?/, '').replace(/:[0-9]+$/, '')
-    const port = isTest ? '7001' : '5100'
+    const port = isTest ? '7001' : '4100'
     return `ws${base}:${port}`
   } else {
     const base = origin_url.replace(/https?:\/\//, '')
