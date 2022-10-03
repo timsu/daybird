@@ -205,7 +205,7 @@ function ProjectTree({ project }: { project: Project }) {
         </>
       )}
 
-      <div className="h-5">&nbsp;</div>
+      {!expanded && <div className="h-5">&nbsp;</div>}
     </>
   )
 }
