@@ -15,7 +15,7 @@ class TopicStore {
 
   topicflow: Session | undefined
 
-  // --- actions
+  // --- topicflow initialization
 
   initTopicflow = () => {
     const clientId = authStore.clientId
@@ -23,7 +23,6 @@ class TopicStore {
     this.token = authStore.authTokens.get()?.access?.token
 
     this.topicflow = new Session(config.topicflowUrl, `${clientId}|${type}`)
-
     this.topicflow.login(this.token!).catch((e) => logger.warn('socketService:init-topicflow', e))
   }
 

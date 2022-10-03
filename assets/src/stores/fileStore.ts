@@ -3,11 +3,13 @@ import { action, map } from 'nanostores'
 import { route } from 'preact-router'
 
 import { API } from '@/api'
+import { EphemeralTopic } from '@/api/topicflowTopic'
 import { config, paths } from '@/config'
 import {
     File, fileListToTree, FileType, makeTreeFile, Project, sortFiles, TreeFile
 } from '@/models'
 import { docStore } from '@/stores/docStore'
+import { topicStore } from '@/stores/topicStore'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
 
 export const DOC_EXT = '.seq'
@@ -19,7 +21,14 @@ type ProjectFileTree = { [projectId: string]: TreeFile[] }
 type FileMap = { [id: string]: File }
 type ExpansionMap = { [key: string]: boolean }
 
+const KEY_TREECHANGE = 'treechange'
+const KEY_RENAME = 'rename:'
+
 class FileStore {
+  // --- topics
+
+  topics: { [id: string]: EphemeralTopic } = {}
+
   // --- stores
 
   files = map<ProjectFileMap>({})
@@ -53,6 +62,8 @@ class FileStore {
 
     logger.info('FILES - loaded files for project', project.name, sortFiles(files))
     this.updateFiles(project.id, files)
+
+    if (!this.topics[project.id]) this.initTopic(project)
   }
 
   newFile = async (project: Project, name: string, type: FileType, parent?: string) => {
@@ -62,6 +73,7 @@ class FileStore {
     const files = this.files.get()[project.id] || []
     const newFiles = sortFiles([...files, response.file])
     this.updateFiles(project.id, newFiles)
+    this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
 
     if (type == FileType.DOC) route(paths.DOC + '/' + project.id + '/' + response.file.id)
   }
@@ -110,6 +122,7 @@ class FileStore {
       type: FileType.DOC,
       parent: monthFolder.file.id,
     })
+    this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
     const newFiles = sortFiles([...files, response.file])
     this.updateFiles(project.id, newFiles)
 
@@ -125,6 +138,7 @@ class FileStore {
 
     try {
       await API.updateFile(projectId, file.id, { parent: newParent })
+      this.topics[projectId]?.setSharedKey(KEY_TREECHANGE, Date.now())
     } catch (e) {
       docStore.docError.set(unwrapError(e))
     }
@@ -135,6 +149,7 @@ class FileStore {
     this.files.notify()
 
     if (file.id == docStore.id.get()) docStore.title.set(name)
+    this.topics[projectId]?.setSharedKey(KEY_RENAME + file.id, name)
 
     try {
       await API.updateFile(projectId, file.id, { name })
@@ -153,6 +168,7 @@ class FileStore {
     }
 
     await API.updateFile(project.id, file.id, { deleted_at: new Date().toISOString() })
+    this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
 
     const newFiles = files.filter((f) => f.id != file.id)
     this.updateFiles(project.id, newFiles)
@@ -179,6 +195,25 @@ class FileStore {
         return r
       }, {} as ExpansionMap)
     API.setUserData(USER_DATA_EXPANDED, data)
+  }
+
+  initTopic = (project: Project) => {
+    const topicName = `files:${project.id}`
+    const topic = topicStore.initEphemeralTopic(topicName)
+    this.topics[project.id] = topic
+
+    topic.onAllKeyChange((key, value) => {
+      if (key == KEY_TREECHANGE) this.loadFiles(project)
+      else if (key.startsWith(KEY_RENAME)) {
+        const id = key.substring(KEY_RENAME.length)
+        const file = this.idToFile.get()[id]
+        if (file) {
+          file.name = value
+          this.fileTree.notify()
+        }
+        if (docStore.id.get() == id) docStore.title.set(value)
+      }
+    })
   }
 }
 
