@@ -2,22 +2,17 @@ import { h } from 'preact'
 import { Link } from 'preact-router'
 import Match from 'preact-router/match'
 
-import {
-    ContextMenu, ContextMenuItem, ContextMenuTrigger, ContextMenuWithData, MenuContext,
-    triggerContextMenu
-} from '@/components/core/ContextMenu'
+import { ContextMenuTrigger, triggerContextMenu } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
-import { File, FileType, Project, TreeFile } from '@/models'
+import { FileType, TreeFile } from '@/models'
 import { fileStore } from '@/stores/fileStore'
-import { modalStore } from '@/stores/modalStore'
-import { getProject, projectStore } from '@/stores/projectStore'
-import { classNames, logger } from '@/utils'
+import {} from '@/stores/modalStore'
+import { projectStore } from '@/stores/projectStore'
+import { classNames } from '@/utils'
 import {
     ChevronDownIcon, ChevronRightIcon, DotsHorizontalIcon, FolderIcon, FolderOpenIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
-
-type ContextMenuArgs = { file: File; projectId: string }
 
 const DRAG_FILE_PREFIX = 'file:'
 
@@ -185,73 +180,3 @@ function RootFolderDropZone({ projectId }: { projectId: string }) {
   return <div className="h-10" onDragOver={allowDrop} onDrop={dropHandler(projectId, null)}></div>
 }
 
-export function FileContextMenu() {
-  return (
-    <>
-      <ContextMenuWithData id="file-tree-doc">
-        {({ file, projectId, ...rest }: ContextMenuArgs) => (
-          <>
-            <ContextMenuItem
-              onClick={() =>
-                modalStore.renameFileModal.set({
-                  project: getProject(projectId),
-                  file,
-                })
-              }
-            >
-              Rename File
-            </ContextMenuItem>
-            <ContextMenuItem
-              onClick={() =>
-                modalStore.deleteFileModal.set({ project: getProject(projectId), file })
-              }
-            >
-              Delete File
-            </ContextMenuItem>
-          </>
-        )}
-      </ContextMenuWithData>
-      <ContextMenuWithData id="file-tree-folder">
-        {({ file, projectId }: ContextMenuArgs) => (
-          <>
-            <ContextMenuItem
-              onClick={() => {
-                const expansionKey = projectId + '/' + file.id
-                fileStore.setExpanded(expansionKey, true)
-
-                modalStore.newFileModal.set({
-                  project: getProject(projectId),
-                  type: FileType.DOC,
-                  parent: file.id,
-                })
-              }}
-            >
-              New File
-            </ContextMenuItem>
-            <ContextMenuItem
-              onClick={() => {
-                const expansionKey = projectId + '/' + file.id
-                fileStore.setExpanded(expansionKey, true)
-
-                modalStore.newFileModal.set({
-                  project: getProject(projectId),
-                  type: FileType.FOLDER,
-                  parent: file.id,
-                })
-              }}
-            >
-              New Folder
-            </ContextMenuItem>
-            <ContextMenuItem
-              onClick={() =>
-                modalStore.deleteFileModal.set({ project: getProject(projectId), file })
-              }
-            >
-              Delete Folder
-            </ContextMenuItem>
-          </>
-        )}
-      </ContextMenuWithData>
-    </>
-  )
-}

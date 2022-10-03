@@ -1,12 +1,11 @@
 import { Fragment, RenderableProps } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 
-import LogoDark from '@/components/core/LogoDark'
 import AppSidebar from '@/components/layout/AppSidebar'
 import UserMenu from '@/components/layout/UserMenu'
+import TaskContextMenu from '@/components/menus/TaskContextMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
-import TaskContextMenu from '@/components/task/TaskContextMenu'
 import { paths } from '@/config'
 import useSwipe from '@/hooks/useSwipe'
 import { modalStore } from '@/stores/modalStore'

@@ -66,7 +66,7 @@ class FileStore {
     if (!this.topics[project.id]) this.initTopic(project)
   }
 
-  newFile = async (project: Project, name: string, type: FileType, parent?: string) => {
+  newFile = async (project: Project, name: string, type: FileType, parent?: string | null) => {
     name = name.trim()
 
     const response = await API.createFile(project, { name, type, parent })
