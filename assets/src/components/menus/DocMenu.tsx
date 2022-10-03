@@ -1,12 +1,13 @@
 import { ContextMenuItem, ContextMenuWithData } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
 import { Project, Task, TaskType } from '@/models'
+import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import {
-    ArchiveIcon, BookmarkIcon, CheckCircleIcon, EyeOffIcon, PencilIcon, TrashIcon
+    ArchiveIcon, BookmarkIcon, CheckCircleIcon, CheckIcon, EyeOffIcon, PencilIcon, TrashIcon
 } from '@heroicons/react/outline'
 
 type Props = {
@@ -19,6 +20,10 @@ export default () => {
     <ContextMenuWithData id="doc-menu">
       {({ projectId, docId }: Props) => (
         <>
+          <ContextMenuItem onClick={() => docStore.removeCompletedTasks()}>
+            <CheckIcon class="h-4 w-4 mr-2 text-gray-500" />
+            Remove Completed Tasks
+          </ContextMenuItem>
           <ContextMenuItem
             onClick={() =>
               modalStore.renameFileModal.set({

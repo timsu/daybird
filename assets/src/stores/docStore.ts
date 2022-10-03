@@ -2,9 +2,11 @@ import { decode } from 'base64-arraybuffer'
 import { atom } from 'nanostores'
 
 import { API } from '@/api'
+import { NODE_NAME } from '@/components/editor/TaskItem'
 import { config } from '@/config'
 import { Project } from '@/models'
 import { fileStore } from '@/stores/fileStore'
+import { taskStore } from '@/stores/taskStore'
 import { logger, unwrapError } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
@@ -58,6 +60,26 @@ class DocStore {
     } catch (e) {
       this.docError.set(unwrapError(e))
     }
+  }
+
+  removeCompletedTasks = () => {
+    const doc = window.editor?.state.doc
+    if (!doc) return
+    const tasks = taskStore.taskMap.get()
+    doc.descendants((node, pos) => {
+      if (node.type.name == NODE_NAME) {
+        const id = node.attrs.id
+        if (!id) return
+        const task = tasks[id]
+
+        if (task?.completed_at) {
+          window.editor!.commands.deleteRange({
+            from: pos,
+            to: pos + node.nodeSize,
+          })
+        }
+      }
+    })
   }
 }
 
