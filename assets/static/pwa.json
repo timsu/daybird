@@ -5,7 +5,7 @@
   "start_url": "/app?source=pwa",
   "display": "standalone",
   "background_color": "#f9fafb",
-  "theme_color": "#a2c4fb",
+  "theme_color": "#f9fafb",
   "icons": [
     {
       "src": "/images/icon-512.png",
