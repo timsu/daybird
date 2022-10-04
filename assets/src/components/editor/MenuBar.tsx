@@ -50,7 +50,7 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
   return (
     <div
       ref={menuBar}
-      className="menubar flex overflow-hidden fixed bg-white sm:relative z-20 sm:z-0 top-[10px]"
+      className="menubar flex overflow-hidden fixed bg-white sm:relative z-20 sm:z-0 top-[10px] w-full sm:w-auto"
     >
       <button
         onClick={createTask}
