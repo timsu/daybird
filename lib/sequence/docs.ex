@@ -74,7 +74,7 @@ defmodule Sequence.Docs do
     end
   end
 
-  def move_doc(project, file, new_project) do
+  def move_doc(file, new_project) do
     {:ok, file} = update_file(file, %{ project_id: new_project.id })
     uuid = file.uuid
 
