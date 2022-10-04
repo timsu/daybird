@@ -4,8 +4,6 @@ defmodule Sequence.Chat.Attachment do
   @versions [:original]
   @acl false
 
-  def bucket, do: "tandem-private-attachments"
-
   def s3_object_headers(_version, {file, _scope}) do
     [content_type: MIME.from_path(file.file_name)]
   end
