@@ -83,8 +83,7 @@ defmodule Sequence.MixProject do
       {:pigeon, ">= 0.0.0"},
       {:kadabra, ">= 0.0.0"},
       {:uuid, "~> 1.1"},
-      {:xfile, "~> 0.4"},
-      {:delta, "~> 0.2"},
+      {:sweet_xml, "~> 0.0"},
 
       # dev dependencies
       {:mix_test_watch, "~> 0.6", only: [:dev, :docker], runtime: false},

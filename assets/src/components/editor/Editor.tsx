@@ -1,13 +1,13 @@
 import './editor-styles.css'
 
-import { decode, encode } from 'base64-arraybuffer'
+import { decode } from 'base64-arraybuffer'
 import { MutableRef, useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
-import { ySyncPluginKey } from 'y-prosemirror'
 import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
 
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
+import { Image } from '@/components/editor/Image'
 import { MenuBar } from '@/components/editor/MenuBar'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
@@ -19,7 +19,6 @@ import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import { EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
 type Props = {
@@ -95,6 +94,7 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
         }),
         HorizontalRule,
         TaskItem,
+        Image,
         Link.configure({
           autolink: false,
           linkOnPaste: true,

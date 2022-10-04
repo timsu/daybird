@@ -70,14 +70,18 @@ config :sequence, load_application_links_from_s3: false
 
 config :sequence, sendgrid_api_key: System.get_env("SENDGRID_KEY")
 
-config :ex_aws, :s3,
-  access_key_id: System.get_env("LN_S3_ACCESS_KEY_ID"),
-  secret_access_key: System.get_env("LN_S3_SECRET_ACCESS_KEY"),
-  host: "us-southeast-1.linodeobjects.com"
+config :ex_aws,
+  access_key_id: {:system, "LN_S3_ACCESS_KEY_ID"},
+  secret_access_key: {:system, "LN_S3_SECRET_ACCESS_KEY"},
+  region: "US",
+  s3: [
+    host: "us-southeast-1.linodeobjects.com"
+  ]
 
 config :arc,
   storage: Arc.Storage.S3,
-  bucket: "listnote-uploads"
+  bucket: "listnote-uploads",
+  virtual_host: true
 
 config :sequence, Sequence.Auth.Guardian,
   issuer: "sequence",
