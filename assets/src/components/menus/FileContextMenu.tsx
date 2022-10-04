@@ -1,4 +1,7 @@
+import copy from 'copy-to-clipboard'
+
 import { ContextMenuItem, ContextMenuWithData } from '@/components/core/ContextMenu'
+import { paths } from '@/config'
 import { File, FileType, Project, TreeFile } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
@@ -6,12 +9,17 @@ import { getProject } from '@/stores/projectStore'
 
 type ContextMenuArgs = { file: File; projectId: string }
 
-export default function() {
+export default function () {
   return (
     <>
       <ContextMenuWithData id="file-tree-doc">
         {({ file, projectId, ...rest }: ContextMenuArgs) => (
           <>
+            <ContextMenuItem
+              onClick={() => copy(`${location.origin}${paths.DOC}/${projectId}/${file.id}`)}
+            >
+              Copy File Link
+            </ContextMenuItem>
             <ContextMenuItem
               onClick={() =>
                 modalStore.renameFileModal.set({
