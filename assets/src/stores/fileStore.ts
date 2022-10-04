@@ -58,7 +58,7 @@ class FileStore {
 
   loadFiles = async (project: Project) => {
     const response = await API.listFiles(project)
-    const files: File[] = response.files.map(File.fromJSON)
+    const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
 
     logger.info('FILES - loaded files for project', project.name, sortFiles(files))
     this.updateFiles(project.id, files)
@@ -70,8 +70,10 @@ class FileStore {
     name = name.trim()
 
     const response = await API.createFile(project, { name, type, parent })
+    const file = File.fromJSON(response.file, project.id)
+
     const files = this.files.get()[project.id] || []
-    const newFiles = sortFiles([...files, response.file])
+    const newFiles = sortFiles([...files, file])
     this.updateFiles(project.id, newFiles)
     this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
 
@@ -122,8 +124,10 @@ class FileStore {
       type: FileType.DOC,
       parent: monthFolder.file.id,
     })
+    const newFile = File.fromJSON(response.file, project.id)
+
     this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
-    const newFiles = sortFiles([...files, response.file])
+    const newFiles = sortFiles([...files, newFile])
     this.updateFiles(project.id, newFiles)
 
     route(paths.DOC + '/' + project.id + '/' + response.file.id)

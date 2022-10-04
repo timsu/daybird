@@ -12,12 +12,15 @@ export class File {
 
   public parent?: string | null
 
+  public projectId?: string
+
   public archived_at?: string | null
 
   public deleted_at?: string | null
 
-  public static fromJSON(obj: Object): File {
+  public static fromJSON(obj: Object, projectId: string): File {
     let item: File = Object.assign(new File(), obj)
+    item.projectId = projectId
 
     return item
   }
