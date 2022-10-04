@@ -135,16 +135,32 @@ class FileStore {
 
   moveFile = async (projectId: string, file: File, newParent: string | null) => {
     if (newParent == file.parent) return
+
     logger.info('set new file parent', file, newParent)
     file.parent = newParent
     const files = this.files.get()[projectId] || []
     this.updateFiles(projectId, files)
 
     try {
-      await API.updateFile(projectId, file.id, { parent: newParent })
+      await API.updateFile(file.projectId || projectId, file.id, { parent: newParent, projectId })
       this.topics[projectId]?.setSharedKey(KEY_TREECHANGE, Date.now())
     } catch (e) {
       docStore.docError.set(unwrapError(e))
+    }
+
+    // if project move
+    if (file.projectId && projectId != file.projectId) {
+      this.topics[file.projectId!]?.setSharedKey(KEY_TREECHANGE, Date.now())
+
+      const newProject = projectId
+      const oldProject = file.projectId
+
+      const files = this.files.get()
+      const newFiles = (files[newProject] || []).concat([file])
+      this.updateFiles(newProject, newFiles)
+
+      const oldFiles = (files[oldProject] || []).filter((f) => f.id != file.id)
+      this.updateFiles(oldProject, oldFiles)
     }
   }
 

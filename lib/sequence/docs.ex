@@ -74,6 +74,14 @@ defmodule Sequence.Docs do
     end
   end
 
+  def move_doc(project, file, new_project) do
+    {:ok, file} = update_file(file, %{ project_id: new_project.id })
+    uuid = file.uuid
+
+    from(d in Doc, where: d.uuid == ^uuid, update: [set: [project_id: ^new_project.id]])
+    |> Repo.update_all([])
+  end
+
   @doc """
   Returns the list of files.
 

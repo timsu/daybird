@@ -87,6 +87,11 @@ defmodule SequenceWeb.DocsController do
          {:ok, doc} <- Docs.file_by_uuid(project, uuid),
          {:ok, doc} <- Docs.update_file(doc, attrs) do
 
+      if params["projectId"] do
+        {:ok, new_project} = Projects.project_by_uuid(user, params["projectId"])
+        Docs.move_doc(project, doc, new_project)
+      end
+
       render conn, "get.json", file: doc
     end
   end
