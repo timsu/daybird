@@ -66,19 +66,27 @@ class DocStore {
     const doc = window.editor?.state.doc
     if (!doc) return
     const tasks = taskStore.taskMap.get()
+
+    // add items to delete
+    const positionsToDelete: { from: number; to: number }[] = []
     doc.descendants((node, pos) => {
       if (node.type.name == NODE_NAME) {
         const id = node.attrs.id
         if (!id) return
         const task = tasks[id]
-
         if (task?.completed_at) {
-          window.editor!.commands.deleteRange({
+          positionsToDelete.push({
             from: pos,
             to: pos + node.nodeSize,
           })
         }
       }
+    })
+
+    // sort in descending order (so deleting doesn't change other positions)
+    positionsToDelete.reverse()
+    window.editor!.commands.forEach(positionsToDelete, (item, { commands }) => {
+      return commands.deleteRange(item)
     })
   }
 }
