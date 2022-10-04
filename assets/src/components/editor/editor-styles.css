@@ -81,6 +81,11 @@
   }
 }
 
+.menubar {
+  /* safari ios hack */
+  transform: translate3d(0,0,0)
+}
+
 .menubar button {
   height: 35px;
   min-width: 30px;

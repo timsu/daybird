@@ -1,16 +1,37 @@
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 
 import { TaskItem } from '@/components/editor/TaskItem'
 import { classNames } from '@/utils'
+import { getOS } from '@/utils/os'
 import { CheckCircleIcon, CheckIcon, ViewListIcon } from '@heroicons/react/outline'
 import { Editor } from '@tiptap/core'
 
 export const MenuBar = ({ editor }: { editor: Editor }) => {
   const [_, setUpdate] = useState(0)
+  const menuBar = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     // update the menu bar when anything changes
     editor.on('selectionUpdate', () => setUpdate(Date.now()))
+
+    let height = window.visualViewport!.height
+    const viewport = window.visualViewport
+
+    // fix the menu bar on the bottom
+    if (getOS() == 'ios') {
+      window.visualViewport!.addEventListener('scroll', resizeHandler)
+      window.visualViewport!.addEventListener('resize', resizeHandler)
+      function resizeHandler() {
+        const top = viewport!.offsetTop + 10
+        if (menuBar.current) {
+          menuBar.current.style.top = `${top}px`
+        }
+      }
+      return () => {
+        window.visualViewport!.removeEventListener('scroll', resizeHandler)
+        window.visualViewport!.removeEventListener('resize', resizeHandler)
+      }
+    }
   }, [])
 
   if (!editor) {
@@ -28,8 +49,8 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
 
   return (
     <div
-      className="menubar flex overflow-hidden fixed bg-white sm:relative
-        top-[15px] left-[70px] sm:top-0 sm:left-0 z-20 sm:z-0"
+      ref={menuBar}
+      className="menubar flex overflow-hidden fixed bg-white sm:relative z-20 sm:z-0 top-[10px] w-full sm:w-auto"
     >
       <button
         onClick={createTask}

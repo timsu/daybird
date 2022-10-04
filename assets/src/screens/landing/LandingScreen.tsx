@@ -17,7 +17,7 @@ export default (props: Props) => {
 
   return (
     <LandingLayout darkFooter>
-      <main className="mx-auto max-w-7xl px-4 sm:mt-24 grow">
+      <main className="mx-auto max-w-7xl px-4 mt-10 sm:mt-24 grow">
         <Hero />
       </main>
 

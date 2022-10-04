@@ -106,6 +106,12 @@ function FileNode({ indent, node, projectId }: ChildProps) {
               onDragOver={allowDrop}
               onDragStart={dragHandler(item.id)}
               onDrop={dropHandler(projectId, item.parent!)}
+              onContextMenu={(e) =>
+                triggerContextMenu(e.clientX, e.clientY, 'file-tree-doc', {
+                  file: item,
+                  projectId: projectId,
+                })
+              }
               className={classNames(
                 matches ? 'bg-blue-200 ' : ' hover:bg-blue-300 ',
                 'text-gray-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
@@ -162,6 +168,12 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
           onDragOver={allowDrop}
           onDragStart={dragHandler(item.id)}
           onDrop={dropHandler(projectId, item.id)}
+          onContextMenu={(e) =>
+            triggerContextMenu(e.clientX, e.clientY, 'file-tree-folder', {
+              file: item,
+              projectId: projectId,
+            })
+          }
           className="text-gray-700 hover:bg-gray-300 group flex
         items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
           style={{ marginLeft: indent * 10 }}
@@ -179,4 +191,3 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
 function RootFolderDropZone({ projectId }: { projectId: string }) {
   return <div className="h-10" onDragOver={allowDrop} onDrop={dropHandler(projectId, null)}></div>
 }
-

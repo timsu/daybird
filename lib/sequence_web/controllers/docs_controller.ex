@@ -89,7 +89,7 @@ defmodule SequenceWeb.DocsController do
 
       if params["projectId"] do
         {:ok, new_project} = Projects.project_by_uuid(user, params["projectId"])
-        Docs.move_doc(project, doc, new_project)
+        Docs.move_doc(doc, new_project)
       end
 
       render conn, "get.json", file: doc
