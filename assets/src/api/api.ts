@@ -262,7 +262,7 @@ class APIService {
 
   async createFile(
     project: Project,
-    file: { name: string; type: FileType; parent?: string }
+    file: { name: string; type: FileType; parent?: string | null }
   ): Promise<R.FileResponse> {
     const response = await this.axios.post(`${this.endpoint}/files?project_id=${project.id}`, file)
     return response.data

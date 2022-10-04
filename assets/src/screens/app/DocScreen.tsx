@@ -3,15 +3,19 @@ import { useCallback, useEffect } from 'preact/hooks'
 
 import Banner from '@/components/core/Banner'
 import Button from '@/components/core/Button'
+import { triggerContextMenu } from '@/components/core/ContextMenu'
 import Helmet from '@/components/core/Helmet'
+import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import Document from '@/components/editor/Document'
+import DocMenu from '@/components/menus/DocMenu'
 import { Project } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { isMobile } from '@/utils/os'
+import { DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 import { JSONContent } from '@tiptap/react'
 
@@ -51,14 +55,6 @@ export default (props: Props) => {
     [props.projectId, props.id]
   )
 
-  useEffect(() => {
-    // start listening for task changes on this project
-    if (props.projectId) {
-      projectStore.setCurrentProject(props.projectId)
-      setTimeout(() => taskStore.initTopic(props.projectId!), 500)
-    }
-  }, [props.projectId])
-
   return (
     <>
       <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
@@ -71,7 +67,19 @@ export default (props: Props) => {
       </CSSTransition>
       <div class="flex flex-col grow  w-full">
         <div class="w-full max-w-2xl mx-auto pt-6 px-8 flex items-center">
-          <h1 class="text-xl font-bold ">{title}</h1>
+          <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold ">{title}</h1>
+            <Pressable
+              onClick={(e) => {
+                triggerContextMenu(e.clientX, e.clientY, 'doc-menu', {
+                  docId: props.id,
+                  projectId: props.projectId,
+                })
+              }}
+            >
+              <DotsHorizontalIcon className="h-4 w-4 text-gray-400" />
+            </Pressable>
+          </div>
           {isTodayJournal && !uncompleteTasksInserted && (
             <Tooltip
               message="Adds all uncompleted tasks from this project to today's journal"
@@ -83,6 +91,7 @@ export default (props: Props) => {
             </Tooltip>
           )}
         </div>
+        <DocMenu />
         <Document projectId={props.projectId} id={props.id} />
       </div>
     </>

@@ -21,8 +21,10 @@ declare module 'prosemirror-state' {
   }
 }
 
+export const NODE_NAME = 'task'
+
 export const TaskItem = Node.create<TaskItemOptions>({
-  name: 'task',
+  name: NODE_NAME,
 
   // on FF / Safari, draggable prevents editing contents
   draggable: navigator.userAgent?.includes('Chrome/'),

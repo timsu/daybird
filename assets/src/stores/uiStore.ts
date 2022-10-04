@@ -2,7 +2,7 @@ import { action, atom } from 'nanostores'
 import { RouterOnChangeArgs } from 'preact-router'
 
 import { config } from '@/config'
-import { User } from '@/models'
+import { File, User } from '@/models'
 import { topicStore } from '@/stores/topicStore'
 
 const SLEEP_CHECK_INTERVAL = 30_000
@@ -14,6 +14,8 @@ class UIStore {
 
   sidebarOpen = atom<boolean>(false)
 
+  recentFiles: { id: string; projectId: string }[] = []
+
   // --- actions
 
   routerOnChange = action(this.path, 'routerOnChange', (store, ctx: RouterOnChangeArgs<any>) => {
@@ -22,6 +24,11 @@ class UIStore {
 
   initLoggedInUser = (user: User) => {
     topicStore.initTopicflow()
+  }
+
+  addRecentNote = (id: string, projectId: string) => {
+    this.recentFiles = this.recentFiles.filter((n) => n.id != id).slice(0, 9)
+    this.recentFiles.unshift({ id, projectId })
   }
 }
 

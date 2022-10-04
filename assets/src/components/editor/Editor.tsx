@@ -7,6 +7,7 @@ import { ySyncPluginKey } from 'y-prosemirror'
 import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
 
+import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { MenuBar } from '@/components/editor/MenuBar'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
@@ -90,7 +91,9 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
         StarterKit.configure({
           // The Collaboration extension comes with its own history handling
           history: false,
+          horizontalRule: false,
         }),
+        HorizontalRule,
         TaskItem,
         Link.configure({
           autolink: false,

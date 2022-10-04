@@ -6,11 +6,13 @@ import { useEffect, useState } from 'preact/hooks'
 import LogoDark from '@/components/core/LogoDark'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
-import FileTree, { FileContextMenu } from '@/components/layout/FileTree'
+import FileTree from '@/components/layout/FileTree'
+import FileContextMenu from '@/components/menus/FileContextMenu'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
 import { paths } from '@/config'
 import { FileType, Project } from '@/models'
+import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -119,15 +121,13 @@ function ProjectTree({ project }: { project: Project }) {
 
   if (!project) return null
 
-  const active = location.pathname == `${paths.PROJECTS}/${project.id}`
-
-  const onNewFile = (e: Event) => {
+  const onNewFile = (type: FileType) => (e: Event) => {
     e.stopPropagation()
-    modalStore.newFileModal.set({ project, type: FileType.DOC })
-  }
-  const onNewFolder = (e: Event) => {
-    e.stopPropagation()
-    modalStore.newFileModal.set({ project, type: FileType.FOLDER })
+    const currentFile = docStore.id.get()
+    const currentProject = projectStore.currentProject.get()?.id == project.id
+    const parent =
+      currentProject && currentFile ? fileStore.idToFile.get()[currentFile]?.parent : undefined
+    modalStore.newFileModal.set({ project, type, parent })
   }
   const onNewDailyFile = (e: Event) => {
     e.stopPropagation()
@@ -165,7 +165,7 @@ function ProjectTree({ project }: { project: Project }) {
           <div className="flex m-2 gap-2 text-gray-500">
             <Pressable
               tooltip={{ message: 'New File', tooltipClass: 'min-w-[75px]' }}
-              onClick={onNewFile}
+              onClick={onNewFile(FileType.DOC)}
             >
               <DocumentAddIcon class="h-6 w-6" />
             </Pressable>
@@ -182,7 +182,7 @@ function ProjectTree({ project }: { project: Project }) {
 
             <Pressable
               tooltip={{ message: 'New Folder', tooltipClass: 'min-w-[100px]' }}
-              onClick={onNewFolder}
+              onClick={onNewFile(FileType.FOLDER)}
             >
               <FolderAddIcon class="h-6 w-6" />
             </Pressable>
