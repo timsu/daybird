@@ -68,12 +68,11 @@ defmodule Sequence.MixProject do
       {:bcrypt_elixir, "~> 2.3"},
       {:cloak, "~> 1.1"},
       {:redix, "~> 1.1"},
+      {:arc, "~> 0.11.0"},
       {:ex_aws, "~> 2.2"},
       {:ex_aws_s3, "~> 2.3"},
       {:libcluster, "~> 3.2.1"},
       {:oban, "~> 2.1"},
-      {:arc, "~> 0.11.0"},
-      {:arc_gcs, "~> 0.2"},
       {:csv, "~> 2.3"},
       {:stripity_stripe, "~> 2.0"},
       {:mint, "~> 1.4"},
@@ -83,8 +82,7 @@ defmodule Sequence.MixProject do
       {:pigeon, ">= 0.0.0"},
       {:kadabra, ">= 0.0.0"},
       {:uuid, "~> 1.1"},
-      {:xfile, "~> 0.4"},
-      {:delta, "~> 0.2"},
+      {:sweet_xml, "~> 0.0"},
 
       # dev dependencies
       {:mix_test_watch, "~> 0.6", only: [:dev, :docker], runtime: false},

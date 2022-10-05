@@ -2,6 +2,7 @@ defmodule SequenceWeb.StorageController do
   use SequenceWeb, :controller
   require Logger
 
+  alias ExAws.S3
   alias Sequence.Users.{Avatar, User}
   alias Sequence.{Chat.Attachment, Chat.ImageAttachment}
   alias Sequence.StorageController.StorageError
@@ -70,26 +71,17 @@ defmodule SequenceWeb.StorageController do
   def upload_attachment(conn, %{ "upload" => upload, "token" => token }) do
     with {:ok, user, _} <- Sequence.Auth.Guardian.resource_from_token(token) do
       timestamp = Timex.now |> Timex.to_unix |> Integer.to_string
-      scope = {user, timestamp}
-      is_image = ImageAttachment.valid_filename(upload.filename)
-      component = if is_image, do: ImageAttachment, else: Attachment
-      %{size: size} = File.stat! upload.path
+      filename = "attachments/#{user.uuid}/#{timestamp}"
 
-      with {:ok, file_name} <- component.store({upload, scope}) do
-        json conn, %{
-          name: file_name,
-          timestamp: timestamp,
-          type: upload.content_type,
-          size: size,
-          url: component.url({file_name, scope}, signed: true, expires_in: 24 * 60 * 60 ),
-          thumb: if(is_image, do: ImageAttachment.url({file_name, scope}, :thumb, signed: true, expires_in: 24 * 60 * 60), else: nil),
-          bare_url: component.url({file_name, scope}),
-        }
-      else
-        {:error, :invalid_file} -> {:error, :bad_request, "File type unsupported."}
-        error ->
-          raise StorageError, message: "Error uploading attachment: #{inspect(error)}"
-      end
+      upload.path
+      |> S3.Upload.stream_file()
+      |> S3.upload("listnote-uploads", filename)
+      |> ExAws.request()
+
+      {:ok, url} = ExAws.Config.new(:s3)
+      |> ExAws.S3.presigned_url(:get, "listnote-uploads", filename, [virtual_host: true])
+
+      json conn, %{ url: url }
     end
   end
 

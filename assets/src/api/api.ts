@@ -3,7 +3,7 @@ import { encode } from 'base64-arraybuffer'
 
 import { config, OAuthProvider } from '@/config'
 import {
-    AuthToken, AuthTokenPair, File, FileType, Project, ProjectRole, Task, Team, User
+    AuthToken, AuthTokenPair, File as LNFile, FileType, Project, ProjectRole, Task, Team, User
 } from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
@@ -291,7 +291,11 @@ class APIService {
     return response.data
   }
 
-  async updateFile(projectId: string, id: string, updates: Partial<File>): Promise<R.FileResponse> {
+  async updateFile(
+    projectId: string,
+    id: string,
+    updates: Partial<LNFile>
+  ): Promise<R.FileResponse> {
     const response = await this.axios.put(
       `${this.endpoint}/files/${id}?project_id=${projectId}`,
       updates
@@ -337,6 +341,21 @@ class APIService {
       `${this.endpoint}/users/data?${projectParam}key=${encodeURIComponent(key)}`,
       { data }
     )
+    return response.data
+  }
+
+  // storage
+
+  async uploadAttachment(file: File): Promise<{ url: string }> {
+    let formData = new FormData()
+    formData.append('upload', file)
+    const { token } = this.tokens?.access || {}
+    if (token) formData.append('token', token)
+
+    const headers = { 'Content-Type': 'multipart/form-data' }
+    const response = await this.axios.post(`${this.endpoint}/images/attachment`, formData, {
+      headers: headers,
+    })
     return response.data
   }
 

@@ -1,11 +1,11 @@
 defmodule Sequence.Chat.ImageAttachment do
   use Arc.Definition
 
-  @versions [:original, :thumb]
+  @versions [:original]
   @extension_whitelist ~w(.jpg .jpeg .gif .png .webp)
   @acl false
 
-  def bucket, do: "tandem-private-attachments"
+  def bucket, do: "listnote-uploads"
 
   def s3_object_headers(_version, {file, _scope}) do
     [content_type: MIME.from_path(file.file_name)]
