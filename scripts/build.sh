@@ -2,6 +2,7 @@
 
 set -e
 
+. $HOME/.asdf/asdf.sh
 cd assets
 yarn --production=false
 yarn build
