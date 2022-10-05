@@ -82,6 +82,7 @@
 }
 
 .menubar {
+  user-select: none;
   /* safari ios hack */
   transform: translate3d(0,0,0)
 }

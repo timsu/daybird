@@ -44,7 +44,8 @@ export const ContextMenuWithData = (
         <div ref={addHandler} class="block fixed" style={{ top: open.y, left: open.x }}>
           <div
             class={classNames(
-              'bg-white w-60 border border-gray-300 rounded-lg flex flex-col text-sm p-1 text-gray-900 shadow-lg',
+              'bg-white w-60 border border-gray-300 rounded-lg flex flex-col text-sm p-1',
+              'select-none  text-gray-900 shadow-lg',
               props.class || ''
             )}
           >
