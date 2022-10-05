@@ -6,16 +6,18 @@ import ErrorMessage from '@/components/core/ErrorMessage'
 import Modal from '@/components/modals/Modal'
 import { unwrapError } from '@/utils'
 import { Dialog } from '@headlessui/react'
-import { TrashIcon } from '@heroicons/react/outline'
+import { ArchiveIcon, TrashIcon } from '@heroicons/react/outline'
 
 type Props = {
   label: string
+  archive?: boolean
   close: () => void
   performAction: () => Promise<void>
 }
 
-export default ({ label, close, children, performAction }: RenderableProps<Props>) => {
+export default ({ archive, label, close, children, performAction }: RenderableProps<Props>) => {
   const [error, setError] = useState<string>()
+  const verb = archive ? 'Archive' : 'Delete'
 
   const submit = async (e: Event) => {
     e.preventDefault()
@@ -37,11 +39,15 @@ export default ({ label, close, children, performAction }: RenderableProps<Props
     <Modal open={!!open} close={close}>
       <form onSubmit={submit}>
         <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-          <TrashIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+          {archive ? (
+            <ArchiveIcon className="h-6 w-6 text-orange-600" aria-hidden="true" />
+          ) : (
+            <TrashIcon className="h-6 w-6 text-red-600" aria-hidden="true" />
+          )}
         </div>
         <div className="mt-3 text-center sm:mt-5">
           <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-            Delete “{label}”?
+            {verb} “{label}”?
           </Dialog.Title>
         </div>
 
@@ -57,7 +63,7 @@ export default ({ label, close, children, performAction }: RenderableProps<Props
             onKeyPress={onDeletePress}
             tabIndex={1}
           >
-            Confirm Delete
+            Confirm {verb}
           </Button>
         </div>
 

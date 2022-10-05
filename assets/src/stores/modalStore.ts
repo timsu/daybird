@@ -11,7 +11,7 @@ class ModalStore {
 
   newFileModal = atom<{ project: Project; type: FileType; parent?: string | null } | false>(false)
 
-  deleteFileModal = atom<{ project: Project; file: File } | false>(false)
+  deleteFileModal = atom<{ project: Project; file: File; archive?: boolean } | false>(false)
 
   renameFileModal = atom<{ project: Project; file: File } | false>(false)
 

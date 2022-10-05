@@ -182,7 +182,7 @@ class FileStore {
     }
   }
 
-  deleteFile = async (project: Project, file: File) => {
+  deleteFile = async (project: Project, file: File, archive?: boolean) => {
     const files = this.files.get()[project.id]
     if (file.type == FileType.FOLDER) {
       const children = files.filter((f) => f.parent == file.id)
@@ -191,7 +191,10 @@ class FileStore {
       })
     }
 
-    await API.updateFile(project.id, file.id, { deleted_at: new Date().toISOString() })
+    const updates = archive
+      ? { archived_at: new Date().toISOString() }
+      : { deleted_at: new Date().toISOString() }
+    await API.updateFile(project.id, file.id, updates)
     this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
 
     const newFiles = files.filter((f) => f.id != file.id)

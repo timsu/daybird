@@ -125,9 +125,10 @@ function FileNode({ indent, node, projectId }: ChildProps) {
                   <div class="grow" />
                   <div
                     onClick={(e) => {
+                      const target = (e.target as HTMLDivElement).getBoundingClientRect()
                       e.stopPropagation()
                       e.preventDefault()
-                      triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-doc', {
+                      triggerContextMenu(target.left, target.top, 'file-tree-doc', {
                         file: item,
                         projectId: projectId,
                       })
