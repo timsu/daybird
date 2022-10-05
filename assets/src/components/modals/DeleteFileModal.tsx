@@ -10,16 +10,16 @@ export default () => {
 
   if (!open) return null
 
-  const { project, file } = deleteFileModal
+  const { project, file, archive } = deleteFileModal
 
   const close = () => modalStore.deleteFileModal.set(false)
 
   const submit = async () => {
-    await fileStore.deleteFile(project, file)
+    await fileStore.deleteFile(project, file, archive)
   }
 
   return (
-    <DeleteModal close={close} performAction={submit} label={file.name}>
+    <DeleteModal archive={archive} close={close} performAction={submit} label={file.name}>
       {file.type == FileType.FOLDER && (
         <div className="text-center my-3">
           Any nested files and folders will be moved to the parent folder.

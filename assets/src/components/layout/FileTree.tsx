@@ -9,6 +9,7 @@ import { fileStore } from '@/stores/fileStore'
 import {} from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
+import { isMobile } from '@/utils/os'
 import {
     ChevronDownIcon, ChevronRightIcon, DotsHorizontalIcon, FolderIcon, FolderOpenIcon
 } from '@heroicons/react/outline'
@@ -100,7 +101,7 @@ function FileNode({ indent, node, projectId }: ChildProps) {
           const matches = location.pathname == encodeURI(href)
           return (
             <Link
-              draggable
+              draggable={!isMobile}
               key={item.name}
               href={href}
               onDragOver={allowDrop}
@@ -124,9 +125,10 @@ function FileNode({ indent, node, projectId }: ChildProps) {
                   <div class="grow" />
                   <div
                     onClick={(e) => {
+                      const target = (e.target as HTMLDivElement).getBoundingClientRect()
                       e.stopPropagation()
                       e.preventDefault()
-                      triggerContextMenu(e.clientX - 200, e.clientY, 'file-tree-doc', {
+                      triggerContextMenu(target.left, target.top, 'file-tree-doc', {
                         file: item,
                         projectId: projectId,
                       })
@@ -164,7 +166,7 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
         data={{ file: item, projectId: projectId }}
       >
         <div
-          draggable
+          draggable={!isMobile}
           onDragOver={allowDrop}
           onDragStart={dragHandler(item.id)}
           onDrop={dropHandler(projectId, item.id)}

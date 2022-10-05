@@ -12,7 +12,7 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
 
   useEffect(() => {
     // update the menu bar when anything changes
-    editor.on('selectionUpdate', () => setUpdate(Date.now()))
+    editor.on('transaction', () => setUpdate(Date.now()))
 
     let height = window.visualViewport!.height
     const viewport = window.visualViewport
