@@ -346,14 +346,15 @@ class APIService {
 
   // storage
 
-  async uploadAttachment(file: File): Promise<{ url: string }> {
+  async uploadAttachment(file: File, projectId: string): Promise<{ url: string }> {
     let formData = new FormData()
     formData.append('upload', file)
     const { token } = this.tokens?.access || {}
     if (token) formData.append('token', token)
+    if (projectId) formData.append('project_id', projectId)
 
     const headers = { 'Content-Type': 'multipart/form-data' }
-    const response = await this.axios.post(`${this.endpoint}/images/attachment`, formData, {
+    const response = await this.axios.post(`${this.endpoint}/attachments`, formData, {
       headers: headers,
     })
     return response.data

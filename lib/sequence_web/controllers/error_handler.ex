@@ -14,8 +14,6 @@ defmodule SequenceWeb.ErrorHandler do
         render conn, "404.json"
       %Phoenix.ActionClauseError{} ->
         render conn, "400.json", message: "Missing params for this request."
-      %Sequence.StorageController.StorageError{reason: message} ->
-        render conn, "500.json", message: message
       _ ->
         if Sequence.dev?, do: IO.inspect(reason)
         if Sequence.test? do
