@@ -1,7 +1,7 @@
 defmodule Sequence.Chat.ImageAttachment do
   use Arc.Definition
 
-  @versions [:original, :thumb]
+  @versions [:original]
   @extension_whitelist ~w(.jpg .jpeg .gif .png .webp)
   @acl false
 
