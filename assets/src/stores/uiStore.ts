@@ -5,7 +5,7 @@ import { config } from '@/config'
 import { File, User } from '@/models'
 import { topicStore } from '@/stores/topicStore'
 
-const SLEEP_CHECK_INTERVAL = 30_000
+const LS_RECENT_FILES = 'rf'
 
 class UIStore {
   // --- stores
@@ -24,11 +24,15 @@ class UIStore {
 
   initLoggedInUser = (user: User) => {
     topicStore.initTopicflow()
+
+    const recentFiles = localStorage.getItem(LS_RECENT_FILES)
+    if (recentFiles) this.recentFiles = JSON.parse(recentFiles)
   }
 
   addRecentNote = (id: string, projectId: string) => {
     this.recentFiles = this.recentFiles.filter((n) => n.id != id).slice(0, 9)
     this.recentFiles.unshift({ id, projectId })
+    localStorage.setItem(LS_RECENT_FILES, JSON.stringify(this.recentFiles))
   }
 }
 
