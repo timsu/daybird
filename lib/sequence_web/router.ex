@@ -72,7 +72,8 @@ defmodule SequenceWeb.Router do
     post "/log_join_event", InvitesController, :log_join_event
 
     post "/images/profile_picture", StorageController, :upload_profile_picture
-    post "/images/attachment", StorageController, :upload_attachment
+    post "/attachments", StorageController, :upload_attachment
+    get "/attachments/:user_id/:timestamp", StorageController, :get_attachment
 
     pipe_through :authenticated
 

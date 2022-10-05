@@ -2,6 +2,7 @@ import { Plugin, PluginKey } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
 import { API } from '@/api'
+import { projectStore } from '@/stores/projectStore'
 import { mergeAttributes, Node, nodeInputRule } from '@tiptap/core'
 
 export interface ImageOptions {
@@ -98,6 +99,16 @@ export const Image = Node.create<ImageOptions>({
   },
 
   addProseMirrorPlugins() {
+    async function uploadImageCreateNode(image: File, view: EditorView) {
+      const { schema } = view.state
+      const response = await API.uploadAttachment(image, projectStore.currentProject.get()!.id)
+      const node = schema.nodes.image.create({
+        src: response.url,
+        title: image.name,
+      })
+      return node
+    }
+
     return [
       new Plugin({
         key: new PluginKey('imageHandler'),
@@ -109,12 +120,8 @@ export const Image = Node.create<ImageOptions>({
               if (item.type.indexOf('image') === 0) {
                 event.preventDefault()
                 const image = item.getAsFile()
-                const { schema } = view.state
-                API.uploadAttachment(image!).then((response) => {
-                  const node = schema.nodes.image.create({
-                    src: response.url,
-                    title: image!.name,
-                  })
+
+                uploadImageCreateNode(image!, view).then((node) => {
                   const transaction = view.state.tr.replaceSelectionWith(node)
                   view.dispatch(transaction)
                 })
@@ -143,15 +150,9 @@ export const Image = Node.create<ImageOptions>({
 
               event.preventDefault()
 
-              const { schema } = view.state
               const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY })
-
               images.forEach(async (image) => {
-                const response = await API.uploadAttachment(image)
-                const node = schema.nodes.image.create({
-                  src: response.url,
-                  title: image.name,
-                })
+                const node = await uploadImageCreateNode(image, view)
                 const transaction = view.state.tr.insert(coordinates!.pos, node)
                 view.dispatch(transaction)
               })
