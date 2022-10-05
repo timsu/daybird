@@ -161,6 +161,10 @@ class FileStore {
 
       const oldFiles = (files[oldProject] || []).filter((f) => f.id != file.id)
       this.updateFiles(oldProject, oldFiles)
+
+      if (location.pathname == `${paths.DOC}/${oldProject}/${file.id}`) {
+        location.pathname = `${paths.DOC}/${newProject}/${file.id}`
+      }
     }
   }
 
