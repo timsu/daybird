@@ -78,7 +78,7 @@ function QuickSearchBody({ close }: { close: () => void }) {
           }
         })
         .filter(Boolean) as SearchResult[]
-      setResults(recentResults)
+      setResults(recentResults.length > 0 ? recentResults : undefined)
       return
     }
 
@@ -173,36 +173,41 @@ function QuickSearchBody({ close }: { close: () => void }) {
         />
         <SearchIcon class="absolute top-4 right-4 h-6 w-6 text-slate-400" />
       </div>
-      {!searchText && results?.length && (
-        <div class="p-2 mx-auto text-sm text-gray-500 uppercase font-semibold">Recent Notes</div>
-      )}
+
       {results === undefined ? (
         <></>
       ) : results.length === 0 ? (
-        <div class="p-8 mx-auto text-sm text-gray-500 uppercase font-semibold">No results</div>
+        <div class="p-2 mx-auto text-sm text-gray-500 uppercase font-semibold">No results</div>
       ) : (
-        <ul class="max-h-[18.375rem] divide-y divide-slate-200 overflow-y-auto rounded-b-lg border-t border-slate-200 text-sm leading-6">
-          {results.map((r, idx) => (
-            <a href={r.href} key={r.href}>
-              <li
-                class={classNames('flex items-center p-4', selected == idx ? 'bg-blue-300' : '')}
-                ref={(elem) =>
-                  selected == idx && elem?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-                }
-              >
-                {r.type == 'file' ? (
-                  <DocumentIcon class="w-4 h-4" />
-                ) : (
-                  <BriefcaseIcon class="w-4 h-4" />
-                )}
-                <span class="ml-4 whitespace-nowrap font-semibold text-slate-900 grow">
-                  {r.name}
-                </span>
-                <span class="ml-4 text-right text-xs text-slate-600">{r.desc}</span>
-              </li>
-            </a>
-          ))}
-        </ul>
+        <>
+          {!searchText && (
+            <div class="p-2 mx-auto text-sm text-gray-500 uppercase font-semibold">
+              Recent Notes
+            </div>
+          )}
+          <ul class="max-h-[18.375rem] divide-y divide-slate-200 overflow-y-auto rounded-b-lg border-t border-slate-200 text-sm leading-6">
+            {results.map((r, idx) => (
+              <a href={r.href} key={r.href}>
+                <li
+                  class={classNames('flex items-center p-4', selected == idx ? 'bg-blue-300' : '')}
+                  ref={(elem) =>
+                    selected == idx && elem?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+                  }
+                >
+                  {r.type == 'file' ? (
+                    <DocumentIcon class="w-4 h-4" />
+                  ) : (
+                    <BriefcaseIcon class="w-4 h-4" />
+                  )}
+                  <span class="ml-4 whitespace-nowrap font-semibold text-slate-900 grow">
+                    {r.name}
+                  </span>
+                  <span class="ml-4 text-right text-xs text-slate-600">{r.desc}</span>
+                </li>
+              </a>
+            ))}
+          </ul>
+        </>
       )}
     </>
   )
