@@ -2,7 +2,7 @@
 
 set -e
 
-. $HOME/.asdf/asdf.sh
+. $HOME/.profile
 cd assets
 yarn --production=false
 yarn build
