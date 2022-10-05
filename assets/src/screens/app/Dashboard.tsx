@@ -13,6 +13,7 @@ type Props = {
 }
 export default (props: Props) => {
   const hasProjects = useStore(projectStore.projects).length > 0
+  const isPWA = location.search?.includes('source=pwa')
 
   return (
     <div className="py-6">
@@ -22,9 +23,11 @@ export default (props: Props) => {
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
       </div>
 
-      {isMobile && (
-        <div className="bg-yellow-500 p-4 mt-10 mb-8">
-          <div className="font-bold">Add ListNote to your home screen!</div>
+      {!isPWA && (
+        <div className="bg-blue-200 p-4 mt-10 mb-8 mx-4 rounded">
+          <div className="font-bold">
+            Add ListNote to your {isMobile ? 'home screen' : 'desktop'}!
+          </div>
           {getOS() == 'ios' ? (
             <div>
               Use the Share button in Safari{' '}
@@ -33,15 +36,18 @@ export default (props: Props) => {
             </div>
           ) : (
             <div>
-              Use the menu in your browser to add ListNote to your home screen and get quick access
-              to your notes.
+              Use the menu in your browser to
+              {isMobile
+                ? ' add ListNote to your home screen '
+                : ' install ListNote as a desktop app '}
+              and get quick access to your notes.
             </div>
           )}
         </div>
       )}
 
       {!hasProjects && (
-        <div className="px-4 sm:px-6 md:px-8 my-6 bg-yellow-100 p-4 rounded">
+        <div className="px-4 sm:px-6 md:px-8 my-6 bg-yellow-200 p-4 rounded">
           <p class="mb-2">Get started by creating your first project:</p>
           <a href={paths.PROJECTS}>
             <Button>Go to the projects page</Button>
@@ -49,27 +55,20 @@ export default (props: Props) => {
         </div>
       )}
 
-      <div className="px-4 sm:px-6 md:px-8 my-6 leading-10">
-        <p class="mb-6">
-          ListNote status: <b>Collaborative MVP</b> ({config.hash})
-        </p>
-
-        <p>Welcome to ListNote! </p>
-
+      <div className="px-4 sm:px-6 md:px-8 my-6 ">
+        <p>Welcome to ListNote! It's a great day to start writing.</p>
+        <div className="h-4" />
         <p>
-          I've moved all documents into the database. If you need the contents of your previous
-          notes please let me know, they are still around.
-        </p>
-
-        <p>
-          Please send ideas and feedback to{' '}
+          ListNote is beta software and is actively being developed. Please send ideas and feedback
+          to{' '}
           <a class="hover:bg-blue-200 rounded text-blue-800" href="mailto:tim@listnote.co">
             tim@listnote.co
           </a>
           .
         </p>
-
+        <div className="h-4" />
         <p>Thank you for your support and patience.</p>
+        <div className="h-4" />
 
         <p>-Tim</p>
       </div>
