@@ -4,7 +4,6 @@ defmodule SequenceWeb.StorageController do
 
   alias ExAws.S3
   alias Sequence.Users.{Avatar, User}
-  alias Sequence.{Chat.Attachment, Chat.ImageAttachment}
   alias Sequence.StorageController.StorageError
 
   action_fallback SequenceWeb.FallbackController
