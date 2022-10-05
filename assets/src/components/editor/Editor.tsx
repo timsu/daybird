@@ -118,13 +118,10 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
       ],
     }))
 
-    try {
-      if (contentType == 'json') {
-        setTimeout(() => editor.chain().setContent(initialContent).focus().run(), 0)
-      }
-    } catch (e) {
-      logger.info(e)
+    if (contentType == 'json') {
+      setTimeout(() => editor.commands.setContent(initialContent), 0)
     }
+    setTimeout(() => editor.commands.focus(), 0)
 
     return { editor, ydoc }
   }, [id])
