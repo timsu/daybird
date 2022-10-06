@@ -7,6 +7,7 @@
 .ProseMirror {
   height: 100%;
   line-height: 170%;
+  margin-bottom: 200px;
 
   p.is-editor-empty:first-child::before {
     color: #adb5bd;
