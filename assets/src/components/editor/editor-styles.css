@@ -7,6 +7,12 @@
 .ProseMirror {
   height: 100%;
   line-height: 170%;
+  margin-bottom: 200px;
+
+  @media print {
+    margin-bottom: 0;
+    height: auto;
+  }
 
   p.is-editor-empty:first-child::before {
     color: #adb5bd;

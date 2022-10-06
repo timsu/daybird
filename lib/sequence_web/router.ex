@@ -18,7 +18,7 @@ defmodule SequenceWeb.Router do
       Plug.Static,
       at: "/", from: :sequence,
       gzip: true,
-      only: ~w(assets js css favicon.ico robots.txt version.json  pwa.json serviceworker.js)
+      only: ~w(assets js css favicon.ico robots.txt version.json pwa.json pwa-local.json serviceworker.js)
     )
   end
 

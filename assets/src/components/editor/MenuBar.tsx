@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'preact/hooks'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 
 import { TaskItem } from '@/components/editor/TaskItem'
 import { classNames } from '@/utils'
 import { getOS } from '@/utils/os'
-import { CheckCircleIcon, CheckIcon, ViewListIcon } from '@heroicons/react/outline'
+import { CheckCircleIcon, CheckIcon, LinkIcon, ViewListIcon } from '@heroicons/react/outline'
 import { Editor } from '@tiptap/core'
 
 export const MenuBar = ({ editor }: { editor: Editor }) => {
@@ -18,10 +18,8 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
       }
     })
 
-    let height = window.visualViewport!.height
+    // fix the menu bar
     const viewport = window.visualViewport
-
-    // fix the menu bar on the bottom
     if (getOS() == 'ios') {
       window.visualViewport!.addEventListener('scroll', resizeHandler)
       window.visualViewport!.addEventListener('resize', resizeHandler)
@@ -42,19 +40,31 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
     return null
   }
 
-  const createTask = () => {
+  const createTask = useCallback(() => {
     const newNode = {
       type: 'task',
       attrs: { id: 'focus' },
     }
-
     editor.commands.insertContent(newNode)
-  }
+  }, [editor])
+
+  const setLink = useCallback(() => {
+    const previousUrl = editor.getAttributes('link').href
+    if (previousUrl) {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run()
+      return
+    }
+
+    let url = window.prompt('URL', previousUrl)
+    if (!url) return
+    if (!url.includes('://')) url = 'https://' + url
+    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  }, [editor])
 
   return (
     <div
       ref={menuBar}
-      className="menubar flex overflow-hidden fixed bg-white sm:relative z-20 sm:z-0 top-[10px] w-full sm:w-auto"
+      className="menubar print:hidden flex overflow-hidden fixed bg-white sm:relative z-20 sm:z-0 top-[10px] w-full sm:w-auto"
     >
       <button
         onClick={createTask}
@@ -142,6 +152,13 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
         title="Block Quote"
       >
         &raquo;
+      </button>
+      <button
+        onClick={setLink}
+        className={classNames('hidden sm:block', editor.isActive('link') ? 'is-active' : '')}
+        title="Link"
+      >
+        <LinkIcon />
       </button>
       <button
         title="Horizontal Line"
