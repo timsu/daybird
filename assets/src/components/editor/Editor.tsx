@@ -13,7 +13,7 @@ import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { taskStore } from '@/stores/taskStore'
-import { debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
+import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
@@ -39,7 +39,12 @@ export default (props: Props) => {
   useDeleteTaskListener(editor)
 
   return (
-    <div class="max-w-2xl mx-auto w-full h-auto grow pt-4 pb-20 px-8 bg-white rounded-md mt-4 shadow">
+    <div
+      class={classNames(
+        'max-w-2xl mx-auto w-full h-auto grow pt-4 pb-20 px-8 bg-white rounded-md mt-4 shadow',
+        'print:shadow-none print:max-w-none print:p-0'
+      )}
+    >
       {editor && <MenuBar editor={editor} />}
       <div ref={editorRef} class="listnote mt-4 h-full" />
     </div>

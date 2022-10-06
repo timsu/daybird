@@ -66,12 +66,13 @@ export default (props: Props) => {
         </div>
       </CSSTransition>
       <div class="flex flex-col grow  w-full">
-        <div class="w-full max-w-2xl mx-auto pt-6 px-8 flex items-center">
+        <div class="w-full max-w-2xl mx-auto pt-6 px-8 flex items-center print:px-0 print:max-w-none">
           <div class="flex items-center gap-4">
             <h1 class="text-xl font-bold ">{title}</h1>
             <Pressable
               onClick={(e) => {
-                triggerContextMenu(e.clientX, e.clientY, 'doc-menu', {
+                const pos = (e.target as HTMLDivElement).getBoundingClientRect()
+                triggerContextMenu(pos.left, pos.top, 'doc-menu', {
                   docId: props.id,
                   projectId: props.projectId,
                 })

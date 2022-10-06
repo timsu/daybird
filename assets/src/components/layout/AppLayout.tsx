@@ -107,8 +107,13 @@ export default function ({ children }: RenderableProps<{}>) {
           <AppSidebar darkHeader />
         </div>
       )}
-      <div className={classNames(!desktopSidebarHidden ? 'md:pl-64' : '', 'flex flex-col h-full')}>
-        <div className="sticky top-0 z-20 flex-shrink-0 flex h-16 bg-white">
+      <div
+        className={classNames(
+          !desktopSidebarHidden ? 'md:pl-64' : '',
+          'flex flex-col h-full print:h-auto'
+        )}
+      >
+        <div className="sticky top-0 z-20 flex-shrink-0 flex h-16 bg-white print:hidden">
           {(!sidebarOpen || desktopSidebarHidden) && (
             <button
               type="button"

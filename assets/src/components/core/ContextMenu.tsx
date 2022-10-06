@@ -40,7 +40,7 @@ export const ContextMenuWithData = (
 
   return (
     <Transition.Root show={!!open} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={close}>
+      <Dialog as="div" className="relative z-50 print:hidden" onClose={close}>
         <div ref={addHandler} class="block fixed" style={{ top: open.y, left: open.x }}>
           <div
             class={classNames(
