@@ -8,6 +8,7 @@ import * as Y from 'yjs'
 
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
+import Link from '@/components/editor/Link'
 import { MenuBar } from '@/components/editor/MenuBar'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { Project } from '@/models'
@@ -17,7 +18,6 @@ import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/ut
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
-import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import StarterKit from '@tiptap/starter-kit'
 
