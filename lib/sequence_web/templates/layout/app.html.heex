@@ -7,7 +7,7 @@
     <meta name="csrf-token" content={csrf_token_value()}>
     <meta name="apple-mobile-web-app-title" content="ListNote">
     <meta name="theme-color" content="#f9fafb">
-    <link rel="manifest" href="/pwa.json">
+    <link rel="manifest" href={if Sequence.dev?, do: "/pwa-local.json", else: "/pwa.json"}>
 
     <%
       title = assigns[:title] || "Love your lists"
