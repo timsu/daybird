@@ -66,18 +66,18 @@ class FileStore {
     if (!this.topics[project.id]) this.initTopic(project)
   }
 
-  newFile = async (project: Project, name: string, type: FileType, parent?: string | null) => {
+  newFile = async (projectId: string, name: string, type: FileType, parent?: string | null) => {
     name = name.trim()
 
-    const response = await API.createFile(project, { name, type, parent })
-    const file = File.fromJSON(response.file, project.id)
+    const response = await API.createFile(projectId, { name, type, parent })
+    const file = File.fromJSON(response.file, projectId)
 
-    const files = this.files.get()[project.id] || []
+    const files = this.files.get()[projectId] || []
     const newFiles = sortFiles([...files, file])
-    this.updateFiles(project.id, newFiles)
-    this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
+    this.updateFiles(projectId, newFiles)
+    this.topics[projectId]?.setSharedKey(KEY_TREECHANGE, Date.now())
 
-    if (type == FileType.DOC) route(paths.DOC + '/' + project.id + '/' + response.file.id)
+    if (type == FileType.DOC) route(paths.DOC + '/' + projectId + '/' + response.file.id)
   }
 
   dailyFileTitle = () => moment().format('YYYY-MM-DD')
@@ -93,7 +93,7 @@ class FileStore {
       (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
     )
     if (!yearFolder) {
-      const response = await API.createFile(project, { name: yearName, type: FileType.FOLDER })
+      const response = await API.createFile(project.id, { name: yearName, type: FileType.FOLDER })
       yearFolder = makeTreeFile(response.file)
       files.push(response.file)
     }
@@ -103,7 +103,7 @@ class FileStore {
       (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
     )
     if (!monthFolder) {
-      const response = await API.createFile(project, {
+      const response = await API.createFile(project.id, {
         name: monthName,
         type: FileType.FOLDER,
         parent: yearFolder.file.id,
@@ -119,7 +119,7 @@ class FileStore {
       return
     }
 
-    const response = await API.createFile(project, {
+    const response = await API.createFile(project.id, {
       name,
       type: FileType.DOC,
       parent: monthFolder.file.id,
@@ -131,6 +131,21 @@ class FileStore {
     this.updateFiles(project.id, newFiles)
 
     route(paths.DOC + '/' + project.id + '/' + response.file.id)
+  }
+
+  handleWikiLink = async (linkName: string) => {
+    const currentDocId = docStore.id.get()
+    if (!currentDocId) return
+    const file = this.idToFile.get()[currentDocId]
+    if (!file) return
+
+    const files = this.files.get()[file.projectId!] || []
+    const existing = files.find((f) => f.parent == file.parent && f.name == linkName)
+    if (existing) {
+      return route(paths.DOC + '/' + file.projectId + '/' + existing.id)
+    }
+
+    return this.newFile(file.projectId!, linkName, FileType.DOC, file.parent)
   }
 
   moveFile = async (projectId: string, file: File, newParent: string | null) => {

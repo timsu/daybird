@@ -88,7 +88,7 @@ class ProjectStore {
     this.setCurrentProject(project)
 
     // create a document
-    fileStore.newFile(project, 'Welcome', FileType.DOC)
+    fileStore.newFile(project.id, 'Welcome', FileType.DOC)
     fileStore.setExpanded(project.id, true)
   })
 

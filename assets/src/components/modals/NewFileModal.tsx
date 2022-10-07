@@ -1,17 +1,17 @@
-import { Fragment } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
+import moment from 'moment-mini'
+import { useEffect, useRef, useState } from 'preact/hooks'
 
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
+import Pressable from '@/components/core/Pressable'
 import Submit from '@/components/core/Submit'
 import Modal from '@/components/modals/Modal'
 import { FileType } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
-import { projectStore } from '@/stores/projectStore'
-import { toTitleCase, unwrapError } from '@/utils'
-import { Dialog, Transition } from '@headlessui/react'
-import { DocumentIcon, FolderIcon, PlusIcon } from '@heroicons/react/outline'
+import { unwrapError } from '@/utils'
+import { Dialog } from '@headlessui/react'
+import { DocumentIcon, FolderIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default () => {
@@ -20,6 +20,7 @@ export default () => {
   const [submitting, setSubmitting] = useState<boolean>(false)
   const newFileOpen = useStore(modalStore.newFileModal)
   const renameFileOpen = useStore(modalStore.renameFileModal)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const open = newFileOpen || renameFileOpen
 
@@ -56,7 +57,7 @@ export default () => {
       if (renameFileOpen) {
         await fileStore.renameFile(renameFileOpen.project.id, renameFileOpen.file, name)
       } else if (newFileOpen) {
-        await fileStore.newFile(newFileOpen.project, name, newFileOpen.type, newFileOpen.parent)
+        await fileStore.newFile(newFileOpen.project.id, name, newFileOpen.type, newFileOpen.parent)
       }
       close()
     } catch (e) {
@@ -86,6 +87,7 @@ export default () => {
           </Dialog.Title>
           <div className="mt-6 text-left">
             <Input
+              forwardRef={inputRef}
               type="text"
               label={`${noun} name`}
               id="name"
@@ -94,6 +96,14 @@ export default () => {
               onChange={(e) => setName((e.target as HTMLInputElement).value)}
             />
           </div>
+          <Pressable
+            onClick={(e) => {
+              setName(moment().format('YY.MM.DD ') + name)
+              inputRef.current?.focus()
+            }}
+          >
+            <div className="text-blue-500 text-sm">Insert today's date (YY.MM.DD)</div>
+          </Pressable>
         </div>
         <div className="mt-5 sm:mt-6">
           <Submit label={`${isRename ? 'Rename' : 'Create'} ${noun}`} disabled={submitting} />

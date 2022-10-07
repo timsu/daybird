@@ -5,7 +5,7 @@ export default Link.extend({
     return {
       'Mod-k': () => {
         const previousUrl: string = this.editor.getAttributes('link').href
-        const url = window.prompt('URL', previousUrl)
+        let url = window.prompt('URL', previousUrl)
 
         // cancelled
         if (url === null) {
@@ -18,6 +18,7 @@ export default Link.extend({
         }
 
         // update link
+        if (!url.includes('://')) url = 'https://' + url
         return this.editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
       },
     }
