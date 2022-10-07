@@ -2,7 +2,7 @@ import { Ref } from 'preact'
 
 type Props = {
   label: string
-  forwardRef: Ref<HTMLInputElement>
+  forwardRef?: Ref<HTMLInputElement>
 } & JSX.HTMLAttributes<HTMLInputElement>
 
 export default (props: Props) => {
