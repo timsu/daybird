@@ -57,7 +57,7 @@ export default () => {
       if (renameFileOpen) {
         await fileStore.renameFile(renameFileOpen.project.id, renameFileOpen.file, name)
       } else if (newFileOpen) {
-        await fileStore.newFile(newFileOpen.project, name, newFileOpen.type, newFileOpen.parent)
+        await fileStore.newFile(newFileOpen.project.id, name, newFileOpen.type, newFileOpen.parent)
       }
       close()
     } catch (e) {
@@ -97,7 +97,7 @@ export default () => {
             />
           </div>
           <Pressable
-            onClick={() => {
+            onClick={(e) => {
               setName(moment().format('YY.MM.DD ') + name)
               inputRef.current?.focus()
             }}

@@ -11,6 +11,7 @@ import { Image } from '@/components/editor/Image'
 import Link from '@/components/editor/Link'
 import { MenuBar } from '@/components/editor/MenuBar'
 import { TaskItem } from '@/components/editor/TaskItem'
+import { WikiLink } from '@/components/editor/WikiLink'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { taskStore } from '@/stores/taskStore'
@@ -100,6 +101,7 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
         HorizontalRule,
         TaskItem,
         Image,
+        WikiLink,
         Link.configure({
           autolink: false,
           linkOnPaste: true,
