@@ -1,4 +1,6 @@
+import Tooltip from '@/components/core/Tooltip'
 import { paths } from '@/config'
+import github from '@/images/github.png'
 
 export default () => (
   <div className="text-center mb-32">
@@ -12,7 +14,7 @@ export default () => (
       <div className="h-4" />
       Work better by working your way.
     </p>
-    <div className="mt-4 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+    <div className="mt-4 mb-8 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
       <div className="rounded-md shadow">
         <a
           href={paths.SIGNUP}
@@ -23,6 +25,17 @@ export default () => (
           Try it for yourself
         </a>
       </div>
+    </div>
+    <div className="mt-4 mb-8 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+      <Tooltip message="Check out ListNote on Github" placement="bottom" tooltipClass="w-[220px]">
+        <a
+          className="text-funblue-600 underline"
+          href="https://github.com/timsu/listnote"
+          target="_blank"
+        >
+          <img src={github} width={32} height={32} />
+        </a>
+      </Tooltip>
     </div>
   </div>
 )
