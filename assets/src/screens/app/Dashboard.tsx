@@ -1,8 +1,6 @@
-import { route } from 'preact-router'
-
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
-import { config, paths } from '@/config'
+import { paths } from '@/config'
 import shareIcon from '@/images/share-apple.svg'
 import { projectStore } from '@/stores/projectStore'
 import { getOS, isMobile } from '@/utils/os'
@@ -11,6 +9,7 @@ import { useStore } from '@nanostores/preact'
 type Props = {
   path: string
 }
+
 export default (props: Props) => {
   const hasProjects = useStore(projectStore.projects).length > 0
   const isPWA = location.search?.includes('source=pwa')
