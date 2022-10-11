@@ -28,7 +28,7 @@ function getTopicflowUrl(origin_url: string) {
     return `ws${base}:${port}`
   } else {
     const base = origin_url.replace(/https?:\/\//, '')
-    return `wss://api.${base}`
+    return `wss://${base}`
   }
 }
 
