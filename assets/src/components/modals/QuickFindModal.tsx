@@ -65,14 +65,14 @@ function QuickSearchBody({ close }: { close: () => void }) {
       const allFiles = fileStore.idToFile.get()
       const recentResults: SearchResult[] = uiStore.recentFiles
         .map(({ id, projectId }) => {
-          const f = allFiles[id]
-          const href = `${paths.DOC}/${projectId}/${f.id}`
+          const f: File | undefined = allFiles[id]
+          const href = `${paths.DOC}/${projectId}/${id}`
           if (href == location.pathname) return null
           const project = projects.find((p) => p.id == projectId)
           return {
             type: 'file',
-            name: f.name,
-            desc: project!.name,
+            name: f?.name,
+            desc: project?.name,
             href,
             score: 1,
           }

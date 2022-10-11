@@ -1,3 +1,4 @@
+import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 
 import Button from '@/components/core/Button'
@@ -6,6 +7,7 @@ import AppLayout from '@/components/layout/AppLayout'
 import { paths } from '@/config'
 import AppRouter from '@/screens/app/AppRouter'
 import { authStore } from '@/stores/authStore'
+import { LS_LAST_DOC } from '@/stores/docStore'
 import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 import { useStore } from '@nanostores/preact'
@@ -18,6 +20,11 @@ export default () => {
     else if (user === null) location.href = paths.SIGNIN
     else {
       uiStore.initLoggedInUser(user)
+
+      if (location.pathname == paths.APP) {
+        const lastDoc = localStorage.getItem(LS_LAST_DOC)
+        if (lastDoc) route(`${paths.DOC}/${lastDoc}`)
+      }
     }
   }, [user])
 
