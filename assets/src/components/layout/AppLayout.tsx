@@ -1,4 +1,5 @@
 import { Fragment, RenderableProps } from 'preact'
+import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 
 import AppSidebar from '@/components/layout/AppSidebar'
@@ -170,7 +171,10 @@ function ProjectPills() {
             'hover:bg-gray-400 hover:text-gray-900 cursor-pointer rounded-md px-4 py-2',
             'overflow-hidden whitespace-nowrap text-ellipsis'
           )}
-          onClick={() => projectStore.setCurrentProject(p)}
+          onClick={() => {
+            projectStore.setCurrentProject(p)
+            route(paths.TODAY)
+          }}
         >
           {p.name}
         </div>

@@ -51,16 +51,16 @@ function Links() {
     { name: 'Today', href: paths.TODAY, icon: CalendarIcon },
     {
       name: 'All Tasks',
-      href: paths.PROJECTS,
+      href: paths.TASKS + '/' + projectStore.currentProject.get()?.id,
       icon: CheckIcon,
     },
   ].filter(Boolean) as NavItem[]
 
   return (
-    <nav className="px-2 py-2 space-y-1">
+    <nav className="px-2 space-y-1">
       <div className="flex-1 flex">
         <form
-          className="w-full flex md:ml-0 bg-white rounded-md px-2 m-4 border hover:ring"
+          className="w-full flex md:ml-0 bg-white rounded-md px-2 mt-2 mb-4 border hover:ring"
           action="#"
           method="GET"
         >
@@ -150,7 +150,7 @@ function ProjectTree({ project }: { project: Project }) {
   return (
     <>
       <div className="group flex flex-col flex-1">
-        <div class="mx-4 mb-2 text-gray-500 font-semibold text-sm">NOTES</div>
+        <div class="m-4 mb-2 text-gray-500 font-semibold text-sm">NOTES</div>
 
         <FileTree projectId={project.id} />
 
