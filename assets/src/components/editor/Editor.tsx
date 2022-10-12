@@ -46,7 +46,6 @@ export default (props: Props) => {
         'print:shadow-none print:max-w-none print:p-0'
       )}
     >
-      {editor && <MenuBar editor={editor} />}
       <div ref={editorRef} class="listnote mt-4 h-full" />
     </div>
   )

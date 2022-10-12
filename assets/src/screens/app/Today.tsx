@@ -3,6 +3,7 @@ import { useEffect, useState } from 'preact/hooks'
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
 import Document from '@/components/editor/Document'
+import DailyPrompt from '@/components/journal/DailyPrompt'
 import DocMenu from '@/components/menus/DocMenu'
 import { paths } from '@/config'
 import shareIcon from '@/images/share-apple.svg'
@@ -38,8 +39,10 @@ export default (props: Props) => {
     <div class="flex flex-col grow  w-full">
       <Helmet title="ListNote | Today" />
 
-      <div className="px-4 sm:px-6 md:px-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Today</h1>
+      <div className="max-w-2xl mx-auto w-full mt-4">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-4">Today</h1>
+
+        <DailyPrompt />
       </div>
 
       <DocMenu />
