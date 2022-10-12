@@ -258,6 +258,19 @@ class FileStore {
       }
     })
   }
+
+  isJournalFolder = (file: File): boolean => {
+    if (!file) return false
+    if (file.parent) {
+      const parent = this.idToFile.get()[file.parent]
+      return this.isJournalFolder(parent)
+    }
+
+    if (file.type != FileType.FOLDER) return false
+    if (file.name.length != 4) return false
+    const intValue = parseInt(file.name)
+    return intValue > 2000 && intValue < 3000
+  }
 }
 
 export const fileStore = new FileStore()

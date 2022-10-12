@@ -93,6 +93,21 @@ export default function () {
               <FolderAddIcon class="h-4 w-4 mr-2" />
               New Folder
             </ContextMenuItem>
+
+            <hr />
+
+            <ContextMenuItem
+              onClick={() =>
+                modalStore.renameFileModal.set({
+                  project: getProject(projectId),
+                  file,
+                })
+              }
+            >
+              <PencilIcon class="h-4 w-4 mr-2" />
+              Rename Folder
+            </ContextMenuItem>
+
             <hr />
             <ContextMenuItem
               onClick={() =>
