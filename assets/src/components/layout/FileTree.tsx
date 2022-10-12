@@ -19,14 +19,21 @@ const DRAG_FILE_PREFIX = 'file:'
 
 export default ({ projectId }: { projectId: string }) => {
   const files = useStore(fileStore.fileTree)[projectId]
-  const project = useStore(projectStore.projectMap)[projectId]
 
   if (!files) return null
 
+  const nonDateFiles = files.filter((f) => {
+    if (f.file.type != FileType.FOLDER) return true
+    if (f.label.length != 4) return true
+    const intValue = parseInt(f.label)
+    if (intValue < 2000 || intValue > 3000) return true
+    return false
+  })
+
   return (
     <nav className="px-2 space-y-1">
-      {files.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
-      <FileTree projectId={projectId} nodes={files} indent={0} />
+      {nonDateFiles.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
+      <FileTree projectId={projectId} nodes={nonDateFiles} indent={0} />
       <RootFolderDropZone projectId={projectId} />
     </nav>
   )
