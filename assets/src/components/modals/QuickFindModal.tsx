@@ -30,7 +30,7 @@ export default () => {
   useEffect(() => {
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       const modifier = isMac ? e.metaKey : e.ctrlKey
-      if (modifier && e.key == 'p') {
+      if (modifier && e.key == 'o') {
         modalStore.quickFindModal.set(true)
         e.preventDefault()
       }
