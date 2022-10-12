@@ -7,6 +7,7 @@ import UserMenu from '@/components/layout/UserMenu'
 import TaskContextMenu from '@/components/menus/TaskContextMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
+import ProjectPills from '@/components/projects/ProjectPills'
 import { paths } from '@/config'
 import useSwipe from '@/hooks/useSwipe'
 import { modalStore } from '@/stores/modalStore'
@@ -111,11 +112,11 @@ export default function ({ children }: RenderableProps<{}>) {
       )}
       <div
         className={classNames(
-          !desktopSidebarHidden ? 'md:pl-64' : '',
-          'flex flex-col h-full print:h-auto'
+          !desktopSidebarHidden ? 'md:ml-52' : '',
+          'flex flex-col h-full print:h-auto bg-white pl-6'
         )}
       >
-        <div className="sticky top-0 z-20 flex-shrink-0 flex h-11 print:hidden">
+        <div className="sticky top-1 z-20 flex-shrink-0 flex print:hidden">
           {(!sidebarOpen || desktopSidebarHidden) && (
             <button
               type="button"
@@ -134,51 +135,17 @@ export default function ({ children }: RenderableProps<{}>) {
               <ProjectPills />
             </div>
             <div className="ml-4 flex items-center md:ml-6">
-              {/* <button
-                type="button"
-                className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <span className="sr-only">View notifications</span>
-                <BellIcon className="h-6 w-6" aria-hidden="true" />
-              </button> */}
-
               <UserMenu />
             </div>
           </div>
         </div>
 
-        <main className="flex flex-1 flex-col">{children}</main>
+        <main className="flex flex-1 flex-col mt-2">{children}</main>
 
         <TaskContextMenu />
         <DeleteTaskModal />
         <QuickFindModal />
       </div>
-    </>
-  )
-}
-
-function ProjectPills() {
-  const projects = useStore(projectStore.projects)
-  const currentProject = useStore(projectStore.currentProject)
-
-  return (
-    <>
-      {projects.map((p) => (
-        <div
-          key={p.id}
-          className={classNames(
-            p.id == currentProject?.id ? 'bg-gray-300 text-gray-900' : 'bg-gray-100 text-gray-400',
-            'hover:bg-gray-400 hover:text-gray-900 cursor-pointer rounded-md px-4 py-2',
-            'overflow-hidden whitespace-nowrap text-ellipsis'
-          )}
-          onClick={() => {
-            projectStore.setCurrentProject(p)
-            route(paths.TODAY)
-          }}
-        >
-          {p.name}
-        </div>
-      ))}
     </>
   )
 }
