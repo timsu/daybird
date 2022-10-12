@@ -7,6 +7,8 @@ export const paths = {
 
   APP: '/app',
 
+  TODAY: '/app/today',
+
   PROJECTS: '/app/projects',
 
   TASKS: '/app/tasks',

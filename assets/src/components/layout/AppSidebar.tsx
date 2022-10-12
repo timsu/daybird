@@ -16,11 +16,12 @@ import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
-import { classNames } from '@/utils'
+import { classNames, ctrlOrCommand } from '@/utils'
+import { isMobile } from '@/utils/os'
 import {
     BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronRightIcon,
     ChevronUpIcon, CogIcon, DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon,
-    FolderIcon, HomeIcon, PlusIcon, ViewListIcon
+    FolderIcon, HomeIcon, PlusIcon, SearchIcon, ViewListIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -34,9 +35,9 @@ type NavItem = {
 export default ({ darkHeader }: { darkHeader?: boolean }) => {
   return (
     <div className="flex-1 flex flex-col min-h-0  select-none">
-      <div className={classNames('flex items-center h-16 flex-shrink-0 px-4')}>
+      {/* <div className={classNames('flex items-center h-16 flex-shrink-0 px-4')}>
         <LogoDark class="w-[160px]" />
-      </div>
+      </div> */}
       <div className="flex-1 flex flex-col overflow-y-auto scrollbar">
         <Links />
         <Projects />
@@ -47,16 +48,40 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
 
 function Links() {
   let navigation: NavItem[] = [
-    { name: 'Dashboard', href: paths.APP, icon: HomeIcon },
+    { name: 'Today', href: paths.TODAY, icon: CalendarIcon },
     {
-      name: 'Projects',
+      name: 'All Tasks',
       href: paths.PROJECTS,
-      icon: BriefcaseIcon,
+      icon: CheckIcon,
     },
   ].filter(Boolean) as NavItem[]
 
   return (
     <nav className="px-2 py-4 space-y-1">
+      <div className="flex-1 flex">
+        <form
+          className="w-full flex md:ml-0 bg-white rounded-md px-2 m-4 border hover:ring"
+          action="#"
+          method="GET"
+        >
+          <label htmlFor="search-field" className="sr-only">
+            Navigate
+          </label>
+          <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+            <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+              <SearchIcon className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div
+              className="w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-500
+                focus:outline-none focus:placeholder-gray-400 focus:ring-0
+                focus:border-transparent sm:text-sm cursor-pointer flex items-center"
+              onClick={() => modalStore.quickFindModal.set(true)}
+            >
+              Navigate {!isMobile && `(${ctrlOrCommand()}+P)`}
+            </div>
+          </div>
+        </form>
+      </div>
       {navigation.map((item) => (
         <Match path={item.href}>
           {({ matches, url }: { matches: boolean; url: string }) => (
@@ -90,7 +115,9 @@ function Links() {
 }
 
 function Projects() {
-  const projects = useStore(projectStore.projects).filter((p) => !p.archived_at)
+  const project = useStore(projectStore.currentProject)
+
+  if (!project) return null
 
   useEffect(() => {
     fileStore.loadExpanded()
@@ -98,9 +125,7 @@ function Projects() {
 
   return (
     <>
-      {projects.map((p) => (
-        <ProjectTree key={p.id} project={p} />
-      ))}
+      <ProjectTree project={project} />
       <NewFileModal />
       <DeleteFileModal />
       <FileContextMenu />
@@ -109,17 +134,11 @@ function Projects() {
 }
 
 function ProjectTree({ project }: { project: Project }) {
-  const expanded = useStore(fileStore.expanded)[project.id]
+  if (!project) return null
 
   useEffect(() => {
-    if (expanded) fileStore.loadFiles(project)
-  }, [expanded])
-
-  const setExpanded = (setting: boolean) => {
-    fileStore.setExpanded(project.id, setting)
-  }
-
-  if (!project) return null
+    fileStore.loadFiles(project)
+  }, [project.id])
 
   const onNewFile = (type: FileType) => (e: Event) => {
     e.stopPropagation()
@@ -136,76 +155,23 @@ function ProjectTree({ project }: { project: Project }) {
 
   return (
     <>
-      <div
-        class={classNames(
-          'rounded-md flex bg-gray-200 mx-2',
-          'text-gray-700 font-semibold text-sm cursor-pressable hover:bg-gray-300 cursor-pointer'
-        )}
-        onClick={() => setExpanded(!expanded)}
-      >
-        {/* <div
-          className={classNames(
-            'flex-shrink-0 flex items-center justify-center w-16 text-white text-sm font-medium rounded-l-md'
-          )}
-          style={{ background: uniqolor(project.id).color }}
-        >
-          {project.shortcode}
-        </div> */}
-        <Tooltip
-          class="py-2 px-2 flex-row items-center grow mr-1 max-w-[200px]"
-          message={expanded ? 'Collapse' : 'Expand'}
-        >
-          <div class="mr-1 text-ellipsis">{project.name.toUpperCase()}</div>
-          {expanded ? <ChevronDownIcon class="h-3 w-3" /> : <ChevronRightIcon class="h-3 w-3" />}
-        </Tooltip>
+      <div class="mx-4 mb-2 text-gray-500 font-semibold text-sm">NOTES</div>
+
+      <FileTree projectId={project.id} />
+
+      <div className="flex-1" />
+
+      <div className="flex m-2 text-gray-500">
+        <Pressable className="flex-1" onClick={onNewFile(FileType.DOC)}>
+          <DocumentAddIcon class="h-6 w-6" />
+          <div class="text-sm">New File</div>
+        </Pressable>
+
+        <Pressable className="flex-1" onClick={onNewFile(FileType.FOLDER)}>
+          <FolderAddIcon class="h-6 w-6" />
+          <div class="text-sm">New Folder</div>
+        </Pressable>
       </div>
-
-      {expanded && (
-        <>
-          <div className="flex m-2 gap-2 text-gray-500">
-            <Pressable
-              tooltip={{ message: 'New File', tooltipClass: 'min-w-[75px]' }}
-              onClick={onNewFile(FileType.DOC)}
-            >
-              <DocumentAddIcon class="h-6 w-6" />
-            </Pressable>
-
-            <Pressable
-              tooltip={{
-                message: "New File with Today's Date",
-                tooltipClass: 'min-w-[120px]',
-              }}
-              onClick={onNewDailyFile}
-            >
-              <CalendarIcon class="h-6 w-6" />
-            </Pressable>
-
-            <Pressable
-              tooltip={{ message: 'New Folder', tooltipClass: 'min-w-[100px]' }}
-              onClick={onNewFile(FileType.FOLDER)}
-            >
-              <FolderAddIcon class="h-6 w-6" />
-            </Pressable>
-
-            <Pressable
-              tooltip={{ message: 'Tasks' }}
-              onClick={() => route(paths.TASKS + '/' + project.id)}
-            >
-              <CheckIcon class="h-6 w-6" />
-            </Pressable>
-
-            <Pressable
-              tooltip={{ message: 'Settings & Members', tooltipClass: 'min-w-[100px]' }}
-              onClick={() => route(paths.PROJECTS + '/' + project.id)}
-            >
-              <CogIcon class="h-6 w-6" />
-            </Pressable>
-          </div>
-          <FileTree projectId={project.id} />
-        </>
-      )}
-
-      {!expanded && <div className="h-5">&nbsp;</div>}
     </>
   )
 }
