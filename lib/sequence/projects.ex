@@ -119,6 +119,13 @@ defmodule Sequence.Projects do
   end
 
   def user_joined(user) do
+    {:ok, project} = create_project(%{ name: "Personal", shortcode: "ME", creator_id: user.id })
+    create_user_project(%{
+      project_id: project.id,
+      role: "admin",
+      user_id: user.id
+    })
+
     invites = Repo.all(from pi in ProjectInvite, where: is_nil(pi.deleted_at) and pi.email == ^user.email)
 
     Enum.each(invites, fn invite ->

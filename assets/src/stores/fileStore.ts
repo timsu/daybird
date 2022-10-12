@@ -216,7 +216,7 @@ class FileStore {
     this.updateFiles(project.id, newFiles)
 
     if (location.pathname.includes(encodeURI(file.id))) {
-      route(paths.APP)
+      route(paths.TODAY)
     }
   }
 

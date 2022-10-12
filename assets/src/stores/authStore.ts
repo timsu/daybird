@@ -78,7 +78,7 @@ class AuthStore {
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
 
-    location.href = paths.APP
+    location.href = paths.TODAY
   }
 
   signIn = async (email: string, password: string) => {
@@ -86,7 +86,7 @@ class AuthStore {
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
 
-    location.href = paths.APP
+    location.href = paths.TODAY
   }
 
   logout = () => {
