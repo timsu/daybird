@@ -20,7 +20,18 @@ export default (props: Props) => {
   const [todayDoc, setTodayDoc] = useState<string>('')
 
   useEffect(() => {
-    if (project) fileStore.newDailyFile(project).then(setTodayDoc)
+    // todo wait until files are loaded
+    if (project) {
+      if (!fileStore.fileTree.get()[project.id]) {
+        const unsub = fileStore.fileTree.listen((value) => {
+          if (!value[project.id]) return
+          unsub()
+          fileStore.newDailyFile(project).then(setTodayDoc)
+        })
+      } else {
+        fileStore.newDailyFile(project).then(setTodayDoc)
+      }
+    }
   }, [project?.id])
 
   return (

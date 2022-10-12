@@ -98,7 +98,7 @@ export default () => {
           </div>
           <Pressable
             onClick={(e) => {
-              setName(format(new Date(), 'yy.mm.dd ') + name)
+              setName(format(new Date(), 'yy.MM.dd ') + name)
               inputRef.current?.focus()
             }}
           >

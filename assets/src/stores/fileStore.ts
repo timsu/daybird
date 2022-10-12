@@ -80,7 +80,7 @@ class FileStore {
     if (type == FileType.DOC) route(paths.DOC + '/' + projectId + '/' + response.file.id)
   }
 
-  dailyFileTitle = () => format(new Date(), 'yyyy-mm-dd')
+  dailyFileTitle = () => format(new Date(), 'yyyy-MM-dd')
 
   newDailyFile = async (project: Project) => {
     assertIsDefined(project, 'project is defined')
@@ -99,7 +99,7 @@ class FileStore {
       files.push(response.file)
     }
 
-    const monthName = format(d, 'mm')
+    const monthName = format(d, 'MM')
     let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
       (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
     )
