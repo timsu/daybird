@@ -100,13 +100,6 @@ export default function ({ children }: RenderableProps<{}>) {
       {/* Static sidebar for desktop */}
       {!desktopSidebarHidden && (
         <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
-          <button
-            type="button"
-            className="absolute right-1 top-6 text-gray-400"
-            onClick={() => setDesktopSidebarHidden(true)}
-          >
-            {/* <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" /> */}
-          </button>
           <AppSidebar darkHeader />
         </div>
       )}
@@ -123,7 +116,8 @@ export default function ({ children }: RenderableProps<{}>) {
           {(!sidebarOpen || desktopSidebarHidden) && (
             <button
               type="button"
-              className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+              className="px-4 border-gray-200 text-gray-500 focus:outline-none -my-1
+                focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden hover:bg-gray-100"
               style={{ display: desktopSidebarHidden ? 'block' : undefined }}
               onClick={(e) =>
                 desktopSidebarHidden ? setDesktopSidebarHidden(false) : setSidebarOpen(true)
@@ -133,6 +127,16 @@ export default function ({ children }: RenderableProps<{}>) {
               <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           )}
+          {!desktopSidebarHidden && (
+            <button
+              type="button"
+              className="text-gray-400 hidden md:block hover:bg-gray-100 rounded-md"
+              onClick={() => setDesktopSidebarHidden(true)}
+            >
+              <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
+            </button>
+          )}
+
           <div className="flex-1 px-4 flex justify-between select-none overflow-x-scroll">
             <div className="flex-1 hidden sm:flex gap-2 justify-center mt-1 overflow-hidden">
               <ProjectPills />
