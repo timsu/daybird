@@ -180,7 +180,7 @@ function ProjectTree({ project }: { project: Project }) {
 
         <div className="flex-1" />
 
-        <div className="flex m-2 text-gray-500 opacity-100 sm:opacity-30 group-hover:opacity-100 transition">
+        <div className="flex m-2 opacity-100 sm:opacity-30 group-hover:opacity-100 transition-opacity">
           <Pressable className="flex-1" onClick={onNewFile(FileType.DOC)}>
             {/* <PlusIcon class="h-3 w-3" /> */}
             <div class="text-sm">+ File</div>
