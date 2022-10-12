@@ -22,8 +22,7 @@ export default () => {
       uiStore.initLoggedInUser(user)
 
       if (location.pathname == paths.APP) {
-        const lastDoc = localStorage.getItem(LS_LAST_DOC)
-        if (lastDoc) route(`${paths.DOC}/${lastDoc}`)
+        route(paths.TODAY)
       }
     }
   }, [user])
