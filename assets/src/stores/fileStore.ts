@@ -119,18 +119,32 @@ class FileStore {
       return file.file.id
     }
 
-    const response = await API.createFile(project.id, {
+    // don't create file yet, only when user edits
+    const newFile: File = File.newFile({
       name,
       type: FileType.DOC,
       parent: monthFolder.file.id,
+      projectId: project.id,
     })
-    const newFile = File.fromJSON(response.file, project.id)
-
-    this.topics[project.id]?.setSharedKey(KEY_TREECHANGE, Date.now())
+    logger.info('created provisional file', newFile)
     const newFiles = sortFiles([...files, newFile])
     this.updateFiles(project.id, newFiles)
 
-    return response.file.id
+    return newFile.id
+  }
+
+  saveProvisionalFile = async (file: File) => {
+    if (!file.provisional) return
+    const projectId = file.projectId
+    assertIsDefined(projectId)
+
+    const response = await API.createFile(projectId, file)
+    const newFile = File.fromJSON(response.file, projectId)
+
+    const files = this.files.get()[projectId] || []
+    const newFiles = sortFiles(files.filter((f) => f.id != file.id).concat([newFile]))
+    this.updateFiles(projectId, newFiles)
+    this.topics[projectId]?.setSharedKey(KEY_TREECHANGE, Date.now())
   }
 
   handleWikiLink = async (linkName: string) => {

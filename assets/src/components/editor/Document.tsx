@@ -27,6 +27,10 @@ export default ({ projectId, id }: { projectId?: string; id?: string }) => {
   }, [project, projectId, id])
 
   const saveContents = (project: Project, id: string, contents: any) => {
+    const file = fileStore.idToFile.get()[id]
+    if (file.provisional) {
+      fileStore.saveProvisionalFile(file)
+    }
     docStore.saveDoc(project, id, contents)
   }
 

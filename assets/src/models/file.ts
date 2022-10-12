@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid'
+
 export enum FileType {
   DOC = 0,
   FOLDER,
@@ -18,11 +20,21 @@ export class File {
 
   public deleted_at?: string | null
 
+  public provisional?: boolean
+
   public static fromJSON(obj: Object, projectId: string): File {
     let item: File = Object.assign(new File(), obj)
     item.projectId = projectId
 
     return item
+  }
+
+  public static newFile(props: Omit<File, 'id'>): File {
+    return {
+      ...props,
+      id: uuid(),
+      provisional: true,
+    }
   }
 }
 
