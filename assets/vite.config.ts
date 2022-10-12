@@ -43,19 +43,7 @@ execSync(`cp -r ${staticPath}/* ${outPath}`)
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    preact(),
-    tsTreeshaking(),
-    useAnalyzer,
-    // chunkSplitPlugin({
-    //   customSplitting: {
-    //     quill: ['quill', 'quill-delta', 'parchment'],
-    //     preact: ['preact', 'preact-router', 'preact/compat'],
-    //     moment: ['moment'],
-    //     utils: [/src\/utils/],
-    //   },
-    // }),
-  ],
+  plugins: [preact(), tsTreeshaking(), useAnalyzer],
   server: {
     port: 3000,
     host: '0.0.0.0',
@@ -80,7 +68,6 @@ export default defineConfig({
         manualChunks: {
           tiptap: ['@tiptap/core'],
           preact: ['preact', 'preact-router', 'preact/compat'],
-          moment: ['moment-mini'],
         },
       },
     },

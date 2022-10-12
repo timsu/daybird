@@ -1,4 +1,4 @@
-import moment from 'moment-mini'
+import { format } from 'date-fns'
 import { action, map } from 'nanostores'
 import { route } from 'preact-router'
 
@@ -80,7 +80,7 @@ class FileStore {
     if (type == FileType.DOC) route(paths.DOC + '/' + projectId + '/' + response.file.id)
   }
 
-  dailyFileTitle = () => moment().format('YYYY-MM-DD')
+  dailyFileTitle = () => format(new Date(), 'YYYY-MM-DD')
 
   newDailyFile = async (project: Project) => {
     assertIsDefined(project, 'project is defined')
@@ -88,7 +88,8 @@ class FileStore {
     const projectFiles = this.getFilesFor(project)
     const files = this.files.get()[project.id] || []
 
-    const yearName = moment().format('YYYY')
+    const d = new Date()
+    const yearName = format(d, 'YYYY')
     let yearFolder: TreeFile | undefined = projectFiles.find(
       (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
     )
@@ -98,7 +99,7 @@ class FileStore {
       files.push(response.file)
     }
 
-    const monthName = moment().format('MM')
+    const monthName = format(d, 'MM')
     let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
       (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
     )

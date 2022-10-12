@@ -1,4 +1,4 @@
-import moment from 'moment-mini'
+import { format } from 'date-fns'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
 import ErrorMessage from '@/components/core/ErrorMessage'
@@ -98,7 +98,7 @@ export default () => {
           </div>
           <Pressable
             onClick={(e) => {
-              setName(moment().format('YY.MM.DD ') + name)
+              setName(format(new Date(), 'YY.MM.DD ') + name)
               inputRef.current?.focus()
             }}
           >
