@@ -10,6 +10,7 @@ import FileTree from '@/components/layout/FileTree'
 import FileContextMenu from '@/components/menus/FileContextMenu'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
+import ProjectPills from '@/components/projects/ProjectPills'
 import { paths } from '@/config'
 import { FileType, Project } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -35,10 +36,10 @@ type NavItem = {
 export default ({ darkHeader }: { darkHeader?: boolean }) => {
   return (
     <div className="flex-1 flex flex-col min-h-0  select-none">
-      {/* <div className={classNames('flex items-center h-16 flex-shrink-0 px-4')}>
-        <LogoDark class="w-[160px]" />
-      </div> */}
       <div className="flex-1 flex flex-col overflow-y-auto scrollbar">
+        <div className="flex flex-wrap gap-2 sm:hidden">
+          <ProjectPills />
+        </div>
         <Links />
         <Projects />
       </div>
@@ -156,7 +157,7 @@ function ProjectTree({ project }: { project: Project }) {
 
         <div className="flex-1" />
 
-        <div className="flex m-2 text-gray-500 opacity-0 group-hover:opacity-100 transition">
+        <div className="flex m-2 text-gray-500 opacity-100 sm:opacity-30 group-hover:opacity-100 transition">
           <Pressable className="flex-1" onClick={onNewFile(FileType.DOC)}>
             {/* <PlusIcon class="h-3 w-3" /> */}
             <div class="text-sm">+ File</div>

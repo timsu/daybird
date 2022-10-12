@@ -116,7 +116,7 @@ export default function ({ children }: RenderableProps<{}>) {
           'flex flex-col h-full print:h-auto bg-white px-6'
         )}
       >
-        <div className="sticky top-1 z-20 flex-shrink-0 flex print:hidden">
+        <div className="sticky top-0 mv-1 z-20 flex-shrink-0 flex min-h-[40px] -mx-6 print:hidden bg-white">
           {(!sidebarOpen || desktopSidebarHidden) && (
             <button
               type="button"
@@ -131,12 +131,12 @@ export default function ({ children }: RenderableProps<{}>) {
             </button>
           )}
           <div className="flex-1 px-4 flex justify-between select-none overflow-x-scroll">
-            <div className="flex-1 flex gap-2 justify-center mt-1 overflow-hidden">
+            <div className="flex-1 hidden sm:flex gap-2 justify-center mt-1 overflow-hidden">
               <ProjectPills />
             </div>
-            <div className="ml-4 flex items-center md:ml-6">
-              <UserMenu />
-            </div>
+          </div>
+          <div className="mr-4 flex items-center md:ml-6">
+            <UserMenu />
           </div>
         </div>
 
