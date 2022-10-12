@@ -116,8 +116,7 @@ class FileStore {
     const name = this.dailyFileTitle()
     let file: TreeFile | undefined = monthFolder.nodes!.find((f) => f.file.name == name)
     if (file) {
-      route(paths.DOC + '/' + project.id + '/' + file.file.id)
-      return
+      return file.file.id
     }
 
     const response = await API.createFile(project.id, {
@@ -131,7 +130,7 @@ class FileStore {
     const newFiles = sortFiles([...files, newFile])
     this.updateFiles(project.id, newFiles)
 
-    route(paths.DOC + '/' + project.id + '/' + response.file.id)
+    return response.file.id
   }
 
   handleWikiLink = async (linkName: string) => {
