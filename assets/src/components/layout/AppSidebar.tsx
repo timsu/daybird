@@ -57,7 +57,7 @@ function Links() {
   ].filter(Boolean) as NavItem[]
 
   return (
-    <nav className="px-2 py-4 space-y-1">
+    <nav className="px-2 py-2 space-y-1">
       <div className="flex-1 flex">
         <form
           className="w-full flex md:ml-0 bg-white rounded-md px-2 m-4 border hover:ring"
@@ -89,9 +89,7 @@ function Links() {
               key={item.name}
               href={item.href}
               className={classNames(
-                url == item.href
-                  ? 'bg-blue-300 text-gray-900'
-                  : 'text-gray-700 hover:bg-gray-400 hover:text-white',
+                url == item.href ? 'bg-blue-200 text-gray-900' : 'text-gray-700 hover:bg-blue-300',
                 'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
               )}
               style={{ marginLeft: item.indent }}
@@ -99,7 +97,7 @@ function Links() {
               {item.icon && (
                 <item.icon
                   className={classNames(
-                    url == item.href ? 'text-gray-700' : 'text-gray-800 group-hover:text-gray-300',
+                    url == item.href ? 'text-gray-700' : 'text-gray-800',
                     'mr-3 flex-shrink-0 h-6 w-6'
                   )}
                   aria-hidden="true"
@@ -148,29 +146,27 @@ function ProjectTree({ project }: { project: Project }) {
       currentProject && currentFile ? fileStore.idToFile.get()[currentFile]?.parent : undefined
     modalStore.newFileModal.set({ project, type, parent })
   }
-  const onNewDailyFile = (e: Event) => {
-    e.stopPropagation()
-    fileStore.newDailyFile(project)
-  }
 
   return (
     <>
-      <div class="mx-4 mb-2 text-gray-500 font-semibold text-sm">NOTES</div>
+      <div className="group flex flex-col flex-1">
+        <div class="mx-4 mb-2 text-gray-500 font-semibold text-sm">NOTES</div>
 
-      <FileTree projectId={project.id} />
+        <FileTree projectId={project.id} />
 
-      <div className="flex-1" />
+        <div className="flex-1" />
 
-      <div className="flex m-2 text-gray-500">
-        <Pressable className="flex-1" onClick={onNewFile(FileType.DOC)}>
-          <DocumentAddIcon class="h-6 w-6" />
-          <div class="text-sm">New File</div>
-        </Pressable>
+        <div className="flex m-2 text-gray-500 opacity-0 group-hover:opacity-100 transition">
+          <Pressable className="flex-1" onClick={onNewFile(FileType.DOC)}>
+            {/* <PlusIcon class="h-3 w-3" /> */}
+            <div class="text-sm">+ File</div>
+          </Pressable>
 
-        <Pressable className="flex-1" onClick={onNewFile(FileType.FOLDER)}>
-          <FolderAddIcon class="h-6 w-6" />
-          <div class="text-sm">New Folder</div>
-        </Pressable>
+          <Pressable className="flex-1" onClick={onNewFile(FileType.FOLDER)}>
+            {/* <PlusIcon class="h-3 w-3" /> */}
+            <div class="text-sm">+ Folder</div>
+          </Pressable>
+        </div>
       </div>
     </>
   )
