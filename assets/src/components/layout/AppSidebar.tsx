@@ -80,7 +80,7 @@ function Links() {
                 focus:border-transparent sm:text-sm cursor-pointer flex items-center"
               onClick={() => modalStore.quickFindModal.set(true)}
             >
-              Navigate {!isMobile && `(${ctrlOrCommand()}+P)`}
+              Navigate {!isMobile && `(${ctrlOrCommand()}+O)`}
             </div>
           </div>
         </form>
@@ -164,10 +164,14 @@ function ProjectTree({ project }: { project: Project }) {
 
   const onNewFile = (type: FileType) => (e: Event) => {
     e.stopPropagation()
-    const currentFile = docStore.id.get()
+    const currentFileId = docStore.id.get()
+    const currentFile = currentFileId && fileStore.idToFile.get()[currentFileId]
     const currentProject = projectStore.currentProject.get()?.id == project.id
+
     const parent =
-      currentProject && currentFile ? fileStore.idToFile.get()[currentFile]?.parent : undefined
+      currentProject && currentFile && !fileStore.isJournalFolder(currentFile)
+        ? currentFile.parent
+        : undefined
     modalStore.newFileModal.set({ project, type, parent })
   }
 
@@ -180,7 +184,7 @@ function ProjectTree({ project }: { project: Project }) {
 
         <div className="flex-1" />
 
-        <div className="flex m-2 text-gray-500 opacity-100 sm:opacity-30 group-hover:opacity-100 transition">
+        <div className="flex m-2 opacity-100 sm:opacity-30 group-hover:opacity-100 transition-opacity">
           <Pressable className="flex-1" onClick={onNewFile(FileType.DOC)}>
             {/* <PlusIcon class="h-3 w-3" /> */}
             <div class="text-sm">+ File</div>

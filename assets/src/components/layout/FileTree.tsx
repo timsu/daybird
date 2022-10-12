@@ -22,13 +22,7 @@ export default ({ projectId }: { projectId: string }) => {
 
   if (!files) return null
 
-  const nonDateFiles = files.filter((f) => {
-    if (f.file.type != FileType.FOLDER) return true
-    if (f.label.length != 4) return true
-    const intValue = parseInt(f.label)
-    if (intValue < 2000 || intValue > 3000) return true
-    return false
-  })
+  const nonDateFiles = files.filter((f) => !fileStore.isJournalFolder(f.file))
 
   return (
     <nav className="px-2 space-y-1">

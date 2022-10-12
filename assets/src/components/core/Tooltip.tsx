@@ -1,9 +1,8 @@
 import { RenderableProps } from 'preact'
-import { useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 
 import { classNames } from '@/utils'
-
-type Placement = 'left' | 'right' | 'top' | 'bottom'
+import { createPopper, Placement } from '@popperjs/core'
 
 export type TooltipProps = {
   class?: string
@@ -20,41 +19,35 @@ export default ({
 
   placement = 'top',
 }: RenderableProps<TooltipProps>) => {
-  const [open, setOpen] = useState(false)
+  const divRef = useRef<HTMLDivElement | null>(null)
+  const tooltipRef = useRef<HTMLDivElement | null>(null)
 
-  const positioning =
-    placement == 'top'
-      ? 'bottom-0 mb-5'
-      : placement == 'right'
-      ? 'left-full ml-6'
-      : placement == 'left'
-      ? 'right-0 mr-6'
-      : placement == 'bottom'
-      ? 'top-full mt-2'
-      : ''
+  useEffect(() => {
+    createPopper(divRef.current!, tooltipRef.current!, {
+      placement,
+    })
+  }, [])
 
   return (
-    <div
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      className={classNames('relative flex', cls || 'flex-row items-center')}
-    >
-      {open && (
+    <>
+      <div
+        ref={divRef}
+        className={classNames('relative flex group', cls || 'flex-row items-center')}
+      >
         <div
-          className={`absolute z-10 ${positioning} flex-col items-center group-hover:flex pointer-events-none`}
+          ref={tooltipRef}
+          role="tooltip"
+          className={classNames(
+            'p-2 text-xs leading-none text-white transition-opacity',
+            'font-normal bg-black shadow-lg rounded-md z-50',
+            'opacity-0 group-hover:opacity-100',
+            tooltipClass || ''
+          )}
         >
-          <div
-            className={classNames(
-              'relative p-2 text-xs leading-none text-white whitespace-no-wrap',
-              'font-normal bg-black shadow-lg rounded-md',
-              tooltipClass || ''
-            )}
-          >
-            {message}
-          </div>
+          {message}
         </div>
-      )}
-      {children}
-    </div>
+        {children}
+      </div>
+    </>
   )
 }
