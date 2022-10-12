@@ -113,7 +113,7 @@ export default function ({ children }: RenderableProps<{}>) {
       <div
         className={classNames(
           !desktopSidebarHidden ? 'md:ml-52' : '',
-          'flex flex-col h-full print:h-auto bg-white pl-6'
+          'flex flex-col h-full print:h-auto bg-white px-6'
         )}
       >
         <div className="sticky top-1 z-20 flex-shrink-0 flex print:hidden">

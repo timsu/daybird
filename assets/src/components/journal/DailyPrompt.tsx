@@ -105,7 +105,7 @@ const prompts = [
   'Productivity is not about getting everything done, rather it is about getting things done effectively – Brianna Gray from fixthephoto.com',
 ]
 
-export default function () {
-  const idx = getDayOfYear(new Date())
+export default function ({ date }: { date: Date }) {
+  const idx = getDayOfYear(date)
   return <div className="italic text-gray-500">{prompts[idx % prompts.length]}</div>
 }
