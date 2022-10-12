@@ -77,6 +77,8 @@ class ProjectStore {
     const projectMap: ProjectMap = {}
     projects.forEach((p) => (projectMap[p.id] = p))
     store.set(projectMap)
+
+    if (!this.currentProject.get()) this.currentProject.set(projects[0])
   })
 
   createProject = action(this.projects, 'createProject', async (store, attrs: Partial<Project>) => {

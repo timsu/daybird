@@ -10,9 +10,7 @@ type Props = {
 
 export default (props: Props) => {
   if (hasToken()) {
-    const lastDoc = localStorage.getItem(LS_LAST_DOC)
-    if (lastDoc) location.href = `${paths.DOC}/${lastDoc}`
-    else location.href = paths.APP
+    location.href = paths.TODAY
   }
 
   return (

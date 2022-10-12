@@ -1,4 +1,4 @@
-import moment from 'moment-mini'
+import { format } from 'date-fns'
 import { action, map } from 'nanostores'
 import { route } from 'preact-router'
 
@@ -80,15 +80,16 @@ class FileStore {
     if (type == FileType.DOC) route(paths.DOC + '/' + projectId + '/' + response.file.id)
   }
 
-  dailyFileTitle = () => moment().format('YYYY-MM-DD')
+  dailyFileTitle = (date?: Date) => format(date || new Date(), 'yyyy-MM-dd')
 
-  newDailyFile = async (project: Project) => {
+  newDailyFile = async (project: Project, date?: Date) => {
     assertIsDefined(project, 'project is defined')
 
     const projectFiles = this.getFilesFor(project)
     const files = this.files.get()[project.id] || []
 
-    const yearName = moment().format('YYYY')
+    const d = date || new Date()
+    const yearName = format(d, 'yyyy')
     let yearFolder: TreeFile | undefined = projectFiles.find(
       (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
     )
@@ -98,7 +99,7 @@ class FileStore {
       files.push(response.file)
     }
 
-    const monthName = moment().format('MM')
+    const monthName = format(d, 'MM')
     let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
       (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
     )
@@ -112,11 +113,10 @@ class FileStore {
       files.push(response.file)
     }
 
-    const name = this.dailyFileTitle()
+    const name = this.dailyFileTitle(d)
     let file: TreeFile | undefined = monthFolder.nodes!.find((f) => f.file.name == name)
     if (file) {
-      route(paths.DOC + '/' + project.id + '/' + file.file.id)
-      return
+      return file.file.id
     }
 
     const response = await API.createFile(project.id, {
@@ -130,7 +130,7 @@ class FileStore {
     const newFiles = sortFiles([...files, newFile])
     this.updateFiles(project.id, newFiles)
 
-    route(paths.DOC + '/' + project.id + '/' + response.file.id)
+    return response.file.id
   }
 
   handleWikiLink = async (linkName: string) => {
@@ -216,7 +216,7 @@ class FileStore {
     this.updateFiles(project.id, newFiles)
 
     if (location.pathname.includes(encodeURI(file.id))) {
-      route(paths.APP)
+      route(paths.TODAY)
     }
   }
 

@@ -1,4 +1,5 @@
 import { Fragment, RenderableProps } from 'preact'
+import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 
 import AppSidebar from '@/components/layout/AppSidebar'
@@ -6,9 +7,11 @@ import UserMenu from '@/components/layout/UserMenu'
 import TaskContextMenu from '@/components/menus/TaskContextMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
+import ProjectPills from '@/components/projects/ProjectPills'
 import { paths } from '@/config'
 import useSwipe from '@/hooks/useSwipe'
 import { modalStore } from '@/stores/modalStore'
+import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { isMobile } from '@/utils/os'
@@ -96,24 +99,24 @@ export default function ({ children }: RenderableProps<{}>) {
 
       {/* Static sidebar for desktop */}
       {!desktopSidebarHidden && (
-        <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 relative">
+        <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
           <button
             type="button"
             className="absolute right-1 top-6 text-gray-400"
             onClick={() => setDesktopSidebarHidden(true)}
           >
-            <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
+            {/* <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" /> */}
           </button>
           <AppSidebar darkHeader />
         </div>
       )}
       <div
         className={classNames(
-          !desktopSidebarHidden ? 'md:pl-64' : '',
-          'flex flex-col h-full print:h-auto'
+          !desktopSidebarHidden ? 'md:ml-52' : '',
+          'flex flex-col h-full print:h-auto bg-white px-6'
         )}
       >
-        <div className="sticky top-0 z-20 flex-shrink-0 flex h-16 bg-white print:hidden">
+        <div className="sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px] -mx-6 print:hidden bg-white">
           {(!sidebarOpen || desktopSidebarHidden) && (
             <button
               type="button"
@@ -127,42 +130,17 @@ export default function ({ children }: RenderableProps<{}>) {
               <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           )}
-          <div className="flex-1 px-4 flex justify-between select-none">
-            <div className="flex-1 flex">
-              <form className="w-full flex md:ml-0" action="#" method="GET">
-                <label htmlFor="search-field" className="sr-only">
-                  Navigate
-                </label>
-                <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-                  <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-                    <SearchIcon className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <div
-                    className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-500
-                      focus:outline-none focus:placeholder-gray-400 focus:ring-0
-                      focus:border-transparent sm:text-sm cursor-pointer flex items-center"
-                    onClick={() => modalStore.quickFindModal.set(true)}
-                  >
-                    Navigate {!isMobile && `(${ctrlOrCommand()}+P)`}
-                  </div>
-                </div>
-              </form>
+          <div className="flex-1 px-4 flex justify-between select-none overflow-x-scroll">
+            <div className="flex-1 hidden sm:flex gap-2 justify-center mt-1 overflow-hidden">
+              <ProjectPills />
             </div>
-            <div className="ml-4 flex items-center md:ml-6">
-              {/* <button
-                type="button"
-                className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <span className="sr-only">View notifications</span>
-                <BellIcon className="h-6 w-6" aria-hidden="true" />
-              </button> */}
-
-              <UserMenu />
-            </div>
+          </div>
+          <div className="mr-4 flex items-center md:ml-6">
+            <UserMenu />
           </div>
         </div>
 
-        <main className="flex flex-1 flex-col">{children}</main>
+        <main className="flex flex-1 flex-col mt-1">{children}</main>
 
         <TaskContextMenu />
         <DeleteTaskModal />
