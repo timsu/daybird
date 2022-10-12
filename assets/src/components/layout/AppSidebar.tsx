@@ -10,6 +10,7 @@ import FileTree from '@/components/layout/FileTree'
 import FileContextMenu from '@/components/menus/FileContextMenu'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
+import Calendar from '@/components/nav/Calendar'
 import ProjectPills from '@/components/projects/ProjectPills'
 import { paths } from '@/config'
 import { FileType, Project } from '@/models'
@@ -41,6 +42,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
           <ProjectPills />
         </div>
         <Links />
+        {/* <CalendarLink /> */}
         <Projects />
       </div>
     </div>
@@ -49,7 +51,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
 
 function Links() {
   let navigation: NavItem[] = [
-    { name: 'Today', href: paths.TODAY, icon: CalendarIcon },
+    { name: 'Today', href: paths.TODAY, icon: HomeIcon },
     {
       name: 'All Tasks',
       href: paths.TASKS + '/' + projectStore.currentProject.get()?.id,
@@ -109,6 +111,27 @@ function Links() {
           )}
         </Match>
       ))}
+    </nav>
+  )
+}
+
+function CalendarLink() {
+  const [showCalendar, setShowCalendar] = useState(false)
+
+  return (
+    <nav className="px-2 space-y-1">
+      <div
+        className={classNames(
+          'text-gray-700 hover:bg-blue-300',
+          'group flex items-center px-2 py-2 text-sm font-medium rounded-md, cursor-pointer'
+        )}
+        onClick={() => setShowCalendar(!showCalendar)}
+      >
+        <CalendarIcon className={'text-gray-800 mr-3 flex-shrink-0 h-6 w-6'} aria-hidden="true" />
+        {showCalendar ? 'Hide ' : ''}Calendar
+      </div>
+
+      {showCalendar && <Calendar />}
     </nav>
   )
 }
