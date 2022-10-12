@@ -116,7 +116,10 @@ export default function ({ children }: RenderableProps<{}>) {
           'flex flex-col min-h-full print:h-auto bg-white px-6'
         )}
       >
-        <div className="sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px] -mx-6 print:hidden bg-white">
+        <div
+          className="sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px] -mx-6 print:hidden
+            bg-white border-b sm:border-b-0"
+        >
           {(!sidebarOpen || desktopSidebarHidden) && (
             <button
               type="button"
