@@ -198,9 +198,7 @@ defmodule Sequence.ProjectsTest do
       Projects.user_joined(user)
 
       ups = Projects.list_all_user_project(user)
-      assert length(ups) == 1
-      [up] = ups
-      assert up.project_id == project.id
+      assert up = Enum.find(ups, fn up -> up.project_id == project.id end)
       assert up.role == "admin"
     end
 
@@ -214,7 +212,8 @@ defmodule Sequence.ProjectsTest do
       Projects.user_joined(user)
 
       ups = Projects.list_all_user_project(user)
-      assert length(ups) == 0
+      up = Enum.find(ups, fn up -> up.project_id == project.id end)
+      assert up == nil
     end
 
   end
