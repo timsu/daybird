@@ -98,7 +98,7 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
   }
 
   return (
-    <div class="calendar text-xs p-2">
+    <div class="calendar text-xs p-2 select-none">
       {getHeader()}
       {getWeekDaysNames()}
       {getDates()}
