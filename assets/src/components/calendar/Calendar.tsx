@@ -2,14 +2,24 @@ import {
     addDays, addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, startOfMonth,
     startOfWeek, subMonths
 } from 'date-fns'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
+import { classNames } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
 
+type Props = {
+  currentDate?: Date
+  onSelect?: (date: Date) => void
+}
+
 // from https://medium.com/@jain.jenil007/building-a-calendar-in-react-2c53b6ca3e96
-const Calendar = () => {
+const Calendar = ({ currentDate, onSelect }: Props) => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [activeDate, setActiveDate] = useState(new Date())
+
+  useEffect(() => {
+    if (currentDate) setSelectedDate(currentDate)
+  }, [currentDate])
 
   const getHeader = () => {
     return (
@@ -47,12 +57,18 @@ const Calendar = () => {
       const cloneDate = currentDate
       week.push(
         <div
-          className={`p-1 text-center rounded-full cursor-pointer ${
-            isSameMonth(currentDate, activeDate) ? '' : 'text-gray-400'
-          } ${isSameDay(currentDate, selectedDate) ? 'bg-blue-500 text-white' : ''}
-          ${isSameDay(currentDate, new Date()) ? 'bg-gray-200' : ''}`}
+          className={classNames(
+            'p-1 text-center rounded-full cursor-pointer',
+            isSameMonth(currentDate, activeDate) ? '' : 'text-gray-400',
+            isSameDay(currentDate, selectedDate)
+              ? 'bg-blue-500 text-white'
+              : isSameDay(currentDate, new Date())
+              ? 'bg-gray-200'
+              : ''
+          )}
           onClick={() => {
             setSelectedDate(cloneDate)
+            onSelect?.(cloneDate)
           }}
         >
           {format(currentDate, 'd')}

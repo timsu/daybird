@@ -16,6 +16,8 @@ class UIStore {
 
   calendarOpen = atom<boolean>(true)
 
+  calendarDate = atom<Date>(new Date())
+
   recentFiles: { id: string; projectId: string }[] = []
 
   // --- actions

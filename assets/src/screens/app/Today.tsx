@@ -9,6 +9,7 @@ import DocMenu from '@/components/menus/DocMenu'
 import { paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
+import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -28,6 +29,10 @@ export default (props: Props) => {
   } catch (e) {
     logger.info(e)
   }
+
+  useEffect(() => {
+    uiStore.calendarDate.set(date)
+  }, [date])
 
   const isToday = isSameDay(date, new Date())
   const title = isToday ? 'Today' : format(date, 'EEEE MMMM do')
