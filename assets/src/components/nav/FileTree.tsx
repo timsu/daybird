@@ -43,7 +43,7 @@ function FileTree({
   projectId: string
 }) {
   return (
-    <>
+    <div className={indent > 0 ? 'ml-4 border-l pl-1' : ''}>
       {nodes.map((node) => {
         const item = node.file
         if (item.type == FileType.DOC) {
@@ -54,7 +54,7 @@ function FileTree({
           return null
         }
       })}
-    </>
+    </div>
   )
 }
 
@@ -118,7 +118,6 @@ function FileNode({ indent, node, projectId }: ChildProps) {
                 matches ? 'bg-blue-200 ' : ' hover:bg-blue-300 ',
                 'text-gray-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
               )}
-              style={{ marginLeft: indent * 10 }}
             >
               {item.name}
               {matches && (
@@ -179,7 +178,6 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
           }
           className="text-gray-700 hover:bg-gray-300 group flex
         items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
-          style={{ marginLeft: indent * 10 }}
           onClick={() => setExpanded(!expanded)}
         >
           <Icon className="text-gray-500  mr-2 flex-shrink-0 h-4 w-4" aria-hidden="true" />

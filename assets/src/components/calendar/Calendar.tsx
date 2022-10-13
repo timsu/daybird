@@ -29,6 +29,7 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
   useEffect(() => {
     if (!currentProject) return
     const files = fileTree[currentProject.id]
+    if (!files) return
     const [year, month] = format(activeDate, 'yyyy-MM').split('-')
 
     const yearFolder = files.find((f) => f.file.type == FileType.FOLDER && f.file.name == year)
