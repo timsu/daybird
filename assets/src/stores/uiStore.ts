@@ -14,6 +14,8 @@ class UIStore {
 
   sidebarOpen = atom<boolean>(false)
 
+  calendarOpen = atom<boolean>(true)
+
   recentFiles: { id: string; projectId: string }[] = []
 
   // --- actions
