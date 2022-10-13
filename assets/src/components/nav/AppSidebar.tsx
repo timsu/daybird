@@ -36,7 +36,6 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
           <ProjectPills />
         </div>
         <Links />
-        {/* <CalendarLink /> */}
         <Projects />
       </div>
     </div>
@@ -105,27 +104,6 @@ function Links() {
           )}
         </Match>
       ))}
-    </nav>
-  )
-}
-
-function CalendarLink() {
-  const [showCalendar, setShowCalendar] = useState(false)
-
-  return (
-    <nav className="px-2 space-y-1">
-      <div
-        className={classNames(
-          'text-gray-700 hover:bg-blue-300',
-          'group flex items-center px-2 py-2 text-sm font-medium rounded-md, cursor-pointer'
-        )}
-        onClick={() => setShowCalendar(!showCalendar)}
-      >
-        <CalendarIcon className={'text-gray-800 mr-3 flex-shrink-0 h-6 w-6'} aria-hidden="true" />
-        {showCalendar ? 'Hide ' : ''}Calendar
-      </div>
-
-      {showCalendar && <Calendar />}
     </nav>
   )
 }

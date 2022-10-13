@@ -38,7 +38,6 @@ export default (props: Props) => {
   const title = isToday ? 'Today' : format(date, 'EEEE MMMM do')
 
   useEffect(() => {
-    console.log('loading today', project)
     // todo wait until files are loaded
     if (!project) return
 
