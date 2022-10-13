@@ -1,5 +1,3 @@
-import './calendar.css'
-
 import {
     addDays, addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, startOfMonth,
     startOfWeek, subMonths
@@ -39,7 +37,7 @@ const Calendar = () => {
         </div>
       )
     }
-    return <div className="weekContainer">{weekDays}</div>
+    return <div className="grid grid-cols-7">{weekDays}</div>
   }
 
   const generateDatesForCurrentWeek = (date: Date, selectedDate: Date, activeDate: Date) => {
@@ -49,10 +47,10 @@ const Calendar = () => {
       const cloneDate = currentDate
       week.push(
         <div
-          className={`day ${isSameMonth(currentDate, activeDate) ? '' : 'inactiveDay'} ${
-            isSameDay(currentDate, selectedDate) ? 'selectedDay' : ''
-          }
-          ${isSameDay(currentDate, new Date()) ? 'today' : ''}`}
+          className={`p-1 text-center rounded-full cursor-pointer ${
+            isSameMonth(currentDate, activeDate) ? '' : 'text-gray-400'
+          } ${isSameDay(currentDate, selectedDate) ? 'bg-blue-500 text-white' : ''}
+          ${isSameDay(currentDate, new Date()) ? 'bg-gray-200' : ''}`}
           onClick={() => {
             setSelectedDate(cloneDate)
           }}
@@ -80,7 +78,7 @@ const Calendar = () => {
       currentDate = addDays(currentDate, 7)
     }
 
-    return <div className="weekContainer">{allWeeks}</div>
+    return <div className="grid grid-cols-7">{allWeeks}</div>
   }
 
   return (
