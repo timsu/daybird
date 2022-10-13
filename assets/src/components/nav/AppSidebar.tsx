@@ -4,13 +4,11 @@ import Match from 'preact-router/match'
 import { useEffect, useState } from 'preact/hooks'
 
 import Calendar from '@/components/calendar/Calendar'
-import LogoDark from '@/components/core/LogoDark'
 import Pressable from '@/components/core/Pressable'
-import Tooltip from '@/components/core/Tooltip'
-import FileTree from '@/components/layout/FileTree'
 import FileContextMenu from '@/components/menus/FileContextMenu'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
+import FileTree from '@/components/nav/FileTree'
 import ProjectPills from '@/components/projects/ProjectPills'
 import { paths } from '@/config'
 import { FileType, Project } from '@/models'
@@ -20,11 +18,7 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { isMobile } from '@/utils/os'
-import {
-    BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronRightIcon,
-    ChevronUpIcon, CogIcon, DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon,
-    FolderIcon, HomeIcon, PlusIcon, SearchIcon, ViewListIcon
-} from '@heroicons/react/outline'
+import { CalendarIcon, CheckIcon, HomeIcon, SearchIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type NavItem = {
