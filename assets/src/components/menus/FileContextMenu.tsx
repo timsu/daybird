@@ -120,6 +120,34 @@ export default function () {
           </>
         )}
       </ContextMenuWithData>
+      <ContextMenuWithData id="file-tree-root">
+        {({ projectId }: ContextMenuArgs) => (
+          <>
+            <ContextMenuItem
+              onClick={() => {
+                modalStore.newFileModal.set({
+                  project: getProject(projectId),
+                  type: FileType.DOC,
+                })
+              }}
+            >
+              <DocumentAddIcon class="h-4 w-4 mr-2" />
+              New File
+            </ContextMenuItem>
+            <ContextMenuItem
+              onClick={() => {
+                modalStore.newFileModal.set({
+                  project: getProject(projectId),
+                  type: FileType.FOLDER,
+                })
+              }}
+            >
+              <FolderAddIcon class="h-4 w-4 mr-2" />
+              New Folder
+            </ContextMenuItem>
+          </>
+        )}
+      </ContextMenuWithData>
     </>
   )
 }

@@ -192,5 +192,9 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
 }
 
 function RootFolderDropZone({ projectId }: { projectId: string }) {
-  return <div className="h-10" onDragOver={allowDrop} onDrop={dropHandler(projectId, null)}></div>
+  return (
+    <ContextMenuTrigger id="file-tree-root" data={{ projectId: projectId }}>
+      <div className="h-10" onDragOver={allowDrop} onDrop={dropHandler(projectId, null)}></div>
+    </ContextMenuTrigger>
+  )
 }
