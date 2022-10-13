@@ -1,24 +1,19 @@
 import { Fragment, RenderableProps } from 'preact'
-import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 
+import CalendarRail from '@/components/calendar/CalendarRail'
 import TaskContextMenu from '@/components/menus/TaskContextMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
 import AppSidebar from '@/components/nav/AppSidebar'
-import UserMenu from '@/components/nav/UserMenu'
-import ProjectPills from '@/components/projects/ProjectPills'
-import { paths } from '@/config'
 import useSwipe from '@/hooks/useSwipe'
-import { modalStore } from '@/stores/modalStore'
-import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
-import { isMobile } from '@/utils/os'
 import { Dialog, Transition } from '@headlessui/react'
-import { BellIcon, ChevronLeftIcon, MenuAlt2Icon, XIcon } from '@heroicons/react/outline'
-import { SearchIcon } from '@heroicons/react/solid'
+import { XIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
+
+import { Header } from './Header'
 
 export default function ({ children }: RenderableProps<{}>) {
   const sidebarOpen = useStore(uiStore.sidebarOpen)
@@ -44,22 +39,24 @@ export default function ({ children }: RenderableProps<{}>) {
   return (
     <>
       <SidebarMenu {...props} />
-
-      {/* Static sidebar for desktop */}
       {!desktopSidebarHidden && (
         <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
           <AppSidebar darkHeader />
         </div>
       )}
+
       <div
         className={classNames(
           !desktopSidebarHidden ? 'md:ml-52' : '',
-          'flex flex-col min-h-full print:h-auto bg-white px-6'
+          'flex flex-col min-h-full print:h-auto bg-white'
         )}
       >
         <Header {...props} />
 
-        <main className="flex flex-1 flex-col mt-1">{children}</main>
+        <div className="flex-1 flex">
+          <main className="flex flex-1 flex-col mt-1 px-6">{children}</main>
+          <CalendarRail />
+        </div>
 
         <TaskContextMenu />
         <DeleteTaskModal />
@@ -69,66 +66,11 @@ export default function ({ children }: RenderableProps<{}>) {
   )
 }
 
-type SidebarProps = {
+export type SidebarProps = {
   sidebarOpen: boolean
   desktopSidebarHidden: boolean
   setDesktopSidebarHidden: (s: boolean) => void
   setSidebarOpen: (s: boolean) => void
-}
-
-function Header(p: SidebarProps) {
-  const { sidebarOpen, desktopSidebarHidden, setSidebarOpen, setDesktopSidebarHidden } = p
-  const [hasShadow, setHasShadow] = useState(false)
-
-  useEffect(() => {
-    const listener = () => {
-      if (hasShadow && window.scrollY == 0) setHasShadow(false)
-      else if (!hasShadow && window.scrollY > 0) setHasShadow(true)
-    }
-    window.addEventListener('scroll', listener)
-    return () => window.removeEventListener('scroll', listener)
-  }, [hasShadow])
-
-  return (
-    <div
-      className={classNames(
-        'sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px] -mx-6',
-        'print:hidden bg-white',
-        hasShadow ? 'border-b' : ''
-      )}
-    >
-      {(!sidebarOpen || desktopSidebarHidden) && (
-        <button
-          type="button"
-          className="px-4 border-gray-200 text-gray-500 focus:outline-none -my-1
-        focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden hover:bg-gray-100"
-          style={{ display: desktopSidebarHidden ? 'block' : undefined }}
-          onClick={(e) =>
-            desktopSidebarHidden ? setDesktopSidebarHidden(false) : setSidebarOpen(true)
-          }
-        >
-          <span className="sr-only">Open sidebar</span>
-          <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
-        </button>
-      )}
-      {!desktopSidebarHidden && (
-        <button
-          type="button"
-          className="text-gray-400 hidden md:block hover:bg-gray-100 rounded-md"
-          onClick={() => setDesktopSidebarHidden(true)}
-        >
-          <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
-        </button>
-      )}
-
-      <div className="flex-1 px-4 flex justify-between select-none overflow-x-scroll pt-1">
-        <ProjectPills />
-      </div>
-      <div className="mr-4 flex items-center md:ml-6">
-        <UserMenu />
-      </div>
-    </div>
-  )
 }
 
 function SidebarMenu(p: SidebarProps) {
