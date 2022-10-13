@@ -9,6 +9,7 @@ import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
+import { useStore } from '@nanostores/preact'
 
 type Props = {
   currentDate?: Date
@@ -21,10 +22,12 @@ type JournalDays = { [d: string]: boolean }
 const Calendar = ({ currentDate, onSelect }: Props) => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [activeDate, setActiveDate] = useState(new Date())
+  const currentProject = useStore(projectStore.currentProject)
 
   const [journalDays, setJournalDays] = useState<JournalDays>({})
   useEffect(() => {
-    const files = fileStore.getFilesFor(projectStore.currentProject.get()!)
+    if (!currentProject) return
+    const files = fileStore.getFilesFor(currentProject)
     const [year, month] = format(activeDate, 'yyyy-MM').split('-')
 
     const yearFolder = files.find((f) => f.file.type == FileType.FOLDER && f.file.name == year)
@@ -37,11 +40,12 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
 
     const days: JournalDays = {}
     monthFolder.nodes!.forEach((f) => {
+      if (f.file.provisional) return
       const [_y, _m, d] = f.label.split('-')
       if (d) days[d.replace(/^0/, '')] = true
     })
     setJournalDays(days)
-  }, [activeDate])
+  }, [currentProject, activeDate])
 
   useEffect(() => {
     if (currentDate) setSelectedDate(currentDate)
@@ -93,7 +97,7 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
             hasJournal ? 'text-orange-500 font-semibold' : '',
             sameMonth ? '' : 'text-gray-400',
             isSameDay(currentDate, selectedDate)
-              ? 'bg-blue-200 text-white'
+              ? 'bg-blue-200'
               : isSameDay(currentDate, new Date())
               ? 'bg-gray-200'
               : ''
