@@ -23,11 +23,12 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [activeDate, setActiveDate] = useState(new Date())
   const currentProject = useStore(projectStore.currentProject)
+  const fileTree = useStore(fileStore.fileTree)
 
   const [journalDays, setJournalDays] = useState<JournalDays>({})
   useEffect(() => {
     if (!currentProject) return
-    const files = fileStore.getFilesFor(currentProject)
+    const files = fileTree[currentProject.id]
     const [year, month] = format(activeDate, 'yyyy-MM').split('-')
 
     const yearFolder = files.find((f) => f.file.type == FileType.FOLDER && f.file.name == year)
@@ -45,7 +46,7 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
       if (d) days[d.replace(/^0/, '')] = true
     })
     setJournalDays(days)
-  }, [currentProject, activeDate])
+  }, [currentProject, fileTree, activeDate])
 
   useEffect(() => {
     if (currentDate) setSelectedDate(currentDate)
