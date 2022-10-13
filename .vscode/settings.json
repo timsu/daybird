@@ -23,5 +23,8 @@
   "css.lint.unknownAtRules": "ignore",
   "importSorter.generalConfiguration.sortOnBeforeSave": true,
   "importSorter.importStringConfiguration.hasSemicolon": false,
-  "prettier.printWidth": 100
+  "prettier.printWidth": 100,
+  "files.associations": {
+    "*.css": "scss"
+  }
 }
