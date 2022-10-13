@@ -34,18 +34,20 @@ export default ({
         ref={divRef}
         className={classNames('relative flex group', cls || 'flex-row items-center')}
       >
-        <div
-          ref={tooltipRef}
-          role="tooltip"
-          className={classNames(
-            'p-2 text-xs leading-none text-white transition-opacity',
-            'font-normal bg-black shadow-lg rounded-md z-50',
-            'opacity-0 group-hover:opacity-100',
-            tooltipClass || ''
-          )}
-        >
-          {message}
-        </div>
+        {message && (
+          <div
+            ref={tooltipRef}
+            role="tooltip"
+            className={classNames(
+              'p-2 text-xs leading-none text-white transition-opacity',
+              'font-normal bg-black shadow-lg rounded-md z-50',
+              'opacity-0 group-hover:opacity-100',
+              tooltipClass || ''
+            )}
+          >
+            {message}
+          </div>
+        )}
         {children}
       </div>
     </>

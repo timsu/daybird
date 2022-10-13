@@ -121,10 +121,8 @@ function Header(p: SidebarProps) {
         </button>
       )}
 
-      <div className="flex-1 px-4 flex justify-between select-none overflow-x-scroll">
-        <div className="flex-1 hidden sm:flex gap-2 justify-center mt-1 overflow-hidden">
-          <ProjectPills />
-        </div>
+      <div className="flex-1 px-4 flex justify-between select-none overflow-x-scroll pt-1">
+        <ProjectPills />
       </div>
       <div className="mr-4 flex items-center md:ml-6">
         <UserMenu />
