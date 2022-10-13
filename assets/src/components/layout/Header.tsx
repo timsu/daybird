@@ -27,8 +27,8 @@ export function Header(p: SidebarProps) {
     <div
       className={classNames(
         'sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px]',
-        'print:hidden bg-white',
-        hasShadow ? 'border-b' : ''
+        'print:hidden bg-white border-b',
+        hasShadow ? '' : 'border-transparent'
       )}
     >
       {(!sidebarOpen || desktopSidebarHidden) && (
