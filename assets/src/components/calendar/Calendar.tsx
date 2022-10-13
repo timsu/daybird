@@ -4,6 +4,9 @@ import {
 } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
 
+import { FileType } from '@/models'
+import { fileStore } from '@/stores/fileStore'
+import { projectStore } from '@/stores/projectStore'
 import { classNames } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
 
@@ -12,10 +15,33 @@ type Props = {
   onSelect?: (date: Date) => void
 }
 
+type JournalDays = { [d: string]: boolean }
+
 // from https://medium.com/@jain.jenil007/building-a-calendar-in-react-2c53b6ca3e96
 const Calendar = ({ currentDate, onSelect }: Props) => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [activeDate, setActiveDate] = useState(new Date())
+
+  const [journalDays, setJournalDays] = useState<JournalDays>({})
+  useEffect(() => {
+    const files = fileStore.getFilesFor(projectStore.currentProject.get()!)
+    const [year, month] = format(activeDate, 'yyyy-MM').split('-')
+
+    const yearFolder = files.find((f) => f.file.type == FileType.FOLDER && f.file.name == year)
+    if (!yearFolder) return setJournalDays({})
+
+    const monthFolder = yearFolder.nodes!.find(
+      (f) => f.file.type == FileType.FOLDER && f.file.name == month
+    )
+    if (!monthFolder) return setJournalDays({})
+
+    const days: JournalDays = {}
+    monthFolder.nodes!.forEach((f) => {
+      const [_y, _m, d] = f.label.split('-')
+      if (d) days[d.replace(/^0/, '')] = true
+    })
+    setJournalDays(days)
+  }, [activeDate])
 
   useEffect(() => {
     if (currentDate) setSelectedDate(currentDate)
@@ -55,13 +81,19 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
     const week = []
     for (let day = 0; day < 7; day++) {
       const cloneDate = currentDate
+
+      const sameMonth = isSameMonth(currentDate, activeDate)
+      const dayLabel = format(currentDate, 'd')
+      const hasJournal = sameMonth && journalDays[dayLabel]
+
       week.push(
         <div
           className={classNames(
-            'p-1 text-center rounded-full cursor-pointer',
-            isSameMonth(currentDate, activeDate) ? '' : 'text-gray-400',
+            'p-1 text-center cursor-pointer rounded-full',
+            hasJournal ? 'text-orange-500 font-semibold' : '',
+            sameMonth ? '' : 'text-gray-400',
             isSameDay(currentDate, selectedDate)
-              ? 'bg-blue-500 text-white'
+              ? 'bg-blue-200 text-white'
               : isSameDay(currentDate, new Date())
               ? 'bg-gray-200'
               : ''
@@ -71,7 +103,7 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
             onSelect?.(cloneDate)
           }}
         >
-          {format(currentDate, 'd')}
+          {dayLabel}
         </div>
       )
       currentDate = addDays(currentDate, 1)
