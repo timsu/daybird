@@ -15,7 +15,7 @@ config :sequence, SequenceWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 
-config :sequence, Teamtalk.Auth.Guardian,
+config :sequence, Sequence.Auth.Guardian,
   issuer: "listnote",
   secret_key: System.get_env("GUARDIAN_SECRET_KEY")
 
