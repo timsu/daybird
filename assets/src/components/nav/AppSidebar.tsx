@@ -3,14 +3,12 @@ import { Link, route } from 'preact-router'
 import Match from 'preact-router/match'
 import { useEffect, useState } from 'preact/hooks'
 
-import LogoDark from '@/components/core/LogoDark'
+import Calendar from '@/components/calendar/Calendar'
 import Pressable from '@/components/core/Pressable'
-import Tooltip from '@/components/core/Tooltip'
-import FileTree from '@/components/layout/FileTree'
 import FileContextMenu from '@/components/menus/FileContextMenu'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
-import Calendar from '@/components/nav/Calendar'
+import FileTree from '@/components/nav/FileTree'
 import ProjectPills from '@/components/projects/ProjectPills'
 import { paths } from '@/config'
 import { FileType, Project } from '@/models'
@@ -20,11 +18,7 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { isMobile } from '@/utils/os'
-import {
-    BriefcaseIcon, CalendarIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronRightIcon,
-    ChevronUpIcon, CogIcon, DocumentAddIcon, DocumentIcon, DotsHorizontalIcon, FolderAddIcon,
-    FolderIcon, HomeIcon, PlusIcon, SearchIcon, ViewListIcon
-} from '@heroicons/react/outline'
+import { CalendarIcon, CheckIcon, HomeIcon, SearchIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type NavItem = {
@@ -42,7 +36,6 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
           <ProjectPills />
         </div>
         <Links />
-        {/* <CalendarLink /> */}
         <Projects />
       </div>
     </div>
@@ -111,27 +104,6 @@ function Links() {
           )}
         </Match>
       ))}
-    </nav>
-  )
-}
-
-function CalendarLink() {
-  const [showCalendar, setShowCalendar] = useState(false)
-
-  return (
-    <nav className="px-2 space-y-1">
-      <div
-        className={classNames(
-          'text-gray-700 hover:bg-blue-300',
-          'group flex items-center px-2 py-2 text-sm font-medium rounded-md, cursor-pointer'
-        )}
-        onClick={() => setShowCalendar(!showCalendar)}
-      >
-        <CalendarIcon className={'text-gray-800 mr-3 flex-shrink-0 h-6 w-6'} aria-hidden="true" />
-        {showCalendar ? 'Hide ' : ''}Calendar
-      </div>
-
-      {showCalendar && <Calendar />}
     </nav>
   )
 }

@@ -39,9 +39,9 @@ export default ({
             ref={tooltipRef}
             role="tooltip"
             className={classNames(
-              'p-2 text-xs leading-none text-white transition-opacity',
+              'p-2 text-xs leading-none text-white transition-opacity pointer-events-none',
               'font-normal bg-black shadow-lg rounded-md z-50',
-              'opacity-0 group-hover:opacity-100',
+              'opacity-0 absolute left-[-9999px] group-hover:opacity-100 group-hover:left-0',
               tooltipClass || ''
             )}
           >

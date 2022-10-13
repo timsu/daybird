@@ -14,6 +14,10 @@ class UIStore {
 
   sidebarOpen = atom<boolean>(false)
 
+  calendarOpen = atom<boolean>(window.innerWidth > 700)
+
+  calendarDate = atom<Date>(new Date())
+
   recentFiles: { id: string; projectId: string }[] = []
 
   // --- actions

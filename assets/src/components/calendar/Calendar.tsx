@@ -1,17 +1,55 @@
-import './calendar.css'
-
 import {
     addDays, addMonths, endOfMonth, endOfWeek, format, isSameDay, isSameMonth, startOfMonth,
     startOfWeek, subMonths
 } from 'date-fns'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
+import { FileType } from '@/models'
+import { fileStore } from '@/stores/fileStore'
+import { projectStore } from '@/stores/projectStore'
+import { classNames } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
+import { useStore } from '@nanostores/preact'
+
+type Props = {
+  currentDate?: Date
+  onSelect?: (date: Date) => void
+}
+
+type JournalDays = { [d: string]: boolean }
 
 // from https://medium.com/@jain.jenil007/building-a-calendar-in-react-2c53b6ca3e96
-const Calendar = () => {
+const Calendar = ({ currentDate, onSelect }: Props) => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [activeDate, setActiveDate] = useState(new Date())
+  const currentProject = useStore(projectStore.currentProject)
+
+  const [journalDays, setJournalDays] = useState<JournalDays>({})
+  useEffect(() => {
+    if (!currentProject) return
+    const files = fileStore.getFilesFor(currentProject)
+    const [year, month] = format(activeDate, 'yyyy-MM').split('-')
+
+    const yearFolder = files.find((f) => f.file.type == FileType.FOLDER && f.file.name == year)
+    if (!yearFolder) return setJournalDays({})
+
+    const monthFolder = yearFolder.nodes!.find(
+      (f) => f.file.type == FileType.FOLDER && f.file.name == month
+    )
+    if (!monthFolder) return setJournalDays({})
+
+    const days: JournalDays = {}
+    monthFolder.nodes!.forEach((f) => {
+      if (f.file.provisional) return
+      const [_y, _m, d] = f.label.split('-')
+      if (d) days[d.replace(/^0/, '')] = true
+    })
+    setJournalDays(days)
+  }, [currentProject, activeDate])
+
+  useEffect(() => {
+    if (currentDate) setSelectedDate(currentDate)
+  }, [currentDate])
 
   const getHeader = () => {
     return (
@@ -39,7 +77,7 @@ const Calendar = () => {
         </div>
       )
     }
-    return <div className="weekContainer">{weekDays}</div>
+    return <div className="grid grid-cols-7">{weekDays}</div>
   }
 
   const generateDatesForCurrentWeek = (date: Date, selectedDate: Date, activeDate: Date) => {
@@ -47,17 +85,29 @@ const Calendar = () => {
     const week = []
     for (let day = 0; day < 7; day++) {
       const cloneDate = currentDate
+
+      const sameMonth = isSameMonth(currentDate, activeDate)
+      const dayLabel = format(currentDate, 'd')
+      const hasJournal = sameMonth && journalDays[dayLabel]
+
       week.push(
         <div
-          className={`day ${isSameMonth(currentDate, activeDate) ? '' : 'inactiveDay'} ${
-            isSameDay(currentDate, selectedDate) ? 'selectedDay' : ''
-          }
-          ${isSameDay(currentDate, new Date()) ? 'today' : ''}`}
+          className={classNames(
+            'p-1 text-center cursor-pointer rounded-full',
+            hasJournal ? 'text-orange-500 font-semibold' : '',
+            sameMonth ? '' : 'text-gray-400',
+            isSameDay(currentDate, selectedDate)
+              ? 'bg-blue-200'
+              : isSameDay(currentDate, new Date())
+              ? 'bg-gray-200'
+              : ''
+          )}
           onClick={() => {
             setSelectedDate(cloneDate)
+            onSelect?.(cloneDate)
           }}
         >
-          {format(currentDate, 'd')}
+          {dayLabel}
         </div>
       )
       currentDate = addDays(currentDate, 1)
@@ -80,11 +130,11 @@ const Calendar = () => {
       currentDate = addDays(currentDate, 7)
     }
 
-    return <div className="weekContainer">{allWeeks}</div>
+    return <div className="grid grid-cols-7">{allWeeks}</div>
   }
 
   return (
-    <div class="calendar text-xs p-2">
+    <div class="calendar text-xs p-2 select-none">
       {getHeader()}
       {getWeekDaysNames()}
       {getDates()}

@@ -1,5 +1,5 @@
 import { route } from 'preact-router'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
 import Tooltip from '@/components/core/Tooltip'
 import { paths } from '@/config'
@@ -12,6 +12,13 @@ export default function () {
   const [pillsOpen, setPillsOpen] = useState(false)
   const projects = useStore(projectStore.projects).filter((p) => !p.archived_at)
   const currentProject = useStore(projectStore.currentProject)
+
+  useEffect(() => {
+    if (!pillsOpen) return
+    const onResize = () => setPillsOpen(false)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [pillsOpen])
 
   return (
     <>
@@ -56,7 +63,7 @@ export default function () {
             {p.name}
           </div>
         ))}
-        <Tooltip message={pillsOpen ? '' : 'Manage Projects'} placement="bottom">
+        <Tooltip message={pillsOpen ? '' : 'Manage Projects'} placement="right">
           <div
             className={classNames(
               'text-gray-400 text-sm flex',
@@ -67,8 +74,8 @@ export default function () {
               route(paths.PROJECTS)
             }}
           >
-            <ViewListIcon className="w-5 h-5 mr-2" />
-            {pillsOpen && 'Manage Projects'}
+            <ViewListIcon className="w-5 h-5" />
+            {pillsOpen && <div className="ml-2">Manage Projects</div>}
           </div>
         </Tooltip>
       </div>
