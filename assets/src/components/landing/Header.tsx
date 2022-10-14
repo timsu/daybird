@@ -1,5 +1,6 @@
 import Button from '@/components/core/Button'
 import Logo from '@/components/core/Logo'
+import LogoIcon from '@/components/core/LogoIcon'
 import { hasToken, paths } from '@/config'
 
 export default function () {
@@ -9,6 +10,13 @@ export default function () {
       className="flex justify-between items-center px-4 py-2
         sm:px-6 md:justify-start md:space-x-10"
     >
+      {location.pathname != paths.ROOT && (
+        <div>
+          <a href={paths.ROOT}>
+            <LogoIcon class="w-[40px]" />
+          </a>
+        </div>
+      )}
       <div className="grow" />
 
       <div className="flex items-center md:ml-12">

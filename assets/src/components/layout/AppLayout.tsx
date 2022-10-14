@@ -12,7 +12,7 @@ import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { useStore } from '@nanostores/preact'
 
-import { Header } from './Header'
+import AppHeader from './AppHeader'
 
 export default function ({ children }: RenderableProps<{}>) {
   const sidebarOpen = useStore(uiStore.sidebarOpen)
@@ -50,7 +50,7 @@ export default function ({ children }: RenderableProps<{}>) {
           'flex flex-col min-h-full print:h-auto bg-white'
         )}
       >
-        <Header {...props} />
+        <AppHeader {...props} />
 
         <div className="flex-1 flex">
           <main className="flex flex-1 flex-col mt-1 px-6">{children}</main>

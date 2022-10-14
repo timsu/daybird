@@ -10,7 +10,7 @@ import { useStore } from '@nanostores/preact'
 
 import { SidebarProps } from './AppLayout'
 
-export function Header(p: SidebarProps) {
+export default function AppHeader(p: SidebarProps) {
   const { sidebarOpen, desktopSidebarHidden, setSidebarOpen, setDesktopSidebarHidden } = p
   const [hasShadow, setHasShadow] = useState(false)
 
