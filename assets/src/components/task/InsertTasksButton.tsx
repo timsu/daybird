@@ -20,9 +20,11 @@ export default function ({ date }: { date: Date }) {
 
   return (
     <>
-      <TasksMenu open={open} close={() => setOpen(null)} />
+      <TasksMenu open={open} close={() => setTimeout(() => setOpen(null), 0)} />
       <Button
-        onClick={(e) => setOpen(open ? null : (e.target as HTMLElement))}
+        onClick={(e) => {
+          !open && setOpen(e.target as HTMLElement)
+        }}
         class="ml-4 py-1 px-1 sm:px-4"
       >
         Insert Tasks
