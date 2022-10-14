@@ -29,27 +29,21 @@ export default () => (
                 <a
                   href={paths.SIGNUP}
                   className="mx-auto px-8 py-3 border border-transparent
-            text-base font-medium rounded-md text-white bg-lavender-700 hover:bg-lavender-800
+            text-base font-medium rounded-md text-white bg-lavender-600 hover:bg-lavender-800
             md:py-4 md:text-lg md:px-10"
                 >
                   Try it for yourself
                 </a>
 
                 <div className="mt-10">
-                  <Tooltip
-                    message="Check out Daybird on Github"
-                    placement="bottom"
-                    tooltipClass="w-[220px]"
+                  <a
+                    className="text-gray-800 hover:bg-lavender-100 p-2 rounded-md flex items-center"
+                    href="https://github.com/timsu/listnote"
+                    target="_blank"
                   >
-                    <a
-                      className="text-gray-800 flex items-center"
-                      href="https://github.com/timsu/listnote"
-                      target="_blank"
-                    >
-                      <img src={github} width={32} height={32} />
-                      <div className="ml-2 text-">Daybird is Open Source!</div>
-                    </a>
-                  </Tooltip>
+                    <img src={github} width={32} height={32} />
+                    <div className="ml-2 text-">Daybird is Open Source!</div>
+                  </a>
                 </div>
               </div>
             </div>
