@@ -3,6 +3,7 @@ import { useState } from 'preact/hooks'
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
 import Submit from '@/components/core/Submit'
+import { paths } from '@/config'
 import AuthForm from '@/screens/auth/AuthForm'
 import { authStore } from '@/stores/authStore'
 import { unwrapError } from '@/utils'
@@ -73,6 +74,12 @@ export default () => {
         <Submit label="Sign in" />
 
         <ErrorMessage error={error} />
+
+        <div className="mt-4 flex justify-center">
+          <a href={paths.SIGNUP} className="text-lavender-400 text-sm">
+            No account? Create one.
+          </a>
+        </div>
       </form>
 
       {/* <div className="mt-6">

@@ -61,7 +61,7 @@ export default function () {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
               <div key={feature.name} className="pt-6">
-                <div className="flow-root rounded-lg bg-gray-50 px-6 pb-8">
+                <div className="h-full flow-root rounded-lg bg-gray-50 px-6 pb-8">
                   <div className="-mt-6">
                     <div>
                       <span className="inline-flex items-center justify-center rounded-md bg-lavender-500 p-3 shadow-lg">
