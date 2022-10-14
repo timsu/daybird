@@ -12,7 +12,7 @@ import { Project, ProjectMember, ProjectRole } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
-import { unwrapError } from '@/utils'
+import { makeInitials, unwrapError } from '@/utils'
 import { MailIcon } from '@heroicons/react/solid'
 import { useStore } from '@nanostores/preact'
 
@@ -51,7 +51,11 @@ export default ({ id }: Props) => {
 
       <InviteCollaborator {...projectArgs} />
 
-      <div className="h-8" />
+      <div className="h-6" />
+
+      <RenameProject {...projectArgs} />
+
+      <div className="h-6" />
 
       {isAdmin && (
         <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
@@ -154,6 +158,83 @@ function Members({ project, isAdmin }: ProjectArgs) {
               </table>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function RenameProject({ project }: ProjectArgs) {
+  const [name, setName] = useState<string>()
+  const [shortcode, setShortcode] = useState<string>()
+  const [error, setError] = useState<string>()
+  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [success, setSuccess] = useState<boolean>(false)
+
+  const onSubmit = async (e: Event) => {
+    e.preventDefault()
+
+    if (!name) return setError('Name must not be blank')
+    if (!shortcode || shortcode.trim().length > 4) return setError('Code must be 1 - 4 characters')
+
+    try {
+      setSubmitting(true)
+      setSuccess(false)
+      setError(undefined)
+      const response = await API.updateProject(project, { name, shortcode })
+      projectStore.onProjectUpdated(response)
+      setName('')
+      setShortcode('')
+      setSuccess(true)
+    } catch (e) {
+      setError(unwrapError(e))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const onNameChange = (e: Event) => {
+    const name = (e.target as HTMLInputElement).value
+    setName(name)
+    setShortcode(makeInitials(name))
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="bg-white shadow sm:rounded-lg mt-8">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">Rename Project</h3>
+          <div className="mt-2 text-sm text-gray-500">
+            Changing the short-code will not affect existing tasks.
+          </div>
+          <ErrorMessage error={error} />
+
+          <form className="mt-5 sm:flex sm:items-center select-none" onSubmit={onSubmit}>
+            <input
+              type="text"
+              className="max-w-xs w-full mr-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={name}
+              placeholder="New Project Name"
+              onChange={onNameChange}
+            />
+            <input
+              type="text"
+              className="max-w-xs w-25 mr-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={shortcode}
+              placeholder="Short code"
+              onChange={(e) => setShortcode((e.target as HTMLInputElement).value.toUpperCase())}
+            />
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              Rename
+            </button>
+          </form>
+
+          {success && <div className="mt-2 text-green-600 font-semibold">Project Renamed!</div>}
         </div>
       </div>
     </div>

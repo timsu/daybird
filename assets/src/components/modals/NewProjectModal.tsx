@@ -78,7 +78,7 @@ export default () => {
               placeholder="Used to identify tasks for this project"
               value={shortcode}
               autoComplete="off"
-              onChange={(e) => setShortcode((e.target as HTMLInputElement).value)}
+              onChange={(e) => setShortcode((e.target as HTMLInputElement).value.toUpperCase())}
             />
           </div>
         </div>

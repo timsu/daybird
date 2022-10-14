@@ -32,29 +32,6 @@ export default (props: Props) => {
   const title = useStore(docStore.title)
   const project = useStore(projectStore.projectMap)[props.projectId!]
 
-  const isTodayJournal = title == fileStore.dailyFileTitle()
-  const uncompleteTasksInserted =
-    isTodayJournal && localStorage.getItem(LS_TASKS_INSERTED + props.projectId) == props.id
-
-  const insertUncompleteTasks = useCallback(
-    async (e: MouseEvent) => {
-      const tasks = await taskStore.loadTasks({ id: props.projectId! } as Project)
-      const notInThisDoc = tasks.filter((t) => t.doc != props.id)
-      const startIndex = 0
-
-      const content = notInThisDoc.map((t, i) => ({
-        type: 'task',
-        attrs: { id: t.id, ref: true },
-      }))
-
-      window.editor?.commands.insertContentAt(startIndex, content)
-
-      localStorage.setItem(LS_TASKS_INSERTED + props.projectId, props.id || '')
-      ;(e.target as HTMLDivElement).style.display = 'none'
-    },
-    [props.projectId, props.id]
-  )
-
   return (
     <>
       <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
@@ -81,16 +58,6 @@ export default (props: Props) => {
               <DotsHorizontalIcon className="h-4 w-4 text-gray-400" />
             </Pressable>
           </div>
-          {isTodayJournal && !uncompleteTasksInserted && (
-            <Tooltip
-              message="Adds all uncompleted tasks from this project to today's journal"
-              placement="bottom"
-            >
-              <Button onClick={insertUncompleteTasks} class="ml-4 py-1 px-1 sm:px-4">
-                {isMobile ? 'Insert Tasks' : 'Insert Uncomplete Tasks'}
-              </Button>
-            </Tooltip>
-          )}
         </div>
         <DocMenu />
         <Document projectId={props.projectId} id={props.id} />
