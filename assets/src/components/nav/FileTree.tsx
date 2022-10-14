@@ -1,5 +1,5 @@
 import { h } from 'preact'
-import { Link } from 'preact-router'
+import { Link, route } from 'preact-router'
 import Match from 'preact-router/match'
 
 import { ContextMenuTrigger, triggerContextMenu } from '@/components/core/ContextMenu'
@@ -81,6 +81,27 @@ function dropHandler(projectId: string, parentId: string | null) {
   }
 }
 
+const longPressDuration = 800
+let timer: number = 0
+
+function longPress(e: TouchEvent, onLongTouch: () => void) {
+  e.preventDefault()
+  if (!timer) {
+    timer = window.setTimeout(() => {
+      onLongTouch()
+      timer = 0
+    }, longPressDuration)
+  }
+}
+
+function touchEnd(onClick: () => void) {
+  if (timer) {
+    window.clearTimeout(timer)
+    onClick()
+    timer = 0
+  }
+}
+
 type ChildProps = {
   indent: number
   node: TreeFile
@@ -90,6 +111,14 @@ type ChildProps = {
 function FileNode({ indent, node, projectId }: ChildProps) {
   const item = node.file
   const href = `${paths.DOC}/${projectId}/${item.id}`
+
+  const onContextMenu = (target: HTMLElement) => {
+    const rect = target.getBoundingClientRect()
+    triggerContextMenu(rect.left, rect.top, 'file-tree-doc', {
+      file: item,
+      projectId: projectId,
+    })
+  }
 
   return (
     <ContextMenuTrigger
@@ -108,12 +137,13 @@ function FileNode({ indent, node, projectId }: ChildProps) {
               onDragOver={allowDrop}
               onDragStart={dragHandler(item.id)}
               onDrop={dropHandler(projectId, item.parent!)}
-              onContextMenu={(e) =>
-                triggerContextMenu(e.clientX, e.clientY, 'file-tree-doc', {
-                  file: item,
-                  projectId: projectId,
+              onContextMenu={(e) => onContextMenu(e.target as HTMLElement)}
+              onTouchStart={(e) =>
+                longPress(e, () => {
+                  onContextMenu(e.target as HTMLElement)
                 })
               }
+              onTouchEnd={() => touchEnd(() => route(href))}
               className={classNames(
                 matches ? 'bg-blue-200 ' : ' hover:bg-blue-300 ',
                 'text-gray-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
@@ -158,6 +188,14 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
 
   const Icon = expanded ? ChevronDownIcon : ChevronRightIcon
 
+  const onContextMenu = (target: HTMLElement) => {
+    const rect = target.getBoundingClientRect()
+    triggerContextMenu(rect.left, rect.top, 'file-tree-folder', {
+      file: item,
+      projectId: projectId,
+    })
+  }
+
   return (
     <>
       <ContextMenuTrigger
@@ -170,12 +208,13 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
           onDragOver={allowDrop}
           onDragStart={dragHandler(item.id)}
           onDrop={dropHandler(projectId, item.id)}
-          onContextMenu={(e) =>
-            triggerContextMenu(e.clientX, e.clientY, 'file-tree-folder', {
-              file: item,
-              projectId: projectId,
+          onContextMenu={(e) => onContextMenu(e.target as HTMLElement)}
+          onTouchStart={(e) =>
+            longPress(e, () => {
+              onContextMenu(e.target as HTMLElement)
             })
           }
+          onTouchEnd={() => touchEnd(() => setExpanded(!expanded))}
           className="text-gray-700 hover:bg-gray-300 group flex
         items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
           onClick={() => setExpanded(!expanded)}

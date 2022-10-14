@@ -20,9 +20,10 @@ export default (props: Props) => {
     <div className="py-6">
       <div className="px-4 sm:px-6 hover:bg-white md:px-8 mt-4">
         <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
+        <div className="my-6 text-sm">
+          Click a project to view settings and invite collaborators.
+        </div>
       </div>
-
-      <div className="h-6" />
 
       <div className="px-4 sm:px-6 md:px-8">
         <ProjectList projects={projects} />
