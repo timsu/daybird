@@ -40,7 +40,7 @@ function TasksMenu({ open, close }: { open: HTMLElement | null; close: () => voi
         <div class="block fixed" style={{ top: (rect?.bottom || 0) + 5, left: rect?.left }}>
           <div
             class={classNames(
-              'bg-white w-[400px] h-[300px] overflow-hidden border border-gray-300 rounded-lg flex flex-col text-sm p-1',
+              'bg-white w-[400px] max-h-[300px] overflow-hidden border border-gray-300 rounded-lg flex flex-col text-sm',
               'select-none text-gray-900 shadow-lg'
             )}
           >
@@ -118,7 +118,7 @@ function TaskMenuContent({ close }: { close: () => void }) {
         {displayedTasks.map((t) => (
           <div
             key={t.id}
-            className="p-2 cursor-pointer"
+            className="flex p-3 cursor-pointer items-center hover:bg-gray-100"
             onClick={() => setSelectedTasks((s) => ({ ...s, [t.id]: !s[t.id] }))}
           >
             <input type="checkbox" className="rounded mr-2" checked={selectedTasks[t.id]} />
