@@ -1,4 +1,7 @@
 import { getDayOfYear } from 'date-fns'
+import { useState } from 'preact/hooks'
+
+import { XIcon } from '@heroicons/react/outline'
 
 const prompts = [
   '“Pleasure in the job puts perfection in the work.” – Aristotle',
@@ -106,6 +109,19 @@ const prompts = [
 ]
 
 export default function ({ date }: { date: Date }) {
+  const [hidden, setHidden] = useState(false)
+  if (hidden) return null
+
   const idx = getDayOfYear(date)
-  return <div className="italic text-gray-500">{prompts[idx % prompts.length]}</div>
+  return (
+    <div className="group italic text-gray-500 relative align-middle">
+      {prompts[idx % prompts.length]}
+      <span
+        className="hidden group-hover:inline ml-2 cursor-pointer absolute"
+        onClick={() => setHidden(true)}
+      >
+        <XIcon className="w-3 h-3" />
+      </span>
+    </div>
+  )
 }
