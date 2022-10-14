@@ -56,7 +56,7 @@ export default ({ id }: Props) => {
       {isAdmin && (
         <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
           <h1 className="text-xl font-semibold text-gray-900 mb-5">Dangerous Stuff</h1>
-          <div className="flex gap-8">
+          <div className="flex gap-8 flex-col md:flex-row">
             <ArchiveProject {...projectArgs} />
             <DeleteProject {...projectArgs} />
           </div>
@@ -201,11 +201,11 @@ function InviteCollaborator({ project }: ProjectArgs) {
           </div>
           <ErrorMessage error={error} />
 
-          <form className="mt-5 sm:flex sm:items-center" onSubmit={onSubmit}>
+          <form className="mt-5 sm:flex sm:items-center select-none" onSubmit={onSubmit}>
             <input
               type="email"
               label="Email address"
-              className="max-w-xs w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="max-w-xs w-full mr-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               value={email}
               placeholder="you@example.com"
               onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
@@ -214,7 +214,7 @@ function InviteCollaborator({ project }: ProjectArgs) {
             <select
               value={role}
               onChange={(e) => setRole((e.target as HTMLInputElement).value as ProjectRole)}
-              className="ml-4 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             >
               <option label="Member" value={ProjectRole.MEMBER} />
               <option label="Admin" value={ProjectRole.ADMIN} />
