@@ -27,7 +27,7 @@ export default () => (
       </div>
     </div>
     <div className="mt-4 mb-8 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-      <Tooltip message="Check out ListNote on Github" placement="bottom" tooltipClass="w-[220px]">
+      <Tooltip message="Check out Daybird on Github" placement="bottom" tooltipClass="w-[220px]">
         <a
           className="text-funblue-600 underline"
           href="https://github.com/timsu/listnote"

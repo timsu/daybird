@@ -16,7 +16,7 @@ export default (props: Props) => {
 
   return (
     <div className="py-6">
-      <Helmet title="ListNote | Dashboard" />
+      <Helmet title="Daybird | Dashboard" />
 
       <div className="px-4 sm:px-6 md:px-8">
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
@@ -25,20 +25,20 @@ export default (props: Props) => {
       {!isPWA && (
         <div className="bg-blue-200 p-4 mt-10 mb-8 mx-4 rounded">
           <div className="font-bold">
-            Add ListNote to your {isMobile ? 'home screen' : 'desktop'}!
+            Add Daybird to your {isMobile ? 'home screen' : 'desktop'}!
           </div>
           {getOS() == 'ios' ? (
             <div>
               Use the Share button in Safari{' '}
               <img src={shareIcon} width={26} height={26} className="inline align-middle" />
-              to add ListNote to your Home Screen.
+              to add Daybird to your Home Screen.
             </div>
           ) : (
             <div>
               Use the menu in your browser to
               {isMobile
-                ? ' add ListNote to your home screen '
-                : ' install ListNote as a desktop app '}
+                ? ' add Daybird to your home screen '
+                : ' install Daybird as a desktop app '}
               and get quick access to your notes.
             </div>
           )}
@@ -55,10 +55,10 @@ export default (props: Props) => {
       )}
 
       <div className="px-4 sm:px-6 md:px-8 my-6 ">
-        <p>Welcome to ListNote! It's a great day to start writing.</p>
+        <p>Welcome to Daybird! It's a great day to start writing.</p>
         <div className="h-4" />
         <p>
-          ListNote is beta software and is actively being developed. Please send ideas and feedback
+          Daybird is beta software and is actively being developed. Please send ideas and feedback
           to{' '}
           <a class="hover:bg-blue-200 rounded text-blue-800" href="mailto:tim@listnote.co">
             tim@listnote.co

@@ -35,7 +35,7 @@ export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
 
   const { id, contents } = props
-  const { editor, ydoc } = useListNoteEditor(id, contents)
+  const { editor, ydoc } = useEditor(id, contents)
   useAutosave(props, editor, ydoc, editorRef)
   useDeleteTaskListener(editor)
 
@@ -43,14 +43,14 @@ export default (props: Props) => {
     <div
       class={classNames('max-w-2xl mx-auto w-full h-auto grow pb-20', 'print:max-w-none print:p-0')}
     >
-      <div ref={editorRef} class="listnote mt-4 h-full" />
+      <div ref={editorRef} class="mt-4 h-full" />
     </div>
   )
 }
 
 // hook to initialize the editor
 
-const useListNoteEditor = (id: string | undefined, initialContent: any) => {
+const useEditor = (id: string | undefined, initialContent: any) => {
   const prevEditor = useRef<Editor>()
   const prevDoc = useRef<Y.Doc>()
 
@@ -104,7 +104,7 @@ const useListNoteEditor = (id: string | undefined, initialContent: any) => {
         }),
         Placeholder.configure({
           placeholder:
-            'Welcome to ListNote!\n\nStart typing to create a note.\n\n' +
+            'Welcome to Daybird!\n\nStart typing to create a note.\n\n' +
             'Type "[] " to create a task.\n\n' +
             'Have fun!',
         }),
