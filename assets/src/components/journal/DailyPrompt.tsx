@@ -106,6 +106,6 @@ const prompts = [
 ]
 
 export default function ({ date }: { date: Date }) {
-  const idx = getDayOfYear(date) - 1
+  const idx = getDayOfYear(date)
   return <div className="italic text-gray-500">{prompts[idx % prompts.length]}</div>
 }
