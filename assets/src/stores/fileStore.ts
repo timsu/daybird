@@ -212,6 +212,12 @@ class FileStore {
   }
 
   deleteFile = async (project: Project, file: File, archive?: boolean) => {
+    if (!location.pathname.includes(paths.DOC) && docStore.id.get() == file.id) {
+      // special case for daily notes: just clear the document
+      window.editor?.commands.clearContent(true)
+      return
+    }
+
     const files = this.files.get()[project.id]
     if (file.type == FileType.FOLDER) {
       const children = files.filter((f) => f.parent == file.id)

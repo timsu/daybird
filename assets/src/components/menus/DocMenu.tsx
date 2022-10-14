@@ -16,17 +16,20 @@ import {
 type Props = {
   projectId: string
   docId: string
+  dailyNote?: boolean
 }
 
 export default () => {
   return (
     <ContextMenuWithData id="doc-menu">
-      {({ projectId, docId }: Props) => (
+      {({ dailyNote, docId }: Props) => (
         <>
-          <ContextMenuItem onClick={() => copy(location.href)}>
-            <LinkIcon class="h-4 w-4 mr-2" />
-            Copy File Link
-          </ContextMenuItem>
+          {!dailyNote && (
+            <ContextMenuItem onClick={() => copy(location.href)}>
+              <LinkIcon class="h-4 w-4 mr-2" />
+              Copy File Link
+            </ContextMenuItem>
+          )}
           <ContextMenuItem onClick={() => print()}>
             <PrinterIcon class="h-4 w-4 mr-2" />
             Print Document
@@ -35,17 +38,19 @@ export default () => {
             <CheckIcon class="h-4 w-4 mr-2 text-gray-500" />
             Remove Completed Tasks
           </ContextMenuItem>
-          <ContextMenuItem
-            onClick={() =>
-              modalStore.renameFileModal.set({
-                project: projectStore.currentProject.get()!,
-                file: fileStore.idToFile.get()[docId],
-              })
-            }
-          >
-            <PencilIcon class="h-4 w-4 mr-2 text-gray-500" />
-            Rename Document
-          </ContextMenuItem>
+          {!dailyNote && (
+            <ContextMenuItem
+              onClick={() =>
+                modalStore.renameFileModal.set({
+                  project: projectStore.currentProject.get()!,
+                  file: fileStore.idToFile.get()[docId],
+                })
+              }
+            >
+              <PencilIcon class="h-4 w-4 mr-2 text-gray-500" />
+              Rename Document
+            </ContextMenuItem>
+          )}
 
           <hr />
           <ContextMenuItem
@@ -57,7 +62,7 @@ export default () => {
             }
           >
             <TrashIcon class="h-4 w-4 mr-2 text-red-500" />
-            Delete Document
+            {dailyNote ? 'Clear' : 'Delete'} Document
           </ContextMenuItem>
         </>
       )}
