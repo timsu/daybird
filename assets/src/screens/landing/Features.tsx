@@ -5,22 +5,22 @@ import {
 
 const features = [
   {
-    name: 'Take note',
+    name: 'Write about it',
     description:
       "Write daily notes and as well as named notes in folders. If you've ever used a bullet journal or any other note-taking app you'll feel right at home.",
     icon: PencilAltIcon,
-  },
-  {
-    name: 'Get it done',
-    description:
-      'Access tasks across all your notes. When planning out your day, check for open tasks for things you may want to get done today.',
-    icon: CheckIcon,
   },
   {
     name: 'Schedule it',
     description:
       'View your calendar from your daily journal page to organize blocks of deep work while not missing your meetings.',
     icon: CalendarIcon,
+  },
+  {
+    name: 'Get it done',
+    description:
+      'Access tasks across all your notes. When planning out your day, check for open tasks for things you may want to get done today.',
+    icon: CheckIcon,
   },
   {
     name: 'Works well with others',
