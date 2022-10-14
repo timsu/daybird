@@ -114,14 +114,15 @@ export default function ({ date }: { date: Date }) {
 
   const idx = getDayOfYear(date)
   return (
-    <div className="group italic text-gray-500 relative align-middle">
+    <div className="group italic text-gray-500 relative">
       {prompts[idx % prompts.length]}
-      <span
-        className="hidden group-hover:inline ml-2 cursor-pointer absolute"
+      <a
+        className="hidden group-hover:inline mt-1 ml-1 cursor-pointer absolute"
+        title="Hide"
         onClick={() => setHidden(true)}
       >
         <XIcon className="w-3 h-3" />
-      </span>
+      </a>
     </div>
   )
 }
