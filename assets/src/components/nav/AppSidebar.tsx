@@ -32,9 +32,6 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
   return (
     <div className="flex-1 flex flex-col min-h-0  select-none">
       <div className="flex-1 flex flex-col overflow-y-auto scrollbar">
-        <div className="flex flex-wrap gap-2 sm:hidden">
-          <ProjectPills />
-        </div>
         <Links />
         <Projects />
       </div>

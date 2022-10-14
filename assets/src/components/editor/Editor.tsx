@@ -35,7 +35,7 @@ export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
 
   const { id, contents } = props
-  const { editor, ydoc } = useEditor(id, contents)
+  const { editor, ydoc } = useEditor(props.project?.id + '/' + id, contents)
   useAutosave(props, editor, ydoc, editorRef)
   useDeleteTaskListener(editor)
 
@@ -127,7 +127,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     setTimeout(() => editor.commands.focus(), 0)
 
     return { editor, ydoc }
-  }, [id])
+  }, [id, initialContent])
 }
 
 // hook to autosave when doc is modified

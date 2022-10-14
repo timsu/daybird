@@ -8,6 +8,7 @@
   height: 100%;
   line-height: 170%;
   margin-bottom: 200px;
+  word-break: break-word;
 
   @media print {
     margin-bottom: 0;
