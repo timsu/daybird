@@ -13,7 +13,7 @@ export interface TaskItemOptions {
   HTMLAttributes: Record<string, any>
 }
 
-const inputRegex = /^\[\]\s(.*)$/
+const inputRegex = /^\s?\[\]\s(.*)$/
 
 declare module 'prosemirror-state' {
   interface EditorState {
@@ -192,7 +192,7 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       const node = $start.node()
 
       const fullText = node.textContent
-      const title = fullText.replace(/^\[\]\s*/, '')
+      const title = fullText.replace(/^\s?\[\]\s*/, '')
       const attributes = {
         focus: true,
         title,
