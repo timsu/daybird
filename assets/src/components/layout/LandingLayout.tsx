@@ -5,9 +5,9 @@ import Header from '@/components/landing/Header'
 
 export default function (props: RenderableProps<{ darkFooter?: boolean }>) {
   return (
-    <div class="h-full flex flex-col">
+    <div class="h-full flex flex-col bg-lavender-50">
       <Header />
-      <div className="flex flex-col grow bg-gray-50">{props.children}</div>
+      <div className="flex flex-col grow ">{props.children}</div>
       <Footer dark={props.darkFooter} />
     </div>
   )

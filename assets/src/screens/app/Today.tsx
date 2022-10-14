@@ -55,7 +55,7 @@ export default (props: Props) => {
 
   return (
     <div class="flex flex-col grow  w-full">
-      <Helmet title={'ListNote | ' + title} />
+      <Helmet title={title} />
 
       <div className="max-w-2xl mx-auto w-full mt-4">
         <div class="flex items-center mb-4">

@@ -10,6 +10,8 @@ const LS_RECENT_FILES = 'rf'
 class UIStore {
   // --- stores
 
+  isPWA = false
+
   path = atom<string>()
 
   sidebarOpen = atom<boolean>(false)

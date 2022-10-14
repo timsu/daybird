@@ -1,8 +1,7 @@
 import LandingLayout from '@/components/layout/LandingLayout'
 import { hasToken, paths } from '@/config'
+import Features from '@/screens/landing/Features'
 import Hero from '@/screens/landing/Hero'
-import HeroScreenshot from '@/screens/landing/HeroScreenshot'
-import { LS_LAST_DOC } from '@/stores/docStore'
 
 type Props = {
   path: string
@@ -15,11 +14,11 @@ export default (props: Props) => {
 
   return (
     <LandingLayout darkFooter>
-      <main className="mx-auto max-w-7xl px-4 mt-10 sm:mt-24 grow">
+      <main className="">
         <Hero />
-      </main>
 
-      <HeroScreenshot />
+        <Features />
+      </main>
     </LandingLayout>
   )
 }

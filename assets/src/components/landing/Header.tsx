@@ -5,14 +5,10 @@ import { hasToken, paths } from '@/config'
 export default function () {
   const loggedIn = hasToken()
   return (
-    <div className="bg-white flex justify-between items-center px-4 py-1 sm:px-6 md:justify-start md:space-x-10">
-      <div>
-        <a href={paths.ROOT} className="flex">
-          <span className="sr-only">Sequence</span>
-          <Logo class="w-[150px] sm:w-[250px]" />
-        </a>
-      </div>
-
+    <div
+      className="flex justify-between items-center px-4 py-2
+        sm:px-6 md:justify-start md:space-x-10"
+    >
       <div className="grow" />
 
       <div className="flex items-center md:ml-12">

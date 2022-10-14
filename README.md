@@ -1,4 +1,4 @@
-# ListNote
+# Daybird
 
 Installation instructions:
 
