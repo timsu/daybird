@@ -58,7 +58,7 @@ function ProjectList({ projects }: { projects: Project[] }) {
 
   return (
     <div>
-      <Helmet title="Daybird | Projects" />
+      <Helmet title="Projects" />
       <ul role="list" className="grid grid-cols-2 gap-5 sm:gap-6">
         {projectItems.map((project) => (
           <a href={project.href}>

@@ -28,6 +28,18 @@ module.exports = {
           700: '#3c99dd',
           800: '#328fd3',
         },
+        lavender: {
+          50: '#ebecf2',
+          100: '#b4bdf1',
+          200: '#aab3e7',
+          300: '#a0a9dd',
+          400: '#969fd3',
+          500: '#8c95c9',
+          600: '#828bbf',
+          700: '#7881b5',
+          800: '#6e77ab',
+          900: '#646da1',
+        },
       },
       fontFamily: {
         sans: ['Inter var', 'sans-serif'],
