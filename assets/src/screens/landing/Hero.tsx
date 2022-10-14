@@ -6,7 +6,7 @@ import screenshot from '@/images/screenshot.png'
 
 export default () => (
   <>
-    <div className="lg:relative lg:py-20/ bg-lavender-50">
+    <div className="lg:relative lg:py-20/ bg-lavender-50 overflow-hidden">
       <div
         className="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:grid lg:max-w-7xl
           lg:grid-cols-2 lg:gap-24 lg:px-8"
