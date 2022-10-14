@@ -38,7 +38,7 @@ export default () => (
                 <div className="mt-10">
                   <a
                     className="text-gray-800 hover:bg-lavender-100 p-2 rounded-md flex items-center"
-                    href="https://github.com/timsu/listnote"
+                    href="https://github.com/timsu/daybird"
                     target="_blank"
                   >
                     <img src={github} width={32} height={32} />

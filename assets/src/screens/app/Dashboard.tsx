@@ -62,8 +62,8 @@ export default (props: Props) => {
         <p>
           Daybird is beta software and is actively being developed. Please send ideas and feedback
           to{' '}
-          <a class="hover:bg-blue-200 rounded text-blue-800" href="mailto:tim@listnote.co">
-            tim@listnote.co
+          <a class="hover:bg-blue-200 rounded text-blue-800" href="mailto:tim@daybird.app">
+            tim@daybird.app
           </a>
           .
         </p>

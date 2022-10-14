@@ -9,7 +9,7 @@ import { useStore } from '@nanostores/preact'
 
 const userNavigation = [
   // { name: 'Your Profile', href: '#' },
-  // { name: 'Settings', href: '#' },
+  { name: 'Report a Bug', href: 'mailto:tim@daybird.app?subject=Bug Report' },
   { name: 'Sign out', href: '#', onClick: () => authStore.logout() },
 ]
 
