@@ -1,4 +1,5 @@
 import { action, atom, onMount } from 'nanostores'
+import { route } from 'preact-router'
 import { v4 as uuid } from 'uuid'
 
 import { API } from '@/api'
@@ -53,9 +54,12 @@ class AuthStore {
 
     const user = User.fromJSON(response.user)
     this.loggedInUser.set(user)
-    projectStore.updateProjects(response.projects.map((p) => Project.fromJSON(p)))
+    projectStore.updateProjects(response.projects.map(Project.fromJSON))
     projectStore.updateCurrentProject(user)
 
+    if (!projectStore.activeProjects.get().length && location.pathname != paths.PROJECTS) {
+      setTimeout(() => route(paths.PROJECTS), 100)
+    }
     // on occasion, hot module reload doesn't update properly without timeout
     if (config.dev) setTimeout(() => this.loggedInUser.notify(), 500)
   }

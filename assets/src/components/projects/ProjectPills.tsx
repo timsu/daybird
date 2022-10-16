@@ -10,7 +10,7 @@ import { useStore } from '@nanostores/preact'
 
 export default function () {
   const [pillsOpen, setPillsOpen] = useState(false)
-  const projects = useStore(projectStore.projects).filter((p) => !p.archived_at)
+  const projects = useStore(projectStore.activeProjects)
   const currentProject = useStore(projectStore.currentProject)
 
   useEffect(() => {

@@ -16,7 +16,7 @@ class UIStore {
 
   sidebarOpen = atom<boolean>(false)
 
-  calendarOpen = atom<boolean>(window.innerWidth > 700)
+  calendarOpen = atom<boolean>(false)
 
   calendarDate = atom<Date>(new Date())
 

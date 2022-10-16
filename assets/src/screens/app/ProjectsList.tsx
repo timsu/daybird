@@ -1,3 +1,5 @@
+import { useEffect } from 'preact/hooks'
+
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
 import NewProjectModal from '@/components/modals/NewProjectModal'
@@ -6,6 +8,7 @@ import { Project } from '@/models'
 import NoProjects from '@/screens/app/NoProjects'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames, makeInitials, mediumColorFor, pluralizeWithCount } from '@/utils'
 import { DotsVerticalIcon, PlusIcon } from '@heroicons/react/solid'
 import { useStore } from '@nanostores/preact'
@@ -15,6 +18,9 @@ type Props = {
 }
 export default (props: Props) => {
   const projects = useStore(projectStore.projects)
+  const activeProjects = useStore(projectStore.activeProjects)
+
+  useEffect(() => uiStore.calendarOpen.set(false))
 
   return (
     <div className="py-6">
@@ -28,7 +34,12 @@ export default (props: Props) => {
       <div className="px-4 sm:px-6 md:px-8">
         <ProjectList projects={projects} />
 
-        {projects.length == 0 && <NoProjects />}
+        {activeProjects.length == 0 && (
+          <>
+            <div className="h-8" />
+            <NoProjects />
+          </>
+        )}
 
         <div className="mt-10 text-center">
           <Button onClick={() => modalStore.newProjectModal.set(true)}>

@@ -14,6 +14,8 @@ export type ProjectMap = { [id: string]: Project }
 class ProjectStore {
   // --- stores
 
+  activeProjects = atom<Project[]>([])
+
   projects = atom<Project[]>([])
 
   projectMap = map<ProjectMap>({})
@@ -25,6 +27,7 @@ class ProjectStore {
   updateProjects = action(this.projects, 'updateProjects', (store, projects: Project[]) => {
     logger.info('PROJECTS - update', projects)
     store.set(projects)
+    this.activeProjects.set(projects.filter((p) => !p.archived_at && !p.deleted_at))
     this.updateProjectMap(projects)
   })
 
