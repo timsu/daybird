@@ -29,6 +29,16 @@ type NavItem = {
 }
 
 export default ({ darkHeader }: { darkHeader?: boolean }) => {
+  const projects = useStore(projectStore.activeProjects)
+
+  if (!projects.length) {
+    return (
+      <div className="flex-1 flex flex-col min-h-0  select-none">
+        <div className="p-4 italic text-sm">Please create a project to continue.</div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex-1 flex flex-col min-h-0  select-none">
       <div className="flex-1 flex flex-col overflow-y-auto scrollbar">

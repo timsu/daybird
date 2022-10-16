@@ -33,6 +33,9 @@ export default (props: Props) => {
     logger.info(e)
   }
 
+  // on first navigate, open calendar
+  useEffect(() => uiStore.calendarOpen.set(window.innerWidth > 700), [])
+
   useEffect(() => {
     uiStore.calendarDate.set(date)
   }, [date])

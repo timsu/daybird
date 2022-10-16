@@ -10,15 +10,17 @@ import { useStore } from '@nanostores/preact'
 export default function () {
   const calendarOpen = useStore(uiStore.calendarOpen)
   const selectedDate = useStore(uiStore.calendarDate)
+  const path = useStore(uiStore.path)
 
   useEffect(() => {
+    if (location.pathname != paths.TODAY) return
     const onResize = () => {
       const shouldBeOpen = window.innerWidth > 700
       if (calendarOpen != shouldBeOpen) uiStore.calendarOpen.set(shouldBeOpen)
     }
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [calendarOpen])
+  }, [calendarOpen, path])
 
   if (!calendarOpen) return null
 
