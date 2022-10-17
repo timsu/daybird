@@ -203,9 +203,12 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       ;(newNode.attrs as any).focus = true
 
       const from = Math.max(1, range.from - 1)
-      const to = Math.min(from - 1 + node.nodeSize, state.doc.nodeSize - 1)
+      const to = Math.min(range.to, state.doc.nodeSize - 1)
 
-      state.tr.split(to).replaceWith(from - 1, to, newNode)
+      if (node == state.doc.lastChild) {
+        state.tr.split(to)
+      }
+      state.tr.replaceWith(from, to, newNode)
     },
   })
 }
