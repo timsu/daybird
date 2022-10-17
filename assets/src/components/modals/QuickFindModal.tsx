@@ -112,7 +112,7 @@ function QuickSearchBody({ close }: { close: () => void }) {
                 type: 'project',
                 name: p.name,
                 desc: 'Project',
-                href: `${paths.PROJECTS}/${p.id}`,
+                href: `${paths.TODAY}?p=${p.id}`,
                 score: stringSimilarity(searchText, p.name, substringLength),
               } as SearchResult)
           )

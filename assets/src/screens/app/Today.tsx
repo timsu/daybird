@@ -22,10 +22,17 @@ type Props = {
 }
 
 export default (props: Props) => {
+  const params = new URLSearchParams(location.search)
+
   const project = useStore(projectStore.currentProject)
   const [todayDoc, setTodayDoc] = useState<string>('')
 
-  const dateParam = new URLSearchParams(location.search).get('d')
+  const projectParam = params.get('p')
+  useEffect(() => {
+    if (projectParam && projectParam != project?.id) projectStore.setCurrentProject(projectParam)
+  }, [projectParam, project])
+
+  const dateParam = params.get('d')
   let date: Date = new Date()
   try {
     if (dateParam) date = parse(dateParam, 'yyyy-MM-dd', new Date())
@@ -38,6 +45,7 @@ export default (props: Props) => {
 
   useEffect(() => {
     uiStore.calendarDate.set(date)
+    setTimeout(() => window.editor?.commands.focus(), 50)
   }, [date])
 
   const isToday = isSameDay(date, new Date())
