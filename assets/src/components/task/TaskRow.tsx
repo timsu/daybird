@@ -118,7 +118,10 @@ export default ({
   // --- actions
 
   const toggleComplete = () => {
-    taskStore.saveTask(task, { completed_at: task.completed_at ? null : new Date().toISOString() })
+    taskStore.saveTask(task, {
+      completed_at: task.completed_at ? null : new Date().toISOString(),
+      state: null,
+    })
   }
 
   const clickShortCode = (e: MouseEvent) => {
@@ -202,6 +205,19 @@ export default ({
           {fileStore.idToFile.get()[task.doc]?.name}
         </div>
       )}
+
+      {task?.state && <div class="font-semibold text-sm text-blue-500 ml-2">IN PROGRESS</div>}
+
+      {task?.priority ? (
+        <div
+          class={classNames(
+            'font-semibold text-sm ml-2',
+            ['text-gray-500', 'text-yellow-500', 'text-orange-500', 'text-red-500'][task.priority]
+          )}
+        >
+          {'!'.repeat(task.priority)}
+        </div>
+      ) : null}
 
       <div
         class="text-sm font-semibold text-slate-500 ml-3 whitespace-nowrap cursor-pointer"

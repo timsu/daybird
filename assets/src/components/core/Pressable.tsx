@@ -17,8 +17,8 @@ export default ({
   const contents = (
     <div
       className={classNames(
-        'relative flex flex-col items-center group p-1 hover:bg-gray-400/50 rounded cursor-pointer print:hidden',
-        className || ''
+        'relative flex flex-col items-center group p-1 rounded cursor-pointer print:hidden',
+        className || 'hover:bg-gray-400/50'
       )}
       onClick={onClick}
     >
