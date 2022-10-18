@@ -1,14 +1,15 @@
 import { ContextMenuItem, ContextMenuWithData } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
-import { Task, TaskType } from '@/models'
+import { Task, TaskState, TaskType } from '@/models'
 import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
 import {
-    ArchiveIcon, BookmarkIcon, CheckCircleIcon, EyeOffIcon, TrashIcon
+    ArchiveIcon, ArrowCircleLeftIcon, ArrowCircleRightIcon, BookmarkIcon, CheckCircleIcon,
+    EyeOffIcon, TrashIcon
 } from '@heroicons/react/outline'
 
 export default () => {
-  const isDoc = location.pathname.startsWith(paths.DOC)
+  const isDoc = location.pathname.startsWith(paths.DOC) || location.pathname.startsWith(paths.TODAY)
 
   return (
     <ContextMenuWithData id="task-menu">
@@ -29,17 +30,17 @@ export default () => {
           </>
         ) : (
           <>
-            {task.type == TaskType.TASK && (
-              <ContextMenuItem onClick={() => taskStore.saveTask(task, { type: TaskType.STORY })}>
-                <BookmarkIcon class="h-4 w-4 mr-2 text-green-500" />
-                Convert to Story
+            {task.state ? (
+              <ContextMenuItem onClick={() => taskStore.saveTask(task, { state: null })}>
+                <ArrowCircleLeftIcon class="h-4 w-4 mr-2 text-blue-500" />
+                Not in progress
               </ContextMenuItem>
-            )}
-
-            {task.type == TaskType.STORY && (
-              <ContextMenuItem onClick={() => taskStore.saveTask(task, { type: TaskType.TASK })}>
-                <CheckCircleIcon class="h-4 w-4 mr-2 text-blue-500" />
-                Convert to Task
+            ) : (
+              <ContextMenuItem
+                onClick={() => taskStore.saveTask(task, { state: TaskState.IN_PROGRESS })}
+              >
+                <ArrowCircleRightIcon class="h-4 w-4 mr-2 text-blue-500" />
+                Mark In Progress
               </ContextMenuItem>
             )}
 

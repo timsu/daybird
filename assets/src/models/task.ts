@@ -3,6 +3,10 @@ export enum TaskType {
   STORY,
 }
 
+export enum TaskState {
+  IN_PROGRESS = 'in_progress',
+}
+
 export class Task {
   public id: string = ''
 
@@ -13,6 +17,10 @@ export class Task {
   public type: TaskType = TaskType.TASK
 
   public doc?: string
+
+  public priority?: number
+
+  public state?: TaskState | null
 
   public completed_at?: string | null
 

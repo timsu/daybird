@@ -48,7 +48,7 @@ defmodule SequenceWeb.TasksController do
   # PUT /tasks/id
   def update(conn, %{ "id" => task_uuid } = params) do
     attrs = Utils.params_to_attrs params, ["title", "type", "completed_at", "archived_at",
-      "doc", "deleted_at"]
+      "doc", "deleted_at", "state", "priority"]
 
     with _user <- Guardian.Plug.current_resource(conn),
          {:ok, task} <- Tasks.task_by_uuid(task_uuid),

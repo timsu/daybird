@@ -118,7 +118,10 @@ export default ({
   // --- actions
 
   const toggleComplete = () => {
-    taskStore.saveTask(task, { completed_at: task.completed_at ? null : new Date().toISOString() })
+    taskStore.saveTask(task, {
+      completed_at: task.completed_at ? null : new Date().toISOString(),
+      state: null,
+    })
   }
 
   const clickShortCode = (e: MouseEvent) => {
@@ -172,6 +175,8 @@ export default ({
           onClick={toggleComplete}
         />
       )}
+
+      {task?.state && <div class="font-semibold text-sm text-blue-500 mr-2 ">IN PROGRESS</div>}
 
       {!task?.title && showPlaceholder && (
         <div class="absolute left-[2.6em] pointer-events-none text-gray-400">New task</div>
