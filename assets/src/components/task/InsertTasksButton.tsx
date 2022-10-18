@@ -11,6 +11,7 @@ import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
+import { JSONContent } from '@tiptap/react'
 
 export default function ({ date }: { date: Date }) {
   const [open, setOpen] = useState<HTMLElement | null>(null)
@@ -93,10 +94,15 @@ function TaskMenuContent({ close }: { close: () => void }) {
   function insertTasks() {
     const tasks = displayedTasks.filter((t) => selectedTasks[t.id])
 
-    const content = tasks.map((t) => ({
-      type: 'task',
-      attrs: { id: t.id, ref: true },
-    }))
+    const content = tasks
+      .map(
+        (t) =>
+          ({
+            type: 'task',
+            attrs: { id: t.id, ref: true },
+          } as JSONContent)
+      )
+      .concat([{ type: 'paragraph' }])
     window.editor?.commands.insertContent(content)
     close()
   }
