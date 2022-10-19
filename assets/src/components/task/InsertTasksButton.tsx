@@ -14,10 +14,19 @@ import { useStore } from '@nanostores/preact'
 import { JSONContent } from '@tiptap/react'
 
 export default function ({ date }: { date: Date }) {
+  const currentProject = useStore(projectStore.currentProject)
+  const allTasks = useStore(taskStore.taskList)
+
   const [open, setOpen] = useState<HTMLElement | null>(null)
   const today = new Date()
 
+  useEffect(() => {
+    if (currentProject) taskStore.loadTasks(currentProject!)
+  }, [currentProject?.id])
+
   if (isBefore(date, startOfDay(today))) return null
+
+  if (allTasks.length == 0) return null
 
   return (
     <>
@@ -56,8 +65,12 @@ function TasksMenu({ open, close }: { open: HTMLElement | null; close: () => voi
 }
 
 function TaskMenuContent({ close }: { close: () => void }) {
-  const currentProject = useStore(projectStore.currentProject)
   const allTasks = useStore(taskStore.taskList)
+
+  useEffect(() => {
+    // re-load task list when menu opens
+    taskStore.loadTasks(projectStore.currentProject.get()!)
+  }, [])
 
   const [displayedTasks, setDisplayedTasks] = useState<Task[]>([])
   const [selectedTasks, setSelectedTasks] = useState<{ [id: string]: boolean }>({})
@@ -75,10 +88,6 @@ function TaskMenuContent({ close }: { close: () => void }) {
     const tasks = allTasks.filter((t) => !t.completed_at && !t.archived_at && !tasksInDoc.has(t.id))
     setDisplayedTasks(tasks)
   }, [allTasks])
-
-  const docTasks = useEffect(() => {
-    taskStore.loadTasks(currentProject!)
-  }, [])
 
   const toggleAllSelected = () => {
     setSelectedTasks((selectedTasks) => {
