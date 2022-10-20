@@ -21,9 +21,9 @@ export default () => (
                 <div className="">Daily Planner with</div>
                 <div className="text-lavender-600">notes, tasks, and calendar</div>
               </h1>
-              <p className="mt-6 text-xl text-gray-500">
-                Daybird is the premier daily journal for creative thinkers and teams. Organize your
-                day by starting with a clean slate and deciding what is important.
+              <p className="mt-6 text-xl text-gray-500 leading-normal">
+                Daybird is the premier daily journal for creative thinkers and teams. Start with a
+                clean slate each day and decide what is important.
               </p>
               <div className="mt-10 flex flex-col items-center">
                 <a
@@ -52,7 +52,7 @@ export default () => (
       </div>
 
       <div className="sm:mx-auto sm:max-w-3xl sm:px-6">
-        <div className="py-12 sm:relative sm:mt-12 sm:py-16 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
+        <div className="sm:relative sm:mt-12 sm:py-16 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
           <div className="hidden sm:block">
             <div className="absolute inset-y-0 left-1/2 w-screen rounded-l-3xl bg-gray-50 lg:left-80 lg:right-0 lg:w-full" />
             <svg

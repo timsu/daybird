@@ -8,7 +8,7 @@ import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
-import { classNames, logger } from '@/utils'
+import { classNames, debounce, DebounceStyle, logger } from '@/utils'
 import { isSafari } from '@/utils/os'
 import { DocumentIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -18,7 +18,7 @@ type Props = {
   focus?: boolean
   initialTitle?: string
   taskList?: boolean
-  showContext?: boolean
+  currentDoc?: string
   newTaskMode?: boolean
   onCreate?: (task: Task) => void
 }
@@ -27,7 +27,7 @@ export default ({
   id,
   initialTitle,
   focus,
-  showContext,
+  currentDoc,
   newTaskMode,
   taskList,
   onCreate,
@@ -98,11 +98,18 @@ export default ({
       div.addEventListener('keypress', async (e) => {
         if (e.key == 'Enter' && !e.shiftKey) {
           e.preventDefault()
-          const task = await onFocusOut(e)
-          if (!task) return
-          setSavedId(undefined)
-          setPlaceholder(true)
-          taskStore.taskList.set([task, ...taskStore.taskList.get()])
+          debounce(
+            'new-task',
+            async () => {
+              const task = await onFocusOut(e)
+              if (!task) return
+              setSavedId(undefined)
+              setPlaceholder(true)
+              taskStore.taskList.set([task, ...taskStore.taskList.get()])
+            },
+            500,
+            DebounceStyle.IGNORE_NEW
+          )
         }
       })
     if (focus && !id) {
@@ -195,7 +202,7 @@ export default ({
         {task?.title || initialTitle}
       </div>
 
-      {showContext && task?.doc && (
+      {task?.doc && currentDoc != task.doc && (
         <div
           class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
               ml-3 max-w-[110px] overflow-ellipsis cursor-pointer"

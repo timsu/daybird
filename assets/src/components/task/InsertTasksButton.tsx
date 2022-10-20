@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'preact/hooks'
 
 import Button from '@/components/core/Button'
 import Pressable from '@/components/core/Pressable'
+import Tooltip from '@/components/core/Tooltip'
 import { NODE_NAME } from '@/components/editor/TaskItem'
 import { Task } from '@/models'
 import { projectStore } from '@/stores/projectStore'
@@ -26,33 +27,40 @@ export default function ({ date }: { date: Date }) {
 
   if (isBefore(date, startOfDay(today))) return null
 
-  if (allTasks.length == 0) return null
+  if (!open && allTasks.length == 0) return null
 
   return (
     <>
-      <TasksMenu open={open} close={() => setTimeout(() => setOpen(null), 0)} />
-      <Button
-        onClick={(e) => {
-          !open && setOpen(e.target as HTMLElement)
-        }}
-        class="ml-4 py-1 px-1 sm:px-4"
-      >
-        Insert Tasks
-      </Button>
+      <TasksMenu open={open} close={() => setOpen(null)} />
+      <Tooltip message="Insert uncompleted tasks" tooltipClass="w-[170px] text-center">
+        <Button
+          onClick={(e) => {
+            !open && setOpen(e.target as HTMLElement)
+          }}
+          class="ml-4 py-1 px-1 sm:px-4"
+        >
+          Tasks
+        </Button>
+      </Tooltip>
     </>
   )
 }
 
+const MENU_WIDTH = 400
+
 function TasksMenu({ open, close }: { open: HTMLElement | null; close: () => void }) {
-  const rect = open?.getBoundingClientRect()
+  const rect = open?.getBoundingClientRect() || { bottom: 0, left: 0 }
+
+  const targetLeft = rect.left + MENU_WIDTH > document.body.clientWidth ? 0 : rect.left
 
   return (
     <Transition.Root show={!!open} as={Fragment}>
       <Dialog as="div" className="relative z-40 print:hidden" onClose={close}>
-        <div class="block fixed" style={{ top: (rect?.bottom || 0) + 5, left: rect?.left }}>
+        <div class="block fixed" style={{ top: (rect?.bottom || 0) + 5, left: targetLeft }}>
           <div
             class={classNames(
-              'bg-white w-[400px] max-h-[300px] overflow-hidden border border-gray-300 rounded-lg flex flex-col text-sm',
+              `w-[${MENU_WIDTH}px] max-w-[${document.body.clientWidth}px]`,
+              'bg-white max-h-[300px] overflow-hidden border border-gray-300 rounded-lg flex flex-col text-sm',
               'select-none text-gray-900 shadow-lg'
             )}
           >
@@ -112,8 +120,9 @@ function TaskMenuContent({ close }: { close: () => void }) {
           } as JSONContent)
       )
       .concat([{ type: 'paragraph' }])
-    window.editor?.commands.insertContent(content)
+
     close()
+    setTimeout(() => window.editor?.chain().insertContent(content).focus().run(), 0)
   }
 
   return (

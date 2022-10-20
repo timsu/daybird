@@ -25,7 +25,7 @@ export default ({ projectId, id }: { projectId?: string; id?: string }) => {
       const file = fileStore.idToFile.get()[id]
 
       if (file && !file.provisional) {
-        setTimeout(() => uiStore.addRecentNote(id, project.id, docStore.title.get()), 50)
+        setTimeout(() => uiStore.addRecentNote(id, project.id, docStore.title.get()!), 50)
       }
     }
   }, [project, projectId, id])

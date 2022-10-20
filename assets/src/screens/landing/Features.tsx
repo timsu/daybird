@@ -7,7 +7,7 @@ const features = [
   {
     name: 'Write about it',
     description:
-      "Write daily notes and as well as named notes in folders. If you've ever used a bullet journal or any other note-taking app you'll feel right at home.",
+      'Write daily notes and as well as named notes in folders. Use reflection prompts to go deeper each day.',
     icon: PencilAltIcon,
   },
   {
@@ -47,9 +47,9 @@ export default function () {
     <div className="bg-white py-12 px-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
-          <h2 className="text-lg font-semibold text-lavender-700">Why Daybird?</h2>
+          <h2 className="text-lg font-semibold text-lavender-700">Features</h2>
           <p className="mt-2 text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">
-            A better way to plan your day
+            A better way to plan
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
             Daybird is built around daily planning and task management, helping you focus on making
