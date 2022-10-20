@@ -10,7 +10,9 @@ import { useStore } from '@nanostores/preact'
 
 const userNavigation = [
   // { name: 'Your Profile', href: '#' },
-  { name: 'Install Daybird App', href: '#', onClick: () => uiStore.installAction() },
+  uiStore.isPWA
+    ? null
+    : { name: 'Install Daybird App', href: '#', onClick: () => uiStore.installAction() },
   { name: 'Report a Bug', href: 'mailto:tim@daybird.app?subject=Bug Report' },
   { name: 'Sign out', href: '#', onClick: () => authStore.logout() },
 ]
@@ -43,22 +45,24 @@ export default () => {
               {user.email}
             </div>
           </Menu.Item>
-          {userNavigation.map((item) => (
-            <Menu.Item key={item.name}>
-              {({ active }: { active: boolean }) => (
-                <a
-                  href={item.href}
-                  onClick={item.onClick}
-                  className={classNames(
-                    active ? 'bg-gray-100' : '',
-                    'block px-4 py-2 text-sm text-gray-700'
-                  )}
-                >
-                  {item.name}
-                </a>
-              )}
-            </Menu.Item>
-          ))}
+          {userNavigation.map((item) =>
+            !item ? null : (
+              <Menu.Item key={item.name}>
+                {({ active }: { active: boolean }) => (
+                  <a
+                    href={item.href}
+                    onClick={item.onClick}
+                    className={classNames(
+                      active ? 'bg-gray-100' : '',
+                      'block px-4 py-2 text-sm text-gray-700'
+                    )}
+                  >
+                    {item.name}
+                  </a>
+                )}
+              </Menu.Item>
+            )
+          )}
         </Menu.Items>
       </Transition>
     </Menu>

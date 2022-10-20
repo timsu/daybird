@@ -20,7 +20,7 @@ type BeforeInstallPromptEvent = Event & {
 class UIStore {
   // --- stores
 
-  isPWA = false
+  isPWA = window.matchMedia('(display-mode: standalone)').matches
 
   path = atom<string>()
 
