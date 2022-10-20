@@ -65,9 +65,10 @@ export default function GoogleServerOAuth(props: Props) {
         data-testid="google"
         disabled={isRequesting}
         class={classNames('px-0 py-0', buttonClass || '')}
+        {...p}
       >
         <GoogleIcon size={40} />
-        <div class="p-2">{desc}</div>
+        <div class="py-2 px-4">{desc}</div>
       </Button>
     )
   }
@@ -203,6 +204,7 @@ export function makeGoogleOauthPopup(
   skipToken: boolean = false,
   email: string | null = null
 ) {
+  console.log('meowy', scope)
   let type = []
   if (scope.includes('profile')) {
     type.push('login')
