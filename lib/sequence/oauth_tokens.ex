@@ -4,9 +4,74 @@ defmodule Sequence.OAuthTokens do
   """
 
   import Ecto.Query, warn: false
-  alias Sequence.Repo
+  alias Sequence.{Repo, Utils}
 
   alias Sequence.OAuthTokens.OAuthToken
+
+  def find_for_user(user, name) do
+    Repo.one(from t in OAuthToken, where: t.user_id == ^user.id and t.name == ^name and
+      is_nil(t.deleted_at), order_by: [desc: :id], limit: 1)
+  end
+
+  def update_or_create_for_user_and_service(user, service, attrs) do
+    case find_for_user(user, service) do
+      nil ->
+        create_oauth_token(attrs)
+      token ->
+        if token.meta["invalid_grant"] do
+          attrs = Map.put(attrs, :meta, Utils.updated_meta_field(token.meta, %{ "invalid_grant" => false }))
+          update_oauth_token(token, attrs)
+        else
+          update_oauth_token(token, attrs)
+        end
+    end
+  end
+
+  def refresh(token) do
+    case get_service(token.name).refresh_token(token.refresh) do
+      {:ok, result} ->
+        expires_in = result["expires_in"]
+        expires_at = Timex.shift(Timex.now, seconds: expires_in)
+        meta = Utils.updated_meta_field(token.meta, %{ "invalid_grant" => false })
+        update_oauth_token(token, %{
+          access: result["access_token"],
+          expires_at: expires_at,
+          meta: meta
+        })
+      {:error, :google, 400, "invalid_grant"} ->
+        meta = Map.put(token.meta || %{}, "invalid_grant", true)
+        {:ok, token} = update_oauth_token(token, %{
+          synced_at: Timex.shift(Timex.now, years: 1000), # this is a hack to prevent them getting pulled into a sync
+          meta: meta
+        })
+        {:skip, token}
+      other -> other
+    end
+  end
+
+  def maybe_refresh(token) do
+    cond do
+      token.meta["invalid_grant"] -> refresh(token)
+      is_nil(token.expires_at) || Timex.before?(token.expires_at, Timex.now()) -> refresh(token)
+      true -> {:ok, token}
+    end
+  end
+
+  def get_service(name) do
+    case name do
+      "google-cal" -> Sequence.Google
+      "google-contacts" -> Sequence.Google
+    end
+  end
+
+  def soft_delete_oauth_token(nil), do: :ok
+  def soft_delete_oauth_token(oauth_token) do
+    update_oauth_token(oauth_token, %{ deleted_at: Timex.now })
+  end
+
+  def list_oauth_tokens_by_name(name) do
+    Repo.all(from o in OAuthToken, where: o.name == ^name and is_nil(o.deleted_at))
+  end
 
   @doc """
   Returns the list of oauth_tokens.
