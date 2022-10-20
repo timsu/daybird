@@ -45,7 +45,7 @@ export default (props: Props) => {
       <div className="max-w-7xl my-4 px-4 sm:px-6 md:px-8 rounded-md bg-white">
         {tasks.map((t) => (
           <div key={t.id}>
-            <TaskRow id={t.id} showContext taskList />
+            <TaskRow id={t.id} taskList />
           </div>
         ))}
       </div>
