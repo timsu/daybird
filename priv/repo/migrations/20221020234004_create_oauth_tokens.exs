@@ -15,5 +15,6 @@ defmodule Sequence.Repo.Migrations.CreateOauthTokens do
     end
 
     create index(:oauth_tokens, [:user_id])
+    create index(:oauth_tokens, [:user_id, :name, :deleted_at])
   end
 end
