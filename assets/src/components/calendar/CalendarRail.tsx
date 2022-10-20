@@ -3,6 +3,7 @@ import { route } from 'preact-router'
 import { useEffect } from 'preact/hooks'
 
 import Calendar from '@/components/calendar/Calendar'
+import DayView from '@/components/calendar/DayView'
 import { paths } from '@/config'
 import { uiStore } from '@/stores/uiStore'
 import { useStore } from '@nanostores/preact'
@@ -33,6 +34,8 @@ export default function () {
       <div className="w-52 flex-col border-l flex relative">
         <div className="w-52 fixed right-0">
           <Calendar currentDate={selectedDate} onSelect={onSelectDate} />
+          <hr className="my-4" />
+          <DayView date={selectedDate} />
         </div>
       </div>
     </>
