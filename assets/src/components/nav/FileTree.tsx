@@ -83,9 +83,10 @@ function dropHandler(projectId: string, parentId: string | null) {
 
 const longPressDuration = 800
 let timer: number = 0
+let touchY = 0
 
 function longPress(e: TouchEvent, onLongTouch: () => void) {
-  e.preventDefault()
+  touchY = e.changedTouches[0].screenY
   if (!timer) {
     timer = window.setTimeout(() => {
       onLongTouch()
@@ -94,10 +95,9 @@ function longPress(e: TouchEvent, onLongTouch: () => void) {
   }
 }
 
-function touchEnd(onClick: () => void) {
+function touchEnd(e: TouchEvent, onClick: () => void) {
   if (timer) {
     window.clearTimeout(timer)
-    onClick()
     timer = 0
   }
 }
@@ -140,10 +140,11 @@ function FileNode({ indent, node, projectId }: ChildProps) {
               onContextMenu={(e) => onContextMenu(e.target as HTMLElement)}
               onTouchStart={(e) =>
                 longPress(e, () => {
+                  e.preventDefault()
                   onContextMenu(e.target as HTMLElement)
                 })
               }
-              onTouchEnd={() => touchEnd(() => route(href))}
+              onTouchEnd={(e) => touchEnd(e, () => route(href))}
               className={classNames(
                 matches ? 'bg-blue-200 ' : ' hover:bg-blue-300 ',
                 'text-gray-700 group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-all'
@@ -211,10 +212,11 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
           onContextMenu={(e) => onContextMenu(e.target as HTMLElement)}
           onTouchStart={(e) =>
             longPress(e, () => {
+              e.preventDefault()
               onContextMenu(e.target as HTMLElement)
             })
           }
-          onTouchEnd={() => touchEnd(() => setExpanded(!expanded))}
+          onTouchEnd={(e) => touchEnd(e, () => setExpanded(!expanded))}
           className="text-gray-700 hover:bg-gray-300 group flex
         items-center px-2 py-2 text-sm font-medium rounded-md transition-all cursor-pointer"
           onClick={() => setExpanded(!expanded)}
