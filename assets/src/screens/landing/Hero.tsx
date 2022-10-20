@@ -21,7 +21,7 @@ export default () => (
                 <div className="">Daily Planner with</div>
                 <div className="text-lavender-600">notes, tasks, and calendar</div>
               </h1>
-              <p className="mt-6 text-xl text-gray-500">
+              <p className="mt-6 text-xl text-gray-500 leading-normal">
                 Daybird is the premier daily journal for creative thinkers and teams. Organize your
                 day by starting with a clean slate and deciding what is important.
               </p>
