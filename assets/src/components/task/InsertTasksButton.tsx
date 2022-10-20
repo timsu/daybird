@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'preact/hooks'
 
 import Button from '@/components/core/Button'
 import Pressable from '@/components/core/Pressable'
+import Tooltip from '@/components/core/Tooltip'
 import { NODE_NAME } from '@/components/editor/TaskItem'
 import { Task } from '@/models'
 import { projectStore } from '@/stores/projectStore'
@@ -30,15 +31,17 @@ export default function ({ date }: { date: Date }) {
 
   return (
     <>
-      <TasksMenu open={open} close={() => setTimeout(() => setOpen(null), 0)} />
-      <Button
-        onClick={(e) => {
-          !open && setOpen(e.target as HTMLElement)
-        }}
-        class="ml-4 py-1 px-1 sm:px-4"
-      >
-        Insert Tasks
-      </Button>
+      <TasksMenu open={open} close={() => setOpen(null)} />
+      <Tooltip message="Insert uncompleted tasks" tooltipClass="w-[170px] text-center">
+        <Button
+          onClick={(e) => {
+            !open && setOpen(e.target as HTMLElement)
+          }}
+          class="ml-4 py-1 px-1 sm:px-4"
+        >
+          Tasks
+        </Button>
+      </Tooltip>
     </>
   )
 }
@@ -117,8 +120,9 @@ function TaskMenuContent({ close }: { close: () => void }) {
           } as JSONContent)
       )
       .concat([{ type: 'paragraph' }])
-    window.editor?.commands.insertContent(content)
+
     close()
+    setTimeout(() => window.editor?.chain().insertContent(content).focus().run(), 0)
   }
 
   return (

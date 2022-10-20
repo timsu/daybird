@@ -7,6 +7,7 @@ import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import Document from '@/components/editor/Document'
 import DailyPrompt from '@/components/journal/DailyPrompt'
+import ReflectButton from '@/components/journal/ReflectButton'
 import DocMenu from '@/components/menus/DocMenu'
 import InsertTasksButton from '@/components/task/InsertTasksButton'
 import { paths } from '@/config'
@@ -89,6 +90,8 @@ export default (props: Props) => {
           </Pressable>
 
           <InsertTasksButton date={date} />
+
+          <ReflectButton date={date} />
 
           <div class="flex-1" />
 
