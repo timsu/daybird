@@ -53,7 +53,7 @@ config :phoenix, :filter_parameters, ["password", "secret", "contents"]
 ##############################
 # Server configuration
 
-# Configure Teamtalk.Application's clustering topology
+# Configure Sequence.Application's clustering topology
 config :sequence, :cluster_topology, [
   strategy: Cluster.Strategy.Epmd,
   config: [hosts: []],
@@ -87,6 +87,10 @@ config :sequence, Sequence.Auth.Guardian,
   issuer: "sequence",
   secret_key: "hNl6o6PmZIvYBP2dx3nDixwG4xA+MquH+MR4u5xBGXBwROzCPNeAOddVssKb7A0i",
   token_ttl: %{ "access" => {3, :day}, "refresh" => {12, :week} }
+
+config :sequence, Sequence.Auth.OAuth,
+  google_client_id: System.get_env("LN_GOOGLE_ID"),
+  google_client_secret: System.get_env("LN_GOOGLE_SECRET")
 
 redis_url = System.get_env("REDIS_URL") || "redis://127.0.0.1:6379/0"
 
