@@ -8,7 +8,7 @@ import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
-import { classNames, logger } from '@/utils'
+import { classNames, debounce, DebounceStyle, logger } from '@/utils'
 import { isSafari } from '@/utils/os'
 import { DocumentIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -98,11 +98,18 @@ export default ({
       div.addEventListener('keypress', async (e) => {
         if (e.key == 'Enter' && !e.shiftKey) {
           e.preventDefault()
-          const task = await onFocusOut(e)
-          if (!task) return
-          setSavedId(undefined)
-          setPlaceholder(true)
-          taskStore.taskList.set([task, ...taskStore.taskList.get()])
+          debounce(
+            'new-task',
+            async () => {
+              const task = await onFocusOut(e)
+              if (!task) return
+              setSavedId(undefined)
+              setPlaceholder(true)
+              taskStore.taskList.set([task, ...taskStore.taskList.get()])
+            },
+            500,
+            DebounceStyle.IGNORE_NEW
+          )
         }
       })
     if (focus && !id) {
