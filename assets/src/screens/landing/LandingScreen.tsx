@@ -1,9 +1,9 @@
-import Button from '@/components/core/Button'
 import LandingLayout from '@/components/layout/LandingLayout'
 import { hasToken, paths } from '@/config'
-import bird_calendar from '@/images/bird-calendar.jpg'
 import Features from '@/screens/landing/Features'
+import FooterCTA from '@/screens/landing/FooterCTA'
 import Hero from '@/screens/landing/Hero'
+import Pricing from '@/screens/landing/Pricing'
 import WhyDaybird from '@/screens/landing/WhyDaybird'
 
 type Props = {
@@ -24,14 +24,7 @@ export default (props: Props) => {
 
         <Features />
 
-        <div className="flex flex-col items-center mt-10 mb-32">
-          <img src={bird_calendar} />
-          <div className="my-4">Let's make magic happen.</div>
-
-          <Button class="text-xl px-20 py-4" onClick={() => (location.href = paths.SIGNUP)}>
-            Get Started!
-          </Button>
-        </div>
+        <FooterCTA />
       </main>
     </LandingLayout>
   )

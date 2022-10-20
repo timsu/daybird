@@ -49,7 +49,7 @@ export default function () {
         <div className="lg:text-center">
           <h2 className="text-lg font-semibold text-lavender-700">Features</h2>
           <p className="mt-2 text-3xl font-bold leading-8 tracking-tight text-gray-900 sm:text-4xl">
-            A better way to plan your day
+            A better way to plan
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
             Daybird is built around daily planning and task management, helping you focus on making
