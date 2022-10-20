@@ -20,7 +20,7 @@ class UIStore {
 
   calendarDate = atom<Date>(new Date())
 
-  recentFiles: { id: string; projectId: string }[] = []
+  recentFiles: { id: string; projectId: string; title: string }[] = []
 
   // --- actions
 
@@ -35,9 +35,9 @@ class UIStore {
     if (recentFiles) this.recentFiles = JSON.parse(recentFiles)
   }
 
-  addRecentNote = (id: string, projectId: string) => {
+  addRecentNote = (id: string, projectId: string, title: string) => {
     this.recentFiles = this.recentFiles.filter((n) => n.id != id).slice(0, 9)
-    this.recentFiles.unshift({ id, projectId })
+    this.recentFiles.unshift({ id, projectId, title })
     localStorage.setItem(LS_RECENT_FILES, JSON.stringify(this.recentFiles))
   }
 }
