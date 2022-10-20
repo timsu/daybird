@@ -4,6 +4,7 @@ import { Plugin, PluginKey } from 'prosemirror-state'
 
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
+import { docStore } from '@/stores/docStore'
 import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
 import { logger } from '@/utils'
@@ -103,7 +104,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
           initialTitle={node.attrs.title}
           focus={node.attrs.focus}
           onCreate={onCreateTask}
-          showContext={node.attrs.ref}
+          currentDoc={docStore.id.get()}
         />,
         container
       )

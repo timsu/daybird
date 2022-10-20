@@ -18,7 +18,7 @@ type Props = {
   focus?: boolean
   initialTitle?: string
   taskList?: boolean
-  showContext?: boolean
+  currentDoc?: string
   newTaskMode?: boolean
   onCreate?: (task: Task) => void
 }
@@ -27,7 +27,7 @@ export default ({
   id,
   initialTitle,
   focus,
-  showContext,
+  currentDoc,
   newTaskMode,
   taskList,
   onCreate,
@@ -195,7 +195,7 @@ export default ({
         {task?.title || initialTitle}
       </div>
 
-      {showContext && task?.doc && (
+      {task?.doc && currentDoc != task.doc && (
         <div
           class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
               ml-3 max-w-[110px] overflow-ellipsis cursor-pointer"
