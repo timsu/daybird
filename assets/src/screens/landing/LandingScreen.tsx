@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default (props: Props) => {
-  if (hasToken()) {
+  if (hasToken() && location.search != '?stay') {
     location.href = paths.TODAY
   }
 

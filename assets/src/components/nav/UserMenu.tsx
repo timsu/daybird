@@ -3,12 +3,14 @@ import { Fragment } from 'preact'
 import Alphatar from '@/components/core/Alphatar'
 import Avatar from '@/components/core/Avatar'
 import { authStore } from '@/stores/authStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import { Menu, Transition } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
 
 const userNavigation = [
   // { name: 'Your Profile', href: '#' },
+  { name: 'Install Daybird App', href: '#', onClick: () => uiStore.installAction() },
   { name: 'Report a Bug', href: 'mailto:tim@daybird.app?subject=Bug Report' },
   { name: 'Sign out', href: '#', onClick: () => authStore.logout() },
 ]

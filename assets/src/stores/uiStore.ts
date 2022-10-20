@@ -8,9 +8,14 @@ import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { logger } from '@/utils'
+import { getOS, isChrome, isMobile, isSafari } from '@/utils/os'
 
 const SLEEP_CHECK_INTERVAL = 30_000
 const LS_RECENT_FILES = 'rf'
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => void
+}
 
 class UIStore {
   // --- stores
@@ -26,6 +31,16 @@ class UIStore {
   calendarDate = atom<Date>(new Date())
 
   recentFiles: { id: string; projectId: string; title: string }[] = []
+
+  installPrompt: null | BeforeInstallPromptEvent = null
+
+  constructor() {
+    window.addEventListener('beforeinstallprompt', (e: Event) => {
+      logger.debug('beforeinstallprompt', e)
+      e.preventDefault()
+      this.installPrompt = e as BeforeInstallPromptEvent
+    })
+  }
 
   // --- actions
 
@@ -83,6 +98,18 @@ class UIStore {
     this.recentFiles = this.recentFiles.filter((n) => n.id != id).slice(0, 9)
     this.recentFiles.unshift({ id, projectId, title })
     localStorage.setItem(LS_RECENT_FILES, JSON.stringify(this.recentFiles))
+  }
+
+  installAction = () => {
+    if (this.installPrompt) this.installPrompt.prompt()
+    else if (getOS() == 'ios') {
+      if (isSafari) alert('Press the share button at the bottom and select "Add to Home Screen')
+      else alert('Please open this site in Safari to add it to your home screen')
+    } else if (isChrome) {
+      alert('Use the menu to install Daybird as a local app')
+    } else {
+      alert('Only Chrome and Firefox support adding Daybird to your homescreen')
+    }
   }
 }
 

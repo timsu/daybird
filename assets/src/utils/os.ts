@@ -53,8 +53,8 @@ export function getOS(): OS {
   return os
 }
 
-export const isSafari =
-  navigator.userAgent?.includes('Safari') && !navigator.userAgent?.includes('Chrome')
+export const isChrome = navigator.userAgent?.includes('Chrome')
+export const isSafari = navigator.userAgent?.includes('Safari') && !isChrome
 export const isMac = getOS() == 'mac'
 export const isWindows = getOS() == 'windows'
 export const isLinux = getOS() == 'linux'
