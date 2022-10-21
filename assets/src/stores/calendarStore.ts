@@ -5,7 +5,7 @@ import { action, atom, map } from 'nanostores'
 
 import { API, OAuthTokenResponse } from '@/api'
 import { GoogleResponse } from '@/components/auth/GoogleServerOAuth'
-import { config, GCalendar, GEvent } from '@/config'
+import { config, GCalendar, GColors, GEvent } from '@/config'
 import { GOOGLE_CAL, OAuthToken } from '@/models'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
 
@@ -22,6 +22,8 @@ type EventMap = {
 }
 
 type EnabledMap = { [calendarId: string]: boolean }
+
+type ColorMap = { [email: string]: GColors }
 
 const USER_DATA_CALENDARS = 'calendars'
 
@@ -41,6 +43,8 @@ class CalendarStore {
   calendarData: CalendarData = {}
 
   events = map<EventMap>({})
+
+  colors: ColorMap = {}
 
   // --- token management
 
@@ -124,6 +128,7 @@ class CalendarStore {
     const validated = await this.validateToken(token)
     if (!validated) return
 
+    this.fetchColors(validated)
     const response = await this.googleGet(validated, '/calendar/v3/users/me/calendarList')
     logger.debug('[cal] fetched cals', token.email, response)
 
@@ -181,10 +186,18 @@ class CalendarStore {
           `/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?${query}`
         )
         const events = response.items as GEvent[]
-        events.forEach((e) => (e.calendar = cal.id))
+        events.forEach((e) => {
+          e.email = token.email!
+          e.calendar = cal.id
+        })
         this.events.setKey(cal.id, events)
       })
     )
+  }
+
+  fetchColors = async (token: OAuthToken) => {
+    const response = await this.googleGet(token, `/calendar/v3/colors`)
+    this.colors[token.email!] = response as GColors
   }
 
   // --- helpers

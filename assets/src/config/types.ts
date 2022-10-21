@@ -33,4 +33,21 @@ export interface GEvent {
   summary: string
   created: string
   updated: string
+  colorId?: string
+  email: string
+}
+
+export interface GColors {
+  calendar: {
+    [key: string]: {
+      background: string
+      foreground: string
+    }
+  }
+  event: {
+    [key: string]: {
+      background: string
+      foreground: string
+    }
+  }
 }

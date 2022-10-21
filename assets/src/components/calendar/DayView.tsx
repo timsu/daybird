@@ -149,14 +149,22 @@ function Events({ date }: Props) {
 
 function Event({ ev }: { ev: GEvent }) {
   const cal = calendarStore.calendarData[ev.calendar]
+  const colors = calendarStore.colors[ev.email]
+  const color =
+    ev.colorId && colors
+      ? colors?.event[ev.colorId]
+      : colors?.calendar[cal.colorId] || {
+          foreground: cal.foregroundColor,
+          background: cal.backgroundColor,
+        }
   return (
     <Tooltip message={cal.summary} class="mb-2">
       <div
-        style={{ background: cal.backgroundColor, color: cal.foregroundColor }}
+        style={{ background: color.background, color: color.foreground }}
         class="p-2 rounded-md text-xs flex-1 cursor-pointer"
         onClick={() => window.open(ev.htmlLink)}
       >
-        {ev.summary}
+        {ev.summary || '(busy)'}
       </div>
     </Tooltip>
   )
@@ -190,6 +198,11 @@ function Calendars() {
             <div class="text-sm font-semibold py-1">{email}</div>
             {calendars[email].map((cal) => {
               const checked = calendarStore.isCalendarEnabled(enabled, cal)
+              const colors = calendarStore.colors[email]
+              const color = colors?.calendar[cal.colorId] || {
+                foreground: cal.foregroundColor,
+                background: cal.backgroundColor,
+              }
               return (
                 <div
                   class="text-sm flex items-center py-1 cursor-pointer"
@@ -197,11 +210,9 @@ function Calendars() {
                 >
                   <div
                     class="mr-2 rounded h-4 w-4 flex justify-center items-center"
-                    style={{ background: cal.backgroundColor }}
+                    style={{ background: color.background }}
                   >
-                    {checked && (
-                      <CheckIcon class="h-3 w-3" style={{ color: cal.foregroundColor }} />
-                    )}
+                    {checked && <CheckIcon class="h-3 w-3" style={{ color: color.foreground }} />}
                   </div>
                   <div class="truncate">{cal.summary}</div>
                 </div>
