@@ -1,10 +1,11 @@
 import { format, getHours } from 'date-fns'
 import { flatten } from 'lodash'
-import { useEffect } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
 import GoogleServerOAuth, {
     CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES
 } from '@/components/auth/GoogleServerOAuth'
+import ErrorMessage from '@/components/core/ErrorMessage'
 import Loader from '@/components/core/Loader'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
@@ -13,7 +14,7 @@ import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
-import { CheckIcon, RefreshIcon } from '@heroicons/react/outline'
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, RefreshIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type Props = { date: Date }
@@ -59,6 +60,7 @@ export default function DayView({ date }: Props) {
 function CalendarView({ date }: Props) {
   const tokens = useStore(calendarStore.tokens)
   const loading = useStore(calendarStore.loading)
+  const error = useStore(calendarStore.error)
 
   useEffect(() => {
     calendarStore.fetchCalendars()
@@ -77,6 +79,8 @@ function CalendarView({ date }: Props) {
 
   return (
     <div class="flex-1 flex flex-col overflow-scroll">
+      <ErrorMessage error={error} />
+
       <Events date={date} />
 
       <Calendars />
@@ -159,6 +163,7 @@ function Event({ ev }: { ev: GEvent }) {
 }
 
 function Calendars() {
+  const [expanded, setExpanded] = useState(false)
   const calendars = useStore(calendarStore.calendars)
   const enabled = useStore(calendarStore.calendarsEnabled)
 
@@ -172,38 +177,47 @@ function Calendars() {
 
   return (
     <div class="flex flex-col">
-      <div class="bg-slate-200 px-3 py-1 rounded font-semibold flex">
-        <div class="flex-1">Calendars</div>
+      <div
+        class="bg-slate-200 px-3 py-1 text-sm flex items-center cursor-pointer hover:bg-slate-400"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div class="mr-2">Calendars</div>
+        {expanded ? <ChevronDownIcon class="h-3 w-3" /> : <ChevronUpIcon class="h-3 w-3" />}
       </div>
-      {Object.keys(calendars).map((email) => (
-        <div class="px-3">
-          <div class="text-sm font-semibold py-1">{email}</div>
-          {calendars[email].map((cal) => {
-            const checked = calendarStore.isCalendarEnabled(enabled, cal)
-            return (
-              <div
-                class="text-sm flex items-center py-1 cursor-pointer"
-                onClick={() => calendarStore.setCalendarEnabled(cal.id, !checked)}
-              >
+      {expanded &&
+        Object.keys(calendars).map((email) => (
+          <div class="px-3">
+            <div class="text-sm font-semibold py-1">{email}</div>
+            {calendars[email].map((cal) => {
+              const checked = calendarStore.isCalendarEnabled(enabled, cal)
+              return (
                 <div
-                  class="mr-2 rounded h-4 w-4 flex justify-center items-center"
-                  style={{ background: cal.backgroundColor }}
+                  class="text-sm flex items-center py-1 cursor-pointer"
+                  onClick={() => calendarStore.setCalendarEnabled(cal.id, !checked)}
                 >
-                  {checked && <CheckIcon class="h-3 w-3" style={{ color: cal.foregroundColor }} />}
+                  <div
+                    class="mr-2 rounded h-4 w-4 flex justify-center items-center"
+                    style={{ background: cal.backgroundColor }}
+                  >
+                    {checked && (
+                      <CheckIcon class="h-3 w-3" style={{ color: cal.foregroundColor }} />
+                    )}
+                  </div>
+                  <div class="truncate">{cal.summary}</div>
                 </div>
-                <div class="truncate">{cal.summary}</div>
-              </div>
-            )
-          })}
-        </div>
-      ))}
-      <GoogleServerOAuth
-        desc="Connect Another"
-        scope={[...PROFILE_SCOPES, ...CALENDAR_SCOPES]}
-        onSuccess={onConnect}
-        skipToken
-        buttonClass="my-3 mx-2 flex-1"
-      />
+              )
+            })}
+          </div>
+        ))}
+      {expanded && (
+        <GoogleServerOAuth
+          desc="Connect Another"
+          scope={[...PROFILE_SCOPES, ...CALENDAR_SCOPES]}
+          onSuccess={onConnect}
+          skipToken
+          buttonClass="my-3 mx-2 flex-1"
+        />
+      )}
     </div>
   )
 }
