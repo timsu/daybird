@@ -6,6 +6,7 @@ defmodule SequenceWeb.OAuthView do
   def render_token(token) do
     %{
       name: token.name,
+      email: token.email,
       access: token.access,
       expires_at: token.expires_at,
       meta: token.meta,

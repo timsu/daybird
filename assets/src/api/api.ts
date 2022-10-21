@@ -366,9 +366,15 @@ class APIService {
   }
 
   async updateOAuthToken(token: OAuthToken): Promise<R.OAuthTokenResponse> {
-    const response = await this.axios.put(`${this.endpoint}/oauth/token?service=${token.name}`, {
-      ...token,
-    })
+    const response = await this.axios.put(
+      `${this.endpoint}/oauth/token?service=${token.name}`,
+      token
+    )
+    return response.data
+  }
+
+  async refreshOAuthToken(service: string, email: string): Promise<R.OAuthTokenResponse> {
+    let response = await this.axios.post(`${this.endpoint}/oauth/refresh`, { service, email })
     return response.data
   }
 

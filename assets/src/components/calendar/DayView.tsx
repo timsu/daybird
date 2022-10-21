@@ -4,12 +4,15 @@ import { useEffect } from 'preact/hooks'
 import GoogleServerOAuth, {
     CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES
 } from '@/components/auth/GoogleServerOAuth'
+import Loader from '@/components/core/Loader'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { logger } from '@/utils'
 import { useStore } from '@nanostores/preact'
 
-export default function DayView({ date }: { date: Date }) {
+type Props = { date: Date }
+
+export default function DayView({ date }: Props) {
   const tokens = useStore(calendarStore.tokens)
   const user = authStore.loggedInUser.get()
 
@@ -44,7 +47,25 @@ export default function DayView({ date }: { date: Date }) {
         </div>
       )}
 
-      {tokens && tokens.length > 0 && <div>tokens</div>}
+      {tokens && tokens.length > 0 && <Events date={date} />}
     </div>
   )
+}
+
+function Events({ date }: Props) {
+  const tokens = useStore(calendarStore.tokens)
+  const loading = useStore(calendarStore.loading)
+
+  useEffect(() => {
+    calendarStore.fetchCalendars()
+  }, [tokens?.length])
+
+  if (loading)
+    return (
+      <div class="flex justify-center my-4">
+        <Loader />
+      </div>
+    )
+
+  return <div class="p-3">events</div>
 }
