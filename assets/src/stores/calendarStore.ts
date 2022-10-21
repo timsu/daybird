@@ -13,6 +13,10 @@ type CalendarsMap = {
   [email: string]: GCalendar[]
 }
 
+type CalendarData = {
+  [id: string]: GCalendar
+}
+
 type EventMap = {
   [calendarId: string]: GEvent[]
 }
@@ -33,6 +37,8 @@ class CalendarStore {
   loading = atom<boolean>(false)
 
   calendars = map<CalendarsMap>({})
+
+  calendarData: CalendarData = {}
 
   events = map<EventMap>({})
 
@@ -86,7 +92,8 @@ class CalendarStore {
     try {
       let response = await API.refreshOAuthToken(GOOGLE_CAL, token.email!)
       if (response.token) {
-        this.updateToken(OAuthToken.fromJSON(response.token))
+        token = OAuthToken.fromJSON(response.token)
+        this.updateToken(token)
         return token
       }
     } catch (error) {
@@ -119,7 +126,10 @@ class CalendarStore {
 
     const response = await this.googleGet(validated, '/calendar/v3/users/me/calendarList')
     logger.debug('[cal] fetched cals', token.email, response)
-    this.calendars.setKey(token.email!, response.items as GCalendar[])
+
+    const calendars = response.items as GCalendar[]
+    this.calendars.setKey(token.email!, calendars)
+    calendars.forEach((c) => (this.calendarData[c.id] = c))
     return this.calendars
   }
 
@@ -139,7 +149,7 @@ class CalendarStore {
 
   isCalendarEnabled = (enabled: EnabledMap, cal: GCalendar) => {
     const setting = enabled[cal.id]
-    if (setting === undefined) return cal.accessRole != 'reader'
+    if (setting === undefined) return cal.selected
     return setting
   }
 
@@ -173,6 +183,7 @@ class CalendarStore {
           `/calendar/v3/calendars/${cal.id}/events?${query}`
         )
         const events = response.items as GEvent[]
+        events.forEach((e) => (e.calendar = cal.id))
         this.events.setKey(cal.id, events)
       })
     )

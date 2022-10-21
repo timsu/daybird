@@ -7,8 +7,8 @@ defmodule Sequence.OAuthTokens.OAuthToken do
   schema "oauth_tokens" do
     field :email, :string
     field :access, :string
-    field :deleted_at, :naive_datetime
-    field :expires_at, :naive_datetime
+    field :deleted_at, :utc_datetime
+    field :expires_at, :utc_datetime
     field :meta, :map
     field :name, :string
     field :refresh, :string

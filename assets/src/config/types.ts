@@ -13,10 +13,12 @@ export interface GCalendar {
   foregroundColor: string
   colorId: string
   primary: boolean
+  selected: boolean
   accessRole: 'owner' | 'reader'
 }
 
 export interface GEvent {
+  calendar: string
   creator: { email: string; self: boolean }
   etag: string
   eventType: 'default' | 'outOfOffice' | 'focusTime'

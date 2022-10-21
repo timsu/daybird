@@ -6,6 +6,7 @@ import GoogleServerOAuth, {
     CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES
 } from '@/components/auth/GoogleServerOAuth'
 import Loader from '@/components/core/Loader'
+import Tooltip from '@/components/core/Tooltip'
 import { GEvent } from '@/config'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
@@ -120,9 +121,7 @@ function Events() {
         <div class="mb-4">
           <div class="font-semibold">All Day</div>
           {allDayEvents.map((e) => (
-            <div>
-              <span>{e.summary}</span>
-            </div>
+            <Event ev={e} />
           ))}
         </div>
       )}
@@ -130,10 +129,25 @@ function Events() {
       {regularEvents.map((e) => (
         <div class="mb-2">
           <div class="font-semibold">{timeString(e)}</div>
-          <span>{e.source.summary}</span>
+          <Event ev={e.source} />
         </div>
       ))}
     </div>
+  )
+}
+
+function Event({ ev }: { ev: GEvent }) {
+  const cal = calendarStore.calendarData[ev.calendar]
+  return (
+    <Tooltip message={cal.summary}>
+      <div
+        style={{ background: cal.backgroundColor, color: cal.foregroundColor }}
+        class="p-2 rounded-md text-xs flex-1"
+        onClick={() => window.open(ev.htmlLink)}
+      >
+        {ev.summary}
+      </div>
+    </Tooltip>
   )
 }
 
