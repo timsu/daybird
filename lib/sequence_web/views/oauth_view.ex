@@ -18,4 +18,10 @@ defmodule SequenceWeb.OAuthView do
     }
   end
 
+  def render("tokens.json", %{tokens: tokens}) do
+    %{
+      tokens: tokens |> Enum.map(&render_token/1)
+    }
+  end
+
 end

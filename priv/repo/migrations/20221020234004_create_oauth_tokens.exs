@@ -3,6 +3,7 @@ defmodule Sequence.Repo.Migrations.CreateOauthTokens do
 
   def change do
     create table(:oauth_tokens) do
+      add :email, :string
       add :access, :string
       add :expires_at, :naive_datetime
       add :deleted_at, :naive_datetime

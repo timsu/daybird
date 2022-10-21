@@ -5,6 +5,7 @@ defmodule Sequence.OAuthTokens.OAuthToken do
   @type t :: %__MODULE__{}
 
   schema "oauth_tokens" do
+    field :email, :string
     field :access, :string
     field :deleted_at, :naive_datetime
     field :expires_at, :naive_datetime
@@ -20,7 +21,7 @@ defmodule Sequence.OAuthTokens.OAuthToken do
   @doc false
   def changeset(oauth_token, attrs) do
     oauth_token
-    |> cast(attrs, [:user_id, :access, :expires_at, :deleted_at, :name, :refresh, :meta])
+    |> cast(attrs, [:user_id, :email, :access, :expires_at, :deleted_at, :name, :refresh, :meta])
     |> validate_required([:user_id, :name])
   end
 end

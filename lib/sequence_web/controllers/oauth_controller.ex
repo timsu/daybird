@@ -9,9 +9,9 @@ defmodule SequenceWeb.OAuthController do
   # GET /oauth/token
   def get_service_token(conn, %{ "service" => service }) do
     user = Guardian.Plug.current_resource(conn)
-    token = OAuthTokens.find_for_user(user, service)
+    tokens = OAuthTokens.find_for_user(user, service)
 
-    render conn, "token.json", token: token
+    render conn, "tokens.json", tokens: tokens
   end
 
   # DELETE /oauth/token

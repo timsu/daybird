@@ -9,8 +9,8 @@ defmodule Sequence.OAuthTokens do
   alias Sequence.OAuthTokens.OAuthToken
 
   def find_for_user(user, name) do
-    Repo.one(from t in OAuthToken, where: t.user_id == ^user.id and t.name == ^name and
-      is_nil(t.deleted_at), order_by: [desc: :id], limit: 1)
+    Repo.all(from t in OAuthToken, where: t.user_id == ^user.id and t.name == ^name and
+      is_nil(t.deleted_at), order_by: [desc: :id])
   end
 
   def update_or_create_for_user_and_service(user, service, attrs) do
