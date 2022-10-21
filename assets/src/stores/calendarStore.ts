@@ -1,9 +1,11 @@
 import axios, { AxiosError } from 'axios'
+import { endOfDay, formatISO, startOfDay } from 'date-fns'
+import _ from 'lodash'
 import { action, atom, map } from 'nanostores'
 
 import { API, OAuthTokenResponse } from '@/api'
 import { GoogleResponse } from '@/components/auth/GoogleServerOAuth'
-import { config, GCalendar } from '@/config'
+import { config, GCalendar, GEvent } from '@/config'
 import { GOOGLE_CAL, OAuthToken } from '@/models'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
 
@@ -11,10 +13,20 @@ type CalendarsMap = {
   [email: string]: GCalendar[]
 }
 
+type EventMap = {
+  [calendarId: string]: GEvent[]
+}
+
+type EnabledMap = { [calendarId: string]: boolean }
+
+const USER_DATA_CALENDARS = 'calendars'
+
 class CalendarStore {
   // --- stores
 
   tokens = atom<OAuthToken[] | undefined>(undefined)
+
+  calendarsEnabled = map<EnabledMap>({})
 
   error = atom<string | undefined>()
 
@@ -22,13 +34,20 @@ class CalendarStore {
 
   calendars = map<CalendarsMap>({})
 
-  // --- actions
+  events = map<EventMap>({})
+
+  // --- token management
 
   init = async () => {
-    const response = await API.getOAuthTokens(GOOGLE_CAL)
-    const tokens = response.tokens.map((t) => OAuthToken.fromJSON(t))
-    logger.info('[cal] got tokens', tokens)
-    this.tokens.set(tokens)
+    API.getOAuthTokens(GOOGLE_CAL).then((response) => {
+      const tokens = response.tokens.map((t) => OAuthToken.fromJSON(t))
+      logger.info('[cal] got tokens', tokens)
+      this.tokens.set(tokens)
+    })
+
+    API.getUserData(USER_DATA_CALENDARS).then((response) => {
+      if (response) this.calendarsEnabled.set(response)
+    })
   }
 
   updateToken = action(this.tokens, 'updateToken', (store, token: OAuthToken) => {
@@ -59,18 +78,6 @@ class CalendarStore {
     return apiResponse
   }
 
-  fetchCalendars = async () => {
-    this.loading.set(true)
-    try {
-      await Promise.all(this.tokens.get()!.map((t) => this.fetchCalendarForToken(t)))
-    } catch (e) {
-      logger.warn(e)
-      this.error.set(unwrapError(e))
-    } finally {
-      this.loading.set(false)
-    }
-  }
-
   validateToken = async (token: OAuthToken) => {
     assertIsDefined(token.expires_at)
     if (token.expires_at.valueOf() > Date.now()) return token
@@ -92,19 +99,86 @@ class CalendarStore {
     }
   }
 
-  fetchCalendarForToken = async (token: OAuthToken) => {
-    try {
-      const validated = await this.validateToken(token)
-      if (!validated) return
+  // --- calendar loading
 
-      const response = await this.googleGet(validated, '/calendar/v3/users/me/calendarList')
-      logger.debug('[cal] fetched cals', token.email, response)
-      this.calendars.setKey(token.email!, response.items as GCalendar[])
+  fetchCalendars = async () => {
+    this.loading.set(true)
+    try {
+      await Promise.all(this.tokens.get()!.map((t) => this.fetchCalendarForToken(t)))
     } catch (e) {
-      // error loading calendars
+      logger.warn(e)
+      this.error.set(unwrapError(e))
+    } finally {
+      this.loading.set(false)
     }
+  }
+
+  fetchCalendarForToken = async (token: OAuthToken) => {
+    const validated = await this.validateToken(token)
+    if (!validated) return
+
+    const response = await this.googleGet(validated, '/calendar/v3/users/me/calendarList')
+    logger.debug('[cal] fetched cals', token.email, response)
+    this.calendars.setKey(token.email!, response.items as GCalendar[])
     return this.calendars
   }
+
+  setCalendarEnabled = (key: string, setting: boolean) => {
+    if (this.calendarsEnabled.get()[key] == setting) return
+    this.calendarsEnabled.setKey(key, setting)
+
+    const expanded = this.calendarsEnabled.get()
+    const data = Object.keys(expanded)
+      .filter((ex) => expanded[ex])
+      .reduce((r, v) => {
+        r[v] = true
+        return r
+      }, {} as EnabledMap)
+    API.setUserData(USER_DATA_CALENDARS, data)
+  }
+
+  isCalendarEnabled = (enabled: EnabledMap, cal: GCalendar) => {
+    const setting = enabled[cal.id]
+    if (setting === undefined) return cal.accessRole != 'reader'
+    return setting
+  }
+
+  // --- event loading
+
+  fetchEvents = async (date: Date) => {
+    if (this.loading.get()) return
+    try {
+      await Promise.all(this.tokens.get()!.map((t) => this.fetchEventsForToken(t, date)))
+    } catch (e) {
+      logger.warn(e)
+      this.error.set(unwrapError(e))
+    }
+  }
+
+  fetchEventsForToken = async (token: OAuthToken, date: Date) => {
+    const calendars = this.calendars.get()[token.email!]
+    if (!calendars) return
+
+    const validated = await this.validateToken(token)
+    if (!validated) return
+
+    const enabled = this.calendarsEnabled.get()
+    await Promise.all(
+      calendars.map(async (cal) => {
+        if (!this.isCalendarEnabled(enabled, cal)) return
+
+        const query = `timeMin=${formatISO(startOfDay(date))}&timeMax=${formatISO(endOfDay(date))}`
+        const response = await this.googleGet(
+          validated,
+          `/calendar/v3/calendars/${cal.id}/events?${query}`
+        )
+        const events = response.items as GEvent[]
+        this.events.setKey(cal.id, events)
+      })
+    )
+  }
+
+  // --- helpers
 
   googleGet = async (token: OAuthToken, path: string) => {
     const response = await axios.get('https://www.googleapis.com' + path, {
