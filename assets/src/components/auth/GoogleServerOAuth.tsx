@@ -107,7 +107,7 @@ export default function GoogleServerOAuth(props: Props) {
 
   const onLoginSuccess = useCallback(
     async (response: GoogleResponse) => {
-      logger.info(response)
+      logger.info('google login success', response)
       let type = []
       if (response.scope) {
         if (scopesInclude(PROFILE_SCOPES, response.scope)) {
@@ -204,15 +204,6 @@ export function makeGoogleOauthPopup(
   skipToken: boolean = false,
   email: string | null = null
 ) {
-  console.log('meowy', scope)
-  let type = []
-  if (scope.includes('profile')) {
-    type.push('login')
-  }
-  if (scope.includes('calendar')) {
-    type.push('calendar')
-  }
-
   logger.debug('making oauth popup for scope', scope)
   const w = 600
   const h = 850

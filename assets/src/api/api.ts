@@ -352,6 +352,26 @@ class APIService {
     return response.data
   }
 
+  async connectOAuthToken(
+    redirectUri: string,
+    code: string,
+    service: string
+  ): Promise<R.OAuthTokenResponse> {
+    const response = await this.axios.post(`${this.endpoint}/oauth/connect`, {
+      service,
+      code,
+      redirect_uri: redirectUri,
+    })
+    return response.data
+  }
+
+  async updateOAuthToken(token: OAuthToken): Promise<R.OAuthTokenResponse> {
+    const response = await this.axios.put(`${this.endpoint}/oauth/token?service=${token.name}`, {
+      ...token,
+    })
+    return response.data
+  }
+
   async deleteOAuthToken(service: string, email: string): Promise<R.SuccessResponse> {
     const response = await this.axios.delete(
       `${this.endpoint}/oauth/token?service=${service}&email=${email}`

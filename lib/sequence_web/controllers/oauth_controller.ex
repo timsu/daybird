@@ -9,15 +9,15 @@ defmodule SequenceWeb.OAuthController do
   # GET /oauth/token
   def get_service_token(conn, %{ "service" => service }) do
     user = Guardian.Plug.current_resource(conn)
-    tokens = OAuthTokens.find_for_user(user, service)
+    tokens = OAuthTokens.all_for_user(user, service)
 
     render conn, "tokens.json", tokens: tokens
   end
 
   # DELETE /oauth/token
-  def delete_service_token(conn, %{ "service" => service }) do
+  def delete_service_token(conn, %{ "service" => service, "email" => email }) do
     user = Guardian.Plug.current_resource(conn)
-    token = OAuthTokens.find_for_user(user, service)
+    token = OAuthTokens.find_for_email(user, email, service)
 
     if token do
       OAuthTokens.soft_delete_oauth_token(token)
@@ -29,7 +29,10 @@ defmodule SequenceWeb.OAuthController do
   # GET /oauth/connect
   def connect_service(conn, %{ "service" => service, "code" => code, "redirect_uri" => redirect_uri }) do
     user = Guardian.Plug.current_resource(conn)
-    with {:ok, result} <- OAuthTokens.get_service(service).exchange_code_for_token(code, redirect_uri) do
+    service_obj = OAuthTokens.get_service(service)
+
+    with {:ok, result} <- service_obj.exchange_code_for_token(code, redirect_uri) do
+      result = service_obj.add_profile_email(result)
       new_params = %{"service" => service}
       {:ok, token} = save_oauth_token(user, Map.merge(result, new_params))
       render conn, "token.json", token: token
@@ -45,7 +48,10 @@ defmodule SequenceWeb.OAuthController do
   #
   # Exchange a code for access/refresh tokens but do not save them.
   def exchange_token(conn, %{ "service" => service, "code" => code, "redirect_uri" => redirect_uri }) do
-    case OAuthTokens.get_service(service).exchange_code_for_token(code, redirect_uri) do
+    _user = Guardian.Plug.current_resource(conn)
+    service_obj = OAuthTokens.get_service(service)
+
+    case service_obj.exchange_code_for_token(code, redirect_uri) do
       {:ok, result} ->
         token = %{
           access: result["access_token"],
@@ -72,12 +78,13 @@ defmodule SequenceWeb.OAuthController do
     save_oauth_token(user, params)
   end
 
-  defp save_oauth_token(user, %{ "service" => service, "access" => access, "refresh" => refresh,
-      "expires_in" => expires_in }) do
+  defp save_oauth_token(user, %{ "email" => email, "service" => service, "access" => access,
+      "refresh" => refresh, "expires_in" => expires_in }) do
     expires_at = Timex.shift(Timex.now, seconds: expires_in)
 
     attrs = %{
       user_id: user.id,
+      email: email,
       name: service,
       access: access,
       refresh: refresh,
@@ -86,14 +93,14 @@ defmodule SequenceWeb.OAuthController do
       deleted_at: nil
     }
 
-    OAuthTokens.update_or_create_for_user_and_service(user, service, attrs)
+    OAuthTokens.update_or_create_for_user_and_service(user, email, service, attrs)
   end
 
   # PUT /oauth/token
-  def update_service_token(conn, %{ "service" => service } = params) do
+  def update_service_token(conn, %{ "service" => service, "email" => email } = params) do
     user = Guardian.Plug.current_resource(conn)
 
-    {:ok, token} = case OAuthTokens.find_for_user(user, service) do
+    {:ok, token} = case OAuthTokens.find_for_email(user, email, service) do
       nil ->
         save_oauth_token(user, params)
 
@@ -123,10 +130,10 @@ defmodule SequenceWeb.OAuthController do
   end
 
   # POST /oauth/refresh
-  def refresh_service_token(conn, %{ "service" => service }) do
+  def refresh_service_token(conn, %{ "service" => service, "email" => email }) do
     user = Guardian.Plug.current_resource(conn)
 
-    case OAuthTokens.find_for_user(user, service) do
+    case OAuthTokens.find_for_email(user, email, service) do
       nil ->
         json conn, %{ token: nil }
       token ->

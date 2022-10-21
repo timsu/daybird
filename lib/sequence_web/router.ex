@@ -83,7 +83,10 @@ defmodule SequenceWeb.Router do
     post "/verify_email", AuthController, :verify_email
     post "/login_success", AuthController, :login_success
 
+    post "/oauth/connect", OAuthController, :connect_service
+    post "/oauth/exchange", OAuthController, :exchange_token
     get "/oauth/token", OAuthController, :get_service_token
+    put "/oauth/token", OAuthController, :update_service_token
     delete "/oauth/token", OAuthController, :delete_service_token
     post "/oauth/refresh", OAuthController, :refresh_service_token
 

@@ -7,11 +7,9 @@ export class OAuthToken {
 
   public refresh?: string
 
-  public expires_at?: Date
+  public expires_at?: Date | number
 
   public meta?: any
-
-  public team?: string
 
   public static fromJSON(obj: any) {
     let item: OAuthToken = Object.assign(new OAuthToken(), obj)
