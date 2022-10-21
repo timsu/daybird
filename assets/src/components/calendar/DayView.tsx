@@ -6,13 +6,14 @@ import GoogleServerOAuth, {
     CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES
 } from '@/components/auth/GoogleServerOAuth'
 import Loader from '@/components/core/Loader'
+import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import { GEvent } from '@/config'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
-import { CheckIcon } from '@heroicons/react/outline'
+import { CheckIcon, RefreshIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type Props = { date: Date }
@@ -30,9 +31,7 @@ export default function DayView({ date }: Props) {
   }
 
   return (
-    <div class="flex-1 flex flex-col">
-      <div class="font-bold px-3">{format(date, 'MMMM do')}</div>
-
+    <div class="flex-1 flex flex-col overflow-hidden">
       {tokens != undefined && tokens.length == 0 && (
         <div class="p-2 flex flex-col items-center text-center text-sm">
           <div class="py-6 italic text-gray-400">No calendar connected.</div>
@@ -77,8 +76,8 @@ function CalendarView({ date }: Props) {
     )
 
   return (
-    <div class="flex-1 flex flex-col">
-      <Events />
+    <div class="flex-1 flex flex-col overflow-scroll">
+      <Events date={date} />
 
       <Calendars />
     </div>
@@ -91,7 +90,7 @@ type Event = {
   end: Date
 }
 
-function Events() {
+function Events({ date }: Props) {
   const events = useStore(calendarStore.events)
 
   const eventList = flatten(Object.values(events))
@@ -116,33 +115,41 @@ function Events() {
   }
 
   return (
-    <div class="overflow-scroll flex-1 px-3 py-1 text-sm">
-      {allDayEvents.length > 0 && (
-        <div class="mb-4">
-          <div class="font-semibold">All Day</div>
-          {allDayEvents.map((e) => (
-            <Event ev={e} />
-          ))}
-        </div>
-      )}
+    <>
+      <div class="flex px-3 items-center">
+        <div class="flex-1 font-bold">{format(date, 'MMMM do')}</div>
+        <Pressable tooltip="Refresh Events" onClick={() => calendarStore.fetchEvents(date)}>
+          <RefreshIcon class="text-gray-500 h-3 w-3" />
+        </Pressable>
+      </div>
+      <div class="flex-1 px-3 py-1 text-sm">
+        {allDayEvents.length > 0 && (
+          <div class="mb-4">
+            <div class="font-semibold">All Day</div>
+            {allDayEvents.map((e) => (
+              <Event ev={e} />
+            ))}
+          </div>
+        )}
 
-      {regularEvents.map((e) => (
-        <div class="mb-2">
-          <div class="font-semibold">{timeString(e)}</div>
-          <Event ev={e.source} />
-        </div>
-      ))}
-    </div>
+        {regularEvents.map((e) => (
+          <div>
+            <div class="font-semibold">{timeString(e)}</div>
+            <Event ev={e.source} />
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
 
 function Event({ ev }: { ev: GEvent }) {
   const cal = calendarStore.calendarData[ev.calendar]
   return (
-    <Tooltip message={cal.summary}>
+    <Tooltip message={cal.summary} class="mb-2">
       <div
         style={{ background: cal.backgroundColor, color: cal.foregroundColor }}
-        class="p-2 rounded-md text-xs flex-1"
+        class="p-2 rounded-md text-xs flex-1 cursor-pointer"
         onClick={() => window.open(ev.htmlLink)}
       >
         {ev.summary}
@@ -159,9 +166,15 @@ function Calendars() {
     calendarStore.fetchEvents(uiStore.calendarDate.get())
   }, [enabled])
 
+  const onConnect = async (response: GoogleResponse) => {
+    calendarStore.saveGoogleOAuthToken(response)
+  }
+
   return (
-    <div class="mb-4">
-      <div class="bg-slate-200 px-3 py-1 rounded font-semibold">Calendars</div>
+    <div class="flex flex-col">
+      <div class="bg-slate-200 px-3 py-1 rounded font-semibold flex">
+        <div class="flex-1">Calendars</div>
+      </div>
       {Object.keys(calendars).map((email) => (
         <div class="px-3">
           <div class="text-sm font-semibold py-1">{email}</div>
@@ -169,7 +182,7 @@ function Calendars() {
             const checked = calendarStore.isCalendarEnabled(enabled, cal)
             return (
               <div
-                class="text-sm flex items-center py-1 "
+                class="text-sm flex items-center py-1 cursor-pointer"
                 onClick={() => calendarStore.setCalendarEnabled(cal.id, !checked)}
               >
                 <div
@@ -184,6 +197,13 @@ function Calendars() {
           })}
         </div>
       ))}
+      <GoogleServerOAuth
+        desc="Connect Another"
+        scope={[...PROFILE_SCOPES, ...CALENDAR_SCOPES]}
+        onSuccess={onConnect}
+        skipToken
+        buttonClass="my-3 mx-2 flex-1"
+      />
     </div>
   )
 }

@@ -137,19 +137,15 @@ class CalendarStore {
     if (this.calendarsEnabled.get()[key] == setting) return
     this.calendarsEnabled.setKey(key, setting)
 
-    const expanded = this.calendarsEnabled.get()
-    const data = Object.keys(expanded)
-      .filter((ex) => expanded[ex])
-      .reduce((r, v) => {
-        r[v] = true
-        return r
-      }, {} as EnabledMap)
+    const data = this.calendarsEnabled.get()
     API.setUserData(USER_DATA_CALENDARS, data)
+
+    if (!setting) this.events.setKey(key, [])
   }
 
   isCalendarEnabled = (enabled: EnabledMap, cal: GCalendar) => {
     const setting = enabled[cal.id]
-    if (setting === undefined) return cal.selected
+    if (setting === undefined) return cal.accessRole != 'reader' && cal.selected
     return setting
   }
 
@@ -177,10 +173,12 @@ class CalendarStore {
       calendars.map(async (cal) => {
         if (!this.isCalendarEnabled(enabled, cal)) return
 
-        const query = `timeMin=${formatISO(startOfDay(date))}&timeMax=${formatISO(endOfDay(date))}`
+        const query = `timeMin=${formatISO(startOfDay(date))}&timeMax=${formatISO(
+          endOfDay(date)
+        )}&singleEvents=true`
         const response = await this.googleGet(
           validated,
-          `/calendar/v3/calendars/${cal.id}/events?${query}`
+          `/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?${query}`
         )
         const events = response.items as GEvent[]
         events.forEach((e) => (e.calendar = cal.id))
