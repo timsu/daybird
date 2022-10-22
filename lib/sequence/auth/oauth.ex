@@ -1,8 +1,6 @@
 defmodule Sequence.Auth.OAuth do
   require Logger
 
-  @google_client_id Application.get_env(:sequence, Sequence.Auth.OAuth)[:google_client_id]
-
   # Fetch google profile given token, make sure 'aud' matches CLIENT_ID and token not expired.
   # %{
   #   "alg" => "RS256",
@@ -31,9 +29,6 @@ defmodule Sequence.Auth.OAuth do
       {:ok, %Mojito.Response{status_code: 200, body: body}} ->
         profile = Poison.decode!(body)
         cond do
-          profile["aud"] != @google_client_id ->
-            Logger.error("Google token has invalid aud: #{inspect(profile)}")
-            {:error, "Invalid aud"}
           profile["exp"] < :os.system_time(:second) ->
             Logger.error("Google token is expired: #{inspect(profile)}")
             {:error, "token expired"}
