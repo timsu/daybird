@@ -62,9 +62,7 @@ function CalendarView({ date }: Props) {
   useEffect(() => {
     if (calendarStore.initialFetch) {
       calendarStore.initialFetch = false
-      calendarStore
-        .fetchCalendars()
-        .then(() => calendarStore.fetchEvents(uiStore.calendarDate.get()))
+      calendarStore.fetchCalendars()
     }
   }, [])
 

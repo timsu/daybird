@@ -87,6 +87,7 @@ class CalendarStore {
 
     logger.info('[cal] Saved token', apiResponse)
     this.updateToken(OAuthToken.fromJSON(apiResponse.token))
+    this.fetchCalendars()
 
     return apiResponse
   }
@@ -125,6 +126,8 @@ class CalendarStore {
     } finally {
       this.loading.set(false)
     }
+
+    this.fetchEvents(uiStore.calendarDate.get())
   }
 
   fetchCalendarForToken = async (token: OAuthToken) => {
