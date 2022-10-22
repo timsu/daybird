@@ -7,7 +7,7 @@ import ErrorMessage from '@/components/core/ErrorMessage'
 import { classNames, logger, unwrapError } from '@/utils'
 
 const SCOPE_PREFIX = 'https://www.googleapis.com/auth/'
-export const CALENDAR_SCOPES = ['calendar.readonly', 'calendar.events.readonly']
+export const CALENDAR_SCOPES = ['calendar.readonly', 'calendar.events']
 export const CONTACTS_SCOPES = ['contacts.readonly']
 export const DIRECTORY_SCOPES = ['directory.readonly']
 export const PROFILE_SCOPES = ['userinfo.email', 'userinfo.profile']

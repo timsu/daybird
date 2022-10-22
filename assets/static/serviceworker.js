@@ -14,8 +14,10 @@ self.addEventListener('fetch', function (event) {
     (async function () {
       try {
         const res = await fetch(event.request)
-        const cache = await caches.open('cache')
-        cache.put(event.request.url, res.clone())
+        if (event.request.method == 'GET') {
+          const cache = await caches.open('cache')
+          cache.put(event.request.url, res.clone())
+        }
         return res
       } catch (error) {
         return caches.match(event.request)
