@@ -61,9 +61,9 @@ defmodule Sequence do
     cond do
       Sequence.dev? -> System.get_env("STEM_URL") || "localhost:4000"
       Sequence.test? -> System.get_env("STEM_URL") || "localhost:4002"
-      Sequence.dogfood? -> "dogfood.sequence.so"
-      Sequence.staging? -> "staging.sequence.so"
-      true -> "sequence.so"
+      Sequence.dogfood? -> "dogfood.daybird.app"
+      Sequence.staging? -> "staging.daybird.app"
+      true -> "daybird.app"
     end
   end
 
