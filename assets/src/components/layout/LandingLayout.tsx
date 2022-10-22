@@ -7,7 +7,7 @@ export default function (props: RenderableProps<{ darkFooter?: boolean }>) {
   return (
     <div class="h-full flex flex-col bg-lavender-50">
       <Header />
-      <div className="flex flex-col grow ">{props.children}</div>
+      {props.children}
       <Footer dark={props.darkFooter} />
     </div>
   )

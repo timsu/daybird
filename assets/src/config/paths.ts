@@ -1,5 +1,7 @@
 export const paths = {
   ROOT: '/',
+  TERMS: '/terms',
+  PRIVACY: '/privacy',
 
   SIGNIN: '/signin',
 
