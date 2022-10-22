@@ -9,7 +9,7 @@ import ErrorMessage from '@/components/core/ErrorMessage'
 import Loader from '@/components/core/Loader'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
-import { GEvent } from '@/config'
+import { config, GEvent } from '@/config'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { uiStore } from '@/stores/uiStore'
@@ -31,7 +31,7 @@ export default function DayView({ date }: Props) {
     calendarStore.saveGoogleOAuthToken(response)
   }
 
-  if (!user?.email?.includes('@listnote.co')) return null
+  if (!config.dev && !user?.email?.includes('@listnote.co')) return null
 
   return (
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -60,8 +60,13 @@ function CalendarView({ date }: Props) {
   const error = useStore(calendarStore.error)
 
   useEffect(() => {
-    calendarStore.fetchCalendars()
-  }, [tokens?.length])
+    if (calendarStore.initialFetch) {
+      calendarStore.initialFetch = false
+      calendarStore
+        .fetchCalendars()
+        .then(() => calendarStore.fetchEvents(uiStore.calendarDate.get()))
+    }
+  }, [])
 
   useEffect(() => {
     calendarStore.fetchEvents(date)
@@ -171,10 +176,6 @@ function Calendars() {
   const [expanded, setExpanded] = useState(false)
   const calendars = useStore(calendarStore.calendars)
   const enabled = useStore(calendarStore.calendarsEnabled)
-
-  useEffect(() => {
-    calendarStore.fetchEvents(uiStore.calendarDate.get())
-  }, [enabled])
 
   const onConnect = async (response: GoogleResponse) => {
     calendarStore.saveGoogleOAuthToken(response)

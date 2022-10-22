@@ -15,6 +15,7 @@ export interface GCalendar {
   primary: boolean
   selected: boolean
   accessRole: 'owner' | 'reader'
+  email: string
 }
 
 export interface GEvent {

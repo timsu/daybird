@@ -7,6 +7,7 @@ import { API, OAuthTokenResponse } from '@/api'
 import { GoogleResponse } from '@/components/auth/GoogleServerOAuth'
 import { config, GCalendar, GColors, GEvent } from '@/config'
 import { GOOGLE_CAL, OAuthToken } from '@/models'
+import { uiStore } from '@/stores/uiStore'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
 
 type CalendarsMap = {
@@ -29,6 +30,8 @@ const USER_DATA_CALENDARS = 'calendars'
 
 class CalendarStore {
   // --- stores
+
+  initialFetch = true
 
   tokens = atom<OAuthToken[] | undefined>(undefined)
 
@@ -134,7 +137,10 @@ class CalendarStore {
 
     const calendars = response.items as GCalendar[]
     this.calendars.setKey(token.email!, calendars)
-    calendars.forEach((c) => (this.calendarData[c.id] = c))
+    calendars.forEach((c) => {
+      c.email = token.email!
+      this.calendarData[c.id] = c
+    })
     return this.calendars
   }
 
@@ -145,7 +151,12 @@ class CalendarStore {
     const data = this.calendarsEnabled.get()
     API.setUserData(USER_DATA_CALENDARS, data)
 
-    if (!setting) this.events.setKey(key, [])
+    if (setting) {
+      const cal = this.calendarData[key]
+      const date = uiStore.calendarDate.get()
+      const token = this.tokens.get()?.find((t) => t.email == cal.email)
+      this.fetchEventsForCalendar(token!, cal.id, date)
+    } else this.events.setKey(key, [])
   }
 
   isCalendarEnabled = (enabled: EnabledMap, cal: GCalendar) => {
@@ -177,22 +188,26 @@ class CalendarStore {
     await Promise.all(
       calendars.map(async (cal) => {
         if (!this.isCalendarEnabled(enabled, cal)) return
-
-        const query = `timeMin=${formatISO(startOfDay(date))}&timeMax=${formatISO(
-          endOfDay(date)
-        )}&singleEvents=true`
-        const response = await this.googleGet(
-          validated,
-          `/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?${query}`
-        )
-        const events = response.items as GEvent[]
-        events.forEach((e) => {
-          e.email = token.email!
-          e.calendar = cal.id
-        })
-        this.events.setKey(cal.id, events)
+        this.fetchEventsForCalendar(validated, cal.id, date)
       })
     )
+  }
+
+  fetchEventsForCalendar = async (token: OAuthToken, calendarId: string, date: Date) => {
+    const query = `timeMin=${formatISO(startOfDay(date))}&timeMax=${formatISO(
+      endOfDay(date)
+    )}&singleEvents=true`
+    const response = await this.googleGet(
+      token,
+      `/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?${query}`
+    )
+    const events = response.items as GEvent[]
+    if (events.length == 0) return
+    events.forEach((e) => {
+      e.email = token.email!
+      e.calendar = calendarId
+    })
+    this.events.setKey(calendarId, events)
   }
 
   fetchColors = async (token: OAuthToken) => {
