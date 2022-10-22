@@ -19,6 +19,12 @@ defmodule Sequence.Google do
     post("https://oauth2.googleapis.com/token", std_headers(), params)
   end
 
+  def add_profile_email(payload) do
+    %{ "id_token" => token } = payload
+    {:ok, profile} = Sequence.Auth.OAuth.get_user_info("google", token)
+    Map.put(payload, "email", profile.email)
+  end
+
   # {
   #   "access_token": "NgCXRK...MzYjw",
   #   "token_type": "Bearer",

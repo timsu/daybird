@@ -6,6 +6,7 @@ defmodule SequenceWeb.OAuthView do
   def render_token(token) do
     %{
       name: token.name,
+      email: token.email,
       access: token.access,
       expires_at: token.expires_at,
       meta: token.meta,
@@ -15,6 +16,12 @@ defmodule SequenceWeb.OAuthView do
   def render("token.json", %{token: token}) do
     %{
       token: render_token(token),
+    }
+  end
+
+  def render("tokens.json", %{tokens: tokens}) do
+    %{
+      tokens: tokens |> Enum.map(&render_token/1)
     }
   end
 

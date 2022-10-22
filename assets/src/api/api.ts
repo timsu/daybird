@@ -3,7 +3,8 @@ import { encode } from 'base64-arraybuffer'
 
 import { config, OAuthProvider } from '@/config'
 import {
-    AuthToken, AuthTokenPair, File as LNFile, FileType, Project, ProjectRole, Task, Team, User
+    AuthToken, AuthTokenPair, File as LNFile, FileType, OAuthToken, Project, ProjectRole, Task,
+    Team, User
 } from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
@@ -340,6 +341,46 @@ class APIService {
     const response = await this.axios.post(
       `${this.endpoint}/users/data?${projectParam}key=${encodeURIComponent(key)}`,
       { data }
+    )
+    return response.data
+  }
+
+  // tokens
+
+  async getOAuthTokens(service: string): Promise<R.OAuthTokensResponse> {
+    const response = await this.axios.get(`${this.endpoint}/oauth/token?service=${service}`)
+    return response.data
+  }
+
+  async connectOAuthToken(
+    redirectUri: string,
+    code: string,
+    service: string
+  ): Promise<R.OAuthTokenResponse> {
+    const response = await this.axios.post(`${this.endpoint}/oauth/connect`, {
+      service,
+      code,
+      redirect_uri: redirectUri,
+    })
+    return response.data
+  }
+
+  async updateOAuthToken(token: OAuthToken): Promise<R.OAuthTokenResponse> {
+    const response = await this.axios.put(
+      `${this.endpoint}/oauth/token?service=${token.name}`,
+      token
+    )
+    return response.data
+  }
+
+  async refreshOAuthToken(service: string, email: string): Promise<R.OAuthTokenResponse> {
+    let response = await this.axios.post(`${this.endpoint}/oauth/refresh`, { service, email })
+    return response.data
+  }
+
+  async deleteOAuthToken(service: string, email: string): Promise<R.SuccessResponse> {
+    const response = await this.axios.delete(
+      `${this.endpoint}/oauth/token?service=${service}&email=${email}`
     )
     return response.data
   }

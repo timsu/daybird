@@ -83,6 +83,13 @@ defmodule SequenceWeb.Router do
     post "/verify_email", AuthController, :verify_email
     post "/login_success", AuthController, :login_success
 
+    post "/oauth/connect", OAuthController, :connect_service
+    post "/oauth/exchange", OAuthController, :exchange_token
+    get "/oauth/token", OAuthController, :get_service_token
+    put "/oauth/token", OAuthController, :update_service_token
+    delete "/oauth/token", OAuthController, :delete_service_token
+    post "/oauth/refresh", OAuthController, :refresh_service_token
+
     resources "/projects", ProjectsController
     post "/projects/:id/add_member", ProjectsController, :add_member
     post "/projects/:id/remove_member", ProjectsController, :remove_member
@@ -197,6 +204,9 @@ defmodule SequenceWeb.Router do
     get "/reset_password", PageController, :auth
 
     get "/admin/*path", PageController, :admin
+
+    get "/oauth/google", OAuthController, :google_oauth
+    get "/oauth/*path", PageController, :auth
 
     get "/about", PageController, :redirect_about
     get "/faq", PageController, :redirect_faq
