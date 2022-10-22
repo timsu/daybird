@@ -17,7 +17,7 @@ export default (props: Props) => {
 
   return (
     <LandingLayout darkFooter>
-      <main className="">
+      <main className="flex flex-col grow ">
         <Hero />
 
         <WhyDaybird />
