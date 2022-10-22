@@ -31,6 +31,8 @@ export default function DayView({ date }: Props) {
     calendarStore.saveGoogleOAuthToken(response)
   }
 
+  if (!user?.email?.includes('@listnote.co')) return null
+
   return (
     <div class="flex-1 flex flex-col overflow-hidden">
       {tokens != undefined && tokens.length == 0 && (
@@ -44,11 +46,6 @@ export default function DayView({ date }: Props) {
             onSuccess={onConnect}
             skipToken
           />
-
-          <div class="py-6 italic text-gray-400">
-            Note that this feature is in testing, please reach out to tim@daybird.app to be added to
-            the list.
-          </div>
         </div>
       )}
 
