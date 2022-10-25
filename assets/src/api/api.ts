@@ -148,23 +148,13 @@ class APIService {
 
   async logInElseSignUpOAuth(
     provider: OAuthProvider,
-    token: string,
-    user: Partial<User>,
-    team?: Partial<Team>,
-    invite?: string,
-    allowSignUp: boolean = true,
-    originType?: string
+    token: string
   ): Promise<R.OAuthSignInResponse> {
     const response = await axios.post(
       `${this.endpoint}/log_in_else_sign_up_oauth`,
       {
         provider,
         token,
-        user,
-        team,
-        invite,
-        allow_sign_up: allowSignUp,
-        origin_type: originType,
       },
       {
         validateStatus: function (status) {

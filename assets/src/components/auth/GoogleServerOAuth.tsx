@@ -1,5 +1,6 @@
 import { JSX } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
+import { twMerge } from 'tailwind-merge'
 
 import GoogleIcon from '@/components/auth/GoogleIcon'
 import Button from '@/components/core/Button'
@@ -61,15 +62,18 @@ export default function GoogleServerOAuth(props: Props) {
     }
 
     return (
-      <Button
+      <button
         data-testid="google"
         disabled={isRequesting}
-        class={classNames('px-0 py-0', buttonClass || '')}
+        class={twMerge(
+          'bg-[#4285F4] hover:bg-[#3367d6] inline-flex items-center shadow-sm text-sm text-white font-medium rounded',
+          buttonClass || ''
+        )}
         {...p}
       >
-        <GoogleIcon size={40} />
+        <GoogleIcon size={40} style={{ margin: -1 }} />
         <div class="py-2 px-4">{desc}</div>
-      </Button>
+      </button>
     )
   }
 
@@ -102,7 +106,7 @@ export default function GoogleServerOAuth(props: Props) {
 
   const onLoginFail = (response: { error: string }) => {
     if (!response) return
-    displayError(`Login failed. ${response.error}`, false)
+    displayError(`Connect failed: ${response.error}`, false)
   }
 
   const onLoginSuccess = useCallback(

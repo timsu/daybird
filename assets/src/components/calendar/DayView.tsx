@@ -3,7 +3,7 @@ import { flatten } from 'lodash'
 import { useEffect, useState } from 'preact/hooks'
 
 import GoogleServerOAuth, {
-    CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES
+    CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES, scopesInclude
 } from '@/components/auth/GoogleServerOAuth'
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Loader from '@/components/core/Loader'
@@ -27,29 +27,41 @@ export default function DayView({ date }: Props) {
     calendarStore.init()
   }, [])
 
-  const onConnect = async (response: GoogleResponse) => {
-    calendarStore.saveGoogleOAuthToken(response)
-  }
-
-  if (!config.dev && !user?.email?.includes('@listnote.co')) return null
+  if (
+    !config.dev &&
+    !user?.email?.includes('@listnote.co') &&
+    !user?.email?.includes('@daybird.app')
+  )
+    return null
 
   return (
     <div class="flex-1 flex flex-col overflow-hidden">
-      {tokens != undefined && tokens.length == 0 && (
-        <div class="p-2 flex flex-col items-center text-center text-sm">
-          <div class="py-6 italic text-gray-400">No calendar connected.</div>
-
-          <GoogleServerOAuth
-            desc="Connect"
-            scope={[...PROFILE_SCOPES, ...CALENDAR_SCOPES]}
-            email={user?.email}
-            onSuccess={onConnect}
-            skipToken
-          />
-        </div>
-      )}
+      {tokens != undefined && tokens.length == 0 && <ConnectCalendar />}
 
       {tokens && tokens.length > 0 && <CalendarView date={date} />}
+    </div>
+  )
+}
+
+function ConnectCalendar() {
+  const error = useStore(calendarStore.error)
+
+  const onConnect = async (response: GoogleResponse) => {
+    await calendarStore.saveGoogleOAuthToken(response)
+  }
+
+  return (
+    <div class="p-2 flex flex-col items-center text-center text-sm">
+      <div class="py-6 italic text-gray-400">No calendar connected.</div>
+
+      <GoogleServerOAuth
+        desc="Add Calendar"
+        scope={[...PROFILE_SCOPES, ...CALENDAR_SCOPES]}
+        onSuccess={onConnect}
+        skipToken
+      />
+
+      <ErrorMessage error={error} />
     </div>
   )
 }

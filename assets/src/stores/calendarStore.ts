@@ -122,7 +122,7 @@ class CalendarStore {
       await Promise.all(this.tokens.get()!.map((t) => this.fetchCalendarForToken(t)))
     } catch (e) {
       logger.warn(e)
-      this.error.set(unwrapError(e))
+      this.error.set(unwrapError(e, 'Error fetching calendar', false))
     } finally {
       this.loading.set(false)
     }

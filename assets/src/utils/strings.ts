@@ -24,7 +24,7 @@ export const pluralize = (noun: string, num: number) => {
 }
 
 /** unwrap backend errors */
-export function unwrapError(error: any, defaultMessage?: string) {
+export function unwrapError(error: any, defaultMessage?: string, expandErrorObject?: boolean) {
   if (!error) return 'Error'
   if (typeof error == 'string') return error
   if (error.response) {
@@ -40,8 +40,12 @@ export function unwrapError(error: any, defaultMessage?: string) {
       const otherKeys = Object.keys(response.data.error).filter(
         (k) => k != 'message' && k != 'resend'
       )
-      if (message && otherKeys.length > 0) {
-        return message + ': ' + otherKeys.map((k) => `${k} ${response.data.error[k]}`).join(', ')
+      if (message && expandErrorObject && otherKeys.length > 0) {
+        return (
+          message +
+          ': ' +
+          otherKeys.map((k) => `${k} ${JSON.stringify(response.data.error[k])}`).join(', ')
+        )
       } else {
         return message
       }

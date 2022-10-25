@@ -67,6 +67,7 @@ defmodule SequenceWeb.AuthController do
         if allow_sign_up do
           user_attrs = attrs_from_google_profile(profile, params)
           with {:ok, user} <- Users.create_user(user_attrs) do
+            Projects.user_joined(user)
             sign_in_success(conn, user)
           end
         else

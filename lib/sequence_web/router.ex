@@ -60,6 +60,7 @@ defmodule SequenceWeb.Router do
     pipe_through :logging
 
     post "/sign_in", AuthController, :sign_in
+    post "/log_in_else_sign_up_oauth", AuthController, :log_in_else_sign_up_oauth
     post "/create_account", AuthController, :create_account
     post "/sign_in_oauth", AuthController, :sign_in_oauth
     post "/forgot_password", AuthController, :forgot_password
