@@ -1,6 +1,7 @@
 import { Fragment } from 'preact'
 
-import AppSidebar from '@/components/nav/AppSidebar'
+import FileContextMenu from '@/components/menus/FileContextMenu'
+import AppSidebar, { SidebarModals } from '@/components/nav/AppSidebar'
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 
@@ -10,11 +11,7 @@ export function SidebarMenu(p: SidebarProps) {
   const { sidebarOpen, setSidebarOpen } = p
   return (
     <Transition.Root show={sidebarOpen} as={Fragment}>
-      <Dialog
-        as="div"
-        className="relative z-40 md:hidden touch-manipulation"
-        onClose={setSidebarOpen}
-      >
+      <Dialog as="div" className="relative z-40 md:hidden touch-manipulation" onClose={() => {}}>
         <Transition.Child
           as={Fragment}
           enter="transition-opacity ease-linear duration-300"
@@ -27,7 +24,7 @@ export function SidebarMenu(p: SidebarProps) {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
         </Transition.Child>
 
-        <div className="fixed inset-0 flex z-40 bg-red">
+        <div className="fixed inset-0 flex z-40" onClick={() => setSidebarOpen(false)}>
           <Transition.Child
             as={Fragment}
             enter="transition ease-in-out duration-300 transform"
@@ -58,7 +55,12 @@ export function SidebarMenu(p: SidebarProps) {
                   </button>
                 </div>
               </Transition.Child>
-              {sidebarOpen && <AppSidebar />}
+              {sidebarOpen && (
+                <>
+                  <AppSidebar />
+                  <SidebarModals />
+                </>
+              )}
             </Dialog.Panel>
           </Transition.Child>
           <div

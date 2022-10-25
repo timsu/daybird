@@ -25,7 +25,7 @@ export default ({ projectId }: { projectId: string }) => {
   const nonDateFiles = files.filter((f) => !fileStore.isJournalFolder(f.file))
 
   return (
-    <nav className="px-2 space-y-1">
+    <nav className="px-2 space-y-1 flex flex-col flex-1">
       {nonDateFiles.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
       <FileTree projectId={projectId} nodes={nonDateFiles} indent={0} />
       <RootFolderDropZone projectId={projectId} />
@@ -232,8 +232,16 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
 
 function RootFolderDropZone({ projectId }: { projectId: string }) {
   return (
-    <ContextMenuTrigger id="file-tree-root" data={{ projectId: projectId }}>
-      <div className="h-10" onDragOver={allowDrop} onDrop={dropHandler(projectId, null)}></div>
-    </ContextMenuTrigger>
+    <div
+      className="min-h-10 flex-1"
+      onDragOver={allowDrop}
+      onDrop={dropHandler(projectId, null)}
+      onContextMenu={(e) => {
+        e.preventDefault()
+        triggerContextMenu(e.clientX, e.clientY, 'file-tree-root', {
+          projectId: projectId,
+        })
+      }}
+    ></div>
   )
 }

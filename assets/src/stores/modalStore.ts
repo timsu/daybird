@@ -24,10 +24,3 @@ class ModalStore {
 
 export const modalStore = new ModalStore()
 if (config.dev) (window as any)['modalStore'] = modalStore
-
-const hideSidebar = () => uiStore.sidebarOpen.set(false)
-
-modalStore.newProjectModal.listen(hideSidebar)
-modalStore.newFileModal.listen(hideSidebar)
-modalStore.deleteFileModal.listen(hideSidebar)
-modalStore.renameFileModal.listen(hideSidebar)
