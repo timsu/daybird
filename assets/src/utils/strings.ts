@@ -73,3 +73,9 @@ export function toTitleCase(str: string, delim?: string) {
 export function ctrlOrCommand() {
   return isMac ? '⌘' : 'ctrl'
 }
+
+export const timeToString = (seconds: number) => {
+  let minutes = Math.floor(seconds / 60)
+  let remain = Math.floor(seconds - minutes * 60)
+  return `${minutes}:${remain < 10 ? '0' : ''}${remain}`
+}
