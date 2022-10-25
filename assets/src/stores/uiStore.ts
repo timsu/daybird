@@ -13,6 +13,8 @@ import { getOS, isChrome, isMobile, isSafari } from '@/utils/os'
 const SLEEP_CHECK_INTERVAL = 30_000
 const LS_RECENT_FILES = 'rf'
 
+export const CALENDAR_OPEN_WIDTH = 800
+
 type BeforeInstallPromptEvent = Event & {
   prompt: () => void
 }

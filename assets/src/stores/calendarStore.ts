@@ -205,7 +205,6 @@ class CalendarStore {
       `/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?${query}`
     )
     const events = response.items as GEvent[]
-    if (events.length == 0) return
     events.forEach((e) => {
       e.email = token.email!
       e.calendar = calendarId

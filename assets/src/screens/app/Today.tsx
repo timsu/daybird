@@ -13,7 +13,7 @@ import InsertTasksButton from '@/components/task/InsertTasksButton'
 import { paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
-import { uiStore } from '@/stores/uiStore'
+import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -42,7 +42,7 @@ export default (props: Props) => {
   }
 
   // on first navigate, open calendar
-  useEffect(() => uiStore.calendarOpen.set(window.innerWidth > 700), [])
+  useEffect(() => uiStore.calendarOpen.set(window.innerWidth > CALENDAR_OPEN_WIDTH), [])
 
   useEffect(() => {
     uiStore.calendarDate.set(date)

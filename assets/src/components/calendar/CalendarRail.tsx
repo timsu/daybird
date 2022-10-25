@@ -5,7 +5,7 @@ import { useEffect } from 'preact/hooks'
 import Calendar from '@/components/calendar/Calendar'
 import DayView from '@/components/calendar/DayView'
 import { paths } from '@/config'
-import { uiStore } from '@/stores/uiStore'
+import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
 import { useStore } from '@nanostores/preact'
 
 export default function () {
@@ -16,7 +16,7 @@ export default function () {
   useEffect(() => {
     if (location.pathname != paths.TODAY) return
     const onResize = () => {
-      const shouldBeOpen = window.innerWidth > 700
+      const shouldBeOpen = window.innerWidth > CALENDAR_OPEN_WIDTH
       if (calendarOpen != shouldBeOpen) uiStore.calendarOpen.set(shouldBeOpen)
     }
     window.addEventListener('resize', onResize)
@@ -32,7 +32,7 @@ export default function () {
   return (
     <>
       <div className="w-52 relative">
-        <div className="w-52 border-l fixed top-0 right-0 flex flex-col h-full pt-[49px]">
+        <div className="w-52 bg-white border-l fixed top-0 right-0 flex flex-col h-full pt-[49px]">
           <Calendar currentDate={selectedDate} onSelect={onSelectDate} />
           <hr className="my-4" />
           <DayView date={selectedDate} />
