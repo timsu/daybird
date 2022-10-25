@@ -6,7 +6,7 @@ import GoogleServerOAuth, {
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
 import Submit from '@/components/core/Submit'
-import { paths } from '@/config'
+import { OAuthProvider, paths } from '@/config'
 import AuthForm from '@/screens/auth/AuthForm'
 import { authStore } from '@/stores/authStore'
 import { unwrapError } from '@/utils'
@@ -16,8 +16,9 @@ export default () => {
   const [email, setEmail] = useState<string>()
   const [password, setPassword] = useState<string>()
   const [error, setError] = useState<string>()
+  const [submitting, setSubmitting] = useState<boolean>(false)
 
-  const onSubmit = (e: Event) => {
+  const onSubmit = async (e: Event) => {
     e.preventDefault()
 
     // read directly from elements due to password manager auto-fill
@@ -26,10 +27,26 @@ export default () => {
     if (!email) return setError('Email is required')
     if (!password) return setError('Password is required')
 
-    authStore.signIn(email, password).catch((e) => setError(unwrapError(e)))
+    try {
+      setSubmitting(true)
+      await authStore.signIn(email, password)
+    } catch (e) {
+      setError(unwrapError(e))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const signInGoogle = async (response: GoogleResponse) => {}
+  const signInGoogle = async (response: GoogleResponse) => {
+    try {
+      setSubmitting(true)
+      await authStore.logInElseSignUpOAuth(OAuthProvider.GOOGLE, response.id_token!)
+    } catch (e) {
+      setError(unwrapError(e))
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <AuthForm title="Sign in to your account">
@@ -76,7 +93,7 @@ export default () => {
                 </div> */}
         </div>
 
-        <Submit label="Sign in" />
+        <Submit label="Sign in" disabled={submitting} />
 
         <ErrorMessage error={error} />
 

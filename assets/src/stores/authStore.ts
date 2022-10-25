@@ -3,7 +3,7 @@ import { route } from 'preact-router'
 import { v4 as uuid } from 'uuid'
 
 import { API } from '@/api'
-import { config, LS_AUTH_TOKENS, paths } from '@/config'
+import { config, LS_AUTH_TOKENS, OAuthProvider, paths } from '@/config'
 import { AuthTokenPair, Project, User } from '@/models'
 import { logger } from '@/utils'
 
@@ -82,6 +82,15 @@ class AuthStore {
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
 
+    location.href = paths.TODAY
+  }
+
+  logInElseSignUpOAuth = async (provider: OAuthProvider, token: string) => {
+    logger.info(`AUTH —— logInElseSignUpOAuth`, provider, token)
+
+    const response = await API.logInElseSignUpOAuth(provider, token)
+    const tokens = { refresh: { token: response.token! } }
+    this.saveTokens(tokens)
     location.href = paths.TODAY
   }
 
