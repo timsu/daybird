@@ -104,7 +104,7 @@ export default () => {
 
       <div className="mt-6 flex justify-center">
         <GoogleServerOAuth
-          desc="Sign in with Google"
+          desc="Sign up with Google"
           scope={PROFILE_SCOPES}
           onSuccess={signUpGoogle}
         />
