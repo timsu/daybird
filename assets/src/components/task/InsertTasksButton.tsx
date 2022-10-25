@@ -14,18 +14,15 @@ import { Dialog, Transition } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
 import { JSONContent } from '@tiptap/react'
 
-export default function ({ date }: { date: Date }) {
+export default function () {
   const currentProject = useStore(projectStore.currentProject)
   const allTasks = useStore(taskStore.taskList)
 
   const [open, setOpen] = useState<HTMLElement | null>(null)
-  const today = new Date()
 
   useEffect(() => {
     if (currentProject) taskStore.loadTasks(currentProject!)
   }, [currentProject?.id])
-
-  if (isBefore(date, startOfDay(today))) return null
 
   if (!open && allTasks.length == 0) return null
 

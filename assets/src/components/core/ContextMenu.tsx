@@ -79,6 +79,7 @@ export const ContextMenuItem = (props: RenderableProps<ContextMenuItemProps>) =>
 type TriggerProps = {
   id: string
   data?: any
+  className?: string
 }
 
 export const ContextMenuTrigger = (props: RenderableProps<TriggerProps>) => {
@@ -87,7 +88,11 @@ export const ContextMenuTrigger = (props: RenderableProps<TriggerProps>) => {
     triggerContextMenu(e.clientX, e.clientY, props.id, props.data)
   }
   return (
-    <span onContextMenu={onContextMenu} style="-webkit-touch-callout: none">
+    <span
+      onContextMenu={onContextMenu}
+      style="-webkit-touch-callout: none"
+      className={props.className}
+    >
       {props.children}
     </span>
   )

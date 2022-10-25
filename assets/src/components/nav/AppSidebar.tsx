@@ -16,6 +16,7 @@ import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { isMobile } from '@/utils/os'
 import { CalendarIcon, CheckIcon, HomeIcon, SearchIcon } from '@heroicons/react/outline'
@@ -118,6 +119,9 @@ function Links() {
 function Projects() {
   const project = useStore(projectStore.currentProject)
 
+  // in order to nest context menu inside sidebar, we must mount it inside the other dialog
+  const sidebarOpen = useStore(uiStore.sidebarOpen)
+
   if (!project) return null
 
   useEffect(() => {
@@ -127,6 +131,14 @@ function Projects() {
   return (
     <>
       <ProjectTree project={project} />
+      {!sidebarOpen && <SidebarModals />}
+    </>
+  )
+}
+
+export function SidebarModals() {
+  return (
+    <>
       <NewFileModal />
       <DeleteFileModal />
       <FileContextMenu />
@@ -160,8 +172,6 @@ function ProjectTree({ project }: { project: Project }) {
         <div class="m-4 mb-2 text-gray-500 font-semibold text-sm">NOTES</div>
 
         <FileTree projectId={project.id} />
-
-        <div className="flex-1" />
 
         <div className="flex m-2 opacity-100 sm:opacity-30 group-hover:opacity-100 transition-opacity">
           <Pressable className="flex-1" onClick={onNewFile(FileType.DOC)}>
