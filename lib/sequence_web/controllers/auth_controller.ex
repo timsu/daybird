@@ -58,7 +58,6 @@ defmodule SequenceWeb.AuthController do
   end
 
   def log_in_else_sign_up_oauth(conn, %{"provider" => "google", "token" => token} = params) do
-    invite = Map.get(params, "invite")
     case find_user_by_google_token(token) do
       {:error, message} -> {:error, :unauthorized, message}
 
@@ -75,15 +74,6 @@ defmodule SequenceWeb.AuthController do
         end
 
       {:ok, user} ->
-        if params["origin_type"] != "meeting" do
-          with {:ok, invite, team} <- Invites.validate_invite(invite, user) do
-            if invite do
-              Invites.join_team(user, invite, team)
-              if user.primary_team_id != team.id, do: Users.update_user(user, %{ primary_team_id: team.id })
-            end
-          end
-        end
-
         sign_in_success(conn, user)
     end
   end
