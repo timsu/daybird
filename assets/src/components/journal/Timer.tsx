@@ -75,7 +75,7 @@ export default function () {
           onClick={(e) => {
             !open && setOpen(true)
           }}
-          class="py-1 px-1 sm:px-4 bg-orange-600 hover:bg-orange-400"
+          class="py-1 px-1 sm:px-4"
         >
           Timer
         </Button>
