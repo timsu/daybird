@@ -8,6 +8,7 @@ import Helmet from '@/components/core/Helmet'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import Document from '@/components/editor/Document'
+import Actions from '@/components/journal/Actions'
 import DocMenu from '@/components/menus/DocMenu'
 import { Project } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -57,6 +58,7 @@ export default (props: Props) => {
             >
               <DotsHorizontalIcon className="h-4 w-4 text-gray-400" />
             </Pressable>
+            <Actions />
           </div>
         </div>
         <DocMenu />

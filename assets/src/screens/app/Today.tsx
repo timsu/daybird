@@ -1,4 +1,4 @@
-import { addDays, format, isSameDay, parse, subDays } from 'date-fns'
+import { addDays, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
@@ -6,6 +6,7 @@ import Helmet from '@/components/core/Helmet'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import Document from '@/components/editor/Document'
+import Actions from '@/components/journal/Actions'
 import DailyPrompt from '@/components/journal/DailyPrompt'
 import ReflectButton from '@/components/journal/ReflectButton'
 import DocMenu from '@/components/menus/DocMenu'
@@ -49,7 +50,9 @@ export default (props: Props) => {
     setTimeout(() => window.editor?.commands.focus(), 50)
   }, [date])
 
-  const isToday = isSameDay(date, new Date())
+  const today = startOfDay(new Date())
+  const isToday = isSameDay(date, today)
+  const showActions = isAfter(date, today)
   const title = isToday ? 'Today' : format(date, 'EEEE MMMM do')
 
   useEffect(() => {
@@ -89,9 +92,7 @@ export default (props: Props) => {
             <DotsHorizontalIcon className="h-4 w-4 text-gray-400" />
           </Pressable>
 
-          <InsertTasksButton date={date} />
-
-          <ReflectButton date={date} />
+          {showActions && <Actions />}
 
           <div class="flex-1" />
 
