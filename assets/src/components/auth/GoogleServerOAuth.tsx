@@ -106,7 +106,7 @@ export default function GoogleServerOAuth(props: Props) {
 
   const onLoginFail = (response: { error: string }) => {
     if (!response) return
-    displayError(`Login failed. ${response.error}`, false)
+    displayError(`Connect failed: ${response.error}`, false)
   }
 
   const onLoginSuccess = useCallback(
