@@ -76,3 +76,11 @@ span.grippy::after {
   a { color: #50567d }
   a:hover { text-decoration: underline }
 }
+
+.blink {
+  animation: blinker 1s step-start infinite;
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}

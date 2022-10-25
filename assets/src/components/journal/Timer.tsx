@@ -4,7 +4,7 @@ import { useEffect, useState } from 'preact/hooks'
 import Button from '@/components/core/Button'
 import Tooltip from '@/components/core/Tooltip'
 import TimerModal from '@/components/journal/TimerModal'
-import { timeToString } from '@/utils'
+import { classNames, timeToString } from '@/utils'
 import { PauseIcon, PlayIcon, XIcon } from '@heroicons/react/outline'
 
 type TimerState = {
@@ -17,11 +17,13 @@ export default function () {
   const [timerState, setTimerState] = useState<TimerState | null>(null)
 
   const startTimer = (duration: number) => {
-    setTimerState({ timerStart: Date.now(), duration: 5 })
+    setTimerState({ timerStart: Date.now(), duration })
   }
 
   if (timerState) {
     const paused = !timerState.timerStart
+    const done = !timerState.duration
+
     const onDone = () => {
       setTimerState({ duration: 0, timerStart: 0 })
       const audio = new Audio('/sounds/good.m4a')
@@ -30,7 +32,7 @@ export default function () {
 
     return (
       <>
-        <div class="text-xl text-orange-600 w-16 text-center">
+        <div class={classNames('text-xl text-orange-600 w-16 text-center', done ? 'blink' : '')}>
           {paused ? (
             timeToString(timerState.duration)
           ) : (
