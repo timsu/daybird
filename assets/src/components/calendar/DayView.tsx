@@ -14,7 +14,9 @@ import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, RefreshIcon } from '@heroicons/react/outline'
+import {
+    CheckIcon, ChevronDownIcon, ChevronUpIcon, RefreshIcon, TrashIcon
+} from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type Props = { date: Date }
@@ -186,10 +188,15 @@ function Calendars() {
   const [expanded, setExpanded] = useState(false)
   const calendars = useStore(calendarStore.calendars)
   const enabled = useStore(calendarStore.calendarsEnabled)
+  const accountError = useStore(calendarStore.accountError)
 
   const onConnect = async (response: GoogleResponse) => {
     calendarStore.saveGoogleOAuthToken(response)
   }
+
+  useEffect(() => {
+    if (Object.keys(accountError).length > 0) setExpanded(true)
+  }, [accountError])
 
   return (
     <div class="flex flex-col">
@@ -203,7 +210,15 @@ function Calendars() {
       {expanded &&
         Object.keys(calendars).map((email) => (
           <div class="px-3">
-            <div class="text-sm font-semibold py-1">{email}</div>
+            <div class="flex py-1 group">
+              <div class="text-sm font-semibold flex-1">{email}</div>
+              <Pressable onClick={() => calendarStore.disconnectAccount(email)}>
+                <TrashIcon class="h-3 w-3 hidden group-hover:block" />
+              </Pressable>
+            </div>
+            {accountError[email] && (
+              <div className="my-2 text-center text-red-600">{accountError[email]}</div>
+            )}
             {calendars[email].map((cal) => {
               const checked = calendarStore.isCalendarEnabled(enabled, cal)
               const colors = calendarStore.colors[email]
