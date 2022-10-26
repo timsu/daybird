@@ -39,6 +39,8 @@ class CalendarStore {
 
   error = atom<string | undefined>()
 
+  accountError = map<{ [email: string]: string | undefined }>({})
+
   loading = atom<boolean>(false)
 
   calendars = map<CalendarsMap>({})
@@ -118,11 +120,18 @@ class CalendarStore {
 
   fetchCalendars = async () => {
     this.loading.set(true)
+    this.error.set(undefined)
+    this.accountError.set({})
     try {
-      await Promise.all(this.tokens.get()!.map((t) => this.fetchCalendarForToken(t)))
+      await Promise.all(
+        this.tokens.get()!.map((t) => {
+          this.fetchCalendarForToken(t).catch((e) => {
+            this.accountError.setKey(t.email!, unwrapError(e))
+          })
+        })
+      )
     } catch (e) {
       logger.warn(e)
-      this.error.set(unwrapError(e, 'Error fetching calendar', false))
     } finally {
       this.loading.set(false)
     }
@@ -173,7 +182,11 @@ class CalendarStore {
   fetchEvents = async (date: Date) => {
     if (this.loading.get()) return
     try {
-      await Promise.all(this.tokens.get()!.map((t) => this.fetchEventsForToken(t, date)))
+      await Promise.all(
+        this.tokens.get()!.map((t) => {
+          this.fetchEventsForToken(t, date)
+        })
+      )
     } catch (e) {
       logger.warn(e)
       this.error.set(unwrapError(e))
@@ -191,7 +204,9 @@ class CalendarStore {
     await Promise.all(
       calendars.map(async (cal) => {
         if (!this.isCalendarEnabled(enabled, cal)) return
-        this.fetchEventsForCalendar(validated, cal.id, date)
+        this.fetchEventsForCalendar(validated, cal.id, date).catch((e) => {
+          this.accountError.setKey(token.email!, unwrapError(e))
+        })
       })
     )
   }

@@ -186,10 +186,15 @@ function Calendars() {
   const [expanded, setExpanded] = useState(false)
   const calendars = useStore(calendarStore.calendars)
   const enabled = useStore(calendarStore.calendarsEnabled)
+  const accountError = useStore(calendarStore.accountError)
 
   const onConnect = async (response: GoogleResponse) => {
     calendarStore.saveGoogleOAuthToken(response)
   }
+
+  useEffect(() => {
+    if (Object.keys(accountError).length > 0) setExpanded(true)
+  }, [accountError])
 
   return (
     <div class="flex flex-col">
@@ -204,6 +209,9 @@ function Calendars() {
         Object.keys(calendars).map((email) => (
           <div class="px-3">
             <div class="text-sm font-semibold py-1">{email}</div>
+            {accountError[email] && (
+              <div className="my-2 text-center text-red-600">{accountError[email]}</div>
+            )}
             {calendars[email].map((cal) => {
               const checked = calendarStore.isCalendarEnabled(enabled, cal)
               const colors = calendarStore.colors[email]
