@@ -15,6 +15,12 @@ type Props = {
 
 export default ({ open, close, performAction }: RenderableProps<Props>) => {
   const [duration, setDuration] = useState('25')
+
+  const quickDuration = (minutes: number) => {
+    performAction(minutes * 60)
+    close()
+  }
+
   const submit = async (e: Event) => {
     e.preventDefault()
 
@@ -42,6 +48,14 @@ export default ({ open, close, performAction }: RenderableProps<Props>) => {
             onChange={(e) => setDuration((e.target as HTMLInputElement).value)}
             className="text-xl"
           />
+        </div>
+
+        <div class="mt-3 flex justify-between gap-1">
+          {[2, 5, 10, 15, 25, 60].map((d) => (
+            <Button class="block flex-1 text-center" onClick={() => quickDuration(d)}>
+              {d}
+            </Button>
+          ))}
         </div>
 
         <div className="mt-5 sm:mt-6 flex justify-between">

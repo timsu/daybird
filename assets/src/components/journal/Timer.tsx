@@ -5,11 +5,12 @@ import Button from '@/components/core/Button'
 import Tooltip from '@/components/core/Tooltip'
 import TimerModal from '@/components/journal/TimerModal'
 import { classNames, timeToString } from '@/utils'
-import { PauseIcon, PlayIcon, XIcon } from '@heroicons/react/outline'
+import { PauseIcon, PlayIcon, RefreshIcon, XIcon } from '@heroicons/react/outline'
 
 type TimerState = {
   timerStart: number
   duration: number
+  original: number
 }
 
 export default function () {
@@ -17,7 +18,7 @@ export default function () {
   const [timerState, setTimerState] = useState<TimerState | null>(null)
 
   const startTimer = (duration: number) => {
-    setTimerState({ timerStart: Date.now(), duration })
+    setTimerState({ timerStart: Date.now(), duration, original: duration })
   }
 
   if (timerState) {
@@ -25,9 +26,24 @@ export default function () {
     const done = !timerState.duration
 
     const onDone = () => {
-      setTimerState({ duration: 0, timerStart: 0 })
+      setTimerState({ duration: 0, timerStart: 0, original: timerState.original })
       const audio = new Audio('/sounds/good.m4a')
       audio.play()
+    }
+
+    const ActionIcon = done ? RefreshIcon : paused ? PlayIcon : PauseIcon
+    const actionColor =
+      paused || done ? 'bg-blue-600 hover:bg-blue-400' : 'bg-orange-600 hover:bg-orange-400'
+    const actionClick = () => {
+      setTimerState({
+        duration: done
+          ? timerState.original
+          : paused
+          ? timerState.duration
+          : timerState.duration - Math.floor((Date.now() - timerState.timerStart) / 1000),
+        timerStart: paused || done ? Date.now() : 0,
+        original: timerState.original,
+      })
     }
 
     return (
@@ -39,24 +55,9 @@ export default function () {
             <TimeLeft state={timerState} onDone={onDone} />
           )}
         </div>
-        {timerState.duration > 0 && (
-          <Button
-            onClick={() =>
-              setTimerState({
-                duration: paused
-                  ? timerState.duration
-                  : timerState.duration - Math.floor((Date.now() - timerState.timerStart) / 1000),
-                timerStart: paused ? Date.now() : 0,
-              })
-            }
-            class={
-              'py-1 px-1 sm:px-4 ' +
-              (paused ? 'bg-blue-600 hover:bg-blue-400' : 'bg-orange-600 hover:bg-orange-400')
-            }
-          >
-            {paused ? <PlayIcon class="w-5 h-5" /> : <PauseIcon class="w-5 h-5" />}
-          </Button>
-        )}
+        <Button onClick={actionClick} class={'py-1 px-1 sm:px-4 ' + actionColor}>
+          <ActionIcon class="w-5 h-5" />
+        </Button>
         <Button
           onClick={() => setTimerState(null)}
           class="py-1 px-1 sm:px-4 bg-gray-600 hover:bg-gray-400"
