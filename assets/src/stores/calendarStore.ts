@@ -116,6 +116,15 @@ class CalendarStore {
     }
   }
 
+  disconnectAccount = (email: string) => {
+    if (!confirm('Disconnect ' + email + "'s calendar?")) return
+
+    API.deleteOAuthToken(GOOGLE_CAL, email)
+    this.tokens.set(this.tokens.get()?.filter((t) => t.email != email))
+    this.events.set({})
+    this.fetchCalendars()
+  }
+
   // --- calendar loading
 
   fetchCalendars = async () => {
