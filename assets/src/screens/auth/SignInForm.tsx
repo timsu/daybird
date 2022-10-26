@@ -3,6 +3,7 @@ import { useState } from 'preact/hooks'
 import GoogleServerOAuth, {
     GoogleResponse, PROFILE_SCOPES
 } from '@/components/auth/GoogleServerOAuth'
+import Checkbox from '@/components/core/Checkbox'
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
 import Submit from '@/components/core/Submit'
@@ -72,19 +73,13 @@ export default () => {
         />
 
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              id="remember-me"
-              name="remember-me"
-              type="checkbox"
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              checked={remember}
-              onChange={(e) => setRemember((e.target as HTMLInputElement).checked)}
-            />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-              Remember me
-            </label>
-          </div>
+          <Checkbox
+            id="remember-me"
+            name="remember-me"
+            checked={remember}
+            setChecked={setRemember}
+            label="Remember me"
+          />
 
           {/* <div className="text-sm">
                   <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
