@@ -18,6 +18,8 @@ class TopicStore {
   // --- topicflow initialization
 
   initTopicflow = () => {
+    if (authStore.debugMode()) (window as any)['topicStore'] = topicStore
+
     const clientId = authStore.clientId
     const type = 'main'
     this.token = authStore.authTokens.get()?.access?.token

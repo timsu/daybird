@@ -3,6 +3,7 @@ import { RouterOnChangeArgs } from 'preact-router'
 
 import { config } from '@/config'
 import { File, User } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
@@ -51,6 +52,7 @@ class UIStore {
   })
 
   initLoggedInUser = (user: User) => {
+    if (authStore.debugMode()) (window as any)['uiStore'] = uiStore
     topicStore.initTopicflow()
 
     const recentFiles = localStorage.getItem(LS_RECENT_FILES)
@@ -116,4 +118,3 @@ class UIStore {
 }
 
 export const uiStore = new UIStore()
-if (config.dev) (window as any)['uiStore'] = uiStore

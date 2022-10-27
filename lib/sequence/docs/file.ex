@@ -31,5 +31,6 @@ defmodule Sequence.Docs.File do
     |> Repo.generate_uuid
     |> validate_required([:uuid, :name, :type, :project_id, :creator_id])
     |> Repo.truncate(:name, 100)
+    |> unique_constraint(:uuid)
   end
 end

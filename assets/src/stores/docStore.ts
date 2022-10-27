@@ -5,6 +5,7 @@ import { API } from '@/api'
 import { NODE_NAME } from '@/components/editor/TaskItem'
 import { config } from '@/config'
 import { Project } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { fileStore } from '@/stores/fileStore'
 import { taskStore } from '@/stores/taskStore'
 import { logger, unwrapError } from '@/utils'
@@ -31,6 +32,8 @@ class DocStore {
   // --- actions
 
   loadDoc = async (project: Project, id: string) => {
+    if (authStore.debugMode()) (window as any)['docStore'] = docStore
+
     this.id.set(id)
     this.title.set(undefined)
     this.document.set(undefined)
@@ -93,4 +96,3 @@ class DocStore {
 }
 
 export const docStore = new DocStore()
-if (config.dev) (window as any)['docStore'] = docStore

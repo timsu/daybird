@@ -62,6 +62,7 @@ class AuthStore {
     }
     // on occasion, hot module reload doesn't update properly without timeout
     if (config.dev) setTimeout(() => this.loggedInUser.notify(), 500)
+    if (this.debugMode()) (window as any)['authStore'] = authStore
   }
 
   saveTokens = async (tokens: AuthTokenPair) => {
@@ -108,6 +109,13 @@ class AuthStore {
     location.href = paths.SIGNIN
   }
 
+  debugMode = () => {
+    if (config.dev) return true
+    const user = this.loggedInUser.get()
+    if (!user) return false
+    return user.email?.includes('@listnote.co') || user.email?.includes('@daybird.app')
+  }
+
   // --- user management
 
   updateUser = action(this.loggedInUser, 'updateUser', async (store, updates: Partial<User>) => {
@@ -118,4 +126,3 @@ class AuthStore {
 }
 
 export const authStore = new AuthStore()
-if (config.dev) (window as any)['authStore'] = authStore

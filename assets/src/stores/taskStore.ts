@@ -4,6 +4,7 @@ import { API } from '@/api'
 import { EphemeralTopic } from '@/api/topicflowTopic'
 import { config } from '@/config'
 import { Project, Task } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { assertIsDefined, logger } from '@/utils'
@@ -33,6 +34,8 @@ class TaskStore {
   })
 
   loadTasks = async (project: Project) => {
+    if (authStore.debugMode()) (window as any)['taskStore'] = taskStore
+
     this.taskList.set([])
 
     const response = await API.listTasks(project)
@@ -106,4 +109,3 @@ class TaskStore {
 }
 
 export const taskStore = new TaskStore()
-if (config.dev) (window as any)['taskStore'] = taskStore

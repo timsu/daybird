@@ -7,6 +7,7 @@ import { API, OAuthTokenResponse } from '@/api'
 import { GoogleResponse } from '@/components/auth/GoogleServerOAuth'
 import { config, GCalendar, GColors, GEvent } from '@/config'
 import { GOOGLE_CAL, OAuthToken } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { uiStore } from '@/stores/uiStore'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
 
@@ -54,6 +55,8 @@ class CalendarStore {
   // --- token management
 
   init = async () => {
+    if (authStore.debugMode()) (window as any)['calendarStore'] = calendarStore
+
     API.getOAuthTokens(GOOGLE_CAL).then((response) => {
       const tokens = response.tokens.map((t) => OAuthToken.fromJSON(t))
       logger.info('[cal] got tokens', tokens)
@@ -252,4 +255,3 @@ class CalendarStore {
 }
 
 export const calendarStore = new CalendarStore()
-if (config.dev) (window as any)['calendarStore'] = calendarStore

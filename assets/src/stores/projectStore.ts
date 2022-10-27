@@ -25,6 +25,8 @@ class ProjectStore {
   // --- actions
 
   updateProjects = action(this.projects, 'updateProjects', (store, projects: Project[]) => {
+    if (authStore.debugMode()) (window as any)['projectStore'] = projectStore
+
     logger.info('PROJECTS - update', projects)
     store.set(projects)
     this.activeProjects.set(projects.filter((p) => !p.archived_at && !p.deleted_at))
@@ -52,7 +54,7 @@ class ProjectStore {
       const projectId = typeof projectOrId == 'string' ? projectOrId : projectOrId.id
 
       if (store.get()?.id != projectId) {
-        const project = this.projects.get().find((p) => p.id == projectId)
+        const project: Project | undefined = this.projects.get().find((p) => p.id == projectId)
         if (project) {
           store.set(project)
           const user = authStore.loggedInUser.get()
@@ -134,6 +136,5 @@ function hasMembers(
 }
 
 export const projectStore = new ProjectStore()
-if (config.dev) (window as any)['projectStore'] = projectStore
 
 export const getProject = (projectId: string) => projectStore.projectMap.get()[projectId]
