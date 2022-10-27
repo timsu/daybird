@@ -102,7 +102,11 @@ function OngoingTimer({ timerState, setTimerState, setFullscreen, textClass }: T
   return (
     <>
       <div
-        class={twMerge('text-xl text-orange-600 w-16 text-center', done ? 'blink' : '', textClass)}
+        class={twMerge(
+          'text-xl text-orange-600 w-16 text-center font-mono',
+          done ? 'blink' : '',
+          textClass
+        )}
         onClick={() => setFullscreen((s) => !s)}
       >
         {paused ? (
