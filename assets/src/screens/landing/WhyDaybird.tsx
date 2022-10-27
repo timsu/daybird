@@ -70,8 +70,8 @@ export default function WhyDaybird() {
           </h1>
           <p className="mt-8 text-xl leading-8">
             Daybird exists to empower a specific workflow: daily planning with a journal. If you’ve
-            tried Bullet Journal, you’ll be familiar with the method — every day you start with a
-            blank page and figure out what to do.
+            tried Bullet Journal, you’ll be familiar with the method of starting every day with a
+            blank page to fill.
           </p>
           <p className="mt-8 leading-8">
             Unlike other productivity tools, Daybird helps you stay in control of your time. You can
@@ -83,7 +83,15 @@ export default function WhyDaybird() {
             <a href="https://timsu.org" target="_blank" className="text-lavender-300 font-semibold">
               Tim Su
             </a>{' '}
-            and is open-source software, so you can also host it yourself or customize it to fit
+            (creator of{' '}
+            <a
+              href="https://en.wikipedia.org/wiki/Astrid_(application)"
+              target="_blank"
+              className="font-semibold"
+            >
+              Astrid
+            </a>
+            ) and is open-source software, so you can also host it yourself or customize it to fit
             your workflow better.
           </p>
         </div>

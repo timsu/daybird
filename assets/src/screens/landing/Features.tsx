@@ -7,19 +7,19 @@ const features = [
   {
     name: 'Write about it',
     description:
-      'Write daily notes and as well as named notes in folders. Use reflection prompts to go deeper each day.',
+      'Write daily notes and as well as named notes in folders with our beautiful Markdown-supported editor.',
     icon: PencilAltIcon,
   },
   {
-    name: 'Schedule it',
+    name: 'Plan your day',
     description:
-      'View your calendar from your daily journal page to organize blocks of deep work while not missing your meetings.',
+      'Add your personal and work Google Calendar to get an overview of your day and prepare for your meetings.',
     icon: CalendarIcon,
   },
   {
     name: 'Get it done',
     description:
-      'Access tasks across all your notes. When planning out your day, check for open tasks for things you may want to get done today.',
+      'Access tasks across all your notes. Each day, check for open tasks for things you may want to get done today.',
     icon: CheckIcon,
   },
   {
@@ -37,7 +37,7 @@ const features = [
   {
     name: 'Synced and secured',
     description:
-      'Notes are encrypted in the cloud so you can write from everywhere with peace of mind. You can also host your own Daybird instance.',
+      'Notes are encrypted in the cloud so you can safely write from anywhere. You can also host a private Daybird instance.',
     icon: LockClosedIcon,
   },
 ]

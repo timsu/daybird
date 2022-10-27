@@ -22,8 +22,8 @@ export default () => (
                 <div className="text-lavender-600">notes, tasks, and calendar</div>
               </h1>
               <p className="mt-6 text-xl text-gray-500 leading-normal">
-                Daybird is the premier daily journal for creative thinkers and teams. Start with a
-                clean slate each day and decide what is important.
+                Daybird is the premier daily journal for creative thinkers and teams. Take control
+                of your day and decide what is important.
               </p>
               <div className="mt-10 flex flex-col items-center">
                 <a
