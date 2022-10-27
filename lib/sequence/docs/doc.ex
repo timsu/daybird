@@ -22,5 +22,6 @@ defmodule Sequence.Docs.Doc do
     |> cast(attrs, [:uuid, :project_id, :contents, :bindata])
     |> Repo.generate_uuid
     |> validate_required([:uuid, :project_id])
+    |> unique_constraint(:uuid)
   end
 end
