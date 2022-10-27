@@ -81,7 +81,7 @@ function Links() {
                 focus:border-transparent sm:text-sm cursor-pointer flex items-center"
               onClick={() => modalStore.quickFindModal.set(true)}
             >
-              Navigate {!isMobile && `(${ctrlOrCommand()}+O)`}
+              Navigate {!isMobile && `(${ctrlOrCommand()}+P)`}
             </div>
           </div>
         </form>

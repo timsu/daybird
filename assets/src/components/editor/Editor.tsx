@@ -124,7 +124,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     if (contentType == 'json') {
       setTimeout(() => editor.commands.setContent(initialContent), 0)
     }
-    setTimeout(() => editor.commands.focus(), 0)
+    setTimeout(() => editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run(), 50)
 
     return { editor, ydoc }
   }, [id, initialContent])
