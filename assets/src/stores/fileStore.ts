@@ -8,6 +8,7 @@ import { config, paths } from '@/config'
 import {
     File, fileListToTree, FileType, makeTreeFile, Project, sortFiles, TreeFile
 } from '@/models'
+import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { topicStore } from '@/stores/topicStore'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
@@ -57,6 +58,8 @@ class FileStore {
   })
 
   loadFiles = async (project: Project) => {
+    if (authStore.debugMode()) (window as any)['fileStore'] = fileStore
+
     const response = await API.listFiles(project)
     const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
 
