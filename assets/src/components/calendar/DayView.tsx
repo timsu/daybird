@@ -10,6 +10,7 @@ import Loader from '@/components/core/Loader'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import { config, GEvent } from '@/config'
+import { User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { uiStore } from '@/stores/uiStore'
@@ -29,13 +30,6 @@ export default function DayView({ date }: Props) {
     calendarStore.init()
   }, [])
 
-  if (
-    !config.dev &&
-    !user?.email?.includes('@listnote.co') &&
-    !user?.email?.includes('@daybird.app')
-  )
-    return null
-
   return (
     <div class="flex-1 flex flex-col overflow-hidden">
       {tokens != undefined && tokens.length == 0 && <ConnectCalendar />}
@@ -47,9 +41,16 @@ export default function DayView({ date }: Props) {
 
 function ConnectCalendar() {
   const error = useStore(calendarStore.error)
+  const user = useStore(authStore.loggedInUser)
+
+  if (User.meta(user).nc) return null
 
   const onConnect = async (response: GoogleResponse) => {
     await calendarStore.saveGoogleOAuthToken(response)
+  }
+
+  const hide = () => {
+    authStore.updateUser({ meta: { nc: 1 } })
   }
 
   return (
@@ -64,6 +65,10 @@ function ConnectCalendar() {
       />
 
       <ErrorMessage error={error} />
+
+      <Pressable className="text-gray-500 mt-8 text-sm" onClick={hide}>
+        hide
+      </Pressable>
     </div>
   )
 }

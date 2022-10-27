@@ -34,4 +34,7 @@ export class UserMeta {
 
   /** last file */
   lf?: string
+
+  /** no-calendars */
+  nc?: number
 }

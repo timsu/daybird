@@ -1,7 +1,7 @@
 import { RenderableProps } from 'preact'
+import { twMerge } from 'tailwind-merge'
 
 import Tooltip, { TooltipProps } from '@/components/core/Tooltip'
-import { classNames } from '@/utils'
 
 export default ({
   tooltip,
@@ -16,9 +16,9 @@ export default ({
 }>) => {
   const contents = (
     <div
-      className={classNames(
-        'relative flex flex-col items-center group p-1 rounded cursor-pointer print:hidden',
-        className || 'hover:bg-gray-400/50'
+      className={twMerge(
+        'relative flex flex-col items-center group p-1 rounded cursor-pointer print:hidden hover:bg-gray-400/50',
+        className || ''
       )}
       onClick={onClick}
     >
