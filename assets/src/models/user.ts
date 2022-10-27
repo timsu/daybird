@@ -37,4 +37,7 @@ export class UserMeta {
 
   /** no-calendars */
   nc?: number
+
+  /** onboarded */
+  ob?: number
 }

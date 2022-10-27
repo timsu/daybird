@@ -20,6 +20,8 @@ class ModalStore {
   deleteProjectModal = atom<Project | false>(false)
 
   quickFindModal = atom<boolean>(false)
+
+  onboardingModal = atom<boolean>(false)
 }
 
 export const modalStore = new ModalStore()

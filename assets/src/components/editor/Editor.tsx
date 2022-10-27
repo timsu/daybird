@@ -14,6 +14,7 @@ import { TaskItem } from '@/components/editor/TaskItem'
 import { WikiLink } from '@/components/editor/WikiLink'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
+import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
 import { Editor } from '@tiptap/core'
@@ -124,7 +125,10 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     if (contentType == 'json') {
       setTimeout(() => editor.commands.setContent(initialContent), 0)
     }
-    setTimeout(() => editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run(), 50)
+    setTimeout(() => {
+      if (modalStore.onboardingModal.get()) return
+      editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run()
+    }, 50)
 
     return { editor, ydoc }
   }, [id, initialContent])
