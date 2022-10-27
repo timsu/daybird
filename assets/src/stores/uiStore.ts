@@ -6,6 +6,7 @@ import { File, User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
+import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { logger } from '@/utils'
@@ -59,6 +60,8 @@ class UIStore {
     if (recentFiles) this.recentFiles = JSON.parse(recentFiles)
 
     this.checkForSleep()
+
+    if (!User.meta(user).ob) modalStore.onboardingModal.set(true)
   }
 
   checkForSleep = () => {

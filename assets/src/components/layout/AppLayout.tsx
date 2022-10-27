@@ -4,6 +4,7 @@ import { useEffect, useState } from 'preact/hooks'
 import CalendarRail from '@/components/calendar/CalendarRail'
 import TaskContextMenu from '@/components/menus/TaskContextMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
+import OnboardingModal from '@/components/modals/OnboardingModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
 import AppSidebar from '@/components/nav/AppSidebar'
 import { SidebarMenu } from '@/components/nav/SidebarMenu'
@@ -60,6 +61,7 @@ export default function ({ children }: RenderableProps<{}>) {
         <TaskContextMenu />
         <DeleteTaskModal />
         <QuickFindModal />
+        <OnboardingModal />
       </div>
     </>
   )
