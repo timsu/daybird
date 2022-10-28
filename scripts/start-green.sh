@@ -2,7 +2,7 @@
 
 source ~/.profile
 
-export PORT=4000
-export TF_PORT=4100
+export PORT=5000
+export TF_PORT=5100
 
 mix phx.server
