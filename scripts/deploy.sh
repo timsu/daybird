@@ -21,5 +21,8 @@ DIR=sites/$DEPLOY_VERSION
 ssh app@app.listnote.co "cd $DIR; git fetch && git reset --hard origin/production && \
   ./scripts/build.sh && \
   sudo systemctl restart daybird-$DEPLOY_VERSION && \
+  sleep 5 && \
   sudo ln -sf /etc/nginx/sites-available/$DEPLOY_VERSION /etc/nginx/sites-enabled/daybird && \
-  sudo systemctl reload nginx"
+  sudo systemctl reload nginx &&
+  sleep 5 && \
+  sudo systemctl stop daybird-$LIVE_VERSION"
