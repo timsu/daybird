@@ -136,7 +136,7 @@ function Events({ date }: Props) {
         source: e,
         start: new Date(e.start.dateTime || e.start.date || 0),
         end: new Date(e.end.dateTime || e.start.date || 0),
-        title: e.summary,
+        title: e.summary || '(busy)',
         backgroundColor: getColor(e).background,
       }))
 
@@ -150,13 +150,18 @@ function Events({ date }: Props) {
             view: 'timeGridDay',
             events: calEvents,
             nowIndicator: true,
+            date: date,
+            slotHeight: 20,
           },
         },
       })
     } else {
+      ec.setOption('date', date)
       ec.setOption('events', calEvents)
     }
-  }, [events])
+
+    document.getElementById('ec')?.parentElement?.scrollTo(0, 9999)
+  }, [date, events])
 
   return (
     <>
@@ -166,22 +171,8 @@ function Events({ date }: Props) {
           <RefreshIcon class="text-gray-500 h-3 w-3" />
         </Pressable>
       </div>
-      <div id="ec" class="flex-1 px-3 py-1 text-sm"></div>
+      <div id="ec" class="flex-1 text-sm"></div>
     </>
-  )
-}
-
-function Event({ ev }: { ev: GEvent }) {
-  return (
-    <Tooltip message={cal.summary} class="mb-2">
-      <div
-        style={{ background: color.background, color: color.foreground }}
-        class="p-2 rounded-md text-xs flex-1 cursor-pointer"
-        onClick={() => window.open(ev.htmlLink)}
-      >
-        {ev.summary || '(busy)'}
-      </div>
-    </Tooltip>
   )
 }
 

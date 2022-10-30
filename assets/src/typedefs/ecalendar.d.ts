@@ -3,6 +3,9 @@ declare module '@event-calendar/core' {
     view: string
     events: CalEvent[]
     nowIndicator?: boolean
+    scrollTime?: string
+    date?: Date
+    slotHeight?: number
   }
 
   export type CalendarSettings = {
