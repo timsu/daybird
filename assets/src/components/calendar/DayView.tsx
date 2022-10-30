@@ -1,3 +1,5 @@
+import '@event-calendar/core/index.css'
+
 import { format, getHours } from 'date-fns'
 import { flatten } from 'lodash'
 import { useEffect, useState } from 'preact/hooks'
@@ -15,6 +17,8 @@ import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
+import Calendar from '@event-calendar/core'
+import TimeGrid from '@event-calendar/time-grid'
 import {
     CheckIcon, ChevronDownIcon, ChevronUpIcon, RefreshIcon, TrashIcon
 } from '@heroicons/react/outline'
@@ -24,7 +28,6 @@ type Props = { date: Date }
 
 export default function DayView({ date }: Props) {
   const tokens = useStore(calendarStore.tokens)
-  const user = authStore.loggedInUser.get()
 
   useEffect(() => {
     calendarStore.init()
@@ -32,6 +35,7 @@ export default function DayView({ date }: Props) {
 
   return (
     <div class="flex-1 flex flex-col overflow-hidden">
+      <div id="ec" />
       {tokens != undefined && tokens.length == 0 && <ConnectCalendar />}
 
       {tokens && tokens.length > 0 && <CalendarView date={date} />}
@@ -136,6 +140,20 @@ function Events({ date }: Props) {
     if (startAM == endAM) return `${format(e.start, 'h:mm')} - ${format(e.end, 'h:mm aaa')}`
     return `${format(e.start, 'H:mm aaa')} - ${format(e.end, 'H:mm aaa')}`
   }
+
+  //   let ec = new Calendar({
+  //     target: document.getElementById('ec'),
+  //     props: {
+  //       plugins: [TimeGrid],
+  //       options: {
+  //         view: 'timeGridDay',
+  //         events: [
+  //           // your list of events
+  //         ],
+  //       },
+  //     },
+  //   })
+  // }, [])
 
   return (
     <>
