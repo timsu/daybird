@@ -5,6 +5,7 @@ import GoogleServerOAuth, {
 } from '@/components/auth/GoogleServerOAuth'
 import Helmet from '@/components/core/Helmet'
 import Pressable from '@/components/core/Pressable'
+import { OAuthToken } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
 import { TrashIcon } from '@heroicons/react/outline'
@@ -71,13 +72,18 @@ function CalendarSettings() {
     await calendarStore.saveGoogleOAuthToken(response)
   }
 
+  const deleteToken = (token: OAuthToken) => () => {
+    if (!confirm('Disconnect ' + token.email + '?')) return
+    calendarStore.disconnectAccount(token.email!)
+  }
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700">Calendars</label>
       {tokens?.map((token) => (
-        <div>
+        <div class="flex items-center my-2 gap-4">
           {token.email}
-          <Pressable onClick={() => calendarStore.disconnectAccount(token.email!)}>
+          <Pressable onClick={deleteToken(token)}>
             <TrashIcon class="w-6 h-6" />
           </Pressable>
         </div>
