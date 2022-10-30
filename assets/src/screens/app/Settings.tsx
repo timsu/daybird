@@ -11,7 +11,7 @@ import { calendarStore } from '@/stores/calendarStore'
 import { TrashIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
-export default () => {
+export default (props: { path: string }) => {
   const user = useStore(authStore.loggedInUser)
 
   return (
