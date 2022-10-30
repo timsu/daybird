@@ -2,6 +2,7 @@ import { Fragment } from 'preact'
 
 import Alphatar from '@/components/core/Alphatar'
 import Avatar from '@/components/core/Avatar'
+import { paths } from '@/config'
 import { authStore } from '@/stores/authStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
@@ -9,7 +10,7 @@ import { Menu, Transition } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
 
 const userNavigation = [
-  // { name: 'Your Profile', href: '#' },
+  { name: 'User Settings', href: paths.SETTINGS },
   uiStore.isPWA
     ? null
     : { name: 'Install Daybird App', href: '#', onClick: () => uiStore.installAction() },
