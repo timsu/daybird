@@ -16,4 +16,6 @@ export const paths = {
   TASKS: '/app/tasks',
 
   DOC: '/app/docs',
+
+  SETTINGS: '/app/settings',
 }

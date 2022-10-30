@@ -1,6 +1,9 @@
+import '@event-calendar/core/index.css'
+import './calendar.css'
+
 import { format, getHours } from 'date-fns'
 import { flatten } from 'lodash'
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 
 import GoogleServerOAuth, {
     CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES, scopesInclude
@@ -13,18 +16,18 @@ import { config, GEvent } from '@/config'
 import { User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
-import { uiStore } from '@/stores/uiStore'
-import { logger } from '@/utils'
+import Calendar from '@event-calendar/core'
+import TimeGrid from '@event-calendar/time-grid'
 import {
     CheckIcon, ChevronDownIcon, ChevronUpIcon, RefreshIcon, TrashIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
+import type { CalEvent } from '@event-calendar/core'
 type Props = { date: Date }
 
 export default function DayView({ date }: Props) {
   const tokens = useStore(calendarStore.tokens)
-  const user = authStore.loggedInUser.get()
 
   useEffect(() => {
     calendarStore.init()
@@ -107,35 +110,58 @@ function CalendarView({ date }: Props) {
   )
 }
 
-type Event = {
-  source: GEvent
-  start: Date
-  end: Date
-}
-
 function Events({ date }: Props) {
   const events = useStore(calendarStore.events)
+  const calInstance = useRef<Calendar | undefined>()
 
-  const eventList = flatten(Object.values(events))
+  useEffect(() => {
+    const eventList = flatten(Object.values(events))
 
-  const allDayEvents = eventList.filter((e) => e.start.date)
+    const getColor = (ev: GEvent) => {
+      const cal = calendarStore.calendarData[ev.calendar]
+      const colors = calendarStore.colors[ev.email]
+      return ev.colorId && colors
+        ? colors?.event[ev.colorId]
+        : colors?.calendar[cal.colorId] || {
+            foreground: cal.foregroundColor,
+            background: cal.backgroundColor,
+          }
+    }
 
-  const regularEvents: Event[] = eventList
-    .filter((e) => e.start.dateTime)
-    .map((e) => ({
-      source: e,
-      start: new Date(e.start.dateTime!),
-      end: new Date(e.end.dateTime!),
-    }))
-    .sort((a, b) => a.start.getTime() - b.start.getTime())
+    const calEvents: CalEvent[] = eventList
+      .filter((e) => e.start.dateTime)
+      .map((e) => ({
+        id: e.id,
+        allDay: Boolean(e.start.date),
+        source: e,
+        start: new Date(e.start.dateTime || e.start.date || 0),
+        end: new Date(e.end.dateTime || e.start.date || 0),
+        title: e.summary || '(busy)',
+        backgroundColor: getColor(e).background,
+      }))
 
-  const timeString = (e: Event) => {
-    const startAM = getHours(e.start) < 12
-    const endAM = getHours(e.end) < 12
+    const ec = calInstance.current
+    if (!ec) {
+      calInstance.current = new Calendar({
+        target: document.getElementById('ec')!,
+        props: {
+          plugins: [TimeGrid],
+          options: {
+            view: 'timeGridDay',
+            events: calEvents,
+            nowIndicator: true,
+            date: date,
+            slotHeight: 20,
+          },
+        },
+      })
+    } else {
+      ec.setOption('date', date)
+      ec.setOption('events', calEvents)
+    }
 
-    if (startAM == endAM) return `${format(e.start, 'h:mm')} - ${format(e.end, 'h:mm aaa')}`
-    return `${format(e.start, 'H:mm aaa')} - ${format(e.end, 'H:mm aaa')}`
-  }
+    document.getElementById('ec')?.parentElement?.scrollTo(0, 9999)
+  }, [date, events])
 
   return (
     <>
@@ -145,47 +171,8 @@ function Events({ date }: Props) {
           <RefreshIcon class="text-gray-500 h-3 w-3" />
         </Pressable>
       </div>
-      <div class="flex-1 px-3 py-1 text-sm">
-        {allDayEvents.length > 0 && (
-          <div class="mb-4">
-            <div class="font-semibold">All Day</div>
-            {allDayEvents.map((e) => (
-              <Event ev={e} />
-            ))}
-          </div>
-        )}
-
-        {regularEvents.map((e) => (
-          <div>
-            <div class="font-semibold">{timeString(e)}</div>
-            <Event ev={e.source} />
-          </div>
-        ))}
-      </div>
+      <div id="ec" class="flex-1 text-sm"></div>
     </>
-  )
-}
-
-function Event({ ev }: { ev: GEvent }) {
-  const cal = calendarStore.calendarData[ev.calendar]
-  const colors = calendarStore.colors[ev.email]
-  const color =
-    ev.colorId && colors
-      ? colors?.event[ev.colorId]
-      : colors?.calendar[cal.colorId] || {
-          foreground: cal.foregroundColor,
-          background: cal.backgroundColor,
-        }
-  return (
-    <Tooltip message={cal.summary} class="mb-2">
-      <div
-        style={{ background: color.background, color: color.foreground }}
-        class="p-2 rounded-md text-xs flex-1 cursor-pointer"
-        onClick={() => window.open(ev.htmlLink)}
-      >
-        {ev.summary || '(busy)'}
-      </div>
-    </Tooltip>
   )
 }
 

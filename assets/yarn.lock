@@ -237,6 +237,29 @@
   resolved "https://registry.yarnpkg.com/@esbuild/linux-loong64/-/linux-loong64-0.15.10.tgz#78a42897c2cf8db9fd5f1811f7590393b77774c7"
   integrity sha512-w0Ou3Z83LOYEkwaui2M8VwIp+nLi/NA60lBLMvaJ+vXVMcsARYdEzLNE7RSm4+lSg4zq4d7fAVuzk7PNQ5JFgg==
 
+"@event-calendar/common@~0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@event-calendar/common/-/common-0.13.1.tgz#31a58ea409bd4c9bd2fd8aabf93496f15050fb68"
+  integrity sha512-6TZQdTuDizuHUldeNcu8H+87uMbrZbQ52/RbHqOS3JR7olD1UfVUMomydJxdihmwCZoJcLQ1vRZ6B7rRUoUinA==
+  dependencies:
+    svelte "^3.51.0"
+
+"@event-calendar/core@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@event-calendar/core/-/core-0.13.1.tgz#a199fe00c25d9e907fcc9dfde7b1a7d821726db4"
+  integrity sha512-0o5tlh8rF9WM3SxI9cR8DtS4oFkKpxK9YTMv3x0qiUZgkC/u+cPczL5uD/8Y841LaYSDvhCwebPQhaCp4SQ6NA==
+  dependencies:
+    "@event-calendar/common" "~0.13.1"
+    svelte "^3.51.0"
+
+"@event-calendar/time-grid@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@event-calendar/time-grid/-/time-grid-0.13.1.tgz#97f320e31068f80c84a90269962cec3fef56ab54"
+  integrity sha512-zx4Txw1LS82eNz7ParIPbx3cBEv7GWPEdrTwYRJlsvmt2hWslY/2hEyjKKYdzxOHQh3wRFzSMneiec9DSY03TQ==
+  dependencies:
+    "@event-calendar/common" "~0.13.1"
+    svelte "^3.51.0"
+
 "@headlessui/react@^1.6.6":
   version "1.6.6"
   resolved "https://registry.yarnpkg.com/@headlessui/react/-/react-1.6.6.tgz#3073c066b85535c9d28783da0a4d9288b5354d0c"
@@ -1659,6 +1682,11 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+svelte@^3.51.0:
+  version "3.52.0"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.52.0.tgz#08259eff20904c63882b66a5d409a55e8c6743b8"
+  integrity sha512-FxcnEUOAVfr10vDU5dVgJN19IvqeHQCS1zfe8vayTfis9A2t5Fhx+JDe5uv/C3j//bB1umpLJ6quhgs9xyUbCQ==
 
 tailwind-merge@^1.7.0:
   version "1.7.0"

@@ -1,0 +1,7 @@
+#ec { font-size: 80% }
+.ec-toolbar { display: none }
+.ec-time, .ec-line {
+  height: 20px;
+}
+.ec-body, .ec-header { border: none }
+.ec-all-day { border-left: none; border-right: none }

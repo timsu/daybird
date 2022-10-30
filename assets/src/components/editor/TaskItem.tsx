@@ -207,7 +207,9 @@ function taskInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       const to = from + node.nodeSize - 1
 
       if (node == state.doc.lastChild) {
-        state.tr.split(to)
+        try {
+          state.tr.split(to)
+        } catch (e) {}
       }
       state.tr.replaceWith(from, to, newNode)
     },

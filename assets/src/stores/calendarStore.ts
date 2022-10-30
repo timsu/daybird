@@ -134,13 +134,14 @@ class CalendarStore {
     this.loading.set(true)
     this.error.set(undefined)
     this.accountError.set({})
+
     try {
       await Promise.all(
-        this.tokens.get()!.map((t) => {
+        this.tokens.get()!.map((t) =>
           this.fetchCalendarForToken(t).catch((e) => {
             this.accountError.setKey(t.email!, unwrapError(e))
           })
-        })
+        )
       )
     } catch (e) {
       logger.warn(e)
@@ -165,6 +166,7 @@ class CalendarStore {
       c.email = token.email!
       this.calendarData[c.id] = c
     })
+
     return this.calendars
   }
 
