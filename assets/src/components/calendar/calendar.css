@@ -1,7 +1,9 @@
-#ec { font-size: 80% }
+#ec { font-size: 80%; overflow: scroll }
 .ec-toolbar { display: none }
 .ec-time, .ec-line {
   height: 20px;
 }
 .ec-body, .ec-header { border: none }
 .ec-all-day { border-left: none; border-right: none }
+.ec-day.ec-today { background: none }
+.ec-event-body { cursor: pointer }

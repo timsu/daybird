@@ -16,30 +16,28 @@ import { useStore } from '@nanostores/preact'
 import AppHeader from './AppHeader'
 
 export default function ({ children }: RenderableProps<{}>) {
-  const sidebarOpen = useStore(uiStore.sidebarOpen)
-  const [desktopSidebarHidden, setDesktopSidebarHidden] = useState(false)
+  const sidebarMenuOpen = useStore(uiStore.sidebarMenuOpen)
+  const sidebarHidden = useStore(uiStore.sidebarHidden)
 
-  const setSidebarOpen = (state: boolean) => uiStore.sidebarOpen.set(state)
+  const setSidebarOpen = (state: boolean) => uiStore.sidebarMenuOpen.set(state)
 
   useEffect(() => {
-    if (sidebarOpen) {
+    if (sidebarMenuOpen) {
       const unsub = uiStore.path.listen(() => {
         setSidebarOpen(false)
       })
       return unsub
     }
-  }, [sidebarOpen])
+  }, [sidebarMenuOpen])
 
   useSwipe((dir) => {
     setSidebarOpen(dir == 'right')
   })
 
-  const props = { sidebarOpen, desktopSidebarHidden, setSidebarOpen, setDesktopSidebarHidden }
-
   return (
     <>
-      <SidebarMenu {...props} />
-      {!desktopSidebarHidden && (
+      <SidebarMenu />
+      {!sidebarHidden && (
         <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
           <AppSidebar darkHeader />
         </div>
@@ -47,14 +45,12 @@ export default function ({ children }: RenderableProps<{}>) {
 
       <div
         className={classNames(
-          !desktopSidebarHidden ? 'md:ml-52' : '',
+          !sidebarHidden ? 'md:ml-52' : '',
           'flex flex-col min-h-full print:h-auto bg-white'
         )}
       >
-        <AppHeader {...props} />
-
         <div className="flex-1 flex">
-          <main className="flex flex-1 flex-col mt-1 px-6">{children}</main>
+          <main className="flex flex-1 flex-col mt-1">{children}</main>
           <CalendarRail />
         </div>
 

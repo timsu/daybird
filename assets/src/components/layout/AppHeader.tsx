@@ -1,4 +1,6 @@
+import { RenderableProps } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
+import { twMerge } from 'tailwind-merge'
 
 import CalendarToggle from '@/components/calendar/CalendarToggle'
 import UserMenu from '@/components/nav/UserMenu'
@@ -8,10 +10,14 @@ import { classNames } from '@/utils'
 import { ChevronLeftIcon, MenuAlt2Icon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
-import { SidebarProps } from './AppLayout'
+type Props = {
+  onClickBack?: () => void
+}
 
-export default function AppHeader(p: SidebarProps) {
-  const { sidebarOpen, desktopSidebarHidden, setSidebarOpen, setDesktopSidebarHidden } = p
+export default function AppHeader(p: RenderableProps<Props>) {
+  const sidebarOpen = useStore(uiStore.sidebarMenuOpen)
+  const sidebarHidden = useStore(uiStore.sidebarHidden)
+
   const [hasShadow, setHasShadow] = useState(false)
 
   useEffect(() => {
@@ -25,38 +31,38 @@ export default function AppHeader(p: SidebarProps) {
 
   return (
     <div
-      className={classNames(
+      className={twMerge(
         'sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px]',
-        'print:hidden bg-white border-b',
-        hasShadow ? '' : 'border-transparent'
+        'bg-white border-b',
+        hasShadow ? 'py-2' : 'border-transparent'
       )}
     >
-      {(!sidebarOpen || desktopSidebarHidden) && (
+      {(!sidebarOpen || sidebarHidden) && (
         <button
           type="button"
           className="px-4 border-gray-200 text-gray-500 focus:outline-none -my-1
         focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden hover:bg-gray-100"
-          style={{ display: desktopSidebarHidden ? 'block' : undefined }}
+          style={{ display: sidebarHidden ? 'block' : undefined }}
           onClick={(e) =>
-            desktopSidebarHidden ? setDesktopSidebarHidden(false) : setSidebarOpen(true)
+            sidebarHidden ? uiStore.sidebarHidden.set(false) : uiStore.sidebarMenuOpen.set(true)
           }
         >
           <span className="sr-only">Open sidebar</span>
           <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
         </button>
       )}
-      {!desktopSidebarHidden && (
+      {!sidebarHidden && (
         <button
           type="button"
           className="text-gray-400 hidden md:block hover:bg-gray-100 rounded-md"
-          onClick={() => setDesktopSidebarHidden(true)}
+          onClick={() => (p.onClickBack ? p.onClickBack() : uiStore.sidebarHidden.set(true))}
         >
           <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
         </button>
       )}
 
       <div className="flex-1 px-4 flex justify-between select-none overflow-x-scroll pt-1">
-        <ProjectPills />
+        {p.children}
       </div>
       <div className="mr-4 flex items-center md:ml-6">
         <CalendarToggle />

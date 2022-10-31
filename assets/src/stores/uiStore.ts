@@ -28,7 +28,9 @@ class UIStore {
 
   path = atom<string>()
 
-  sidebarOpen = atom<boolean>(false)
+  sidebarMenuOpen = atom<boolean>(false)
+
+  sidebarHidden = atom<boolean>(false)
 
   calendarOpen = atom<boolean>(false)
 

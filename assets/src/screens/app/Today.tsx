@@ -1,4 +1,4 @@
-import { addDays, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
+import { addDays, endOfDay, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
@@ -9,6 +9,7 @@ import Document from '@/components/editor/Document'
 import Actions from '@/components/journal/Actions'
 import DailyPrompt from '@/components/journal/DailyPrompt'
 import ReflectButton from '@/components/journal/ReflectButton'
+import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
 import InsertTasksButton from '@/components/task/InsertTasksButton'
 import { paths } from '@/config'
@@ -55,6 +56,13 @@ export default (props: Props) => {
   const showActions = isAfter(date, today)
   const title = isToday ? 'Today' : format(date, 'EEEE MMMM do')
 
+  const [_, updateTitle] = useState(0)
+  useEffect(() => {
+    // update title once it crosses midnight
+    if (isToday)
+      setTimeout(() => updateTitle(Date.now()), endOfDay(date).getTime() - Date.now() + 1000)
+  }, [isToday, date])
+
   useEffect(() => {
     // todo wait until files are loaded
     if (!project) return
@@ -72,11 +80,11 @@ export default (props: Props) => {
   }, [project?.id, date.getTime()])
 
   return (
-    <div class="flex flex-col grow  w-full">
+    <>
       <Helmet title={title} />
 
-      <div className="max-w-2xl mx-auto w-full mt-4">
-        <div class="flex gap-2 items-center mb-4">
+      <AppHeader>
+        <div class="flex gap-2 items-center pl-4">
           <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
 
           <Pressable
@@ -96,7 +104,7 @@ export default (props: Props) => {
 
           <div class="flex-1" />
 
-          <Tooltip message="Previous Day">
+          <Tooltip message="Previous Day" placement="right">
             <a
               className="p-2 hover:bg-gray-200 rounded-md"
               href={paths.TODAY + '?d=' + format(subDays(date || new Date(), 1), 'yyyy-MM-dd')}
@@ -104,7 +112,7 @@ export default (props: Props) => {
               <ChevronLeftIcon class="h-4 w-4 text-gray-400" />
             </a>
           </Tooltip>
-          <Tooltip message="Next Day">
+          <Tooltip message="Next Day" placement="right">
             <a
               className="p-2 hover:bg-gray-200 rounded-md"
               href={paths.TODAY + '?d=' + format(addDays(date || new Date(), 1), 'yyyy-MM-dd')}
@@ -113,12 +121,13 @@ export default (props: Props) => {
             </a>
           </Tooltip>
         </div>
-
-        <DailyPrompt date={date} />
-      </div>
-
+      </AppHeader>
       <DocMenu />
-      {todayDoc && <Document projectId={project?.id} id={todayDoc} />}
-    </div>
+
+      <div class="flex flex-col grow w-full px-6 mt-4">
+        <DailyPrompt date={date} />
+        {todayDoc && <Document projectId={project?.id} id={todayDoc} />}
+      </div>
+    </>
   )
 }
