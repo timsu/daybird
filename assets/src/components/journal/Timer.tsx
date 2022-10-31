@@ -35,7 +35,11 @@ export default function () {
   return (
     <>
       <TimerModal open={open} close={() => setOpen(false)} performAction={startTimer} />
-      <Tooltip message="Start a timer (e.g. pomodoro)" tooltipClass="w-[170px] text-center">
+      <Tooltip
+        message="Start a timer (e.g. pomodoro)"
+        tooltipClass="w-[170px] text-center"
+        placement="right"
+      >
         <Button
           onClick={(e) => {
             !open && setOpen(true)

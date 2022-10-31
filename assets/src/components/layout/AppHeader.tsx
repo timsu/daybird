@@ -29,7 +29,7 @@ export default function AppHeader(p: RenderableProps<{}>) {
     <div
       className={twMerge(
         'sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px]',
-        'print:hidden bg-white border-b',
+        'bg-white border-b',
         hasShadow ? 'py-2' : 'border-transparent'
       )}
     >

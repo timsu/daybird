@@ -32,7 +32,7 @@ export default function () {
   return (
     <>
       <div className="w-52 relative">
-        <div className="w-52 bg-white border-l fixed top-0 right-0 flex flex-col h-full pt-[49px]">
+        <div className="w-52 bg-white border-l fixed top-0 right-0 flex flex-col h-full pt-2">
           <MonthView currentDate={selectedDate} onSelect={onSelectDate} />
           <hr className="my-4" />
           <DayView date={selectedDate} />

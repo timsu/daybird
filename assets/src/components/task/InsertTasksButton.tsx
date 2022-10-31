@@ -29,7 +29,11 @@ export default function () {
   return (
     <>
       <TasksMenu open={open} close={() => setOpen(null)} />
-      <Tooltip message="Insert uncompleted tasks" tooltipClass="w-[170px] text-center">
+      <Tooltip
+        message="Insert uncompleted tasks"
+        tooltipClass="w-[170px] text-center"
+        placement="right"
+      >
         <Button
           onClick={(e) => {
             !open && setOpen(e.target as HTMLElement)

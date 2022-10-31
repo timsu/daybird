@@ -39,7 +39,7 @@ export default (props: Props) => {
       <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
 
       <AppHeader>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 pl-4">
           <h1 class="text-xl font-bold ">{title}</h1>
           <Pressable
             onClick={(e) => {
@@ -55,6 +55,7 @@ export default (props: Props) => {
           <Actions />
         </div>
       </AppHeader>
+      <DocMenu />
 
       <div class="flex flex-col grow w-full px-6">
         <CSSTransition appear in={!!docError} classNames="fade" duration={500}>
@@ -65,7 +66,6 @@ export default (props: Props) => {
           </div>
         </CSSTransition>
 
-        <DocMenu />
         <Document projectId={props.projectId} id={props.id} />
       </div>
     </>
