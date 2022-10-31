@@ -1,7 +1,9 @@
+import { route } from 'preact-router'
 import { useEffect } from 'preact/hooks'
 
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
+import AppHeader from '@/components/layout/AppHeader'
 import NewProjectModal from '@/components/modals/NewProjectModal'
 import { paths } from '@/config'
 import { Project } from '@/models'
@@ -23,15 +25,17 @@ export default (props: Props) => {
   useEffect(() => uiStore.calendarOpen.set(false))
 
   return (
-    <div className="py-6">
-      <div className="px-4 sm:px-6 hover:bg-white md:px-8 mt-4">
+    <>
+      <Helmet title="Projects" />
+
+      <AppHeader onClickBack={() => route(paths.TODAY)}>
         <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
+      </AppHeader>
+
+      <div className="px-4 sm:px-6 md:px-8">
         <div className="my-6 text-sm">
           Click a project to view settings and invite collaborators.
         </div>
-      </div>
-
-      <div className="px-4 sm:px-6 md:px-8">
         <ProjectList projects={projects} />
 
         {activeProjects.length == 0 && (
@@ -50,7 +54,7 @@ export default (props: Props) => {
       </div>
 
       <NewProjectModal />
-    </div>
+    </>
   )
 }
 
@@ -70,7 +74,6 @@ function ProjectList({ projects }: { projects: Project[] }) {
 
   return (
     <div>
-      <Helmet title="Projects" />
       <ul role="list" className="grid grid-cols-2 gap-5 sm:gap-6">
         {projectItems.map((project) => (
           <a href={project.href}>

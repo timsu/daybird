@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'preact/hooks'
 
 import Helmet from '@/components/core/Helmet'
+import AppHeader from '@/components/layout/AppHeader'
 import TaskRow from '@/components/task/TaskRow'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
@@ -24,13 +25,14 @@ export default (props: Props) => {
   if (!project) return null
 
   return (
-    <div className="py-6">
+    <>
       <Helmet title={`Tasks | ${project.name}`} />
-      <div className="max-w-7xl px-4 sm:px-6 md:px-8">
+
+      <AppHeader>
         <h1 className="text-2xl font-semibold text-gray-900">
           Tasks for {project.name} ({project.shortcode})
         </h1>
-      </div>
+      </AppHeader>
 
       <div class="max-w-7xl px-4 my-8 sm:px-6 md:px-8">
         <TaskRow id={undefined} newTaskMode />
@@ -49,6 +51,6 @@ export default (props: Props) => {
           </div>
         ))}
       </div>
-    </div>
+    </>
   )
 }

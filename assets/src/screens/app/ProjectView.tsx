@@ -1,3 +1,4 @@
+import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 
 import { API } from '@/api'
@@ -7,7 +8,9 @@ import ErrorMessage from '@/components/core/ErrorMessage'
 import Helmet from '@/components/core/Helmet'
 import Input from '@/components/core/Input'
 import Pressable from '@/components/core/Pressable'
+import AppHeader from '@/components/layout/AppHeader'
 import DeleteProjectModal from '@/components/modals/DeleteProjectModal'
+import { paths } from '@/config'
 import { Project, ProjectMember, ProjectRole } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { modalStore } from '@/stores/modalStore'
@@ -37,38 +40,40 @@ export default ({ id }: Props) => {
   const projectArgs = { project, isAdmin }
 
   return (
-    <div className="py-6">
+    <>
       <Helmet title={`Project | ${project.name}`} />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <AppHeader onClickBack={() => route(paths.PROJECTS)}>
         <h1 className="text-2xl font-semibold text-gray-900">
           {project.name} ({project.shortcode})
         </h1>
-      </div>
+      </AppHeader>
 
-      <div className="h-8" />
+      <div class="w-full max-w-2xl px-6 pb-6">
+        <div className="h-8" />
 
-      <Members {...projectArgs} />
+        <Members {...projectArgs} />
 
-      <InviteCollaborator {...projectArgs} />
+        <InviteCollaborator {...projectArgs} />
 
-      <div className="h-6" />
+        <div className="h-6" />
 
-      <RenameProject {...projectArgs} />
+        <RenameProject {...projectArgs} />
 
-      <div className="h-6" />
+        <div className="h-6" />
 
-      {isAdmin && (
-        <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
-          <h1 className="text-xl font-semibold text-gray-900 mb-5">Dangerous Stuff</h1>
-          <div className="flex gap-8 flex-col md:flex-row">
-            <ArchiveProject {...projectArgs} />
-            <DeleteProject {...projectArgs} />
+        {isAdmin && (
+          <div className="max-w-7xl mt-20 mx-auto px-4 sm:px-6 md:px-8">
+            <h1 className="text-xl font-semibold text-gray-900 mb-5">Dangerous Stuff</h1>
+            <div className="flex gap-8 flex-col md:flex-row">
+              <ArchiveProject {...projectArgs} />
+              <DeleteProject {...projectArgs} />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <DeleteProjectModal />
-    </div>
+        <DeleteProjectModal />
+      </div>
+    </>
   )
 }
 

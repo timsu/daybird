@@ -10,7 +10,11 @@ import { classNames } from '@/utils'
 import { ChevronLeftIcon, MenuAlt2Icon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
-export default function AppHeader(p: RenderableProps<{}>) {
+type Props = {
+  onClickBack?: () => void
+}
+
+export default function AppHeader(p: RenderableProps<Props>) {
   const sidebarOpen = useStore(uiStore.sidebarMenuOpen)
   const sidebarHidden = useStore(uiStore.sidebarHidden)
 
@@ -51,7 +55,7 @@ export default function AppHeader(p: RenderableProps<{}>) {
         <button
           type="button"
           className="text-gray-400 hidden md:block hover:bg-gray-100 rounded-md"
-          onClick={() => uiStore.sidebarHidden.set(true)}
+          onClick={() => (p.onClickBack ? p.onClickBack() : uiStore.sidebarHidden.set(true))}
         >
           <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
         </button>
