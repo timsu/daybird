@@ -160,7 +160,9 @@ function Events({ date }: Props) {
       ec.setOption('events', calEvents)
     }
 
-    document.getElementById('ec')?.parentElement?.scrollTo(0, 9999)
+    const nowIndicator = document.getElementsByClassName('ec-now-indicator')[0]
+    if (nowIndicator) nowIndicator.scrollIntoView()
+    else document.getElementById('ec')?.parentElement?.scrollTo(0, 9999)
   }, [date, events])
 
   return (
@@ -186,15 +188,23 @@ function Calendars() {
     calendarStore.saveGoogleOAuthToken(response)
   }
 
+  const toggleExpanded = () => {
+    if (!expanded)
+      setTimeout(() => {
+        document.getElementById('calendarContainer')?.parentElement?.scrollTo(0, 9999)
+      }, 0)
+    setExpanded(!expanded)
+  }
+
   useEffect(() => {
     if (Object.keys(accountError).length > 0) setExpanded(true)
   }, [accountError])
 
   return (
-    <div class="flex flex-col">
+    <div class="flex flex-col" id="calendarContainer">
       <div
         class="bg-slate-200 px-3 py-1 text-sm flex items-center cursor-pointer hover:bg-slate-400"
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => toggleExpanded()}
       >
         <div class="mr-2">Calendars</div>
         {expanded ? <ChevronDownIcon class="h-3 w-3" /> : <ChevronUpIcon class="h-3 w-3" />}
