@@ -1,4 +1,4 @@
-import { addDays, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
+import { addDays, endOfDay, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
@@ -54,6 +54,13 @@ export default (props: Props) => {
   const isToday = isSameDay(date, today)
   const showActions = isAfter(date, today)
   const title = isToday ? 'Today' : format(date, 'EEEE MMMM do')
+
+  const [_, updateTitle] = useState(0)
+  useEffect(() => {
+    // update title once it crosses midnight
+    if (isToday)
+      setTimeout(() => updateTitle(Date.now()), endOfDay(date).getTime() - Date.now() + 1000)
+  }, [isToday, date])
 
   useEffect(() => {
     // todo wait until files are loaded
