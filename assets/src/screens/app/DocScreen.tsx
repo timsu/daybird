@@ -9,6 +9,7 @@ import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import Document from '@/components/editor/Document'
 import Actions from '@/components/journal/Actions'
+import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
 import { Project } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -36,31 +37,34 @@ export default (props: Props) => {
   return (
     <>
       <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
-      <CSSTransition appear in={!!docError} classNames="fade" duration={500}>
-        <div class="relative bg-red-500">
-          <Banner onClose={() => docStore.docError.set(undefined)}>
-            <p>{docError}</p>
-          </Banner>
+
+      <AppHeader>
+        <div class="flex items-center gap-4">
+          <h1 class="text-xl font-bold ">{title}</h1>
+          <Pressable
+            onClick={(e) => {
+              const pos = (e.target as HTMLDivElement).getBoundingClientRect()
+              triggerContextMenu(pos.left, pos.top, 'doc-menu', {
+                docId: props.id,
+                projectId: props.projectId,
+              })
+            }}
+          >
+            <DotsHorizontalIcon className="h-4 w-4 text-gray-400" />
+          </Pressable>
+          <Actions />
         </div>
-      </CSSTransition>
-      <div class="flex flex-col grow  w-full">
-        <div class="w-full max-w-2xl mx-auto pt-6 flex items-center print:px-0 print:max-w-none">
-          <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold ">{title}</h1>
-            <Pressable
-              onClick={(e) => {
-                const pos = (e.target as HTMLDivElement).getBoundingClientRect()
-                triggerContextMenu(pos.left, pos.top, 'doc-menu', {
-                  docId: props.id,
-                  projectId: props.projectId,
-                })
-              }}
-            >
-              <DotsHorizontalIcon className="h-4 w-4 text-gray-400" />
-            </Pressable>
-            <Actions />
+      </AppHeader>
+
+      <div class="flex flex-col grow w-full px-6">
+        <CSSTransition appear in={!!docError} classNames="fade" duration={500}>
+          <div class="relative bg-red-500">
+            <Banner onClose={() => docStore.docError.set(undefined)}>
+              <p>{docError}</p>
+            </Banner>
           </div>
-        </div>
+        </CSSTransition>
+
         <DocMenu />
         <Document projectId={props.projectId} id={props.id} />
       </div>

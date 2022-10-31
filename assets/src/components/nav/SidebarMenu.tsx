@@ -2,13 +2,16 @@ import { Fragment } from 'preact'
 
 import FileContextMenu from '@/components/menus/FileContextMenu'
 import AppSidebar, { SidebarModals } from '@/components/nav/AppSidebar'
+import { uiStore } from '@/stores/uiStore'
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
+import { useStore } from '@nanostores/preact'
 
 import { SidebarProps } from '../layout/AppLayout'
 
-export function SidebarMenu(p: SidebarProps) {
-  const { sidebarOpen, setSidebarOpen } = p
+export function SidebarMenu() {
+  const sidebarOpen = useStore(uiStore.sidebarMenuOpen)
+
   return (
     <Transition.Root show={sidebarOpen} as={Fragment}>
       <Dialog as="div" className="relative z-40 md:hidden touch-manipulation" onClose={() => {}}>
@@ -24,7 +27,7 @@ export function SidebarMenu(p: SidebarProps) {
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
         </Transition.Child>
 
-        <div className="fixed inset-0 flex z-40" onClick={() => setSidebarOpen(false)}>
+        <div className="fixed inset-0 flex z-40" onClick={() => uiStore.sidebarMenuOpen.set(false)}>
           <Transition.Child
             as={Fragment}
             enter="transition ease-in-out duration-300 transform"
@@ -48,7 +51,7 @@ export function SidebarMenu(p: SidebarProps) {
                   <button
                     type="button"
                     className="flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                    onClick={() => setSidebarOpen(false)}
+                    onClick={() => uiStore.sidebarMenuOpen.set(false)}
                   >
                     <span className="sr-only">Close sidebar</span>
                     <XIcon className="h-6 w-6 text-white" aria-hidden="true" />
@@ -66,7 +69,7 @@ export function SidebarMenu(p: SidebarProps) {
           <div
             className="flex-shrink-0 w-14 touch-manipulation"
             aria-hidden="true"
-            onClick={() => setSidebarOpen(false)}
+            onClick={() => uiStore.sidebarMenuOpen.set(false)}
           >
             {/* Dummy element to force sidebar to shrink to fit close icon */}
           </div>

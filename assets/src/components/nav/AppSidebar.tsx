@@ -8,6 +8,8 @@ import FileContextMenu from '@/components/menus/FileContextMenu'
 import DeleteFileModal from '@/components/modals/DeleteFileModal'
 import NewFileModal from '@/components/modals/NewFileModal'
 import FileTree from '@/components/nav/FileTree'
+import ProjectDropdown from '@/components/projects/ProjectDropdown'
+import ProjectPills from '@/components/projects/ProjectPills'
 import { paths } from '@/config'
 import { FileType, Project } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -41,6 +43,7 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
   return (
     <div className="flex-1 flex flex-col min-h-0  select-none">
       <div className="flex-1 flex flex-col overflow-y-auto scrollbar">
+        <ProjectDropdown />
         <Links />
         <Projects />
       </div>
@@ -118,7 +121,7 @@ function Projects() {
   const project = useStore(projectStore.currentProject)
 
   // in order to nest context menu inside sidebar, we must mount it inside the other dialog
-  const sidebarOpen = useStore(uiStore.sidebarOpen)
+  const sidebarOpen = useStore(uiStore.sidebarMenuOpen)
 
   if (!project) return null
 
