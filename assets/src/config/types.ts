@@ -27,6 +27,7 @@ export interface GEvent {
   iCalUID: string
   id: string
   kind: 'calendar#event'
+  location?: string
   organizer: { email: string; self: boolean }
   start: { date?: string; dateTime?: string; timeZone: string }
   end: { date?: string; dateTime?: string; timeZone: string }

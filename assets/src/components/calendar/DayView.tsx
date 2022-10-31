@@ -16,12 +16,14 @@ import { config, GEvent } from '@/config'
 import { User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
-import Calendar from '@event-calendar/core'
+import { assertIsDefined, logger } from '@/utils'
+import Calendar, { EventClickInfo } from '@event-calendar/core'
 import TimeGrid from '@event-calendar/time-grid'
 import {
     CheckIcon, ChevronDownIcon, ChevronUpIcon, RefreshIcon, TrashIcon
 } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
+import { createPopper } from '@popperjs/core'
 
 import type { CalEvent } from '@event-calendar/core'
 type Props = { date: Date }
@@ -100,7 +102,7 @@ function CalendarView({ date }: Props) {
     )
 
   return (
-    <div class="flex-1 flex flex-col overflow-scroll">
+    <div class="flex-1 flex flex-col overflow-hidden">
       <ErrorMessage error={error} />
 
       <Events date={date} />
@@ -113,6 +115,9 @@ function CalendarView({ date }: Props) {
 function Events({ date }: Props) {
   const events = useStore(calendarStore.events)
   const calInstance = useRef<Calendar | undefined>()
+  const tooltipRef = useRef<HTMLDivElement | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<GEvent>()
+  const eventMap = useRef<{ [id: string]: GEvent }>({})
 
   useEffect(() => {
     const eventList = flatten(Object.values(events))
@@ -128,6 +133,7 @@ function Events({ date }: Props) {
           }
     }
 
+    eventList.forEach((ev) => (eventMap.current[ev.id] = ev))
     const calEvents: CalEvent[] = eventList
       .filter((e) => e.start.dateTime)
       .map((e) => ({
@@ -142,6 +148,38 @@ function Events({ date }: Props) {
 
     const ec = calInstance.current
     if (!ec) {
+      const popperClear = (e?: MouseEvent) => {
+        console.log('clear the popper', e)
+        const target = e?.target as HTMLElement
+        if (target && tooltipRef.current?.contains(target)) return
+        if (target?.className.includes('ec-event')) return
+        setSelectedEvent(undefined)
+        tooltipRef.current!.style.visibility = 'hidden'
+        document.removeEventListener('click', popperClear)
+      }
+
+      const eventClick = (info: EventClickInfo) => {
+        logger.info('[cal] clicked', info)
+        assertIsDefined(tooltipRef.current)
+        setSelectedEvent((current) => {
+          const newEvent = eventMap.current[info.event.id]
+
+          if (newEvent == current) {
+            popperClear()
+            return undefined
+          }
+
+          tooltipRef.current!.style.visibility = 'visible'
+          createPopper(info.el, tooltipRef.current!, {
+            placement: 'left',
+          })
+
+          if (!current) setTimeout(() => document.addEventListener('click', popperClear), 200)
+
+          return newEvent
+        })
+      }
+
       calInstance.current = new Calendar({
         target: document.getElementById('ec')!,
         props: {
@@ -152,6 +190,7 @@ function Events({ date }: Props) {
             nowIndicator: true,
             date: date,
             slotHeight: 20,
+            eventClick,
           },
         },
       })
@@ -162,7 +201,7 @@ function Events({ date }: Props) {
 
     const nowIndicator = document.getElementsByClassName('ec-now-indicator')[0]
     if (nowIndicator) nowIndicator.scrollIntoView()
-    else document.getElementById('ec')?.parentElement?.scrollTo(0, 9999)
+    else document.getElementById('ec')?.scrollTo(0, 9999)
   }, [date, events])
 
   return (
@@ -174,6 +213,30 @@ function Events({ date }: Props) {
         </Pressable>
       </div>
       <div id="ec" class="flex-1 text-sm"></div>
+      <div
+        id="cal-tooltip"
+        ref={tooltipRef}
+        className={
+          'bg-white rounded-md p-4 z-10 border shadow-sm w-80 ' +
+          (selectedEvent ? 'visible' : 'invisible')
+        }
+        role="tooltip"
+      >
+        {selectedEvent && <TooltipContents ev={selectedEvent} />}
+      </div>
+    </>
+  )
+}
+
+function TooltipContents({ ev }: { ev: GEvent }) {
+  console.log(ev)
+  return (
+    <>
+      <div class="max-h-12 text-ellipsis overflow-hidden">
+        <div>{ev.summary}</div>
+      </div>
+      {ev.location && <div class="text-sm">{ev.location}</div>}
+      <div class="text-sm">{ev.calendar}</div>
     </>
   )
 }
@@ -201,7 +264,7 @@ function Calendars() {
   }, [accountError])
 
   return (
-    <div class="flex flex-col" id="calendarContainer">
+    <div class="flex flex-col max-h-96 overflow-auto" id="calendarContainer">
       <div
         class="bg-slate-200 px-3 py-1 text-sm flex items-center cursor-pointer hover:bg-slate-400"
         onClick={() => toggleExpanded()}
