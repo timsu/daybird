@@ -149,7 +149,6 @@ function Events({ date }: Props) {
     const ec = calInstance.current
     if (!ec) {
       const popperClear = (e?: MouseEvent) => {
-        console.log('clear the popper', e)
         const target = e?.target as HTMLElement
         if (target && tooltipRef.current?.contains(target)) return
         if (target?.className.includes('ec-event')) return
@@ -229,7 +228,6 @@ function Events({ date }: Props) {
 }
 
 function TooltipContents({ ev }: { ev: GEvent }) {
-  console.log(ev)
   return (
     <>
       <div class="max-h-12 text-ellipsis overflow-hidden">
