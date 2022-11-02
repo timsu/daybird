@@ -64,6 +64,11 @@ class UIStore {
     this.checkForSleep()
 
     if (!User.meta(user).ob) modalStore.onboardingModal.set(true)
+
+    if (!user.timezone) {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      authStore.updateUser({ timezone })
+    }
   }
 
   checkForSleep = () => {
