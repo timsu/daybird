@@ -40,6 +40,9 @@ class UIStore {
 
   installPrompt: null | BeforeInstallPromptEvent = null
 
+  startTimer?: (e: MouseEvent) => void
+  insertTasks?: (e: MouseEvent) => void
+
   constructor() {
     window.addEventListener('beforeinstallprompt', (e: Event) => {
       logger.debug('beforeinstallprompt', e)
@@ -64,6 +67,11 @@ class UIStore {
     this.checkForSleep()
 
     if (!User.meta(user).ob) modalStore.onboardingModal.set(true)
+
+    if (!user.timezone) {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      authStore.updateUser({ timezone })
+    }
   }
 
   checkForSleep = () => {

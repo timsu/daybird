@@ -6,6 +6,7 @@ import Button from '@/components/core/Button'
 import Pressable from '@/components/core/Pressable'
 import Tooltip from '@/components/core/Tooltip'
 import TimerModal from '@/components/journal/TimerModal'
+import { uiStore } from '@/stores/uiStore'
 import { classNames, timeToString } from '@/utils'
 import { PauseIcon, PlayIcon, RefreshIcon, XIcon } from '@heroicons/react/outline'
 
@@ -32,6 +33,10 @@ export default function () {
     return <OngoingTimer {...timerProps} textClass="cursor-pointer" />
   }
 
+  uiStore.startTimer = (e) => {
+    !open && setOpen(true)
+  }
+
   return (
     <>
       <TimerModal open={open} close={() => setOpen(false)} performAction={startTimer} />
@@ -39,13 +44,9 @@ export default function () {
         message="Start a timer (e.g. pomodoro)"
         tooltipClass="w-[170px] text-center"
         placement="right"
+        class="hidden sm:block"
       >
-        <Button
-          onClick={(e) => {
-            !open && setOpen(true)
-          }}
-          class="py-1 px-1 sm:px-4"
-        >
+        <Button onClick={uiStore.startTimer} class="py-1 px-1 sm:px-4">
           Timer
         </Button>
       </Tooltip>
@@ -104,7 +105,7 @@ function OngoingTimer({ timerState, setTimerState, setFullscreen, textClass }: T
   }
 
   return (
-    <>
+    <div class="absolute sm:relative bg-white flex gap-2 left-0">
       <div
         class={twMerge(
           'text-xl text-orange-600 w-16 text-center font-mono',
@@ -130,7 +131,7 @@ function OngoingTimer({ timerState, setTimerState, setFullscreen, textClass }: T
           <XIcon class="w-5 h-5" />
         </Button>
       </div>
-    </>
+    </div>
   )
 }
 

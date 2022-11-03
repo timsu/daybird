@@ -33,7 +33,7 @@ export default function AppHeader(p: RenderableProps<Props>) {
     <div
       className={twMerge(
         'sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px]',
-        'bg-white border-b',
+        'bg-white border-b max-w-[100vw]',
         hasShadow ? 'py-2' : 'border-transparent'
       )}
     >
@@ -61,7 +61,9 @@ export default function AppHeader(p: RenderableProps<Props>) {
         </button>
       )}
 
-      <div className="flex-1 px-4 flex justify-between select-none pt-1">{p.children}</div>
+      <div className="flex-1 sm:px-4 flex justify-between select-none pt-1 overflow-hidden">
+        {p.children}
+      </div>
       <div className="mr-4 flex items-center md:ml-6">
         <CalendarToggle />
         <UserMenu />

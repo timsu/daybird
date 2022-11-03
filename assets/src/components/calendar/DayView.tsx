@@ -118,6 +118,9 @@ function Events({ date }: Props) {
   const tooltipRef = useRef<HTMLDivElement | null>(null)
   const [selectedEvent, setSelectedEvent] = useState<GEvent>()
   const eventMap = useRef<{ [id: string]: GEvent }>({})
+  const [_now, setNow] = useState(0)
+
+  // re-render events every 10 minutes to keep the red line ticking
 
   useEffect(() => {
     const eventList = flatten(Object.values(events))
@@ -201,6 +204,11 @@ function Events({ date }: Props) {
     const nowIndicator = document.getElementsByClassName('ec-now-indicator')[0]
     if (nowIndicator) nowIndicator.scrollIntoView()
     else document.getElementById('ec')?.scrollTo(0, 9999)
+
+    if (nowIndicator) {
+      const interval = setInterval(() => setNow(Date.now()), 300_000)
+      return () => clearInterval(interval)
+    }
   }, [date, events])
 
   return (
@@ -216,7 +224,7 @@ function Events({ date }: Props) {
         id="cal-tooltip"
         ref={tooltipRef}
         className={
-          'bg-white rounded-md p-4 z-10 border shadow-sm w-80 ' +
+          'bg-white rounded-md p-4 z-10 border shadow-sm sm:w-80 ' +
           (selectedEvent ? 'visible' : 'invisible')
         }
         role="tooltip"
