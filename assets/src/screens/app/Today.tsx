@@ -84,7 +84,7 @@ export default (props: Props) => {
       <Helmet title={title} />
 
       <AppHeader>
-        <div class="flex gap-2 items-center pl-4">
+        <div class="flex gap-2 items-center pl-4 relative">
           <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
 
           <Pressable

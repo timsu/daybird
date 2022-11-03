@@ -105,7 +105,7 @@ function OngoingTimer({ timerState, setTimerState, setFullscreen, textClass }: T
   }
 
   return (
-    <>
+    <div class="absolute sm:relative bg-white flex gap-2 left-0">
       <div
         class={twMerge(
           'text-xl text-orange-600 w-16 text-center font-mono',
@@ -131,7 +131,7 @@ function OngoingTimer({ timerState, setTimerState, setFullscreen, textClass }: T
           <XIcon class="w-5 h-5" />
         </Button>
       </div>
-    </>
+    </div>
   )
 }
 
