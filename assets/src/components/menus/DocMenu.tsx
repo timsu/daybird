@@ -8,9 +8,10 @@ import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
+import { uiStore } from '@/stores/uiStore'
 import {
-    ArchiveIcon, BookmarkIcon, CheckCircleIcon, CheckIcon, EyeOffIcon, LinkIcon, PencilIcon,
-    PrinterIcon, TrashIcon
+    ArchiveIcon, BookmarkIcon, CheckCircleIcon, CheckIcon, ClockIcon, EyeOffIcon, LinkIcon,
+    PencilIcon, PrinterIcon, TrashIcon
 } from '@heroicons/react/outline'
 
 type Props = {
@@ -30,6 +31,17 @@ export default () => {
               Copy File Link
             </ContextMenuItem>
           )}
+
+          <ContextMenuItem class="sm:hidden" onClick={uiStore.insertTasks}>
+            <CheckIcon class="h-4 w-4 mr-2" />
+            Insert Tasks
+          </ContextMenuItem>
+
+          <ContextMenuItem class="sm:hidden" onClick={uiStore.startTimer}>
+            <ClockIcon class="h-4 w-4 mr-2" />
+            Start Timer
+          </ContextMenuItem>
+
           <ContextMenuItem onClick={() => print()}>
             <PrinterIcon class="h-4 w-4 mr-2" />
             Print Document

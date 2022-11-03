@@ -9,6 +9,7 @@ import { NODE_NAME } from '@/components/editor/TaskItem'
 import { Task } from '@/models'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import { Dialog, Transition } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
@@ -26,6 +27,10 @@ export default function () {
 
   if (!open && allTasks.length == 0) return null
 
+  uiStore.insertTasks = (e) => {
+    !open && setOpen(e.target as HTMLElement)
+  }
+
   return (
     <>
       <TasksMenu open={open} close={() => setOpen(null)} />
@@ -33,13 +38,9 @@ export default function () {
         message="Insert uncompleted tasks"
         tooltipClass="w-[170px] text-center"
         placement="right"
+        class="hidden sm:block"
       >
-        <Button
-          onClick={(e) => {
-            !open && setOpen(e.target as HTMLElement)
-          }}
-          class="ml-4 py-1 px-1 sm:px-4"
-        >
+        <Button onClick={uiStore.insertTasks} class="ml-4 py-1 px-1 sm:px-4">
           Tasks
         </Button>
       </Tooltip>

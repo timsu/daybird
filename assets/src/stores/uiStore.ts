@@ -40,6 +40,9 @@ class UIStore {
 
   installPrompt: null | BeforeInstallPromptEvent = null
 
+  startTimer?: (e: MouseEvent) => void
+  insertTasks?: (e: MouseEvent) => void
+
   constructor() {
     window.addEventListener('beforeinstallprompt', (e: Event) => {
       logger.debug('beforeinstallprompt', e)

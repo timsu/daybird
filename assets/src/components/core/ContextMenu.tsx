@@ -100,6 +100,7 @@ export const ContextMenuTrigger = (props: RenderableProps<TriggerProps>) => {
 
 export const triggerContextMenu = (x: number, y: number, id: string, data?: any) => {
   const menu = contextMenus[id]
+  x = Math.min(document.body.clientWidth - 300, x)
   if (!menu) logger.warn('Unknown context menu:', id)
   else menu(x, y, data)
 }
