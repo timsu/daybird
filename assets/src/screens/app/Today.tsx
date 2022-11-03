@@ -54,7 +54,9 @@ export default (props: Props) => {
   const today = startOfDay(new Date())
   const isToday = isSameDay(date, today)
   const showActions = isAfter(date, today)
-  const title = isToday ? 'Today' : format(date, 'EEEE MMMM do')
+  const title = isToday
+    ? 'Today'
+    : format(date, document.body.clientWidth > 500 ? 'EEEE MMMM do' : 'EEE M/d')
 
   const [_, updateTitle] = useState(0)
   useEffect(() => {
@@ -84,8 +86,10 @@ export default (props: Props) => {
       <Helmet title={title} />
 
       <AppHeader>
-        <div class="flex gap-2 items-center pl-4 relative">
-          <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
+        <div class="flex gap-2 items-center sm:pl-4 relative overflow-hidden">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden overflow-ellipsis">
+            {title}
+          </h1>
 
           <Pressable
             onClick={(e) => {
