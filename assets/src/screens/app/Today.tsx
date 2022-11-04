@@ -84,7 +84,7 @@ export default (props: Props) => {
     <>
       <Helmet title={title} />
 
-      <AppHeader transparent>
+      <AppHeader>
         <div class="flex flex-1 gap-2 items-center sm:pl-4 relative overflow-hidden">
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden overflow-ellipsis">
             {title}
