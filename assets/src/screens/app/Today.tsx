@@ -1,5 +1,6 @@
 import { addDays, endOfDay, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
+import uniqolor from 'uniqolor'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import Helmet from '@/components/core/Helmet'
@@ -8,15 +9,13 @@ import Tooltip from '@/components/core/Tooltip'
 import Document from '@/components/editor/Document'
 import Actions from '@/components/journal/Actions'
 import DailyPrompt from '@/components/journal/DailyPrompt'
-import ReflectButton from '@/components/journal/ReflectButton'
 import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
-import InsertTasksButton from '@/components/task/InsertTasksButton'
 import { paths } from '@/config'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
-import { logger } from '@/utils'
+import { lightColorFor, logger } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -81,11 +80,29 @@ export default (props: Props) => {
     }
   }, [project?.id, date.getTime()])
 
+  // generate two random colors from today's date
+  const gradientColor1 = uniqolor(format(date, 'd MMMM EEEE'), { lightness: [80, 95] }).color
+  const gradientColor2 = uniqolor(format(date, 'EEEE M<MM d'), { lightness: [80, 95] }).color
+
   return (
     <>
       <Helmet title={title} />
 
-      <AppHeader>
+      <div
+        className="h-[120px] absolute top-0 left-0 right-0"
+        style={{
+          background: `linear-gradient(90deg, ${gradientColor1} 0%, ${gradientColor2} 100%)`,
+        }}
+      >
+        <div
+          className="h-[60px] absolute bottom-0 left-0 w-full"
+          style={{
+            background: 'linear-gradient(0deg, white 0%, transparent 100%)',
+          }}
+        />
+      </div>
+
+      <AppHeader transparent>
         <div class="flex flex-1 gap-2 items-center sm:pl-4 relative overflow-hidden">
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden overflow-ellipsis">
             {title}
@@ -110,7 +127,7 @@ export default (props: Props) => {
 
           <Tooltip message="Previous Day" placement="right">
             <a
-              className="p-2 hover:bg-gray-200 rounded-md"
+              className="p-2 hover:bg-gray-200/50 rounded-md"
               href={paths.TODAY + '?d=' + format(subDays(date || new Date(), 1), 'yyyy-MM-dd')}
             >
               <ChevronLeftIcon class="h-4 w-4 text-gray-400" />
@@ -118,7 +135,7 @@ export default (props: Props) => {
           </Tooltip>
           <Tooltip message="Next Day" placement="right">
             <a
-              className="p-2 hover:bg-gray-200 rounded-md"
+              className="p-2 hover:bg-gray-200/50 rounded-md"
               href={paths.TODAY + '?d=' + format(addDays(date || new Date(), 1), 'yyyy-MM-dd')}
             >
               <ChevronRightIcon class="h-4 w-4 text-gray-400" />
@@ -127,7 +144,6 @@ export default (props: Props) => {
         </div>
       </AppHeader>
       <DocMenu />
-
       <div class="flex flex-col grow w-full px-6 mt-4">
         <DailyPrompt date={date} />
         {todayDoc && <Document projectId={project?.id} id={todayDoc} />}
