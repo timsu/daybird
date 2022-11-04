@@ -11,6 +11,7 @@ import { ChevronLeftIcon, MenuAlt2Icon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
+  transparent?: boolean
   onClickBack?: () => void
 }
 
@@ -33,7 +34,8 @@ export default function AppHeader(p: RenderableProps<Props>) {
     <div
       className={twMerge(
         'sticky top-0 py-1 z-20 flex-shrink-0 flex min-h-[40px]',
-        'bg-white border-b max-w-[100vw]',
+        'border-b max-w-[100vw]',
+        p.transparent ? 'bg-transparent' : 'bg-white',
         hasShadow ? 'py-2' : 'border-transparent'
       )}
     >
