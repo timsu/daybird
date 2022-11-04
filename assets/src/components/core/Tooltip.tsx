@@ -30,10 +30,7 @@ export default ({
 
   return (
     <>
-      <div
-        ref={divRef}
-        className={classNames('relative flex group', cls || 'flex-row items-center')}
-      >
+      <div ref={divRef} className={classNames('flex group', cls || 'flex-row items-center')}>
         {message && (
           <div
             ref={tooltipRef}

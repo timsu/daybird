@@ -64,7 +64,7 @@ export default function AppHeader(p: RenderableProps<Props>) {
       <div className="flex-1 sm:px-4 flex justify-between select-none pt-1 overflow-hidden">
         {p.children}
       </div>
-      <div className="mr-4 flex items-center md:ml-6">
+      <div className="mr-4 flex items-center">
         <CalendarToggle />
         <UserMenu />
       </div>
