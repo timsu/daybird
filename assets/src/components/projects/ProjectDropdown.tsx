@@ -29,7 +29,7 @@ export default function () {
       <div
         className={classNames(
           'm-1 flex items-center text-gray-900 text-sm whitespace-nowrap',
-          'hover:bg-gray-300 hover:text-gray-900 cursor-pointer rounded-md px-1 py-2',
+          'hover:bg-gray-300/50 hover:text-gray-900 cursor-pointer rounded-md px-1 py-2',
           'block'
         )}
         onClick={() => {

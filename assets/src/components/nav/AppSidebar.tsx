@@ -1,7 +1,9 @@
+import { format } from 'date-fns'
 import { JSX } from 'preact'
 import { Link, route } from 'preact-router'
 import Match from 'preact-router/match'
 import { useEffect, useState } from 'preact/hooks'
+import uniqolor from 'uniqolor'
 
 import Pressable from '@/components/core/Pressable'
 import FileContextMenu from '@/components/menus/FileContextMenu'
@@ -31,21 +33,30 @@ type NavItem = {
 
 export default ({ darkHeader }: { darkHeader?: boolean }) => {
   const projects = useStore(projectStore.activeProjects)
+  const date = useStore(uiStore.calendarDate)
 
-  if (!projects.length) {
-    return (
-      <div className="flex-1 flex flex-col min-h-0  select-none">
-        <div className="p-4 italic text-sm">Please create a project to continue.</div>
-      </div>
-    )
+  // generate two random colors from today's date
+  const gradientColor1 = uniqolor(format(date, 'd MMMM EEEE'), { lightness: [80, 95] }).color
+  const gradientColor2 = uniqolor(format(date, 'EEEE M<MM d'), { lightness: [80, 95] }).color
+
+  const style = {
+    background: `linear-gradient(320deg, ${gradientColor1} 0%, ${gradientColor2} 100%)`,
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0  select-none">
+    <div className="flex-1 flex flex-col min-h-0 select-none" style={style}>
       <div className="flex-1 flex flex-col overflow-y-auto scrollbar">
-        <ProjectDropdown />
-        <Links />
-        <Projects />
+        {!projects.length ? (
+          <>
+            <div className="p-4 italic text-sm">Please create a project to continue.</div>
+          </>
+        ) : (
+          <>
+            <ProjectDropdown />
+            <Links />
+            <Projects />
+          </>
+        )}
       </div>
     </div>
   )
@@ -65,7 +76,7 @@ function Links() {
     <nav className="px-2 space-y-1">
       <div className="flex-1 flex">
         <form
-          className="w-full flex md:ml-0 bg-white rounded-md px-2 mt-2 mb-4 border hover:ring"
+          className="w-full flex md:ml-0 bg-white/80 rounded-md px-2 mt-2 mb-4 border hover:ring"
           action="#"
           method="GET"
         >

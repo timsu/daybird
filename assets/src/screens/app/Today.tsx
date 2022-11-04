@@ -80,27 +80,9 @@ export default (props: Props) => {
     }
   }, [project?.id, date.getTime()])
 
-  // generate two random colors from today's date
-  const gradientColor1 = uniqolor(format(date, 'd MMMM EEEE'), { lightness: [80, 95] }).color
-  const gradientColor2 = uniqolor(format(date, 'EEEE M<MM d'), { lightness: [80, 95] }).color
-
   return (
     <>
       <Helmet title={title} />
-
-      <div
-        className="h-[120px] absolute top-0 left-0 right-0"
-        style={{
-          background: `linear-gradient(90deg, ${gradientColor1} 0%, ${gradientColor2} 100%)`,
-        }}
-      >
-        <div
-          className="h-[60px] absolute bottom-0 left-0 w-full"
-          style={{
-            background: 'linear-gradient(0deg, white 0%, transparent 100%)',
-          }}
-        />
-      </div>
 
       <AppHeader transparent>
         <div class="flex flex-1 gap-2 items-center sm:pl-4 relative overflow-hidden">
