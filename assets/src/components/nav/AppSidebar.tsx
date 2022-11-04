@@ -36,8 +36,8 @@ export default ({ darkHeader }: { darkHeader?: boolean }) => {
   const date = useStore(uiStore.calendarDate)
 
   // generate two random colors from today's date
-  const gradientColor1 = uniqolor(format(date, 'd MMMM EEEE'), { lightness: [80, 95] }).color
-  const gradientColor2 = uniqolor(format(date, 'EEEE M<MM d'), { lightness: [80, 95] }).color
+  const gradientColor1 = uniqolor(format(date, 'd MMMM EEEE'), { lightness: [85, 97] }).color
+  const gradientColor2 = uniqolor(format(date, 'EEEE M<MM d'), { lightness: [85, 97] }).color
 
   const style = {
     background: `linear-gradient(320deg, ${gradientColor1} 0%, ${gradientColor2} 100%)`,
