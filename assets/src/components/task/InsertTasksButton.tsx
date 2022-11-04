@@ -15,7 +15,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
 import { JSONContent } from '@tiptap/react'
 
-export default function () {
+export default function ({ buttonClass }: { buttonClass: string }) {
   const currentProject = useStore(projectStore.currentProject)
   const allTasks = useStore(taskStore.taskList)
 
@@ -38,7 +38,7 @@ export default function () {
         message="Insert uncompleted tasks"
         tooltipClass="w-[170px] text-center"
         placement="right"
-        class="hidden sm:block"
+        class={buttonClass}
       >
         <Button onClick={uiStore.insertTasks} class="ml-4 py-1 px-1 sm:px-4">
           Tasks

@@ -16,7 +16,7 @@ type TimerState = {
   original: number
 }
 
-export default function () {
+export default function ({ buttonClass }: { buttonClass: string }) {
   const [open, setOpen] = useState<boolean>(false)
   const [timerState, setTimerState] = useState<TimerState | null>(null)
   const [fullscreen, setFullscreen] = useState<boolean>(false)
@@ -44,7 +44,7 @@ export default function () {
         message="Start a timer (e.g. pomodoro)"
         tooltipClass="w-[170px] text-center"
         placement="right"
-        class="hidden sm:block"
+        class={buttonClass}
       >
         <Button onClick={uiStore.startTimer} class="py-1 px-1 sm:px-4">
           Timer

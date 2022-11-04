@@ -21,6 +21,7 @@ type Props = {
 }
 
 export default () => {
+  const actionsHidden = uiStore.calendarOpen.get() ? 'lg:hidden' : 'sm:hidden'
   return (
     <ContextMenuWithData id="doc-menu">
       {({ dailyNote, docId }: Props) => (
@@ -32,12 +33,12 @@ export default () => {
             </ContextMenuItem>
           )}
 
-          <ContextMenuItem class="sm:hidden" onClick={uiStore.insertTasks}>
+          <ContextMenuItem class={actionsHidden} onClick={uiStore.insertTasks}>
             <CheckIcon class="h-4 w-4 mr-2" />
             Insert Tasks
           </ContextMenuItem>
 
-          <ContextMenuItem class="sm:hidden" onClick={uiStore.startTimer}>
+          <ContextMenuItem class={actionsHidden} onClick={uiStore.startTimer}>
             <ClockIcon class="h-4 w-4 mr-2" />
             Start Timer
           </ContextMenuItem>
