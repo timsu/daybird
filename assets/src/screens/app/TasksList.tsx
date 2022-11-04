@@ -12,7 +12,9 @@ type Props = {
   projectId?: string
 }
 export default (props: Props) => {
-  const project = useStore(projectStore.projectMap)[props.projectId!]
+  const project = useStore(projectStore.projectMap)[
+    props.projectId || projectStore.currentProject.get()?.id || ''
+  ]
   const tasks = useStore(taskStore.taskList)
 
   useEffect(() => {

@@ -14,11 +14,11 @@ import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, logger } from '@/utils'
 import { isMac } from '@/utils/os'
-import { BriefcaseIcon, DocumentIcon, SearchIcon } from '@heroicons/react/outline'
+import { BriefcaseIcon, DocumentIcon, LinkIcon, SearchIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type SearchResult = {
-  type: 'file' | 'project'
+  type: 'file' | 'project' | 'link'
   name: string
   desc?: string
   href: string
@@ -83,6 +83,20 @@ function QuickSearchBody({ close }: { close: () => void }) {
     }
 
     const substringLength = searchText.length < 4 ? searchText.length : undefined
+    const currentProject = projectStore.currentProject.get()
+
+    const linkResults: SearchResult[] = [
+      { name: 'Today', href: paths.TODAY },
+      { name: 'All Tasks', href: paths.TASKS + '/' + currentProject?.id },
+      { name: 'All Projects', href: paths.PROJECTS },
+      { name: 'Project Settings', href: paths.PROJECTS + '/' + currentProject?.id },
+      { name: 'User Settings', href: paths.SETTINGS },
+    ].map((t) => ({
+      type: 'link',
+      name: t.name,
+      href: t.href,
+      score: stringSimilarity(searchText, t.name, substringLength),
+    }))
 
     const allFiles = fileStore.files.get()
     const results: SearchResult[] = flatten(
@@ -118,6 +132,7 @@ function QuickSearchBody({ close }: { close: () => void }) {
           )
           .filter((s) => s.score > 0)
       )
+      .concat(linkResults)
       .sort((a, b) => b.score - a.score)
       .slice(0, 10)
 
@@ -196,8 +211,10 @@ function QuickSearchBody({ close }: { close: () => void }) {
                 >
                   {r.type == 'file' ? (
                     <DocumentIcon class="w-4 h-4" />
-                  ) : (
+                  ) : r.type == 'project' ? (
                     <BriefcaseIcon class="w-4 h-4" />
+                  ) : (
+                    <LinkIcon class="w-4 h-4" />
                   )}
                   <span class="ml-4 whitespace-nowrap font-semibold text-slate-900 grow">
                     {r.name}

@@ -16,6 +16,7 @@ export default () => (
     <Today path={paths.TODAY} />
     <ProjectsList path={paths.PROJECTS} />
     <ProjectView path={paths.PROJECTS + '/:id'} />
+    <TasksList path={paths.TASKS} />
     <TasksList path={paths.TASKS + '/:projectId'} />
     <DocScreen path={paths.DOC + '/:projectId/:id'} />
     <Settings path={paths.SETTINGS} />
