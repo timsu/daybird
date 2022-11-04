@@ -6,6 +6,7 @@ import { stringSimilarity } from 'string-similarity-js'
 
 import { ModalWithoutPadding } from '@/components/modals/Modal'
 import { paths } from '@/config'
+import useShortcut from '@/hooks/useShortcut'
 import { File, FileType } from '@/models'
 import { DOC_EXT, fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
@@ -27,14 +28,13 @@ type SearchResult = {
 export default () => {
   const open = useStore(modalStore.quickFindModal)
 
-  useEffect(() => {
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      const modifier = isMac ? e.metaKey : e.ctrlKey
-      if (modifier && e.key == 'p') {
-        modalStore.quickFindModal.set(true)
-        e.preventDefault()
-      }
-    })
+  useShortcut((e) => {
+    const modifier = isMac ? e.metaKey : e.ctrlKey
+    if (modifier && e.key == 'p') {
+      modalStore.quickFindModal.set(true)
+      return true
+    }
+    return false
   }, [])
 
   if (!open) return null

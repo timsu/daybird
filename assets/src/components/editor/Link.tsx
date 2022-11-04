@@ -3,7 +3,7 @@ import Link from '@tiptap/extension-link'
 export default Link.extend({
   addKeyboardShortcuts() {
     return {
-      'Mod-k': () => {
+      'Mod-l': () => {
         const previousUrl: string = this.editor.getAttributes('link').href
         let url = window.prompt('URL', previousUrl)
 

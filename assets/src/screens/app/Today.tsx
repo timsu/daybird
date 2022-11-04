@@ -1,4 +1,5 @@
 import { addDays, endOfDay, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
+import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 import uniqolor from 'uniqolor'
 
@@ -12,10 +13,12 @@ import DailyPrompt from '@/components/journal/DailyPrompt'
 import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
 import { paths } from '@/config'
+import useShortcut from '@/hooks/useShortcut'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
 import { lightColorFor, logger } from '@/utils'
+import { isMac } from '@/utils/os'
 import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -79,6 +82,20 @@ export default (props: Props) => {
       fileStore.newDailyFile(project, date).then(setTodayDoc)
     }
   }, [project?.id, date.getTime()])
+
+  useShortcut(
+    (e) => {
+      const modifier = isMac ? e.metaKey : e.ctrlKey
+      if (modifier && (e.key == 'j' || e.key == 'k')) {
+        const newDate = addDays(date || new Date(), e.key == 'j' ? -1 : 1)
+        const newUrl = paths.TODAY + '?d=' + format(newDate, 'yyyy-MM-dd')
+        route(newUrl)
+        return true
+      }
+      return false
+    },
+    [date]
+  )
 
   return (
     <>
