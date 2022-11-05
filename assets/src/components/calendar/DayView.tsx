@@ -224,7 +224,7 @@ function Events({ date }: Props) {
         id="cal-tooltip"
         ref={tooltipRef}
         className={
-          'bg-white rounded-md p-4 z-10 border shadow-sm sm:w-80 ' +
+          'bg-white absolute rounded-md p-4 z-10 border shadow-sm sm:w-80 ' +
           (selectedEvent ? 'visible' : 'invisible')
         }
         role="tooltip"
