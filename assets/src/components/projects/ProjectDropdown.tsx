@@ -80,6 +80,7 @@ export default function () {
             )}
             onClick={() => {
               route(paths.PROJECTS)
+              setPillsOpen(false)
             }}
           >
             <ViewListIcon className="w-5 h-5" />

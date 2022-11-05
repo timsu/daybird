@@ -30,7 +30,11 @@ export default function ({ buttonClass }: { buttonClass: string }) {
 
   if (timerState) {
     if (fullscreen) return <FullScreenTimer {...timerProps} />
-    return <OngoingTimer {...timerProps} textClass="cursor-pointer" />
+    return (
+      <div class="absolute sm:relative bg-white flex gap-2 left-0">
+        <OngoingTimer {...timerProps} textClass="cursor-pointer" />
+      </div>
+    )
   }
 
   uiStore.startTimer = (e) => {
@@ -57,7 +61,7 @@ export default function ({ buttonClass }: { buttonClass: string }) {
 function FullScreenTimer(props: TimerProps) {
   return (
     <div
-      class="absolute top-0 bottom-0 left-0 right-0 flex flex-col justify-center items-center
+      class="fixed top-0 bottom-0 left-0 right-0 flex flex-col justify-center items-center
         bg-black/90 z-50"
     >
       <div class="flex flex-col items-center">
@@ -105,7 +109,7 @@ function OngoingTimer({ timerState, setTimerState, setFullscreen, textClass }: T
   }
 
   return (
-    <div class="absolute sm:relative bg-white flex gap-2 left-0">
+    <>
       <div
         class={twMerge(
           'text-xl text-orange-600 w-16 text-center font-mono',
@@ -131,7 +135,7 @@ function OngoingTimer({ timerState, setTimerState, setFullscreen, textClass }: T
           <XIcon class="w-5 h-5" />
         </Button>
       </div>
-    </div>
+    </>
   )
 }
 

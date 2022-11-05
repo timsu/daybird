@@ -55,7 +55,7 @@ const Calendar = ({ currentDate, onSelect }: Props) => {
 
   const getHeader = () => {
     return (
-      <div class="flex items-center mb-1">
+      <div class="flex items-center mb-2">
         <ChevronLeftIcon
           className="rounded cursor-pointer h-4 w-4 text-gray-400 hover:bg-gray-200"
           onClick={() => setActiveDate(subMonths(activeDate, 1))}

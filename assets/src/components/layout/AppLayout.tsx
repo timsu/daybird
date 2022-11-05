@@ -1,5 +1,7 @@
+import { format } from 'date-fns'
 import { RenderableProps } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
+import uniqolor from 'uniqolor'
 
 import CalendarRail from '@/components/calendar/CalendarRail'
 import TaskContextMenu from '@/components/menus/TaskContextMenu'
@@ -34,8 +36,17 @@ export default function ({ children }: RenderableProps<{}>) {
     setSidebarOpen(dir == 'right')
   })
 
+  // generate two random colors from today's date
+  const date = useStore(uiStore.calendarDate)
+  const gradientColor1 = uniqolor(format(date, 'd MMMM EEEE'), { lightness: [85, 97] }).color
+  const gradientColor2 = uniqolor(format(date, 'EEEE M<MM d'), { lightness: [85, 97] }).color
+
+  const style = {
+    background: `linear-gradient(320deg, ${gradientColor1} 0%, ${gradientColor2} 100%)`,
+  }
+
   return (
-    <>
+    <div class="w-full h-full" style={style}>
       <SidebarMenu />
       {!sidebarHidden && (
         <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
@@ -59,7 +70,7 @@ export default function ({ children }: RenderableProps<{}>) {
         <QuickFindModal />
         <OnboardingModal />
       </div>
-    </>
+    </div>
   )
 }
 

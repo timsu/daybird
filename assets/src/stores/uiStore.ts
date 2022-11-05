@@ -123,7 +123,7 @@ class UIStore {
       if (isSafari) alert('Press the share button at the bottom and select "Add to Home Screen')
       else alert('Please open this site in Safari to add it to your home screen')
     } else if (isChrome) {
-      alert('Use the menu to install Daybird as a local app')
+      alert("Use your browser's menu to install Daybird as a local app")
     } else {
       alert('Only Chrome and Firefox support adding Daybird to your homescreen')
     }

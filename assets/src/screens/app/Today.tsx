@@ -143,7 +143,7 @@ export default (props: Props) => {
         </div>
       </AppHeader>
       <DocMenu />
-      <div class="flex flex-col grow w-full px-6 mt-4">
+      <div class="flex flex-col grow w-full px-6 mt-4 max-w-2xl mx-auto">
         <DailyPrompt date={date} />
         {todayDoc && <Document projectId={project?.id} id={todayDoc} />}
       </div>

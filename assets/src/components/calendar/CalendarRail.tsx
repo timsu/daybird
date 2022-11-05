@@ -31,7 +31,7 @@ export default function () {
 
   return (
     <>
-      <div className="w-52 relative">
+      <div className="w-52 relative z-0">
         <div
           className="sm:hidden bg-gray-800/50 fixed left-0 top-0 w-full h-full z-20"
           onClick={() => uiStore.calendarOpen.set(false)}

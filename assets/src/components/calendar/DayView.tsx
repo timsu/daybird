@@ -60,7 +60,7 @@ function ConnectCalendar() {
 
   return (
     <div class="p-2 flex flex-col items-center text-center text-sm">
-      <div class="py-6 italic text-gray-400">No calendar connected.</div>
+      <div class="py-6 text-gray-400">Would you like to see your calendar events here?</div>
 
       <GoogleServerOAuth
         desc="Add Calendar"
@@ -71,7 +71,7 @@ function ConnectCalendar() {
 
       <ErrorMessage error={error} />
 
-      <Pressable className="text-gray-500 mt-8 text-sm" onClick={hide}>
+      <Pressable className="text-gray-400 mt-8 text-sm" onClick={hide}>
         hide
       </Pressable>
     </div>
