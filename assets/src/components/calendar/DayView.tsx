@@ -204,11 +204,6 @@ function Events({ date }: Props) {
     const nowIndicator = document.getElementsByClassName('ec-now-indicator')[0]
     if (nowIndicator) nowIndicator.scrollIntoView()
     else document.getElementById('ec')?.scrollTo(0, 9999)
-
-    if (nowIndicator) {
-      const interval = setInterval(() => setNow(Date.now()), 300_000)
-      return () => clearInterval(interval)
-    }
   }, [date, events])
 
   return (
