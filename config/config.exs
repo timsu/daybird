@@ -59,10 +59,15 @@ config :sequence, :cluster_topology, [
   config: [hosts: []],
 ]
 
+{githash, _} = System.cmd("git", ["rev-parse", "HEAD"])
+config :sequence, githash: String.trim(githash)
+
 config :sequence, env: Mix.env
 config :sequence, prod: Mix.env == :prod
 config :sequence, dev: Mix.env == :dev
 config :sequence, test: Mix.env == :test
+config :sequence, staging: System.get_env("STAGING")
+
 config :sequence, staging: System.get_env("STAGING")
 
 config :sequence, static_asset_path: "priv/static"

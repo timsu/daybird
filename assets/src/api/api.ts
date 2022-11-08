@@ -391,6 +391,13 @@ class APIService {
     return response.data
   }
 
+  // misc
+
+  async githash(): Promise<{ hash: string }> {
+    const response = await this.axios.get(`${this.endpoint}/githash`)
+    return response.data
+  }
+
   // for storybooks, put API into a stub state
 
   stubMode() {

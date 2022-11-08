@@ -68,6 +68,7 @@ defmodule SequenceWeb.Router do
     post "/exchange_token", AuthController, :exchange_token
 
     get "/time", ConfigController, :time
+    get "/githash", ConfigController, :githash
 
     get "/valid_invite", InvitesController, :valid_invite
     post "/log_join_event", InvitesController, :log_join_event

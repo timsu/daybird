@@ -27,6 +27,8 @@ class DocStore {
 
   docError = atom<string | undefined>()
 
+  dirty = atom<boolean>(false)
+
   fileListener?: () => void | undefined
 
   // --- actions

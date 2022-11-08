@@ -1,6 +1,7 @@
 import { action, atom } from 'nanostores'
 import { RouterOnChangeArgs } from 'preact-router'
 
+import { API } from '@/api'
 import { config } from '@/config'
 import { File, User } from '@/models'
 import { authStore } from '@/stores/authStore'
@@ -16,6 +17,8 @@ const SLEEP_CHECK_INTERVAL = 30_000
 const LS_RECENT_FILES = 'rf'
 
 export const CALENDAR_OPEN_WIDTH = 800
+
+export const REFRESH_INTERVAL = 86400000
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => void
@@ -39,6 +42,8 @@ class UIStore {
   recentFiles: { id: string; projectId: string; title: string }[] = []
 
   installPrompt: null | BeforeInstallPromptEvent = null
+
+  loadedAt: number = Date.now()
 
   startTimer?: (e: MouseEvent) => void
   insertTasks?: (e: MouseEvent) => void
@@ -100,7 +105,17 @@ class UIStore {
     })
   }
 
-  resumeFromSleep = () => {
+  resumeFromSleep = async () => {
+    // check for daily refresh
+    if (Date.now() > this.loadedAt + REFRESH_INTERVAL && !docStore.dirty.get()) {
+      const response = await API.githash()
+      logger.debug('Refresh check', response.hash, config.hash)
+      if (!response.hash.startsWith(config.hash)) {
+        location.reload()
+        return
+      }
+    }
+
     const projects = projectStore.projects.get()
     projects.forEach((p) => {
       fileStore.loadFiles(p)
