@@ -119,7 +119,7 @@ defmodule Sequence.Projects do
   end
 
   def user_joined(user) do
-    {:ok, project} = create_project(%{ name: "Personal", shortcode: "ME", creator_id: user.id })
+    {:ok, project} = create_project(%{ name: "Personal", shortcode: "P", creator_id: user.id })
     create_user_project(%{
       project_id: project.id,
       role: "admin",
