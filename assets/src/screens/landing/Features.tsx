@@ -53,7 +53,7 @@ export default function () {
           </p>
           <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
             Daybird is built around daily planning and task management, helping you focus on making
-            progress on your goals done every day.
+            progress on your goals every day.
           </p>
         </div>
 
