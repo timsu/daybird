@@ -94,7 +94,7 @@ defmodule Sequence.Projects do
       update_project(project, %{ next_id: next_id })
       next_id
     end)
-    "#{project.shortcode}-#{next_id}"
+    "##{next_id}"
   end
 
   @spec list_project_members(Project.t()) :: [%{ id: binary, name: binary, email: binary, role: binary }]
