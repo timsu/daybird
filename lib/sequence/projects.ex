@@ -94,7 +94,7 @@ defmodule Sequence.Projects do
       update_project(project, %{ next_id: next_id })
       next_id
     end)
-    "#{project.shortcode}-#{next_id}"
+    "##{next_id}"
   end
 
   @spec list_project_members(Project.t()) :: [%{ id: binary, name: binary, email: binary, role: binary }]
@@ -119,7 +119,7 @@ defmodule Sequence.Projects do
   end
 
   def user_joined(user) do
-    {:ok, project} = create_project(%{ name: "Personal", shortcode: "ME", creator_id: user.id })
+    {:ok, project} = create_project(%{ name: "Personal", shortcode: "P", creator_id: user.id })
     create_user_project(%{
       project_id: project.id,
       role: "admin",

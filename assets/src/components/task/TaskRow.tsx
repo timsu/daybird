@@ -5,7 +5,7 @@ import { triggerContextMenu } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
-import { fileStore } from '@/stores/fileStore'
+import { fileStore, isDailyFile } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames, debounce, DebounceStyle, logger } from '@/utils'
@@ -135,6 +135,7 @@ export default ({
     const target = e.target as HTMLDivElement
     const rect = target.getBoundingClientRect()
     triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
+    e.preventDefault()
   }
 
   // --- task deletion handling
@@ -155,14 +156,16 @@ export default ({
     }
   }
 
+  const docName = task?.doc && fileStore.idToFile.get()[task.doc]?.name
+  const showGoToDoc = docName && task.doc != currentDoc && !isDailyFile(docName)
   const goToDoc = () => {
-    const currentProject = projectStore.currentProject.get()
-    route(`${paths.DOC}/${currentProject!.id}/${task.doc}`)
+    fileStore.openDoc(task.doc!)
   }
 
   return (
     <div
       id={task ? `task-${task.id}` : ''}
+      onContextMenu={clickShortCode}
       className={classNames(
         'rounded-md -mt-[1px] p-2 flex flex-row items-center relative hover-parent',
         taskList ? '' : 'border border-transparent hover:border-gray-200 -ml-4'
@@ -202,14 +205,14 @@ export default ({
         {task?.title || initialTitle}
       </div>
 
-      {task?.doc && currentDoc != task.doc && (
+      {showGoToDoc && (
         <div
           class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
-              ml-3 max-w-[110px] overflow-ellipsis cursor-pointer"
+              ml-3 max-w-[110px] overflow-hidden cursor-pointer overflow-ellipsis whitespace-nowrap"
           onClick={goToDoc}
         >
           <DocumentIcon class="w-4 h-4 mr-1" />
-          {fileStore.idToFile.get()[task.doc]?.name}
+          {fileStore.idToFile.get()[task.doc!]?.name}
         </div>
       )}
 

@@ -28,7 +28,7 @@ export default (props: Props) => {
     <>
       <Helmet title="Projects" />
 
-      <AppHeader onClickBack={() => route(paths.TODAY)}>
+      <AppHeader>
         <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
       </AppHeader>
 

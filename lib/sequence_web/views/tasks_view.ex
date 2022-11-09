@@ -2,11 +2,13 @@
 defmodule SequenceWeb.TasksView do
   use SequenceWeb, :view
 
+  alias Sequence.Utils
+
   def render_task(task) do
     %{
       id: Sequence.Utils.no_dash(task.uuid),
       title: task.title,
-      doc: task.doc,
+      doc: if(task.doc, do: Utils.no_dash(task.doc)),
       short_code: task.short_code,
       state: task.state,
       priority: task.priority,

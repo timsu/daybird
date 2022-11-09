@@ -1,6 +1,7 @@
 import { action, atom } from 'nanostores'
-import { RouterOnChangeArgs } from 'preact-router'
+import { route, RouterOnChangeArgs } from 'preact-router'
 
+import { API } from '@/api'
 import { config } from '@/config'
 import { File, User } from '@/models'
 import { authStore } from '@/stores/authStore'
@@ -17,6 +18,10 @@ const LS_RECENT_FILES = 'rf'
 
 export const CALENDAR_OPEN_WIDTH = 800
 
+export const REFRESH_INTERVAL = 86400000
+
+const PREV_PATH_LENGTH = 10
+
 type BeforeInstallPromptEvent = Event & {
   prompt: () => void
 }
@@ -27,6 +32,7 @@ class UIStore {
   isPWA = window.matchMedia('(display-mode: standalone)').matches
 
   path = atom<string>()
+  prevPaths = atom<string[]>([])
 
   sidebarMenuOpen = atom<boolean>(false)
 
@@ -39,6 +45,8 @@ class UIStore {
   recentFiles: { id: string; projectId: string; title: string }[] = []
 
   installPrompt: null | BeforeInstallPromptEvent = null
+
+  loadedAt: number = Date.now()
 
   startTimer?: (e: MouseEvent) => void
   insertTasks?: (e: MouseEvent) => void
@@ -53,9 +61,31 @@ class UIStore {
 
   // --- actions
 
+  goingBack: boolean = false
+
   routerOnChange = action(this.path, 'routerOnChange', (store, ctx: RouterOnChangeArgs<any>) => {
-    store.set(ctx.path!)
+    if (ctx.previous && !this.goingBack) {
+      let prevPaths = this.prevPaths.get()
+      // if we're going to the previous path, don't modify prev paths
+      logger.info('Router on change', prevPaths, ctx.url, ctx.previous)
+      if (prevPaths[0] != ctx.url) {
+        prevPaths = prevPaths.filter((p) => p != ctx.previous).slice(0, PREV_PATH_LENGTH)
+        prevPaths.unshift(ctx.previous)
+        this.prevPaths.set(prevPaths)
+      }
+    } else if (this.goingBack) this.goingBack = false
+    store.set(ctx.url!)
   })
+
+  goBack = () => {
+    const prevPaths = this.prevPaths.get()
+    const url = prevPaths.shift()
+    if (url) {
+      this.goingBack = true
+      route(url)
+      this.prevPaths.notify()
+    }
+  }
 
   initLoggedInUser = (user: User) => {
     if (authStore.debugMode()) (window as any)['uiStore'] = uiStore
@@ -100,7 +130,17 @@ class UIStore {
     })
   }
 
-  resumeFromSleep = () => {
+  resumeFromSleep = async () => {
+    // check for daily refresh
+    if (Date.now() > this.loadedAt + REFRESH_INTERVAL && !docStore.dirty.get()) {
+      const response = await API.githash()
+      logger.debug('Refresh check', response.hash, config.hash)
+      if (!response.hash.startsWith(config.hash)) {
+        location.reload()
+        return
+      }
+    }
+
     const projects = projectStore.projects.get()
     projects.forEach((p) => {
       fileStore.loadFiles(p)

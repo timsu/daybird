@@ -7,4 +7,8 @@ defmodule SequenceWeb.ConfigController do
     json conn, %{ time: :os.system_time(:millisecond) }
   end
 
+  def githash(conn, _params) do
+    json conn, %{ hash: Application.get_env(:sequence, :githash) }
+  end
+
 end

@@ -8,6 +8,7 @@ import TaskContextMenu from '@/components/menus/TaskContextMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import OnboardingModal from '@/components/modals/OnboardingModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
+import ShorctutsModal from '@/components/modals/ShorctutsModal'
 import AppSidebar from '@/components/nav/AppSidebar'
 import { SidebarMenu } from '@/components/nav/SidebarMenu'
 import useSwipe from '@/hooks/useSwipe'
@@ -50,7 +51,7 @@ export default function ({ children }: RenderableProps<{}>) {
       <SidebarMenu />
       {!sidebarHidden && (
         <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
-          <AppSidebar darkHeader />
+          <AppSidebar showHideButton />
         </div>
       )}
 
@@ -69,6 +70,7 @@ export default function ({ children }: RenderableProps<{}>) {
         <DeleteTaskModal />
         <QuickFindModal />
         <OnboardingModal />
+        <ShorctutsModal />
       </div>
     </div>
   )

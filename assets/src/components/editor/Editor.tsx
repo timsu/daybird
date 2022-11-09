@@ -14,6 +14,7 @@ import { TaskItem } from '@/components/editor/TaskItem'
 import { WikiLink } from '@/components/editor/WikiLink'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
+import { docStore } from '@/stores/docStore'
 import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
@@ -143,7 +144,6 @@ function useAutosave(
 ) {
   const { id, project, saveContents } = props
   const currentFile = useRef<string>()
-  const isDirty = useRef<boolean>()
 
   useEffect(() => {
     if (!editor || !ydoc) return
@@ -155,7 +155,7 @@ function useAutosave(
     }
 
     currentFile.current = id
-    isDirty.current = false
+    docStore.dirty.set(false)
     const textChangeHandler = ({
       editor,
       transaction,
@@ -166,13 +166,13 @@ function useAutosave(
       // ignore non-local changes
       if (transaction && isChangeOrigin(transaction)) return
 
-      isDirty.current = true
+      docStore.dirty.set(true)
       debounce(
         'save-' + id,
         () => {
           if (id != currentFile.current) return
           saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
-          isDirty.current = false
+          docStore.dirty.set(false)
         },
         SAVE_INTERVAL,
         DebounceStyle.RESET_ON_NEW
@@ -180,12 +180,12 @@ function useAutosave(
     }
     editor.on('update', textChangeHandler)
     window.onbeforeunload = () => {
-      if (isDirty.current) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+      if (docStore.dirty.get()) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
     }
 
     return () => {
       editor.off('update', textChangeHandler)
-      if (isDirty.current) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+      if (docStore.dirty.get()) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
       window.onbeforeunload = null
     }
   }, [editor])
