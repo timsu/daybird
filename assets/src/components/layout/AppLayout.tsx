@@ -1,6 +1,7 @@
 import { format } from 'date-fns'
 import { RenderableProps } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
+import { Toaster } from 'react-hot-toast'
 import uniqolor from 'uniqolor'
 
 import CalendarRail from '@/components/calendar/CalendarRail'
@@ -48,6 +49,7 @@ export default function ({ children }: RenderableProps<{}>) {
 
   return (
     <div class="w-full h-full" style={style}>
+      <Toaster />
       <SidebarMenu />
       {!sidebarHidden && (
         <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
