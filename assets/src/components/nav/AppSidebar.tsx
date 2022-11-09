@@ -31,7 +31,7 @@ type NavItem = {
   indent?: number
 }
 
-export default ({ darkHeader }: { darkHeader?: boolean }) => {
+export default ({ showHideButton }: { showHideButton?: boolean }) => {
   const projects = useStore(projectStore.activeProjects)
   const date = useStore(uiStore.calendarDate)
 

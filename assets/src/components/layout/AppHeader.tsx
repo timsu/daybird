@@ -1,4 +1,5 @@
 import { RenderableProps } from 'preact'
+import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 import { twMerge } from 'tailwind-merge'
 
@@ -12,12 +13,12 @@ import { useStore } from '@nanostores/preact'
 
 type Props = {
   transparent?: boolean
-  onClickBack?: () => void
 }
 
 export default function AppHeader(p: RenderableProps<Props>) {
   const sidebarOpen = useStore(uiStore.sidebarMenuOpen)
   const sidebarHidden = useStore(uiStore.sidebarHidden)
+  const prevPaths = useStore(uiStore.prevPaths)
 
   const [hasShadow, setHasShadow] = useState(false)
 
@@ -53,11 +54,12 @@ export default function AppHeader(p: RenderableProps<Props>) {
           <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
         </button>
       )}
-      {!sidebarHidden && (
+      {prevPaths.length > 0 && (
         <button
           type="button"
-          className="text-gray-400 hidden md:block hover:bg-gray-100 rounded-md"
-          onClick={() => (p.onClickBack ? p.onClickBack() : uiStore.sidebarHidden.set(true))}
+          className="text-gray-400 ml-4 md:block hover:bg-gray-100 rounded-md"
+          onClick={() => uiStore.goBack()}
+          title="Previous Page"
         >
           <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
         </button>

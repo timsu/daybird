@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="Daybird"/>
     <meta name="description" content="Daybird is the premier daily journal for creative thinkers and teams."/>
     <%
-      title = assigns[:title] || "Plan to win"
+      title = if assigns[:title], do: "Daybird | #{assigns[:title]}", else: "Daybird"
     %>
-    <title>Daybird | <%= title %></title>
+    <title><%= title %></title>
     <link rel="icon" href="/favicon.ico?v=2"/>
     <link rel="apple-touch-icon" sizes="128x128" href="/images/apple-touch-icon.png"/>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css"/>

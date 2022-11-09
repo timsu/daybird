@@ -39,7 +39,7 @@ export default (props: Props) => {
       <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
 
       <AppHeader>
-        <div class="flex items-center gap-4 sm:pl-4 overflow-hidden">
+        <div class="flex items-center gap-4 overflow-hidden">
           <h1 class="text-xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden overflow-ellipsis">
             {title}
           </h1>

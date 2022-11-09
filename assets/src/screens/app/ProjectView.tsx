@@ -42,7 +42,7 @@ export default ({ id }: Props) => {
   return (
     <>
       <Helmet title={`Project | ${project.name}`} />
-      <AppHeader onClickBack={() => route(paths.PROJECTS)}>
+      <AppHeader>
         <h1 className="text-2xl font-semibold text-gray-900">
           {project.name} ({project.shortcode})
         </h1>

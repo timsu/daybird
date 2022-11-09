@@ -11,9 +11,9 @@
     <link rel="manifest" href={if Sequence.dev?, do: "/pwa-local.json", else: "/pwa.json"}>
 
     <%
-      title = assigns[:title] || "Plan to win"
+      title = if assigns[:title], do: "Daybird | #{assigns[:title]}", else: "Daybird"
     %>
-    <title>Daybird | <%= title %></title>
+    <title><%= title %></title>
     <link rel="apple-touch-icon" sizes="128x128" href="/images/apple-touch-icon.png"/>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css"/>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4E3FGBFQ3T"></script>

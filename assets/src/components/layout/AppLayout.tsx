@@ -50,7 +50,7 @@ export default function ({ children }: RenderableProps<{}>) {
       <SidebarMenu />
       {!sidebarHidden && (
         <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
-          <AppSidebar darkHeader />
+          <AppSidebar showHideButton />
         </div>
       )}
 
