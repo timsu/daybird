@@ -7,8 +7,6 @@ export type CommandListProps = {
 }
 
 export default function ({ items, selectedIndex, selectItem }: CommandListComponentProps) {
-  console.log('rendarr', items)
-
   return (
     <div class="shadow rounded bg-white flex flex-col w-52">
       {items.map((item, index) => {

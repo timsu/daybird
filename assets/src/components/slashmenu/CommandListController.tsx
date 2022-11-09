@@ -82,8 +82,6 @@ export default class CommandsListController extends Component<Props, State> {
     const { items, component: Component } = this.props
     const { selectedIndex } = this.state
 
-    console.log('command list controller', this)
-
     return <Component items={items} selectedIndex={selectedIndex} selectItem={this.selectItem} />
   }
 }

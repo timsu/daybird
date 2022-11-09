@@ -14,8 +14,6 @@ const renderItems = (renderComponent: FunctionalComponent<CommandListComponentPr
   let ref = createRef<CommandsListController>()
   let popup: Instance[]
 
-  console.log('render items')
-
   return {
     onStart: (props: SuggestionProps<CommandItem>) => {
       const componentProps = {
