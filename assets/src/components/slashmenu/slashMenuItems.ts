@@ -1,7 +1,7 @@
-import { CommandItem } from '@/components/slashmenu/CommandsList'
+import { CommandItem } from '@/components/slashmenu/commands'
 import { Editor } from '@tiptap/core'
 
-const getSuggestionItems = ({ query, editor }: { query: string; editor: Editor }) => {
+export default ({ query, editor }: { query: string; editor: Editor }) => {
   const items: CommandItem[] = [
     {
       title: 'H1',
@@ -40,5 +40,3 @@ const getSuggestionItems = ({ query, editor }: { query: string; editor: Editor }
 
   return items
 }
-
-export default getSuggestionItems
