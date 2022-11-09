@@ -24,7 +24,7 @@ export const pluralize = (noun: string, num: number) => {
 }
 
 /** unwrap backend errors */
-export function unwrapError(error: any, defaultMessage?: string, expandErrorObject?: boolean) {
+export function unwrapError(error: any, skipExpandErrors?: boolean, defaultMessage?: string) {
   if (!error) return 'Error'
   if (typeof error == 'string') return error
   if (error.response) {
@@ -34,17 +34,28 @@ export function unwrapError(error: any, defaultMessage?: string, expandErrorObje
     const errorObject = response.data.error
     if (errorObject) {
       const message =
-        typeof errorObject.message == 'string'
+        errorObject.message == 'Invalid parameters were provided'
+          ? 'Data was not valid'
+          : typeof errorObject.message == 'string'
           ? errorObject.message
           : JSON.stringify(errorObject.message)
       const otherKeys = Object.keys(response.data.error).filter(
         (k) => k != 'message' && k != 'resend'
       )
-      if (message && expandErrorObject && otherKeys.length > 0) {
+      if (message && !skipExpandErrors && otherKeys.length > 0) {
         return (
           message +
           ': ' +
-          otherKeys.map((k) => `${k} ${JSON.stringify(response.data.error[k])}`).join(', ')
+          otherKeys
+            .map(
+              (k) =>
+                `${k} ${
+                  Array.isArray(response.data.error[k])
+                    ? response.data.error[k].join(', ')
+                    : JSON.stringify(response.data.error[k])
+                }`
+            )
+            .join(', ')
         )
       } else {
         return message
