@@ -135,6 +135,7 @@ export default ({
     const target = e.target as HTMLDivElement
     const rect = target.getBoundingClientRect()
     triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
+    e.preventDefault()
   }
 
   // --- task deletion handling
@@ -165,6 +166,7 @@ export default ({
   return (
     <div
       id={task ? `task-${task.id}` : ''}
+      onContextMenu={clickShortCode}
       className={classNames(
         'rounded-md -mt-[1px] p-2 flex flex-row items-center relative hover-parent',
         taskList ? '' : 'border border-transparent hover:border-gray-200 -ml-4'
