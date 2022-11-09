@@ -2,23 +2,26 @@ import { ContextMenuItem, ContextMenuWithData } from '@/components/core/ContextM
 import Pressable from '@/components/core/Pressable'
 import { paths } from '@/config'
 import { Task, TaskState, TaskType } from '@/models'
+import { docStore } from '@/stores/docStore'
+import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
 import {
     ArchiveIcon, ArrowCircleLeftIcon, ArrowCircleRightIcon, BookmarkIcon, CheckCircleIcon,
-    EyeOffIcon, FlagIcon, TrashIcon
+    DocumentIcon, EyeOffIcon, FlagIcon, LinkIcon, TrashIcon
 } from '@heroicons/react/outline'
 
 export default () => {
-  const isDoc = location.pathname.startsWith(paths.DOC) || location.pathname.startsWith(paths.TODAY)
+  const isDocPage =
+    location.pathname.startsWith(paths.DOC) || location.pathname.startsWith(paths.TODAY)
 
   return (
     <ContextMenuWithData id="task-menu">
       {(task: Task) =>
         task.deleted_at ? (
           <>
-            {isDoc && (
+            {isDocPage && (
               <ContextMenuItem onClick={() => taskStore.deletedTask.set(task)}>
                 <EyeOffIcon class="h-4 w-4 mr-2 text-gray-500" />
                 Remove from page
@@ -65,7 +68,15 @@ export default () => {
 
             <hr />
 
-            {isDoc && (
+            {task.doc &&
+              (!isDocPage ||
+                (task.doc != docStore.id.get() && (
+                  <ContextMenuItem onClick={() => fileStore.openDoc(task.doc)}>
+                    <DocumentIcon class="h-4 w-4 mr-2 text-gray-500" />
+                    View original note
+                  </ContextMenuItem>
+                )))}
+            {isDocPage && (
               <ContextMenuItem onClick={() => taskStore.deletedTask.set(task)}>
                 <EyeOffIcon class="h-4 w-4 mr-2 text-gray-500" />
                 Remove from page

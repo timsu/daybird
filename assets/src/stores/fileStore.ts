@@ -10,6 +10,7 @@ import {
 } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
+import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
 
@@ -159,7 +160,7 @@ class FileStore {
     const files = this.files.get()[file.projectId!] || []
     const existing = files.find((f) => f.parent == file.parent && f.name == linkName)
     if (existing) {
-      return route(paths.DOC + '/' + file.projectId + '/' + existing.id)
+      return this.openDoc(existing.id)
     }
 
     return this.newFile(file.projectId!, linkName, FileType.DOC, file.parent)
@@ -293,6 +294,21 @@ class FileStore {
     if (file.name.length != 4) return false
     const intValue = parseInt(file.name)
     return intValue > 2000 && intValue < 3000
+  }
+
+  openDoc = (id: string | undefined) => {
+    const file = this.idToFile.get()[id || '']
+    logger.info('open doc', id, file)
+    if (!file) return
+
+    if (isDailyFile(file.name)) {
+      if (file.projectId != projectStore.currentProject.get()?.id) {
+        projectStore.setCurrentProject(file.projectId!)
+      }
+      route(paths.TODAY + '?d=' + file.name)
+    } else {
+      route(paths.DOC + '/' + file.projectId + '/' + file.id)
+    }
   }
 }
 

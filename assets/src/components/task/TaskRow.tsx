@@ -159,8 +159,7 @@ export default ({
   const docName = task?.doc && fileStore.idToFile.get()[task.doc]?.name
   const showGoToDoc = docName && task.doc != currentDoc && !isDailyFile(docName)
   const goToDoc = () => {
-    const currentProject = projectStore.currentProject.get()
-    route(`${paths.DOC}/${currentProject!.id}/${task.doc}`)
+    fileStore.openDoc(task.doc!)
   }
 
   return (
