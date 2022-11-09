@@ -6,7 +6,7 @@ import { stringSimilarity } from 'string-similarity-js'
 
 import { ModalWithoutPadding } from '@/components/modals/Modal'
 import { paths } from '@/config'
-import useShortcut from '@/hooks/useShortcut'
+import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
 import { File, FileType } from '@/models'
 import { DOC_EXT, fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
@@ -29,8 +29,7 @@ export default () => {
   const open = useStore(modalStore.quickFindModal)
 
   useShortcut((e) => {
-    const modifier = isMac ? e.metaKey : e.ctrlKey
-    if (modifier && e.key == 'p') {
+    if (checkShortcut(e, 'p')) {
       modalStore.quickFindModal.set(true)
       return true
     }

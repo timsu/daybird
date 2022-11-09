@@ -1,14 +1,7 @@
-import { StateUpdater, useState } from 'preact/hooks'
-
 import Button from '@/components/core/Button'
-import Modal, { ModalWithoutPadding } from '@/components/modals/Modal'
-import create_task from '@/images/create_task.mp4'
-import install_daybird from '@/images/install_daybird.mp4'
-import new_notes from '@/images/new_notes.mp4'
-import { authStore } from '@/stores/authStore'
+import Modal from '@/components/modals/Modal'
 import { modalStore } from '@/stores/modalStore'
 import { ctrlOrCommand } from '@/utils'
-import { Dialog } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
 
 enum Page {
@@ -32,11 +25,12 @@ export default () => {
 
       <div class="text-gray-700 text-left">
         <Shortcut hotkey="p" role="Quickly switch notes and projects" />
+        <Shortcut hotkey="y" role="Jump to Today" />
         <Shortcut hotkey="\" role="Toggle focus mode" />
         <Shortcut hotkey="l" role="Add a link" />
         <Shortcut hotkey="j" role="Today page: Go to previous day" />
         <Shortcut hotkey="k" role="Today page: Go to next day" />
-        <Shortcut hotkey="?" role="Show this help" />
+        <Shortcut hotkey="/" role="Show this help" />
       </div>
 
       <div class="mt-8 flex justify-center">
