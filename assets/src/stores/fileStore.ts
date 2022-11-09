@@ -298,3 +298,5 @@ class FileStore {
 
 export const fileStore = new FileStore()
 if (config.dev) (window as any)['fileStore'] = fileStore
+
+export const isDailyFile = (name: string) => /[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(name)
