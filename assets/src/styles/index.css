@@ -38,13 +38,6 @@ body,
 }
 */
 
-.hover-parent .hover-visible {
-  opacity: 0;
-}
-.hover-parent:hover .hover-visible {
-  opacity: 1;
-}
-
 span.grippy {
   content: '....';
   width: 10px;

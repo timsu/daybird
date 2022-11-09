@@ -23,14 +23,14 @@ export default () => {
     if (!name) return setError('Name is required')
     if (!email) return setError('Email is required')
     if (!password) return setError('Password is required')
-    if (!email.includes('@')) setError('Email is invalid')
-    if (password.length < 6) setError('Password needs to be at least 6 characters')
+    if (!email.includes('@')) return setError('Email is invalid')
+    if (password.length < 6) return setError('Password needs to be at least 6 characters')
 
     try {
       setSubmitting(true)
       await authStore.createAccount(name, email, password)
     } catch (e) {
-      setError(unwrapError(e))
+      setError(unwrapError(e, false, "We're so sorry, there was an error creating the account."))
     } finally {
       setSubmitting(false)
     }
@@ -41,7 +41,7 @@ export default () => {
       setSubmitting(true)
       await authStore.logInElseSignUpOAuth(OAuthProvider.GOOGLE, response.id_token!)
     } catch (e) {
-      setError(unwrapError(e))
+      setError(unwrapError(e, false, "We're so sorry, there was an error creating the account."))
     } finally {
       setSubmitting(false)
     }
@@ -49,6 +49,25 @@ export default () => {
 
   return (
     <AuthForm title="Create an account">
+      <div className="flex justify-center">
+        <GoogleServerOAuth
+          desc="Sign up with Google"
+          scope={PROFILE_SCOPES}
+          onSuccess={signUpGoogle}
+        />
+      </div>
+
+      <div className="my-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">Or</span>
+          </div>
+        </div>
+      </div>
+
       <form className="space-y-6" action="#" method="POST" onSubmit={onSubmit}>
         <Input
           id="name"
@@ -90,25 +109,6 @@ export default () => {
           </a>
         </div>
       </form>
-
-      <div className="mt-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 flex justify-center">
-        <GoogleServerOAuth
-          desc="Sign up with Google"
-          scope={PROFILE_SCOPES}
-          onSuccess={signUpGoogle}
-        />
-      </div>
     </AuthForm>
   )
 }

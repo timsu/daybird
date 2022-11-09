@@ -139,7 +139,7 @@ class CalendarStore {
       await Promise.all(
         this.tokens.get()!.map((t) =>
           this.fetchCalendarForToken(t).catch((e) => {
-            this.accountError.setKey(t.email!, unwrapError(e))
+            this.accountError.setKey(t.email!, unwrapError(e, true))
           })
         )
       )
@@ -203,7 +203,7 @@ class CalendarStore {
       )
     } catch (e) {
       logger.warn(e)
-      this.error.set(unwrapError(e))
+      this.error.set(unwrapError(e, true))
     }
   }
 
@@ -219,7 +219,7 @@ class CalendarStore {
       calendars.map(async (cal) => {
         if (!this.isCalendarEnabled(enabled, cal)) return
         this.fetchEventsForCalendar(validated, cal.id, date).catch((e) => {
-          this.accountError.setKey(token.email!, unwrapError(e))
+          this.accountError.setKey(token.email!, unwrapError(e, true))
         })
       })
     )
