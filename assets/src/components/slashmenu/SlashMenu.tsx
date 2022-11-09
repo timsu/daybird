@@ -14,13 +14,14 @@ export default function ({ items, selectedIndex, selectItem }: CommandListCompon
       {items.map((item, index) => {
         return (
           <button
-            className={`text-left p-2 hover:bg-gray-400 ${
+            className={`text-left p-2 hover:bg-gray-400 flex ${
               index === selectedIndex ? 'bg-gray-300' : ''
             }`}
             key={index}
             onClick={() => selectItem(index)}
           >
-            {item.title}
+            <div class="flex-1">{item.title}</div>
+            {item.shortcut && <div class="opacity-50">{item.shortcut}</div>}
           </button>
         )
       })}

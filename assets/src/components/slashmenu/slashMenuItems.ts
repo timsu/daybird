@@ -4,34 +4,63 @@ import { Editor } from '@tiptap/core'
 export default ({ query, editor }: { query: string; editor: Editor }) => {
   const items: CommandItem[] = [
     {
-      title: 'H1',
+      title: 'New Task',
+      shortcut: '[]',
+      command: ({ editor, range }) => {
+        const newNode = {
+          type: 'task',
+          attrs: { id: 'focus' },
+        }
+        editor.chain().focus().deleteRange(range).insertContent(newNode).run()
+      },
+    } as CommandItem,
+    {
+      title: 'Heading 1',
+      shortcut: '#',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 1 }).run()
       },
     } as CommandItem,
     {
-      title: 'H2',
+      title: 'Heading 2',
+      shortcut: '##',
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).setNode('heading', { level: 2 }).run()
       },
     } as CommandItem,
     {
-      title: 'bold',
+      title: 'Bullet List',
+      shortcut: '-',
       command: ({ editor, range }) => {
-        editor.chain().focus().deleteRange(range).setMark('bold').run()
+        editor.chain().focus().deleteRange(range).toggleBulletList().run()
       },
     } as CommandItem,
     {
-      title: 'italic',
+      title: 'Numbered List',
+      shortcut: '1.',
       command: ({ editor, range }) => {
-        editor.chain().focus().deleteRange(range).setMark('italic').run()
+        editor.chain().focus().deleteRange(range).toggleOrderedList().run()
       },
     } as CommandItem,
     {
-      title: 'image',
+      title: 'Quote',
+      shortcut: '>',
       command: ({ editor, range }) => {
-        console.log('call some function from parent')
-        editor.chain().focus().deleteRange(range).setNode('paragraph').run()
+        editor.chain().focus().deleteRange(range).toggleBlockquote().run()
+      },
+    } as CommandItem,
+    {
+      title: 'Divider',
+      shortcut: '---',
+      command: ({ editor, range }) => {
+        editor.chain().focus().deleteRange(range).setHorizontalRule().run()
+      },
+    } as CommandItem,
+    {
+      title: 'Code',
+      shortcut: '```',
+      command: ({ editor, range }) => {
+        editor.chain().focus().deleteRange(range).toggleCodeBlock().run()
       },
     } as CommandItem,
   ]

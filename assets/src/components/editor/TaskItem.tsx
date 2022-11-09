@@ -72,15 +72,15 @@ export const TaskItem = Node.create<TaskItemOptions>({
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const container = document.createElement('div')
 
-      const onCreateTask = (task: Task) => {
+      const onCreateTask = (task: Task | null) => {
         const { view } = editor
         if (typeof getPos === 'function') {
-          // … dispatch a transaction, for the current position in the document …
-          view.dispatch(
-            view.state.tr.setNodeMarkup(getPos(), undefined, {
-              id: task.id,
-            })
-          )
+          const newAttrs = task
+            ? {
+                id: task.id,
+              }
+            : {}
+          view.dispatch(view.state.tr.setNodeMarkup(getPos(), undefined, newAttrs))
         }
         return true
       }

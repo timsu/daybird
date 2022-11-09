@@ -27,7 +27,7 @@ const renderItems = (renderComponent: FunctionalComponent<CommandListComponentPr
       container = document.createElement('div') as HTMLDivElement
       render(<CommandsListController {...componentProps} />, container)
 
-      requestAnimationFrame(() => {
+      setTimeout(() => {
         popup = tippy('body', {
           getReferenceClientRect: props.clientRect as () => DOMRect,
           appendTo: () => document.body,
@@ -37,7 +37,7 @@ const renderItems = (renderComponent: FunctionalComponent<CommandListComponentPr
           trigger: 'manual',
           placement: 'bottom-start',
         })
-      })
+      }, 0)
     },
     onUpdate(props: SuggestionProps<CommandItem>) {
       const newProps = { ...props, ref, component: renderComponent }
