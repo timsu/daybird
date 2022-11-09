@@ -12,6 +12,9 @@ import Link from '@/components/editor/Link'
 import { MenuBar } from '@/components/editor/MenuBar'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { WikiLink } from '@/components/editor/WikiLink'
+import Commands from '@/components/slashmenu/commands'
+import getSuggestionItems from '@/components/slashmenu/items'
+import renderItems from '@/components/slashmenu/renderItems'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
@@ -107,8 +110,14 @@ const useEditor = (id: string | undefined, initialContent: any) => {
         Placeholder.configure({
           placeholder:
             'Welcome to Daybird!\n\nStart typing to create a note.\n\n' +
-            'Type "[] " to create a task.\n\n' +
+            'Type "/" to insert a task or add formatting.\n\n' +
             'Have fun!',
+        }),
+        Commands.configure({
+          suggestion: {
+            items: getSuggestionItems,
+            render: renderItems,
+          },
         }),
         Collaboration.configure({
           document: ydoc,

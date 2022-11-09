@@ -3,13 +3,11 @@ import { NodeType } from 'prosemirror-model'
 import { Plugin, PluginKey } from 'prosemirror-state'
 import toast from 'react-hot-toast'
 
-import Button from '@/components/core/Button'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
-import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
-import { logger, pluralize, pluralizeWithCount } from '@/utils'
+import { pluralize, pluralizeWithCount } from '@/utils'
 import { InputRule, InputRuleFinder, mergeAttributes, Node } from '@tiptap/core'
 
 export interface TaskItemOptions {
