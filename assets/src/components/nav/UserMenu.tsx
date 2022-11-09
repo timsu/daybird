@@ -5,6 +5,7 @@ import Avatar from '@/components/core/Avatar'
 import { paths } from '@/config'
 import useShortcut from '@/hooks/useShortcut'
 import { authStore } from '@/stores/authStore'
+import { modalStore } from '@/stores/modalStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { Menu, Transition } from '@headlessui/react'
@@ -27,6 +28,12 @@ const userNavigation = [
   uiStore.isPWA
     ? null
     : { name: 'Install Daybird App', href: '#', onClick: () => uiStore.installAction() },
+  {
+    name: 'Keyboard Shortcuts',
+    href: '#',
+    shortcut: '/',
+    onClick: () => modalStore.shortcutsModal.set(true),
+  },
   { name: 'Report a Bug', href: 'mailto:tim@daybird.app?subject=Bug Report' },
   { name: 'Sign out', href: '#', onClick: () => authStore.logout() },
 ]
@@ -39,6 +46,9 @@ export default () => {
   useShortcut((e) => {
     if (e.key == '\\' && (e.metaKey || e.ctrlKey)) {
       toggleFocusMode()
+      return true
+    } else if (e.key == '/' && (e.metaKey || e.ctrlKey)) {
+      modalStore.shortcutsModal.set(true)
       return true
     }
     return false
@@ -86,7 +96,9 @@ export default () => {
                     {item.shortcut && (
                       <>
                         <div class="flex-1 min-w-[20px]" />
-                        <div class="opacity-50">{ctrlOrCommand()}+\</div>
+                        <div class="opacity-50">
+                          {ctrlOrCommand()}+{item.shortcut}
+                        </div>
                       </>
                     )}
                   </a>

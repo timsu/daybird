@@ -22,6 +22,8 @@ class ModalStore {
   quickFindModal = atom<boolean>(false)
 
   onboardingModal = atom<boolean>(false)
+
+  shortcutsModal = atom<boolean>(false)
 }
 
 export const modalStore = new ModalStore()
