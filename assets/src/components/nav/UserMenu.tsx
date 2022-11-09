@@ -10,6 +10,15 @@ import { Menu, Transition } from '@headlessui/react'
 import { useStore } from '@nanostores/preact'
 
 const userNavigation = [
+  {
+    name: 'Toggle Focus Mode',
+    href: '#',
+    onClick: () => {
+      const setting = !uiStore.sidebarHidden.get()
+      uiStore.sidebarHidden.set(setting)
+      uiStore.calendarOpen.set(!setting)
+    },
+  },
   { name: 'User Settings', href: paths.SETTINGS },
   uiStore.isPWA
     ? null
