@@ -1,4 +1,3 @@
-import { route } from 'preact-router'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
@@ -12,6 +11,7 @@ import { classNames, debounce, DebounceStyle, logger } from '@/utils'
 import { isSafari } from '@/utils/os'
 import { DocumentIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
+import { NodeViewWrapper } from '@tiptap/react'
 
 type Props = {
   id: string | undefined
@@ -163,15 +163,17 @@ export default ({
   }
 
   return (
-    <div
+    <NodeViewWrapper
       id={task ? `task-${task.id}` : ''}
       onContextMenu={clickShortCode}
       className={classNames(
-        'rounded-md -mt-[1px] p-2 flex flex-row items-center relative hover-parent',
+        'rounded-md -mt-[1px] p-2 flex flex-row items-center relative group',
         taskList ? '' : 'border border-transparent hover:border-gray-200 -ml-4'
       )}
     >
-      {!taskList && !isSafari && <span class="-ml-2 drag-handle grippy hover-visible" />}
+      {!taskList && !isSafari && (
+        <span data-drag-handle="" class="-ml-2 drag-handle grippy invisible group-hover:visible" />
+      )}
 
       {task?.deleted_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">DELETED</div>
@@ -235,6 +237,6 @@ export default ({
       >
         {task?.short_code}
       </div>
-    </div>
+    </NodeViewWrapper>
   )
 }

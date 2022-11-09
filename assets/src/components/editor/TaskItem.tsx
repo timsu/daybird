@@ -32,17 +32,9 @@ export const TaskItem = Node.create<TaskItemOptions>({
   // on FF / Safari, draggable prevents editing contents
   draggable: navigator.userAgent?.includes('Chrome/'),
 
-  addOptions() {
-    return {
-      HTMLAttributes: {},
-    }
-  },
-
-  content: 'inline*',
+  content: 'text*',
 
   group: 'block',
-
-  defining: true,
 
   addAttributes() {
     return {
