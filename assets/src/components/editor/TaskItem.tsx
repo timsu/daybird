@@ -152,7 +152,6 @@ export const TaskItem = Node.create<TaskItemOptions>({
 
           replaceSteps.forEach((index) => {
             const map = transaction.mapping.maps[index] as any
-            console.log('replaces', map)
             const oldStart = map.ranges[0]
             const oldEnd = map.ranges[0] + map.ranges[1]
 
@@ -182,8 +181,8 @@ export const TaskItem = Node.create<TaskItemOptions>({
                     Delete {tasksToDelete.length == 1 ? 'it' : 'them'}?
                   </button>
                 </div>
-              )
-              // { duration: 10_000 }
+              ),
+              { duration: 10_000 }
             )
           }
 
