@@ -143,6 +143,7 @@ function TaskMenuContent({ close }: { close: () => void }) {
       </div>
 
       <div className="grid grid-cols-1 divide-y h-full overflow-scroll">
+        {displayedTasks.length == 0 && <div class="p-3">No uncompleted tasks to insert</div>}
         {displayedTasks.map((t) => (
           <div
             key={t.id}
