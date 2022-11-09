@@ -1,13 +1,15 @@
 import { render } from 'preact'
 import { NodeType } from 'prosemirror-model'
 import { Plugin, PluginKey } from 'prosemirror-state'
+import toast from 'react-hot-toast'
 
+import Button from '@/components/core/Button'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
-import { logger } from '@/utils'
+import { logger, pluralize, pluralizeWithCount } from '@/utils'
 import { InputRule, InputRuleFinder, mergeAttributes, Node } from '@tiptap/core'
 
 export interface TaskItemOptions {
@@ -154,24 +156,45 @@ export const TaskItem = Node.create<TaskItemOptions>({
             }
           })
 
+          const tasksToDelete: string[] = []
+
           replaceSteps.forEach((index) => {
             const map = transaction.mapping.maps[index] as any
+            console.log('replaces', map)
             const oldStart = map.ranges[0]
             const oldEnd = map.ranges[0] + map.ranges[1]
+
             state.doc.nodesBetween(oldStart, oldEnd, (node) => {
               if (node.type.name === 'task') {
-                // prevent deleting of tasks
-                logger.info('prosemirror attempt delete', node)
-                const id = node.attrs.id
-                const taskToDelete = taskStore.deletedTask.get()
-                if (id && id != taskToDelete?.id) {
-                  result = false
-                  const task = taskStore.taskMap.get()[id]
-                  modalStore.deleteTaskModal.set(task)
-                }
+                // if (node.attrs.id != taskStore.del
+                tasksToDelete.push(node.attrs.id)
               }
             })
           })
+
+          if (tasksToDelete.length > 0) {
+            toast(
+              (t) => (
+                <div class="inline">
+                  {pluralizeWithCount('task', tasksToDelete.length)} removed from page.
+                  <button
+                    onClick={() => {
+                      tasksToDelete.forEach((id) =>
+                        taskStore.deleteTask(taskStore.taskMap.get()[id])
+                      )
+                      toast.dismiss(t.id)
+                      toast.success(pluralize('Task', tasksToDelete.length) + ' deleted')
+                    }}
+                    class="px-2 py-1 shadow bg-gray-200 ml-2 hover:bg-gray-400 rounded"
+                  >
+                    Delete {tasksToDelete.length == 1 ? 'it' : 'them'}?
+                  </button>
+                </div>
+              )
+              // { duration: 10_000 }
+            )
+          }
+
           return result
         },
       }),

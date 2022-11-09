@@ -67,7 +67,6 @@ class UIStore {
     if (ctx.previous && !this.goingBack) {
       let prevPaths = this.prevPaths.get()
       // if we're going to the previous path, don't modify prev paths
-      logger.info('Router on change', prevPaths, ctx.url, ctx.previous)
       if (prevPaths[0] != ctx.url) {
         prevPaths = prevPaths.filter((p) => p != ctx.previous).slice(0, PREV_PATH_LENGTH)
         prevPaths.unshift(ctx.previous)
