@@ -13,7 +13,7 @@ import DailyPrompt from '@/components/journal/DailyPrompt'
 import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
 import { paths } from '@/config'
-import useShortcut from '@/hooks/useShortcut'
+import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
@@ -85,8 +85,7 @@ export default (props: Props) => {
 
   useShortcut(
     (e) => {
-      const modifier = isMac ? e.metaKey : e.ctrlKey
-      if (modifier && (e.key == 'j' || e.key == 'k')) {
+      if (checkShortcut(e, 'j', 'k')) {
         const newDate = addDays(date || new Date(), e.key == 'j' ? -1 : 1)
         const newUrl = paths.TODAY + '?d=' + format(newDate, 'yyyy-MM-dd')
         route(newUrl)

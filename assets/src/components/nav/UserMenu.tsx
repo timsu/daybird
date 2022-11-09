@@ -1,9 +1,10 @@
 import { Fragment } from 'preact'
+import { route } from 'preact-router'
 
 import Alphatar from '@/components/core/Alphatar'
 import Avatar from '@/components/core/Avatar'
 import { paths } from '@/config'
-import useShortcut from '@/hooks/useShortcut'
+import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
 import { authStore } from '@/stores/authStore'
 import { modalStore } from '@/stores/modalStore'
 import { uiStore } from '@/stores/uiStore'
@@ -44,12 +45,14 @@ export default () => {
   if (!user) return null
 
   useShortcut((e) => {
-    if (e.key == '\\' && (e.metaKey || e.ctrlKey)) {
+    if (checkShortcut(e, '\\')) {
       toggleFocusMode()
       return true
-    } else if (e.key == '/' && (e.metaKey || e.ctrlKey)) {
+    } else if (checkShortcut(e, '/', '?')) {
       modalStore.shortcutsModal.set(true)
       return true
+    } else if (checkShortcut(e, 'y')) {
+      route(paths.TODAY)
     }
     return false
   }, [])
