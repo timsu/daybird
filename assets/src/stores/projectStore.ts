@@ -7,6 +7,7 @@ import { FileType, Project, User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
+import { taskStore } from '@/stores/taskStore'
 import { logger } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
@@ -44,6 +45,7 @@ class ProjectStore {
         currentProject = projects.find((p) => p.id == lastProjectId)
       }
       store.set(currentProject)
+      if (currentProject) taskStore.loadTasks(currentProject)
     }
   )
 
@@ -61,6 +63,7 @@ class ProjectStore {
           if (user?.meta?.lp != project.id) {
             authStore.updateUser({ meta: { lp: project.id } })
           }
+          taskStore.loadTasks(project)
 
           return project
         }

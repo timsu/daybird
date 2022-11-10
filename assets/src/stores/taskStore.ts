@@ -36,8 +36,6 @@ class TaskStore {
   loadTasks = async (project: Project) => {
     if (authStore.debugMode()) (window as any)['taskStore'] = taskStore
 
-    this.taskList.set([])
-
     const response = await API.listTasks(project)
     const tasks = response.tasks.map((t) => Task.fromJSON(t))
     const taskMap = this.taskMap.get()

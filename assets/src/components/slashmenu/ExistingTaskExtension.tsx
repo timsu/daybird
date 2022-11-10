@@ -18,7 +18,7 @@ const pluginKey = new PluginKey('existingtasks')
 
 const TaskMenu = function ({ items, selectedIndex, selectItem }: MenuComponentProps<Task>) {
   return (
-    <div class="shadow rounded bg-white flex flex-col w-52">
+    <div class="shadow rounded bg-white flex flex-col w-96">
       {items.map((item, index) => {
         return (
           <button
@@ -66,9 +66,6 @@ const ExistingTasksExtension = Extension.create<ExtensionOptions>({
   name: 'existingtasks',
 
   addOptions() {
-    if (taskStore.taskList.get().length == 0)
-      taskStore.loadTasks(projectStore.currentProject.get()!)
-
     return {
       ...this.parent?.(),
       suggestion: {
