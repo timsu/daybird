@@ -31,7 +31,7 @@ const features = [
   {
     name: 'Prefer an app?',
     description:
-      'Install Daybird as a progressive app for web, desktop, Android, iOS for a native-like experience without extra resource usage.',
+      'Install Daybird on your Mac, Windows, Linux, Android and iOS devices for quick access to your notes.',
     icon: DeviceMobileIcon,
   },
   {
