@@ -1,6 +1,8 @@
+import { AxiosError } from 'axios'
 import { format } from 'date-fns'
 import { action, map } from 'nanostores'
 import { route } from 'preact-router'
+import toast from 'react-hot-toast'
 
 import { API } from '@/api'
 import { EphemeralTopic } from '@/api/topicflowTopic'
@@ -61,13 +63,29 @@ class FileStore {
   loadFiles = async (project: Project) => {
     if (authStore.debugMode()) (window as any)['fileStore'] = fileStore
 
-    const response = await API.listFiles(project)
-    const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
+    try {
+      const response = await API.listFiles(project)
+      const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
 
-    logger.info('FILES - loaded files for project', project.name, sortFiles(files))
-    this.updateFiles(project.id, files)
+      logger.info('FILES - loaded files for project', project.name, sortFiles(files))
+      this.updateFiles(project.id, files)
 
-    if (!this.topics[project.id]) this.initTopic(project)
+      if (!this.topics[project.id]) this.initTopic(project)
+    } catch (e) {
+      const status = (e as AxiosError).response?.status
+      if (status == 401 || status == 404) {
+        API.getUser()
+          .then(() => {
+            // user fetch success. this means the project is not accessible
+            toast.error('Error loading files: ' + unwrapError(e))
+          })
+          .catch(() => {
+            // user fetch failed. this mean token is expired.
+            authStore.logout()
+          })
+      }
+      console.log('my status', (e as AxiosError).code, e)
+    }
   }
 
   newFile = async (projectId: string, name: string, type: FileType, parent?: string | null) => {

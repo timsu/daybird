@@ -75,6 +75,8 @@ class AuthStore {
     if (tokens.refresh?.token) this.saveTokens(tokens)
   })
 
+  updateAPITokens = (newTokens: AuthTokenPair) => API.setAuthTokens(newTokens)
+
   // --- sign in / sign up
 
   createAccount = async (name: string, email: string, password: string) => {
