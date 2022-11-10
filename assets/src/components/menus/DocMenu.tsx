@@ -9,10 +9,12 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { uiStore } from '@/stores/uiStore'
+import { isMobile } from '@/utils/os'
 import {
-    ArchiveIcon, BookmarkIcon, CheckCircleIcon, CheckIcon, ClockIcon, EyeOffIcon, LinkIcon,
-    PencilIcon, PrinterIcon, TrashIcon
+    ArchiveIcon, BackspaceIcon, BookmarkIcon, CheckCircleIcon, CheckIcon, ClockIcon, EyeOffIcon,
+    LinkIcon, PencilIcon, PrinterIcon, TrashIcon
 } from '@heroicons/react/outline'
+import { ArrowNarrowLeftIcon } from '@heroicons/react/solid'
 
 type Props = {
   projectId: string
@@ -26,6 +28,13 @@ export default () => {
     <ContextMenuWithData id="doc-menu">
       {({ dailyNote, docId }: Props) => (
         <>
+          {isMobile && window.editor?.can().undo() && (
+            <ContextMenuItem onClick={() => window.editor?.commands.undo()}>
+              <ArrowNarrowLeftIcon class="h-4 w-4 mr-2" />
+              Undo
+            </ContextMenuItem>
+          )}
+
           {!dailyNote && (
             <ContextMenuItem onClick={() => copy(location.href)}>
               <LinkIcon class="h-4 w-4 mr-2" />
