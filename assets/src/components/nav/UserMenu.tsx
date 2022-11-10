@@ -3,7 +3,7 @@ import { route } from 'preact-router'
 
 import Alphatar from '@/components/core/Alphatar'
 import Avatar from '@/components/core/Avatar'
-import { paths } from '@/config'
+import { config, paths } from '@/config'
 import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
 import { authStore } from '@/stores/authStore'
 import { modalStore } from '@/stores/modalStore'
@@ -21,23 +21,23 @@ const toggleFocusMode = () => {
 const userNavigation = [
   {
     name: 'Toggle Focus Mode',
-    href: '#',
     shortcut: '\\',
     onClick: toggleFocusMode,
   },
   { name: 'User Settings', href: paths.SETTINGS },
-  uiStore.isPWA
-    ? null
-    : { name: 'Install Daybird App', href: '#', onClick: () => uiStore.installAction() },
+  uiStore.isPWA ? null : { name: 'Install Daybird App', onClick: () => uiStore.installAction() },
   {
     name: 'Keyboard Shortcuts',
-    href: '#',
     shortcut: '/',
     onClick: () => modalStore.shortcutsModal.set(true),
   },
   { name: 'Report a Bug', href: 'mailto:tim@daybird.app?subject=Bug Report' },
-  { name: 'Sign out', href: '#', onClick: () => authStore.logout() },
-]
+  config.dev && {
+    name: '[dev] Onboarding',
+    onClick: () => uiStore.checkForOnboarding(true),
+  },
+  { name: 'Sign out', onClick: () => authStore.logout() },
+].filter(Boolean)
 
 export default () => {
   const user = useStore(authStore.loggedInUser)

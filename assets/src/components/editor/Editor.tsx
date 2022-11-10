@@ -3,6 +3,7 @@ import './editor-styles.css'
 import { decode } from 'base64-arraybuffer'
 import { MutableRef, useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
+import { EditorView } from 'prosemirror-view'
 import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
 
@@ -25,6 +26,12 @@ import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import Placeholder from '@tiptap/extension-placeholder'
 import StarterKit from '@tiptap/starter-kit'
+
+// Hack to prevent the matchesNode error on hot reloads
+EditorView.prototype.updateState = function updateState(state) {
+  if (!(this as any).docView) return
+  ;(this as any).updateStateInner(state, this.state.plugins != state.plugins)
+}
 
 type Props = {
   project: Project
@@ -91,7 +98,6 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     try {
       if (contentType == 'ydoc') {
         const array = new Uint8Array(decode(initialContent))
-
         Y.applyUpdate(ydoc, array)
       }
     } catch (e) {

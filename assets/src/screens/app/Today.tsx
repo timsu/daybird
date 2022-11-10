@@ -15,6 +15,7 @@ import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
 import { paths } from '@/config'
 import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
+import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
@@ -194,6 +195,7 @@ const TodayDoc = ({ date }: { date: Date }) => {
 
     if (!fileStore.idToFile.get()[todayDocId]) {
       fileStore.newDailyFile(project, date, todayDocId)
+      uiStore.checkForOnboarding()
     }
   }, [todayDocId])
 
