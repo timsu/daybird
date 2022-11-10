@@ -18,7 +18,7 @@ const pluginKey = new PluginKey('existingtasks')
 
 const TaskMenu = function ({ items, selectedIndex, selectItem }: MenuComponentProps<Task>) {
   return (
-    <div class="shadow rounded bg-white flex flex-col w-96">
+    <div class="shadow rounded bg-white flex flex-col w-96 max-h-56 overflow-auto">
       {items.map((item, index) => {
         return (
           <button
@@ -49,13 +49,15 @@ const loadTasks = ({ query, editor }: { query: string; editor: Editor }) => {
       tasksInDoc.add(id)
     }
   })
-  const tasks = allTasks.filter(
-    (t) =>
-      !t.completed_at &&
-      !t.archived_at &&
-      !tasksInDoc.has(t.id) &&
-      (!query || t.title.toLowerCase().includes(lowerQuery))
-  )
+  const tasks = allTasks
+    .filter(
+      (t) =>
+        !t.completed_at &&
+        !t.archived_at &&
+        !tasksInDoc.has(t.id) &&
+        (!query || t.title.toLowerCase().includes(lowerQuery))
+    )
+    .slice(0, 20)
 
   if (tasks.length == 0)
     tasks.push({ id: '', title: 'No tasks to insert', short_code: '', type: TaskType.TASK })
