@@ -33,11 +33,6 @@ export default () => {
             </ContextMenuItem>
           )}
 
-          <ContextMenuItem class={actionsHidden} onClick={uiStore.insertTasks}>
-            <CheckIcon class="h-4 w-4 mr-2" />
-            Insert Tasks
-          </ContextMenuItem>
-
           <ContextMenuItem class={actionsHidden} onClick={uiStore.startTimer}>
             <ClockIcon class="h-4 w-4 mr-2" />
             Start Timer
