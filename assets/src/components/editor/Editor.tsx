@@ -11,10 +11,8 @@ import { Image } from '@/components/editor/Image'
 import Link from '@/components/editor/Link'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { WikiLink } from '@/components/editor/WikiLink'
-import Commands from '@/components/slashmenu/commands'
-import renderItems from '@/components/slashmenu/renderItems'
-import SlashMenu from '@/components/slashmenu/SlashMenu'
-import slashMenuItems from '@/components/slashmenu/slashMenuItems'
+import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
+import SlashExtension from '@/components/slashmenu/SlashExtension'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
@@ -113,13 +111,8 @@ const useEditor = (id: string | undefined, initialContent: any) => {
             'Type "/" to insert a task or add formatting.\n\n' +
             'Have fun!',
         }),
-        Commands.configure({
-          suggestion: {
-            char: '/',
-            items: slashMenuItems,
-            render: renderItems(SlashMenu),
-          },
-        }),
+        SlashExtension,
+        ExistingTasksExtension,
         Collaboration.configure({
           document: ydoc,
         }),

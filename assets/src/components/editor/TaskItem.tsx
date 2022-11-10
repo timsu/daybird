@@ -156,7 +156,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
             state.doc.nodesBetween(oldStart, oldEnd, (node) => {
               if (node.type.name === 'task') {
                 // if (node.attrs.id != taskStore.del
-                tasksToDelete.push(node.attrs.id)
+                if (node.attrs.id) tasksToDelete.push(node.attrs.id)
               }
             })
           })

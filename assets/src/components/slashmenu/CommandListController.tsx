@@ -1,6 +1,6 @@
 import { Component, FunctionalComponent } from 'preact'
 
-import { CommandItem } from '@/components/slashmenu/commands'
+import { CommandItem } from '@/components/slashmenu/SlashExtension'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 
 export type CommandListComponentProps = {

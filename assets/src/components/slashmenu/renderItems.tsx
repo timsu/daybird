@@ -5,7 +5,7 @@ import tippy, { Instance } from 'tippy.js'
 import CommandsListController, {
     CommandListComponentProps
 } from '@/components/slashmenu/CommandListController'
-import { CommandItem } from '@/components/slashmenu/commands'
+import { CommandItem } from '@/components/slashmenu/SlashExtension'
 import { ReactRenderer } from '@tiptap/react'
 import { SuggestionKeyDownProps, SuggestionProps } from '@tiptap/suggestion'
 

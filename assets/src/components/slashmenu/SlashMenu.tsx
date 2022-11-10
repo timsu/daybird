@@ -1,5 +1,5 @@
 import { CommandListComponentProps } from '@/components/slashmenu/CommandListController'
-import { CommandItem } from '@/components/slashmenu/commands'
+import { CommandItem } from '@/components/slashmenu/SlashExtension'
 
 export type CommandListProps = {
   items: CommandItem[]

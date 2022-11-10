@@ -1,8 +1,8 @@
-import { CommandItem } from '@/components/slashmenu/commands'
+import { CommandItem } from '@/components/slashmenu/SlashExtension'
 import { Editor } from '@tiptap/core'
 
 export default ({ query, editor }: { query: string; editor: Editor }) => {
-  const items: CommandItem[] = [
+  let items: CommandItem[] = [
     {
       title: 'New Task',
       shortcut: '[]',
@@ -12,6 +12,12 @@ export default ({ query, editor }: { query: string; editor: Editor }) => {
           attrs: { id: 'focus' },
         }
         editor.chain().focus().deleteRange(range).insertContent(newNode).run()
+      },
+    } as CommandItem,
+    {
+      title: 'Existing Task',
+      command: ({ editor, range }) => {
+        editor.chain().focus().deleteRange(range).insertContent('//').run()
       },
     } as CommandItem,
     {
@@ -64,8 +70,12 @@ export default ({ query, editor }: { query: string; editor: Editor }) => {
       },
     } as CommandItem,
   ]
-    .filter((item) => item.title.toLowerCase().startsWith(query.toLowerCase()))
-    .slice(0, 10)
+
+  if (query) {
+    items = items
+      .filter((item) => item.title.toLowerCase().startsWith(query.toLowerCase()))
+      .slice(0, 10)
+  }
 
   return items
 }
