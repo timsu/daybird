@@ -5,6 +5,7 @@ import { NODE_NAME } from '@/components/editor/TaskItem'
 import { MenuComponentProps } from '@/components/slashmenu/CommandListController'
 import renderItems from '@/components/slashmenu/renderItems'
 import { Task, TaskType } from '@/models'
+import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { Editor, Extension, Range } from '@tiptap/core'
 import Suggestion, { SuggestionOptions } from '@tiptap/suggestion'
@@ -36,39 +37,44 @@ const TaskMenu = function ({ items, selectedIndex, selectItem }: MenuComponentPr
   )
 }
 
+const loadTasks = ({ query, editor }: { query: string; editor: Editor }) => {
+  const lowerQuery = query.toLowerCase()
+
+  const tasksInDoc = new Set<string>()
+  const allTasks = taskStore.taskList.get()
+  const doc = editor.state.doc
+  doc.descendants((node, pos) => {
+    if (node.type.name == NODE_NAME) {
+      const id = node.attrs.id
+      tasksInDoc.add(id)
+    }
+  })
+  const tasks = allTasks.filter(
+    (t) =>
+      !t.completed_at &&
+      !t.archived_at &&
+      !tasksInDoc.has(t.id) &&
+      (!query || t.title.toLowerCase().includes(lowerQuery))
+  )
+
+  if (tasks.length == 0)
+    tasks.push({ id: '', title: 'No tasks to insert', short_code: '', type: TaskType.TASK })
+  return tasks
+}
+
 const ExistingTasksExtension = Extension.create<ExtensionOptions>({
   name: 'existingtasks',
 
   addOptions() {
+    if (taskStore.taskList.get().length == 0)
+      taskStore.loadTasks(projectStore.currentProject.get()!)
+
     return {
       ...this.parent?.(),
       suggestion: {
         char: '//',
         startOfLine: true,
-        items: ({ query, editor }: { query: string; editor: Editor }) => {
-          const lowerQuery = query.toLowerCase()
-
-          const tasksInDoc = new Set<string>()
-          const allTasks = taskStore.taskList.get()
-          const doc = editor.state.doc
-          doc.descendants((node, pos) => {
-            if (node.type.name == NODE_NAME) {
-              const id = node.attrs.id
-              tasksInDoc.add(id)
-            }
-          })
-          const tasks = allTasks.filter(
-            (t) =>
-              !t.completed_at &&
-              !t.archived_at &&
-              !tasksInDoc.has(t.id) &&
-              (!query || t.title.toLowerCase().includes(lowerQuery))
-          )
-
-          if (tasks.length == 0)
-            tasks.push({ id: '', title: 'No tasks to insert', short_code: '', type: TaskType.TASK })
-          return tasks
-        },
+        items: loadTasks,
         render: renderItems(TaskMenu),
         command: ({ editor, range, props }) => {
           if (!props.id) return editor.chain().deleteRange(range).focus().run()
