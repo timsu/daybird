@@ -77,7 +77,7 @@ export default ({
       const task = taskStore.taskMap.get()[id!]
 
       const dirty = title != task?.title
-      if (!dirty || !title) return onCreate?.(null)
+      if (!dirty || !title) return onCreate?.(task)
 
       if (!task) {
         const doc = docStore.id.get()

@@ -5,6 +5,7 @@ import { NODE_NAME } from '@/components/editor/TaskItem'
 import { MenuComponentProps } from '@/components/slashmenu/CommandListController'
 import renderItems from '@/components/slashmenu/renderItems'
 import { Task, TaskType } from '@/models'
+import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { Editor, Extension, Range } from '@tiptap/core'
 import Suggestion, { SuggestionOptions } from '@tiptap/suggestion'
@@ -17,7 +18,7 @@ const pluginKey = new PluginKey('existingtasks')
 
 const TaskMenu = function ({ items, selectedIndex, selectItem }: MenuComponentProps<Task>) {
   return (
-    <div class="shadow rounded bg-white flex flex-col w-52">
+    <div class="shadow rounded bg-white flex flex-col w-96 max-h-56 overflow-auto">
       {items.map((item, index) => {
         return (
           <button
@@ -36,6 +37,33 @@ const TaskMenu = function ({ items, selectedIndex, selectItem }: MenuComponentPr
   )
 }
 
+const loadTasks = ({ query, editor }: { query: string; editor: Editor }) => {
+  const lowerQuery = query.toLowerCase()
+
+  const tasksInDoc = new Set<string>()
+  const allTasks = taskStore.taskList.get()
+  const doc = editor.state.doc
+  doc.descendants((node, pos) => {
+    if (node.type.name == NODE_NAME) {
+      const id = node.attrs.id
+      tasksInDoc.add(id)
+    }
+  })
+  const tasks = allTasks
+    .filter(
+      (t) =>
+        !t.completed_at &&
+        !t.archived_at &&
+        !tasksInDoc.has(t.id) &&
+        (!query || t.title.toLowerCase().includes(lowerQuery))
+    )
+    .slice(0, 20)
+
+  if (tasks.length == 0)
+    tasks.push({ id: '', title: 'No tasks to insert', short_code: '', type: TaskType.TASK })
+  return tasks
+}
+
 const ExistingTasksExtension = Extension.create<ExtensionOptions>({
   name: 'existingtasks',
 
@@ -45,30 +73,7 @@ const ExistingTasksExtension = Extension.create<ExtensionOptions>({
       suggestion: {
         char: '//',
         startOfLine: true,
-        items: ({ query, editor }: { query: string; editor: Editor }) => {
-          const lowerQuery = query.toLowerCase()
-
-          const tasksInDoc = new Set<string>()
-          const allTasks = taskStore.taskList.get()
-          const doc = editor.state.doc
-          doc.descendants((node, pos) => {
-            if (node.type.name == NODE_NAME) {
-              const id = node.attrs.id
-              tasksInDoc.add(id)
-            }
-          })
-          const tasks = allTasks.filter(
-            (t) =>
-              !t.completed_at &&
-              !t.archived_at &&
-              !tasksInDoc.has(t.id) &&
-              (!query || t.title.toLowerCase().includes(lowerQuery))
-          )
-
-          if (tasks.length == 0)
-            tasks.push({ id: '', title: 'No tasks to insert', short_code: '', type: TaskType.TASK })
-          return tasks
-        },
+        items: loadTasks,
         render: renderItems(TaskMenu),
         command: ({ editor, range, props }) => {
           if (!props.id) return editor.chain().deleteRange(range).focus().run()
