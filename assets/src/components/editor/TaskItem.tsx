@@ -30,7 +30,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
   // on FF / Safari, draggable prevents editing contents
   draggable: navigator.userAgent?.includes('Chrome/'),
 
-  content: 'text*',
+  content: 'inline*',
 
   group: 'block',
 
@@ -71,6 +71,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
   addNodeView() {
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const container = document.createElement('div')
+      const oldPos = typeof getPos === 'function' ? getPos() : editor.state.selection.$head.pos
 
       const onCreateTask = (task: Task | null) => {
         const { view } = editor
@@ -80,6 +81,8 @@ export const TaskItem = Node.create<TaskItemOptions>({
                 id: task.id,
               }
             : {}
+          const newPos = getPos() || oldPos
+          console.log('meowth,', getPos(), newPos, oldPos)
           view.dispatch(view.state.tr.setNodeMarkup(getPos(), undefined, newAttrs))
         }
         return true

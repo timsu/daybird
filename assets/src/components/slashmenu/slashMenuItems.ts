@@ -9,11 +9,13 @@ export default ({ query, editor }: { query: string; editor: Editor }) => {
       title: 'New Task',
       shortcut: '[]',
       command: ({ editor, range }) => {
-        const newNode = {
-          type: 'task',
-          attrs: { id: 'focus' },
-        }
-        editor.chain().focus().deleteRange(range).insertContent(newNode).run()
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertContent('\n')
+          .setNode('task', { id: 'focus' })
+          .run()
       },
     } as CommandItem,
     {
