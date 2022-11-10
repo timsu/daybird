@@ -9,9 +9,10 @@ import * as Y from 'yjs'
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
 import Link from '@/components/editor/Link'
-import { MenuBar } from '@/components/editor/MenuBar'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { WikiLink } from '@/components/editor/WikiLink'
+import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
+import SlashExtension from '@/components/slashmenu/SlashExtension'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
@@ -107,9 +108,11 @@ const useEditor = (id: string | undefined, initialContent: any) => {
         Placeholder.configure({
           placeholder:
             'Welcome to Daybird!\n\nStart typing to create a note.\n\n' +
-            'Type "[] " to create a task.\n\n' +
+            'Type "/" to insert a task or add formatting.\n\n' +
             'Have fun!',
         }),
+        SlashExtension,
+        ExistingTasksExtension,
         Collaboration.configure({
           document: ydoc,
         }),

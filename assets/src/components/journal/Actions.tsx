@@ -10,7 +10,7 @@ export default function Actions() {
   const buttonClass = 'hidden ' + (calendarOpen ? 'lg:block' : 'sm:block')
   return (
     <>
-      <InsertTasksButton buttonClass={buttonClass} />
+      {/* <InsertTasksButton buttonClass={buttonClass} /> */}
       <Timer buttonClass={buttonClass} />
     </>
   )

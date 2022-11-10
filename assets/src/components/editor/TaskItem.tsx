@@ -3,13 +3,11 @@ import { NodeType } from 'prosemirror-model'
 import { Plugin, PluginKey } from 'prosemirror-state'
 import toast from 'react-hot-toast'
 
-import Button from '@/components/core/Button'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
-import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
-import { logger, pluralize, pluralizeWithCount } from '@/utils'
+import { pluralize, pluralizeWithCount } from '@/utils'
 import { InputRule, InputRuleFinder, mergeAttributes, Node } from '@tiptap/core'
 
 export interface TaskItemOptions {
@@ -74,15 +72,15 @@ export const TaskItem = Node.create<TaskItemOptions>({
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const container = document.createElement('div')
 
-      const onCreateTask = (task: Task) => {
+      const onCreateTask = (task: Task | null) => {
         const { view } = editor
         if (typeof getPos === 'function') {
-          // … dispatch a transaction, for the current position in the document …
-          view.dispatch(
-            view.state.tr.setNodeMarkup(getPos(), undefined, {
-              id: task.id,
-            })
-          )
+          const newAttrs = task
+            ? {
+                id: task.id,
+              }
+            : {}
+          view.dispatch(view.state.tr.setNodeMarkup(getPos(), undefined, newAttrs))
         }
         return true
       }
@@ -158,7 +156,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
             state.doc.nodesBetween(oldStart, oldEnd, (node) => {
               if (node.type.name === 'task') {
                 // if (node.attrs.id != taskStore.del
-                tasksToDelete.push(node.attrs.id)
+                if (node.attrs.id) tasksToDelete.push(node.attrs.id)
               }
             })
           })

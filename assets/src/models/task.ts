@@ -14,7 +14,7 @@ export class Task {
 
   public short_code: string = ''
 
-  public type: TaskType = TaskType.TASK
+  public type?: TaskType | undefined
 
   public doc?: string
 

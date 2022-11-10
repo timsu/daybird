@@ -20,7 +20,7 @@ type Props = {
   taskList?: boolean
   currentDoc?: string
   newTaskMode?: boolean
-  onCreate?: (task: Task) => void
+  onCreate?: (task: Task | null) => void
 }
 
 export default ({
@@ -77,7 +77,7 @@ export default ({
       const task = taskStore.taskMap.get()[id!]
 
       const dirty = title != task?.title
-      if (!dirty || !title) return
+      if (!dirty || !title) return onCreate?.(null)
 
       if (!task) {
         const doc = docStore.id.get()
@@ -113,7 +113,7 @@ export default ({
         }
       })
     if (focus && !id) {
-      requestAnimationFrame(() => div.focus())
+      setTimeout(() => div.focus(), 0)
     }
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [id, focus])
