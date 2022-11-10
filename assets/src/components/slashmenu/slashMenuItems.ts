@@ -1,4 +1,6 @@
 import { CommandItem } from '@/components/slashmenu/SlashExtension'
+import { projectStore } from '@/stores/projectStore'
+import { taskStore } from '@/stores/taskStore'
 import { Editor } from '@tiptap/core'
 
 export default ({ query, editor }: { query: string; editor: Editor }) => {
@@ -16,8 +18,12 @@ export default ({ query, editor }: { query: string; editor: Editor }) => {
     } as CommandItem,
     {
       title: 'Existing Task',
+      shortcut: '//',
       command: ({ editor, range }) => {
-        editor.chain().focus().deleteRange(range).insertContent('//').run()
+        const currentProject = projectStore.currentProject.get()
+        taskStore
+          .loadTasks(currentProject!)
+          .then(() => editor.chain().focus().deleteRange(range).insertContent('//').run())
       },
     } as CommandItem,
     {

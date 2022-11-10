@@ -1,25 +1,24 @@
 import { Component, FunctionalComponent } from 'preact'
 
-import { CommandItem } from '@/components/slashmenu/SlashExtension'
 import { SuggestionKeyDownProps } from '@tiptap/suggestion'
 
-export type CommandListComponentProps = {
-  items: CommandItem[]
+export type MenuComponentProps<T> = {
+  items: T[]
   selectedIndex: number
   selectItem: (index: number) => void
 }
 
-type Props = {
-  items: CommandItem[]
-  command: (item: CommandItem) => void
-  component: FunctionalComponent<CommandListComponentProps>
+type Props<T> = {
+  items: T[]
+  command: (item: T) => void
+  component: FunctionalComponent<MenuComponentProps<T>>
 }
 
 type State = {
   selectedIndex: number
 }
 
-export default class CommandsListController extends Component<Props, State> {
+export default class CommandsListController<T> extends Component<Props<T>, State> {
   constructor() {
     super()
     this.state = {
@@ -72,7 +71,7 @@ export default class CommandsListController extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props, prevState: State) {
+  componentDidUpdate(prevProps: Props<T>, prevState: State) {
     if (prevProps.items.length !== this.props.items.length) {
       this.setState({ selectedIndex: 0 })
     }

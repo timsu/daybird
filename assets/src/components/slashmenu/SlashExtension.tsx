@@ -1,7 +1,7 @@
 import { PluginKey } from 'prosemirror-state'
 
+import { MenuComponentProps } from '@/components/slashmenu/CommandListController'
 import renderItems from '@/components/slashmenu/renderItems'
-import SlashMenu from '@/components/slashmenu/SlashMenu'
 import slashMenuItems from '@/components/slashmenu/slashMenuItems'
 import { Editor, Extension, Range } from '@tiptap/core'
 import Suggestion, { SuggestionOptions } from '@tiptap/suggestion'
@@ -17,6 +17,27 @@ type ExtensionOptions = {
 }
 
 const pluginKey = new PluginKey('slashmenu')
+
+const SlashMenu = function ({ items, selectedIndex, selectItem }: MenuComponentProps<CommandItem>) {
+  return (
+    <div class="shadow rounded bg-white flex flex-col w-52">
+      {items.map((item, index) => {
+        return (
+          <button
+            className={`text-left p-2 hover:bg-gray-400 flex ${
+              index === selectedIndex ? 'bg-gray-300' : ''
+            }`}
+            key={index}
+            onClick={() => selectItem(index)}
+          >
+            <div class="flex-1">{item.title}</div>
+            {item.shortcut && <div class="opacity-50">{item.shortcut}</div>}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 const SlashExtension = Extension.create<ExtensionOptions>({
   name: 'slashmenu',
