@@ -1,5 +1,3 @@
-import { v4 as uuid } from 'uuid'
-
 export enum FileType {
   DOC = 0,
   FOLDER,
@@ -29,10 +27,9 @@ export class File {
     return item
   }
 
-  public static newFile(props: Omit<File, 'id'>): File {
+  public static newFile(props: File): File {
     return {
       ...props,
-      id: uuid(),
       provisional: true,
     }
   }

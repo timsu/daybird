@@ -86,7 +86,7 @@ class FileStore {
 
   dailyFileTitle = (date?: Date) => format(date || new Date(), 'yyyy-MM-dd')
 
-  newDailyFile = async (project: Project, date?: Date) => {
+  newDailyFile = async (project: Project, date?: Date, provisionalFileId?: string) => {
     assertIsDefined(project, 'project is defined')
 
     const projectFiles = this.getFilesFor(project)
@@ -123,18 +123,22 @@ class FileStore {
       return file.file.id
     }
 
-    // don't create file yet, only when user edits
-    const newFile: File = File.newFile({
-      name,
-      type: FileType.DOC,
-      parent: monthFolder.file.id,
-      projectId: project.id,
-    })
-    logger.info('created provisional file', newFile)
-    const newFiles = sortFiles([...files, newFile])
-    this.updateFiles(project.id, newFiles)
+    if (provisionalFileId) {
+      const newFile: File = File.newFile({
+        id: provisionalFileId,
+        name,
+        type: FileType.DOC,
+        parent: monthFolder.file.id,
+        projectId: project.id,
+      })
 
-    return newFile.id
+      logger.info('created provisional file', newFile)
+      const newFiles = sortFiles([...files, newFile])
+      this.updateFiles(project.id, newFiles)
+      return newFile.id
+    }
+
+    return null
   }
 
   saveProvisionalFile = async (file: File) => {

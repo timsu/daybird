@@ -15,6 +15,8 @@ class TopicStore {
 
   topicflow: Session | undefined
 
+  ready = atom<boolean>(false)
+
   // --- topicflow initialization
 
   initTopicflow = () => {
@@ -26,6 +28,7 @@ class TopicStore {
 
     this.topicflow = new Session(config.topicflowUrl, `${clientId}|${type}`)
     this.topicflow.login(this.token!).catch((e) => logger.warn('socketService:init-topicflow', e))
+    this.ready.set(true)
   }
 
   initDataTopic = (topic: string) => {

@@ -1,8 +1,9 @@
 import { addDays, endOfDay, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
 import { route } from 'preact-router'
-import { useEffect, useState } from 'preact/hooks'
-import uniqolor from 'uniqolor'
+import { useEffect, useRef, useState } from 'preact/hooks'
+import { v4 as uuid } from 'uuid'
 
+import { EphemeralTopic } from '@/api/topicflowTopic'
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import Helmet from '@/components/core/Helmet'
 import Pressable from '@/components/core/Pressable'
@@ -14,11 +15,12 @@ import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
 import { paths } from '@/config'
 import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
+import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
+import { topicStore } from '@/stores/topicStore'
 import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
-import { lightColorFor, logger } from '@/utils'
-import { isMac } from '@/utils/os'
+import { logger } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -28,9 +30,7 @@ type Props = {
 
 export default (props: Props) => {
   const params = new URLSearchParams(location.search)
-
   const project = useStore(projectStore.currentProject)
-  const [todayDoc, setTodayDoc] = useState<string>('')
 
   const projectParam = params.get('p')
   useEffect(() => {
@@ -67,22 +67,6 @@ export default (props: Props) => {
       setTimeout(() => updateTitle(Date.now()), endOfDay(date).getTime() - Date.now() + 1000)
   }, [isToday, date])
 
-  useEffect(() => {
-    // todo wait until files are loaded
-    if (!project) return
-
-    if (!fileStore.fileTree.get()[project.id]) {
-      const unsub = fileStore.fileTree.listen((value) => {
-        if (!value[project.id]) return
-        unsub()
-        fileStore.newDailyFile(project, date).then(setTodayDoc)
-      })
-      return unsub
-    } else {
-      fileStore.newDailyFile(project, date).then(setTodayDoc)
-    }
-  }, [project?.id, date.getTime()])
-
   useShortcut(
     (e) => {
       if (checkShortcut(e, 'j', 'k')) {
@@ -111,7 +95,7 @@ export default (props: Props) => {
               const pos = (e.target as HTMLDivElement).getBoundingClientRect()
               triggerContextMenu(pos.left, pos.top, 'doc-menu', {
                 dailyNote: true,
-                docId: todayDoc,
+                docId: docStore.id.get(),
                 projectId: project?.id,
               })
             }}
@@ -144,8 +128,76 @@ export default (props: Props) => {
       <DocMenu />
       <div class="flex flex-col grow w-full px-6 mt-4 max-w-2xl mx-auto">
         <DailyPrompt date={date} />
-        {todayDoc && <Document projectId={project?.id} id={todayDoc} />}
+        <TodayDoc date={date} />
       </div>
     </>
   )
+}
+
+const TodayDoc = ({ date }: { date: Date }) => {
+  const project = useStore(projectStore.currentProject)
+  const topicflowReady = useStore(topicStore.ready)
+  const topicSub = useRef<EphemeralTopic>()
+  const [todayDocId, setTodayDocId] = useState<string>('')
+  const dateString = format(date, 'yyyy-MM-dd')
+
+  useEffect(() => {
+    setTodayDocId('')
+  }, [project?.id, date])
+
+  // subscribe to topicflow - if we receive a document id, use that
+  useEffect(() => {
+    if (!project || !topicflowReady) return
+
+    let topic = topicSub.current
+    if (topic && !topic.topic.id.endsWith(project.id)) {
+      topic.unsubscribe()
+      topic = undefined
+    }
+    if (!topic) {
+      topic = topicSub.current = topicStore.initEphemeralTopic('today:' + project.id)
+    }
+    const unsub = topic.onKeyChange(dateString, (_, value) => {
+      if (value) setTodayDocId(value)
+    })
+    return unsub
+  }, [project?.id, date, topicflowReady])
+
+  // subscribe to files, check for existing document
+  useEffect(() => {
+    if (!project) return
+    const onDailyFile = (id: string | null) =>
+      setTodayDocId((prevValue) => {
+        if (id) return id
+        if (prevValue) return prevValue
+        const newValue = uuid()
+        topicSub.current?.setSharedKey(dateString, newValue)
+        return newValue
+      })
+
+    if (!fileStore.fileTree.get()[project.id]) {
+      // if files were not loaded, wait until files are loaded
+      const unsub = fileStore.fileTree.listen((value) => {
+        if (!value[project.id]) return
+        unsub()
+        fileStore.newDailyFile(project, date).then(onDailyFile)
+      })
+      return unsub
+    } else {
+      fileStore.newDailyFile(project, date).then(onDailyFile)
+    }
+  }, [project?.id, date])
+
+  // create provisional file if needed
+  useEffect(() => {
+    if (!project || !todayDocId) return
+
+    if (!fileStore.idToFile.get()[todayDocId]) {
+      fileStore.newDailyFile(project, date, todayDocId)
+    }
+  }, [todayDocId])
+
+  if (!todayDocId) return null
+
+  return <Document projectId={project?.id} id={todayDocId} />
 }
