@@ -13,6 +13,7 @@ import { TaskItem } from '@/components/editor/TaskItem'
 import { WikiLink } from '@/components/editor/WikiLink'
 import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
 import SlashExtension from '@/components/slashmenu/SlashExtension'
+import { paths } from '@/config'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
@@ -33,6 +34,16 @@ type Props = {
 }
 
 const SAVE_INTERVAL = 5_000
+
+const PLACEHOLDER_TODAY =
+  "What's important today?\n\nStart typing to create a note.\n\n" +
+  'Type "/" to insert a task or add formatting.\n\n' +
+  'Have fun!'
+
+const PLACEHOLDER_DOC =
+  'Start typing to create a note.\n\n' +
+  'Type "/" to insert a task or add formatting.\n\n' +
+  'Have fun!'
 
 export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
@@ -89,6 +100,8 @@ const useEditor = (id: string | undefined, initialContent: any) => {
 
     const provider = new WebrtcProvider(id, ydoc)
 
+    const isToday = location.pathname.startsWith(paths.TODAY)
+
     const user = authStore.loggedInUser.get()!
     const editor = (prevEditor.current = new Editor({
       extensions: [
@@ -106,10 +119,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           linkOnPaste: true,
         }),
         Placeholder.configure({
-          placeholder:
-            'Welcome to Daybird!\n\nStart typing to create a note.\n\n' +
-            'Type "/" to insert a task or add formatting.\n\n' +
-            'Have fun!',
+          placeholder: isToday ? PLACEHOLDER_TODAY : PLACEHOLDER_DOC,
         }),
         SlashExtension,
         ExistingTasksExtension,
