@@ -5,6 +5,7 @@ import GoogleServerOAuth, {
 } from '@/components/auth/GoogleServerOAuth'
 import Helmet from '@/components/core/Helmet'
 import Pressable from '@/components/core/Pressable'
+import AppHeader from '@/components/layout/AppHeader'
 import { OAuthToken } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
@@ -15,19 +16,19 @@ export default (props: { path: string }) => {
   const user = useStore(authStore.loggedInUser)
 
   return (
-    <div className="py-6 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <>
       <Helmet title={`Settings`} />
-      <div className="">
+      <AppHeader>
         <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-      </div>
+      </AppHeader>
 
-      <div className="h-8" />
-
-      <div class="flex flex-col gap-6">
-        <TimeZoneSetting />
-        <CalendarSettings />
+      <div className="py-6 w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div class="flex flex-col gap-6">
+          <TimeZoneSetting />
+          <CalendarSettings />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
