@@ -82,8 +82,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
               }
             : {}
           const newPos = getPos() || oldPos
-          console.log('meowth,', getPos(), newPos, oldPos)
-          view.dispatch(view.state.tr.setNodeMarkup(getPos(), undefined, newAttrs))
+          view.dispatch(view.state.tr.setNodeMarkup(newPos, undefined, newAttrs))
         }
         return true
       }
@@ -127,7 +126,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
 
         props: {
           handleKeyDown: (view, event) => {
-            if (event.which === 8 || event.which === 46) {
+            if (event.which === 8 || event.which === 46 || event.which == 68) {
               view.state.deleting = true
             }
 
