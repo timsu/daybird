@@ -20,6 +20,7 @@ export default function () {
       if (calendarOpen != shouldBeOpen) uiStore.calendarOpen.set(shouldBeOpen)
     }
     window.addEventListener('resize', onResize)
+    onResize()
     return () => window.removeEventListener('resize', onResize)
   }, [calendarOpen, path])
 
