@@ -163,11 +163,7 @@ const TodayDoc = ({ date }: { date: Date }) => {
     if (!topic) {
       topic = topicSub.current = topicStore.initEphemeralTopic('today:' + project.id)
     }
-    const unsub = topic.onKeyChange(dateString, (_, value) => {
-      if (value) setTodayDocId(value)
-    })
-    return unsub
-  }, [project?.id, date, topicflowReady])
+  }, [project?.id, topicflowReady])
 
   // subscribe to files, check for existing document
   useEffect(() => {
@@ -175,15 +171,19 @@ const TodayDoc = ({ date }: { date: Date }) => {
 
     const onDailyFile = (file: File | null) =>
       setTodayDocId((prevValue) => {
+        logger.debug('[today] on daily file', file, prevValue)
         if (file) return file.id
         if (prevValue) return prevValue
-        const newValue = uuid()
-        docStore.docCache[newValue] = { title: '', contents: '' }
-        topicSub.current?.setSharedKey(dateString, newValue)
+
+        const valueFromTF = topicSub.current?.getSharedKey(dateString)
+        logger.debug('[today] generating new uuid', valueFromTF)
+        const newValue = valueFromTF || uuid()
+        if (!valueFromTF) topicSub.current?.setSharedKey(dateString, newValue)
         return newValue
       })
 
     if (!fileStore.fileTree.get()[project.id]) {
+      logger.debug('[today] checking for files empty state')
       // if files were not loaded, wait until files are loaded
       const unsub = fileStore.fileTree.listen((value) => {
         if (!value[project.id]) return
@@ -192,19 +192,20 @@ const TodayDoc = ({ date }: { date: Date }) => {
       })
       return unsub
     } else {
+      logger.debug('[today] checking for files non-empty state')
       fileStore.newDailyFile(project, date).then(onDailyFile)
     }
-  }, [project?.id, date])
+  }, [project?.id, dateString])
 
   // create provisional file if needed
   useEffect(() => {
     if (!project || !todayDocId) return
 
-    if (docStore.id.get() == todayDocId) return
-
     if (!fileStore.idToFile.get()[todayDocId]) {
+      logger.debug('[today] time to create provisional file', todayDocId)
       fileStore.newDailyFile(project, date, todayDocId).then(() => {
         setTimeout(() => {
+          logger.debug('[today] check for onboarding etc')
           // need to wait for editor to initialize
           uiStore.checkForOnboarding()
           checkForDueTasks(date)
