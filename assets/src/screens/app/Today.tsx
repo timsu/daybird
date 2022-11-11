@@ -147,10 +147,6 @@ const TodayDoc = ({ date }: { date: Date }) => {
   const [todayDocId, setTodayDocId] = useState<string>('')
   const dateString = format(date, 'yyyy-MM-dd')
 
-  useEffect(() => {
-    setTodayDocId('')
-  }, [project?.id, date])
-
   // subscribe to topicflow - if we receive a document id, use that
   useEffect(() => {
     if (!project || !topicflowReady) return
@@ -169,6 +165,8 @@ const TodayDoc = ({ date }: { date: Date }) => {
   useEffect(() => {
     if (!project) return
 
+    setTodayDocId('')
+
     const onDailyFile = (file: File | null) =>
       setTodayDocId((prevValue) => {
         logger.debug('[today] on daily file', file, prevValue)
@@ -176,8 +174,8 @@ const TodayDoc = ({ date }: { date: Date }) => {
         if (prevValue) return prevValue
 
         const valueFromTF = topicSub.current?.getSharedKey(dateString)
-        logger.debug('[today] generating new uuid', valueFromTF)
-        const newValue = valueFromTF || uuid()
+        const newValue = valueFromTF || uuid().replaceAll('-', '')
+        logger.debug('[today] generating new uuid. from tf?', valueFromTF, newValue)
         if (!valueFromTF) topicSub.current?.setSharedKey(dateString, newValue)
         return newValue
       })
@@ -202,17 +200,20 @@ const TodayDoc = ({ date }: { date: Date }) => {
     if (!project || !todayDocId) return
 
     if (!fileStore.idToFile.get()[todayDocId]) {
-      logger.debug('[today] time to create provisional file', todayDocId)
-      fileStore.newDailyFile(project, date, todayDocId).then(() => {
-        setTimeout(() => {
-          logger.debug('[today] check for onboarding etc')
-          // need to wait for editor to initialize
-          uiStore.checkForOnboarding()
-          checkForDueTasks(date)
-        }, 100)
+      const unsub = docStore.document.listen((value) => {
+        if (value === undefined) return
+        logger.debug('[today] post-load check for onboarding etc', value?.length)
+        uiStore.checkForOnboarding()
+        checkForDueTasks(date)
+        unsub()
       })
+
+      logger.debug('[today] time to create provisional file', todayDocId)
+      fileStore.newDailyFile(project, date, todayDocId)
     }
   }, [todayDocId])
+
+  logger.debug('[today] rendar', todayDocId)
 
   if (!todayDocId) return null
 
@@ -242,5 +243,5 @@ function checkForDueTasks(date: Date) {
     )
     .concat([{ type: 'paragraph' }])
 
-  window.editor?.chain().insertContent(content).focus().run()
+  setTimeout(() => window.editor?.chain().insertContent(content).focus().run(), 500)
 }

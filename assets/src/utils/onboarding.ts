@@ -1,31 +1,28 @@
-import install_daybird from '@/images/install_daybird.mp4'
+import { TaskItem } from '@/components/editor/TaskItem'
+import { Task } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
-import { isChrome } from '@/utils/os'
+
+const paragraph = (text?: string) => ({
+  type: 'paragraph',
+  content: text
+    ? [
+        {
+          type: 'text',
+          text,
+        },
+      ]
+    : undefined,
+})
 
 export default async function doOnboarding(): Promise<void> {
   // create today doc
   const editor = window.editor
   if (!editor) {
-    setTimeout(doOnboarding, 5000)
+    setTimeout(doOnboarding, 100)
     return
   }
-
-  const task =
-    taskStore.taskList.get()[0] || (await taskStore.createTask({ title: 'Create your first task' }))
-
-  const paragraph = (text?: string) => ({
-    type: 'paragraph',
-    content: text
-      ? [
-          {
-            type: 'text',
-            text,
-          },
-        ]
-      : undefined,
-  })
 
   editor
     .chain()
@@ -37,27 +34,23 @@ export default async function doOnboarding(): Promise<void> {
       ),
       paragraph(),
       paragraph(
-        'You can create additional notes on the 👈 left and see a calendar view of your day on the 👉 right. (On mobile, use the buttons in the header).'
+        'You can create additional notes in the sidebar and see a calendar view of your day by connecting with Google Calendar.'
       ),
       paragraph(),
       paragraph(
         'Type / at the beginning of a line to open a menu where you can create tasks and insert various types of text. Try it out!'
       ),
       paragraph(),
-      { type: 'task', attrs: { id: task.id } },
       paragraph(),
-      paragraph(
-        'Tasks are more than meet the eye - click on the ' +
-          task.short_code +
-          " to see extra options. Try giving your task a date so it shows up on tomorrow's page."
-      ),
-      paragraph(),
-      paragraph('Happy journaling!'),
     ])
     .focus()
     .run()
 
-  editor.commands.insertContent(paragraph()) // insert content to trigger a save
+  const task =
+    taskStore.taskList.get()[0] || (await taskStore.createTask({ title: 'Create your first task' }))
+  editor.commands.insertContent([{ type: 'task', attrs: { id: task.id } }, paragraph()])
+
+  TaskItem.options.postCreateTask = onCreateTask
 
   const project = projectStore.currentProject.get()!
   const files = fileStore.getFilesFor(project)
@@ -67,4 +60,17 @@ export default async function doOnboarding(): Promise<void> {
   //     src: install_daybird,
   //   },
   // },
+}
+
+function onCreateTask(task: Task) {
+  TaskItem.options.postCreateTask = undefined
+
+  window.editor?.commands.insertContent([
+    paragraph(),
+    paragraph(
+      `Fantastic! Try clicking on the ${task.short_code} and set a date so it shows up on tomorrow's page.`
+    ),
+    paragraph(),
+    paragraph('Happy journaling!'),
+  ])
 }

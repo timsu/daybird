@@ -52,14 +52,9 @@ class DocStore {
       if (file) setTimeout(() => this.title.set(file.name), 0)
     })
 
-    if (file?.provisional) {
-      this.document.set('')
-      return
-    }
-
     try {
       const response = (await API.readFile(project, id)) as string
-      logger.info('DOCS - doc loaded', id, typeof response)
+      logger.info('DOCS - doc loaded', id, response.length)
       if (id != this.id.get()) return
       this.document.set(response)
       this.docCache[id] = response

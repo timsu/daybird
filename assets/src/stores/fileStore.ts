@@ -104,42 +104,55 @@ class FileStore {
 
   dailyFileTitle = (date?: Date) => format(date || new Date(), 'yyyy-MM-dd')
 
+  creatingFolders: null | Promise<TreeFile> = null
   newDailyFile = async (project: Project, date?: Date, provisionalFileId?: string) => {
     assertIsDefined(project, 'project is defined')
-
-    const projectFiles = this.getFilesFor(project)
-    const files = this.files.get()[project.id] || []
-
     const d = date || new Date()
-    const yearName = format(d, 'yyyy')
-    let yearFolder: TreeFile | undefined = projectFiles.find(
-      (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
-    )
-    if (!yearFolder) {
-      const response = await API.createFile(project.id, { name: yearName, type: FileType.FOLDER })
-      yearFolder = makeTreeFile(response.file)
-      files.push(response.file)
-    }
 
-    const monthName = format(d, 'MM')
-    let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
-      (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
-    )
-    if (!monthFolder) {
-      const response = await API.createFile(project.id, {
-        name: monthName,
-        type: FileType.FOLDER,
-        parent: yearFolder.file.id,
-      })
-      monthFolder = makeTreeFile(response.file)
-      files.push(response.file)
+    // critical section (don't let this run concurrently)
+    if (this.creatingFolders) {
+      await this.creatingFolders
     }
+    this.creatingFolders = new Promise<TreeFile>(async (res) => {
+      const projectFiles = this.getFilesFor(project)
+      const files = this.files.get()[project.id] || []
+
+      const yearName = format(d, 'yyyy')
+
+      let yearFolder: TreeFile | undefined = projectFiles.find(
+        (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
+      )
+      if (!yearFolder) {
+        const response = await API.createFile(project.id, { name: yearName, type: FileType.FOLDER })
+        yearFolder = makeTreeFile(response.file)
+        files.push(response.file)
+        this.updateFiles(project.id, files)
+      }
+
+      const monthName = format(d, 'MM')
+      let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
+        (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
+      )
+      if (!monthFolder) {
+        const response = await API.createFile(project.id, {
+          name: monthName,
+          type: FileType.FOLDER,
+          parent: yearFolder.file.id,
+        })
+        monthFolder = makeTreeFile(response.file)
+        files.push(response.file)
+        this.updateFiles(project.id, files)
+      }
+
+      res(monthFolder)
+    })
+    const monthFolder = await this.creatingFolders
+    this.creatingFolders = null
 
     const name = this.dailyFileTitle(d)
     let file: TreeFile | undefined = monthFolder.nodes!.find((f) => f.file.name == name)
-    if (file) {
-      return file.file
-    }
+
+    if (file) return file.file
 
     if (provisionalFileId) {
       const newFile: File = File.newFile({
@@ -151,6 +164,7 @@ class FileStore {
       })
 
       logger.info('created provisional file', newFile)
+      const files = this.files.get()[project.id] || []
       const newFiles = sortFiles([...files, newFile])
       this.updateFiles(project.id, newFiles)
       return newFile

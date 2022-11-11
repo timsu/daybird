@@ -11,6 +11,7 @@ import { pluralize, pluralizeWithCount } from '@/utils'
 import { InputRule, InputRuleFinder, mergeAttributes, Node } from '@tiptap/core'
 
 export interface TaskItemOptions {
+  postCreateTask?: (task: Task) => void
   HTMLAttributes: Record<string, any>
 }
 
@@ -69,7 +70,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
   },
 
   addNodeView() {
-    return ({ node, HTMLAttributes, getPos, editor }) => {
+    return ({ node, extension, getPos, editor }) => {
       const container = document.createElement('div')
       const oldPos = typeof getPos === 'function' ? getPos() : editor.state.selection.$head.pos
 
@@ -84,6 +85,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
           const newPos = getPos() || oldPos
           view.dispatch(view.state.tr.setNodeMarkup(newPos, undefined, newAttrs))
         }
+        if (task) TaskItem.options.postCreateTask?.(task)
         return true
       }
 
