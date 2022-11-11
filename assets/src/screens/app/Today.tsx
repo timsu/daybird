@@ -243,5 +243,8 @@ function checkForDueTasks(date: Date) {
     )
     .concat([{ type: 'paragraph' }])
 
-  setTimeout(() => window.editor?.chain().insertContent(content).focus().run(), 500)
+  setTimeout(() => {
+    if (docStore.document.get()) return
+    window.editor?.chain().insertContent(content).focus().run()
+  }, 500)
 }
