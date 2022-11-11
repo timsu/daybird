@@ -170,7 +170,7 @@ class UIStore {
   checkForOnboarding = (force?: boolean) => {
     const user = authStore.loggedInUser.get()
     if (User.meta(user).ob && !force) return
-
+    logger.info('Onboarding start')
     doOnboarding()
     if (!force) authStore.updateUser({ meta: { ob: 1 } })
   }

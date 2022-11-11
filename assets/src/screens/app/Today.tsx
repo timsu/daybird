@@ -1,4 +1,6 @@
-import { addDays, endOfDay, format, isAfter, isSameDay, parse, startOfDay, subDays } from 'date-fns'
+import {
+    addDays, endOfDay, format, isAfter, isBefore, isSameDay, parse, startOfDay, subDays
+} from 'date-fns'
 import { route } from 'preact-router'
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { v4 as uuid } from 'uuid'
@@ -15,15 +17,18 @@ import AppHeader from '@/components/layout/AppHeader'
 import DocMenu from '@/components/menus/DocMenu'
 import { paths } from '@/config'
 import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
+import { File } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'
+import { taskStore } from '@/stores/taskStore'
 import { topicStore } from '@/stores/topicStore'
 import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
+import { JSONContent } from '@tiptap/react'
 
 type Props = {
   path: string
@@ -167,11 +172,13 @@ const TodayDoc = ({ date }: { date: Date }) => {
   // subscribe to files, check for existing document
   useEffect(() => {
     if (!project) return
-    const onDailyFile = (id: string | null) =>
+
+    const onDailyFile = (file: File | null) =>
       setTodayDocId((prevValue) => {
-        if (id) return id
+        if (file) return file.id
         if (prevValue) return prevValue
         const newValue = uuid()
+        docStore.docCache[newValue] = { title: '', contents: '' }
         topicSub.current?.setSharedKey(dateString, newValue)
         return newValue
       })
@@ -193,13 +200,46 @@ const TodayDoc = ({ date }: { date: Date }) => {
   useEffect(() => {
     if (!project || !todayDocId) return
 
+    if (docStore.id.get() == todayDocId) return
+
     if (!fileStore.idToFile.get()[todayDocId]) {
-      fileStore.newDailyFile(project, date, todayDocId)
-      uiStore.checkForOnboarding()
+      fileStore.newDailyFile(project, date, todayDocId).then(() => {
+        setTimeout(() => {
+          // need to wait for editor to initialize
+          uiStore.checkForOnboarding()
+          checkForDueTasks(date)
+        }, 100)
+      })
     }
   }, [todayDocId])
 
   if (!todayDocId) return null
 
   return <Document projectId={project?.id} id={todayDocId} />
+}
+
+function checkForDueTasks(date: Date) {
+  const today = new Date()
+  if (isBefore(date, today)) return
+
+  const threshold = endOfDay(date)
+  const tasks = taskStore.taskList
+    .get()
+    .filter((t) => t.due_at && !t.deleted_at && !t.completed_at)
+    .filter((t) => isBefore(new Date(t.due_at!), threshold))
+
+  if (!tasks.length) return
+  logger.info('due tasks found', tasks)
+
+  const content = tasks
+    .map(
+      (t) =>
+        ({
+          type: 'task',
+          attrs: { id: t.id, ref: true },
+        } as JSONContent)
+    )
+    .concat([{ type: 'paragraph' }])
+
+  window.editor?.chain().insertContent(content).focus().run()
 }

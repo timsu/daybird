@@ -138,7 +138,7 @@ class FileStore {
     const name = this.dailyFileTitle(d)
     let file: TreeFile | undefined = monthFolder.nodes!.find((f) => f.file.name == name)
     if (file) {
-      return file.file.id
+      return file.file
     }
 
     if (provisionalFileId) {
@@ -153,7 +153,7 @@ class FileStore {
       logger.info('created provisional file', newFile)
       const newFiles = sortFiles([...files, newFile])
       this.updateFiles(project.id, newFiles)
-      return newFile.id
+      return newFile
     }
 
     return null

@@ -1,4 +1,4 @@
-import { h } from 'preact'
+import { h, RenderableProps } from 'preact'
 import { Link, route } from 'preact-router'
 import Match from 'preact-router/match'
 
@@ -26,9 +26,14 @@ export default ({ projectId }: { projectId: string }) => {
 
   return (
     <nav className="px-2 space-y-1 flex flex-col flex-1">
-      {nonDateFiles.length == 0 && <div className="text-gray-500 italic text-sm px-2">Empty</div>}
       <FileTree projectId={projectId} nodes={nonDateFiles} indent={0} />
-      <RootFolderDropZone projectId={projectId} />
+      <RootFolderDropZone projectId={projectId}>
+        {nonDateFiles.length == 0 && (
+          <div className="text-gray-500 italic text-sm px-2">
+            Right-click to create a file or folder.
+          </div>
+        )}
+      </RootFolderDropZone>
     </nav>
   )
 }
@@ -231,7 +236,7 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
   )
 }
 
-function RootFolderDropZone({ projectId }: { projectId: string }) {
+function RootFolderDropZone({ projectId, children }: RenderableProps<{ projectId: string }>) {
   return (
     <div
       className="min-h-10 flex-1"
@@ -243,6 +248,8 @@ function RootFolderDropZone({ projectId }: { projectId: string }) {
           projectId: projectId,
         })
       }}
-    ></div>
+    >
+      {children}
+    </div>
   )
 }

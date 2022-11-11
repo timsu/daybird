@@ -200,13 +200,6 @@ defmodule SequenceWeb.AuthController do
       end
 
       with {:ok, user} <- Users.update_user(user, attrs) do
-        if Map.has_key?(attrs, "name") or Map.has_key?(attrs, "nickname") or Map.has_key?(attrs, "timezone") do
-          Teams.list_user_teams(user)
-          |> Enum.each(fn t ->
-            SequenceWeb.Endpoint.broadcast("team:#{t.uuid}", "update_members", %{})
-          end)
-        end
-
         render conn, "user.json", user: user
       end
     end
