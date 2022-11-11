@@ -1,6 +1,8 @@
+import { AxiosError } from 'axios'
 import { format } from 'date-fns'
 import { action, map } from 'nanostores'
 import { route } from 'preact-router'
+import toast from 'react-hot-toast'
 
 import { API } from '@/api'
 import { EphemeralTopic } from '@/api/topicflowTopic'
@@ -61,13 +63,28 @@ class FileStore {
   loadFiles = async (project: Project) => {
     if (authStore.debugMode()) (window as any)['fileStore'] = fileStore
 
-    const response = await API.listFiles(project)
-    const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
+    try {
+      const response = await API.listFiles(project)
+      const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
 
-    logger.info('FILES - loaded files for project', project.name, sortFiles(files))
-    this.updateFiles(project.id, files)
+      logger.info('FILES - loaded files for project', project.name, sortFiles(files))
+      this.updateFiles(project.id, files)
 
-    if (!this.topics[project.id]) this.initTopic(project)
+      if (!this.topics[project.id]) this.initTopic(project)
+    } catch (e) {
+      const status = (e as AxiosError).response?.status
+      if (status == 401 || status == 404) {
+        API.getUser()
+          .then(() => {
+            // user fetch success. this means the project is not accessible
+            toast.error('Error loading files: ' + unwrapError(e))
+          })
+          .catch(() => {
+            // user fetch failed. this mean token is expired.
+            authStore.logout()
+          })
+      }
+    }
   }
 
   newFile = async (projectId: string, name: string, type: FileType, parent?: string | null) => {
@@ -86,55 +103,73 @@ class FileStore {
 
   dailyFileTitle = (date?: Date) => format(date || new Date(), 'yyyy-MM-dd')
 
-  newDailyFile = async (project: Project, date?: Date) => {
+  creatingFolders: null | Promise<TreeFile> = null
+  newDailyFile = async (project: Project, date?: Date, provisionalFileId?: string) => {
     assertIsDefined(project, 'project is defined')
-
-    const projectFiles = this.getFilesFor(project)
-    const files = this.files.get()[project.id] || []
-
     const d = date || new Date()
-    const yearName = format(d, 'yyyy')
-    let yearFolder: TreeFile | undefined = projectFiles.find(
-      (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
-    )
-    if (!yearFolder) {
-      const response = await API.createFile(project.id, { name: yearName, type: FileType.FOLDER })
-      yearFolder = makeTreeFile(response.file)
-      files.push(response.file)
-    }
 
-    const monthName = format(d, 'MM')
-    let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
-      (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
-    )
-    if (!monthFolder) {
-      const response = await API.createFile(project.id, {
-        name: monthName,
-        type: FileType.FOLDER,
-        parent: yearFolder.file.id,
-      })
-      monthFolder = makeTreeFile(response.file)
-      files.push(response.file)
+    // critical section (don't let this run concurrently)
+    if (this.creatingFolders) {
+      await this.creatingFolders
     }
+    this.creatingFolders = new Promise<TreeFile>(async (res) => {
+      const projectFiles = this.getFilesFor(project)
+      const files = this.files.get()[project.id] || []
+
+      const yearName = format(d, 'yyyy')
+
+      let yearFolder: TreeFile | undefined = projectFiles.find(
+        (f) => f.file.type == FileType.FOLDER && f.file.name == yearName
+      )
+      if (!yearFolder) {
+        const response = await API.createFile(project.id, { name: yearName, type: FileType.FOLDER })
+        yearFolder = makeTreeFile(response.file)
+        files.push(response.file)
+        this.updateFiles(project.id, files)
+      }
+
+      const monthName = format(d, 'MM')
+      let monthFolder: TreeFile | undefined = yearFolder.nodes!.find(
+        (f) => f.file.type == FileType.FOLDER && f.file.name == monthName
+      )
+      if (!monthFolder) {
+        const response = await API.createFile(project.id, {
+          name: monthName,
+          type: FileType.FOLDER,
+          parent: yearFolder.file.id,
+        })
+        monthFolder = makeTreeFile(response.file)
+        files.push(response.file)
+        this.updateFiles(project.id, files)
+      }
+
+      res(monthFolder)
+    })
+    const monthFolder = await this.creatingFolders
+    this.creatingFolders = null
 
     const name = this.dailyFileTitle(d)
     let file: TreeFile | undefined = monthFolder.nodes!.find((f) => f.file.name == name)
-    if (file) {
-      return file.file.id
+
+    if (file) return file.file
+
+    if (provisionalFileId) {
+      const newFile: File = File.newFile({
+        id: provisionalFileId,
+        name,
+        type: FileType.DOC,
+        parent: monthFolder.file.id,
+        projectId: project.id,
+      })
+
+      logger.info('created provisional file', newFile)
+      const files = this.files.get()[project.id] || []
+      const newFiles = sortFiles([...files, newFile])
+      this.updateFiles(project.id, newFiles)
+      return newFile
     }
 
-    // don't create file yet, only when user edits
-    const newFile: File = File.newFile({
-      name,
-      type: FileType.DOC,
-      parent: monthFolder.file.id,
-      projectId: project.id,
-    })
-    logger.info('created provisional file', newFile)
-    const newFiles = sortFiles([...files, newFile])
-    this.updateFiles(project.id, newFiles)
-
-    return newFile.id
+    return null
   }
 
   saveProvisionalFile = async (file: File) => {

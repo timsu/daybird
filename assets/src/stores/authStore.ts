@@ -75,6 +75,8 @@ class AuthStore {
     if (tokens.refresh?.token) this.saveTokens(tokens)
   })
 
+  updateAPITokens = (newTokens: AuthTokenPair) => API.setAuthTokens(newTokens)
+
   // --- sign in / sign up
 
   createAccount = async (name: string, email: string, password: string) => {
@@ -121,7 +123,9 @@ class AuthStore {
   updateUser = action(this.loggedInUser, 'updateUser', async (store, updates: Partial<User>) => {
     logger.info(`AUTH —— Update User`, updates)
     const response = await API.updateUser(updates)
-    store.set(User.fromJSON(response.user))
+
+    // by default, don't update logged in user since that triggers re-renders
+    Object.assign(store.get()!, User.fromJSON(response.user))
   })
 }
 

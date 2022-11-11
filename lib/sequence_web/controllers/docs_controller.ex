@@ -60,7 +60,7 @@ defmodule SequenceWeb.DocsController do
          {:ok, project} <- Projects.project_by_uuid(user, project_uuid),
          parent <- validate_parent(project, params["parent"]),
          {:ok, doc} <- Docs.create_file(%{
-            uuid: params["id"],
+            uuid: if(params["id"], do: Utils.uuid_to_base16(params["id"])),
             parent: parent,
             name: name,
             type: type,

@@ -11,6 +11,7 @@ import { pluralize, pluralizeWithCount } from '@/utils'
 import { InputRule, InputRuleFinder, mergeAttributes, Node } from '@tiptap/core'
 
 export interface TaskItemOptions {
+  postCreateTask?: (task: Task) => void
   HTMLAttributes: Record<string, any>
 }
 
@@ -69,7 +70,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
   },
 
   addNodeView() {
-    return ({ node, HTMLAttributes, getPos, editor }) => {
+    return ({ node, extension, getPos, editor }) => {
       const container = document.createElement('div')
       const oldPos = typeof getPos === 'function' ? getPos() : editor.state.selection.$head.pos
 
@@ -84,6 +85,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
           const newPos = getPos() || oldPos
           view.dispatch(view.state.tr.setNodeMarkup(newPos, undefined, newAttrs))
         }
+        if (task) TaskItem.options.postCreateTask?.(task)
         return true
       }
 
@@ -157,28 +159,29 @@ export const TaskItem = Node.create<TaskItemOptions>({
 
             state.doc.nodesBetween(oldStart, oldEnd, (node) => {
               if (node.type.name === 'task') {
-                // if (node.attrs.id != taskStore.del
-                if (node.attrs.id) tasksToDelete.push(node.attrs.id)
+                if (node.attrs.id && node.attrs.id != taskStore.deletedTask.get()?.id)
+                  tasksToDelete.push(node.attrs.id)
               }
             })
           })
 
           if (tasksToDelete.length > 0) {
+            const tasks = tasksToDelete.map((id) => taskStore.taskMap.get()[id])
+            tasks.forEach((task) => taskStore.deleteTask(task))
+
             toast(
               (t) => (
-                <div class="inline">
-                  {pluralizeWithCount('task', tasksToDelete.length)} removed from page.
+                <div class="flex items-center gap-2">
+                  {pluralizeWithCount('task', tasksToDelete.length)} deleted.
                   <button
                     onClick={() => {
-                      tasksToDelete.forEach((id) =>
-                        taskStore.deleteTask(taskStore.taskMap.get()[id])
-                      )
                       toast.dismiss(t.id)
-                      toast.success(pluralize('Task', tasksToDelete.length) + ' deleted')
+                      tasks.forEach((task) => taskStore.undeleteTask(task))
+                      this.editor.commands.undo()
                     }}
                     class="px-2 py-1 shadow bg-gray-200 ml-2 hover:bg-gray-400 rounded"
                   >
-                    Delete {tasksToDelete.length == 1 ? 'it' : 'them'}?
+                    Undo
                   </button>
                 </div>
               ),

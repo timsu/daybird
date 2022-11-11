@@ -1,6 +1,8 @@
+import { format, isAfter, isSameYear } from 'date-fns'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
+import { showTaskDatePicker } from '@/components/task/TaskDatePicker'
 import { paths } from '@/config'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -219,6 +221,18 @@ export default ({
       )}
 
       {task?.state && <div class="font-semibold text-sm text-blue-500 ml-2">IN PROGRESS</div>}
+
+      {task?.due_at && (
+        <div
+          class={
+            'font-semibold text-sm ml-2 cursor-pointer ' +
+            (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
+          }
+          onClick={(e) => showTaskDatePicker(task, e)}
+        >
+          {Task.renderDueDate(task)}
+        </div>
+      )}
 
       {task?.priority ? (
         <div

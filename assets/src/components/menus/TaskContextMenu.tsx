@@ -1,5 +1,9 @@
+import { render } from 'preact'
+import tippy from 'tippy.js'
+
 import { ContextMenuItem, ContextMenuWithData } from '@/components/core/ContextMenu'
 import Pressable from '@/components/core/Pressable'
+import TaskDatePicker, { showTaskDatePicker } from '@/components/task/TaskDatePicker'
 import { paths } from '@/config'
 import { Task, TaskState, TaskType } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -8,8 +12,8 @@ import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
 import {
-    ArchiveIcon, ArrowCircleLeftIcon, ArrowCircleRightIcon, BookmarkIcon, CheckCircleIcon,
-    DocumentIcon, EyeOffIcon, FlagIcon, LinkIcon, TrashIcon
+    ArchiveIcon, ArrowCircleLeftIcon, ArrowCircleRightIcon, BookmarkIcon, CalendarIcon,
+    CheckCircleIcon, DocumentIcon, EyeOffIcon, FlagIcon, LinkIcon, TrashIcon, XIcon
 } from '@heroicons/react/outline'
 
 export default () => {
@@ -46,6 +50,24 @@ export default () => {
               >
                 <ArrowCircleRightIcon class="h-4 w-4 mr-2 text-blue-500" />
                 Mark In Progress
+              </ContextMenuItem>
+            )}
+
+            {!task.due_at ? (
+              <ContextMenuItem onClick={(e) => showTaskDatePicker(task, e)}>
+                <CalendarIcon class="h-4 w-4 mr-2 text-green-500" />
+                Add Date
+              </ContextMenuItem>
+            ) : (
+              <ContextMenuItem class="hover:bg-inherit">
+                <CalendarIcon class="h-4 w-4 mr-2 text-green-500" />
+                <Pressable className="flex-row" onClick={(e) => showTaskDatePicker(task, e)}>
+                  Date: <span className="ml-2 text-green-500">{Task.renderDueDate(task)}</span>
+                </Pressable>
+                <div className="flex-1" />
+                <Pressable onClick={(e) => taskStore.saveTask(task, { due_at: null })}>
+                  <XIcon class="h-4 w-4" />
+                </Pressable>
               </ContextMenuItem>
             )}
 

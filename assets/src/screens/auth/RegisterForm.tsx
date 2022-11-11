@@ -5,8 +5,9 @@ import GoogleServerOAuth, {
 } from '@/components/auth/GoogleServerOAuth'
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
+import Pressable from '@/components/core/Pressable'
 import Submit from '@/components/core/Submit'
-import { OAuthProvider, paths } from '@/config'
+import { config, OAuthProvider, paths } from '@/config'
 import AuthForm from '@/screens/auth/AuthForm'
 import { authStore } from '@/stores/authStore'
 import { unwrapError } from '@/utils'
@@ -45,6 +46,14 @@ export default () => {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const randomUser = () => {
+    authStore.createAccount(
+      Math.random().toString(36),
+      Math.random().toString(36) + '@random.com',
+      'test12'
+    )
   }
 
   return (
@@ -108,6 +117,12 @@ export default () => {
             Meant to sign in?
           </a>
         </div>
+
+        {config.dev && (
+          <Pressable onClick={randomUser} className="mt-4 flex justify-center">
+            create a random user
+          </Pressable>
+        )}
       </form>
     </AuthForm>
   )

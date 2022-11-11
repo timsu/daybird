@@ -11,6 +11,7 @@ import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { logger } from '@/utils'
+import doOnboarding from '@/utils/onboarding'
 import { getOS, isChrome, isMobile, isSafari } from '@/utils/os'
 
 const SLEEP_CHECK_INTERVAL = 30_000
@@ -95,8 +96,6 @@ class UIStore {
 
     this.checkForSleep()
 
-    if (!User.meta(user).ob) modalStore.onboardingModal.set(true)
-
     if (!user.timezone) {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       authStore.updateUser({ timezone })
@@ -166,6 +165,14 @@ class UIStore {
     } else {
       alert('Only Chrome and Firefox support adding Daybird to your homescreen')
     }
+  }
+
+  checkForOnboarding = (force?: boolean) => {
+    const user = authStore.loggedInUser.get()
+    if (User.meta(user).ob && !force) return
+    logger.info('Onboarding start')
+    doOnboarding()
+    if (!force) authStore.updateUser({ meta: { ob: 1 } })
   }
 }
 

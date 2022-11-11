@@ -1,3 +1,5 @@
+import { isSameYear } from 'date-fns'
+
 export enum TaskType {
   TASK = 0,
   STORY,
@@ -22,6 +24,8 @@ export class Task {
 
   public state?: TaskState | null
 
+  public due_at?: string | null
+
   public completed_at?: string | null
 
   public archived_at?: string | null
@@ -32,5 +36,15 @@ export class Task {
     let item: Task = Object.assign(new Task(), obj)
 
     return item
+  }
+
+  public static renderDueDate(task: Task) {
+    if (!task.due_at) return
+    const due = new Date(task.due_at)
+    return due.toLocaleDateString(navigator.language, {
+      month: 'numeric',
+      day: 'numeric',
+      year: isSameYear(new Date(), due) ? undefined : '2-digit',
+    })
   }
 }

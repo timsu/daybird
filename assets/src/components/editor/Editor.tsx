@@ -3,6 +3,7 @@ import './editor-styles.css'
 import { decode } from 'base64-arraybuffer'
 import { MutableRef, useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
+import { EditorView } from 'prosemirror-view'
 import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
 
@@ -10,9 +11,11 @@ import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
 import Link from '@/components/editor/Link'
 import { TaskItem } from '@/components/editor/TaskItem'
+import { Video } from '@/components/editor/Video'
 import { WikiLink } from '@/components/editor/WikiLink'
 import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
 import SlashExtension from '@/components/slashmenu/SlashExtension'
+import { paths } from '@/config'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
@@ -25,6 +28,12 @@ import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import Placeholder from '@tiptap/extension-placeholder'
 import StarterKit from '@tiptap/starter-kit'
 
+// Hack to prevent the matchesNode error on hot reloads
+EditorView.prototype.updateState = function updateState(state) {
+  if (!(this as any).docView) return
+  ;(this as any).updateStateInner(state, this.state.plugins != state.plugins)
+}
+
 type Props = {
   project: Project
   id?: string
@@ -33,6 +42,16 @@ type Props = {
 }
 
 const SAVE_INTERVAL = 5_000
+
+const PLACEHOLDER_TODAY =
+  "What's important today?\n\nStart typing to create a note.\n\n" +
+  'Type "/" to insert a task or add formatting.\n\n' +
+  'Have fun!'
+
+const PLACEHOLDER_DOC =
+  'Start typing to create a note.\n\n' +
+  'Type "/" to insert a task or add formatting.\n\n' +
+  'Have fun!'
 
 export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
@@ -80,7 +99,6 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     try {
       if (contentType == 'ydoc') {
         const array = new Uint8Array(decode(initialContent))
-
         Y.applyUpdate(ydoc, array)
       }
     } catch (e) {
@@ -88,6 +106,8 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     }
 
     const provider = new WebrtcProvider(id, ydoc)
+
+    const isToday = location.pathname.startsWith(paths.TODAY)
 
     const user = authStore.loggedInUser.get()!
     const editor = (prevEditor.current = new Editor({
@@ -100,16 +120,14 @@ const useEditor = (id: string | undefined, initialContent: any) => {
         HorizontalRule,
         TaskItem,
         Image,
+        Video,
         WikiLink,
         Link.configure({
           autolink: false,
           linkOnPaste: true,
         }),
         Placeholder.configure({
-          placeholder:
-            'Welcome to Daybird!\n\nStart typing to create a note.\n\n' +
-            'Type "/" to insert a task or add formatting.\n\n' +
-            'Have fun!',
+          placeholder: isToday ? PLACEHOLDER_TODAY : PLACEHOLDER_DOC,
         }),
         SlashExtension,
         ExistingTasksExtension,

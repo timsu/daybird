@@ -29,7 +29,7 @@ class DocStore {
 
   dirty = atom<boolean>(false)
 
-  docCache: { [id: string]: { title: string; contents: any } } = {}
+  docCache: { [id: string]: any } = {}
 
   fileListener?: () => void | undefined
 
@@ -39,10 +39,11 @@ class DocStore {
     if (authStore.debugMode()) (window as any)['docStore'] = docStore
 
     const cached = this.docCache[id]
+    const file = fileStore.idToFile.get()[id]
 
     this.id.set(id)
-    this.title.set(cached?.title)
-    this.document.set(cached?.contents)
+    this.title.set(file?.name)
+    this.document.set(cached)
     this.docError.set(undefined)
 
     this.fileListener?.()
@@ -53,10 +54,10 @@ class DocStore {
 
     try {
       const response = (await API.readFile(project, id)) as string
-      logger.info('DOCS - doc loaded', id, typeof response)
+      logger.info('DOCS - doc loaded', id, response.length)
       if (id != this.id.get()) return
       this.document.set(response)
-      this.docCache[id] = { contents: response, title: this.title.get()! }
+      this.docCache[id] = response
       localStorage.setItem(LS_LAST_DOC, project.id + '/' + id)
     } catch (e) {
       this.docError.set(unwrapError(e))

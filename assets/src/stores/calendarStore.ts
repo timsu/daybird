@@ -59,7 +59,6 @@ class CalendarStore {
 
     API.getOAuthTokens(GOOGLE_CAL).then((response) => {
       const tokens = response.tokens.map((t) => OAuthToken.fromJSON(t))
-      logger.info('[cal] got tokens', tokens)
       this.tokens.set(tokens)
     })
 
