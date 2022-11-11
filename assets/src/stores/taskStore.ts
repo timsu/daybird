@@ -59,6 +59,7 @@ class TaskStore {
     const response = await API.createTask(project, attrs)
     logger.info('TASKS - create', response)
     this.updateTaskMap(response.task)
+    this.taskList.set([...this.taskList.get(), response.task])
     return response.task
   }
 
@@ -67,7 +68,7 @@ class TaskStore {
 
     const response = await API.updateTask(task.id, attrs)
     this.updateTaskMap(response.task)
-    this.onTaskUpdated(task)
+    this.onTaskUpdated(response.task)
 
     return response.task
   }
@@ -103,6 +104,8 @@ class TaskStore {
   onTaskUpdated = (task: Task) => {
     const projectId = projectStore.currentProject.get()?.id
     this.topics[projectId!]?.setSharedKey(`${KEY_TASK}${task.id}`, Date.now())
+
+    this.taskList.set(this.taskList.get().map((t) => (t.id == task.id ? task : t)))
   }
 }
 

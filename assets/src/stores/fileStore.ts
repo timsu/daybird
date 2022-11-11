@@ -84,7 +84,6 @@ class FileStore {
             authStore.logout()
           })
       }
-      console.log('my status', (e as AxiosError).code, e)
     }
   }
 

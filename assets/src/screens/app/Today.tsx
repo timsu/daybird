@@ -222,7 +222,10 @@ const TodayDoc = ({ date }: { date: Date }) => {
 
 function checkForDueTasks(date: Date) {
   const today = new Date()
-  if (isBefore(date, today)) return
+  if (isBefore(date, today)) {
+    logger.debug('[today] task check but day is past')
+    return
+  }
 
   const threshold = endOfDay(date)
   const tasks = taskStore.taskList
@@ -230,6 +233,7 @@ function checkForDueTasks(date: Date) {
     .filter((t) => t.due_at && !t.deleted_at && !t.completed_at)
     .filter((t) => isBefore(new Date(t.due_at!), threshold))
 
+  logger.debug('[today] relevant tasks', tasks, threshold)
   if (!tasks.length) return
   logger.info('due tasks found', tasks)
 

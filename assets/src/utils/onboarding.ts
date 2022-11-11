@@ -72,5 +72,7 @@ function onCreateTask(task: Task) {
     ),
     paragraph(),
     paragraph('Happy journaling!'),
+    paragraph(),
+    paragraph(),
   ])
 }
