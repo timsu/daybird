@@ -11,6 +11,7 @@ import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
 import Link from '@/components/editor/Link'
 import { TaskItem } from '@/components/editor/TaskItem'
+import { Video } from '@/components/editor/Video'
 import { WikiLink } from '@/components/editor/WikiLink'
 import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
 import SlashExtension from '@/components/slashmenu/SlashExtension'
@@ -119,6 +120,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
         HorizontalRule,
         TaskItem,
         Image,
+        Video,
         WikiLink,
         Link.configure({
           autolink: false,
