@@ -36,7 +36,7 @@ defmodule Sequence.Tasks.Task do
   def changeset(task, attrs) do
     task
     |> cast(attrs, [:type, :short_code, :title, :description, :state, :completed_at, :deleted_at,
-      :archived_at, :project_id, :user_id, :creator_id, :doc, :priority])
+      :archived_at, :due_at, :project_id, :user_id, :creator_id, :doc, :priority])
     |> Repo.generate_uuid
     |> validate_required([:uuid, :short_code, :title, :creator_id, :project_id])
     |> Repo.truncate(:doc, 100)

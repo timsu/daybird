@@ -12,6 +12,7 @@ defmodule SequenceWeb.TasksView do
       short_code: task.short_code,
       state: task.state,
       priority: task.priority,
+      due_at: task.due_at,
       completed_at: task.completed_at,
       archived_at: task.archived_at,
       deleted_at: task.deleted_at
