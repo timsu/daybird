@@ -40,6 +40,7 @@ class UIStore {
   sidebarHidden = atom<boolean>(false)
 
   calendarOpen = atom<boolean>(false)
+  manualCalendarOpen: boolean | undefined = undefined
 
   calendarDate = atom<Date>(new Date())
 

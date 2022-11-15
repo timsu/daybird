@@ -6,6 +6,7 @@ import DayView from '@/components/calendar/DayView'
 import MonthView from '@/components/calendar/MonthView'
 import { paths } from '@/config'
 import { CALENDAR_OPEN_WIDTH, uiStore } from '@/stores/uiStore'
+import { debounce, DebounceStyle } from '@/utils'
 import { useStore } from '@nanostores/preact'
 
 export default function () {
@@ -15,10 +16,17 @@ export default function () {
 
   useEffect(() => {
     if (location.pathname != paths.TODAY) return
-    const onResize = () => {
-      const shouldBeOpen = window.innerWidth > CALENDAR_OPEN_WIDTH
-      if (calendarOpen != shouldBeOpen) uiStore.calendarOpen.set(shouldBeOpen)
-    }
+    const onResize = () =>
+      debounce(
+        'cal-resize',
+        () => {
+          const shouldBeOpen = window.innerWidth > CALENDAR_OPEN_WIDTH
+          const newSetting = uiStore.manualCalendarOpen ?? shouldBeOpen
+          if (calendarOpen != newSetting) uiStore.calendarOpen.set(newSetting)
+        },
+        500,
+        DebounceStyle.QUEUE_LAST
+      )
     window.addEventListener('resize', onResize)
     onResize()
     return () => window.removeEventListener('resize', onResize)
