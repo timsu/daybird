@@ -69,7 +69,7 @@ class DocStore {
     logger.info('DOCS - saving doc', id, typeof contents)
     try {
       await API.writeFile(project, id, contents)
-      if (this.docCache[id]) this.docCache[id].contents = contents
+      if (this.docCache[id]) this.docCache[id] = contents
     } catch (e) {
       this.docError.set(unwrapError(e))
     }
