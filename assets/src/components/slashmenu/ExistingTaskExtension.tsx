@@ -1,7 +1,7 @@
 import { task } from 'nanostores'
 import { PluginKey } from 'prosemirror-state'
 
-import { NODE_NAME } from '@/components/editor/TaskItem'
+import { NODE_NAME } from '@/components/editor/LegacyTaskItem'
 import { MenuComponentProps } from '@/components/slashmenu/CommandListController'
 import renderItems from '@/components/slashmenu/renderItems'
 import { Task, TaskType } from '@/models'

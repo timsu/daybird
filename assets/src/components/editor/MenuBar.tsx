@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 
-import { TaskItem } from '@/components/editor/TaskItem'
+import { TaskItem } from '@/components/editor/LegacyTaskItem'
 import { classNames } from '@/utils'
 import { getOS } from '@/utils/os'
 import { CheckCircleIcon, CheckIcon, LinkIcon, ViewListIcon } from '@heroicons/react/outline'

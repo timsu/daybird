@@ -1,4 +1,4 @@
-import { TaskItem } from '@/components/editor/TaskItem'
+import { TaskItem } from '@/components/editor/LegacyTaskItem'
 import { Task } from '@/models'
 import { fileStore } from '@/stores/fileStore'
 import { projectStore } from '@/stores/projectStore'

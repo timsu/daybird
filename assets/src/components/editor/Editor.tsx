@@ -10,7 +10,6 @@ import * as Y from 'yjs'
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
 import Link from '@/components/editor/Link'
-import { SimpleTaskItem } from '@/components/editor/SimpleTaskItem'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { TaskList } from '@/components/editor/TaskList'
 import { Video } from '@/components/editor/Video'
@@ -100,11 +99,14 @@ const useEditor = (id: string | undefined, initialContent: any) => {
 
     try {
       if (contentType == 'ydoc') {
-        const array = new Uint8Array(decode(initialContent))
+        const array =
+          initialContent instanceof Uint8Array
+            ? initialContent
+            : new Uint8Array(decode(initialContent))
         Y.applyUpdate(ydoc, array)
       }
     } catch (e) {
-      logger.error('error loading', e)
+      logger.error('error loading', e, initialContent)
     }
 
     const provider = new WebrtcProvider(id, ydoc)
@@ -121,7 +123,9 @@ const useEditor = (id: string | undefined, initialContent: any) => {
         }),
         HorizontalRule,
         TaskList,
-        SimpleTaskItem,
+        TaskItem.configure({
+          nested: true,
+        }),
         Image,
         Video,
         WikiLink,

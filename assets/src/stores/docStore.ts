@@ -2,7 +2,7 @@ import { decode } from 'base64-arraybuffer'
 import { atom } from 'nanostores'
 
 import { API } from '@/api'
-import { NODE_NAME } from '@/components/editor/TaskItem'
+import { NODE_NAME } from '@/components/editor/LegacyTaskItem'
 import { config } from '@/config'
 import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'

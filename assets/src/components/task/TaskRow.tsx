@@ -1,5 +1,5 @@
 import { format, isAfter, isSameYear } from 'date-fns'
-import { useEffect, useRef, useState } from 'preact/hooks'
+import { MutableRef, useEffect, useRef, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import { showTaskDatePicker } from '@/components/task/TaskDatePicker'
@@ -17,166 +17,37 @@ import { NodeViewWrapper } from '@tiptap/react'
 
 type Props = {
   id: string | undefined
-  focus?: boolean
-  initialTitle?: string
+  contentRef?: MutableRef<HTMLDivElement | null>
   taskList?: boolean
   currentDoc?: string
   newTaskMode?: boolean
   onCreate?: (task: Task | null) => void
 }
 
-export default ({
-  id,
-  initialTitle,
-  focus,
-  currentDoc,
-  newTaskMode,
-  taskList,
-  onCreate,
-}: Props) => {
-  const [savedId, setSavedId] = useState<string>()
-  const [showPlaceholder, setPlaceholder] = useState<boolean>(!id && !initialTitle)
-
-  id = id || savedId
+export default function (props: Props) {
+  const { id, contentRef, onCreate } = props
   const task = useStore(taskStore.taskMap)[id!]
-  const titleRef = useRef<HTMLDivElement | null>(null)
 
-  // --- saving and loading
+  return (
+    <>
+      <TaskCheckbox task={task} />
+      <TaskContent task={task} {...props} />
+      <TaskActions task={task} />
+    </>
+  )
+}
 
-  useEffect(() => {
-    const div = titleRef.current
-    if (!div) return
-
-    div.addEventListener('input', (e) => {
-      e.stopPropagation()
-      setPlaceholder(!titleRef.current?.innerText)
-    })
-
-    div.addEventListener('keydown', (e) => e.stopPropagation())
-    div.addEventListener('keypress', (e) => {
-      e.stopPropagation()
-      if (!newTaskMode && e.key == 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        const pos = window.editor?.view.posAtDOM(e.target as Node, 0, 1)
-        if (pos) {
-          window.editor
-            ?.chain()
-            .setTextSelection(pos + 1)
-            .createParagraphNear()
-            .focus()
-            .run()
-        }
-      }
-    })
-  }, [])
-
-  useEffect(() => {
-    // handle focus out -> task saving
-    const div = titleRef.current
-    if (!div) return
-    const onFocusOut = async (e: Event) => {
-      const title = titleRef.current?.innerText?.trim()
-      const task = taskStore.taskMap.get()[id!]
-
-      const dirty = title != task?.title
-      if (!dirty || !title) return onCreate?.(task)
-
-      if (!task) {
-        const doc = docStore.id.get()
-        const newTask = await taskStore.createTask({ title, doc })
-        onCreate?.(newTask)
-        div.innerText = '' // need to clear div text so it gets re-populated when id comes in
-        setSavedId(newTask.id)
-        return newTask
-      } else {
-        const doc = task.doc ? undefined : docStore.id.get()
-        await taskStore.saveTask(task, { title, doc })
-        return task
-      }
-    }
-
-    div.addEventListener('focusout', onFocusOut)
-    if (newTaskMode)
-      div.addEventListener('keypress', async (e) => {
-        if (e.key == 'Enter' && !e.shiftKey) {
-          e.preventDefault()
-          debounce(
-            'new-task',
-            async () => {
-              const task = await onFocusOut(e)
-              if (!task) return
-              setSavedId(undefined)
-              setPlaceholder(true)
-              taskStore.taskList.set([task, ...taskStore.taskList.get()])
-            },
-            500,
-            DebounceStyle.IGNORE_NEW
-          )
-        }
-      })
-    if (focus && !id) {
-      setTimeout(() => div.focus(), 0)
-    }
-    return () => div.removeEventListener('focusout', onFocusOut)
-  }, [id, focus])
-
-  useEffect(() => {
-    if (id && id != 'undefined' && id != 'null') taskStore.loadTask(id)
-  }, [id])
-
-  // --- actions
-
+function TaskCheckbox({ task }: { task: Task }) {
   const toggleComplete = () => {
+    if (!task) return
     taskStore.saveTask(task, {
       completed_at: task.completed_at ? null : new Date().toISOString(),
       state: null,
     })
   }
 
-  const clickShortCode = (e: MouseEvent) => {
-    const target = e.target as HTMLDivElement
-    const rect = target.getBoundingClientRect()
-    triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
-    e.preventDefault()
-  }
-
-  // --- task deletion handling
-
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key == 'Backspace') {
-      const title = titleRef.current?.innerText?.trim()
-      if (title == '') {
-        // user pressed backspace on an empty task, let's delete it.
-        if (!task) {
-          id = 'delete-me'
-          titleRef.current!.id = 'task-delete-me'
-          taskStore.deletedTask.set({ id } as Task)
-        } else {
-          taskStore.deleteTask(task)
-        }
-      }
-    }
-  }
-
-  const docName = task?.doc && fileStore.idToFile.get()[task.doc]?.name
-  const showGoToDoc = docName && task.doc != currentDoc && !isDailyFile(docName)
-  const goToDoc = () => {
-    fileStore.openDoc(task.doc!)
-  }
-
   return (
-    <NodeViewWrapper
-      id={task ? `task-${task.id}` : ''}
-      onContextMenu={clickShortCode}
-      className={classNames(
-        'rounded-md -mt-[1px] p-2 flex flex-row items-center relative group',
-        taskList ? '' : 'border border-transparent hover:border-gray-200 -ml-4'
-      )}
-    >
-      {!taskList && !isSafari && (
-        <span data-drag-handle="" class="-ml-2 drag-handle grippy invisible group-hover:visible" />
-      )}
-
+    <label class="mr-1 select-none">
       {task?.deleted_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">DELETED</div>
       ) : task?.archived_at ? (
@@ -185,41 +56,47 @@ export default ({
         <input
           checked={!!task?.completed_at}
           type="checkbox"
-          class="mr-2 rounded border-gray-400 cursor-pointer"
+          class="rounded border-gray-400 cursor-pointer"
           onClick={toggleComplete}
         />
       )}
+    </label>
+  )
+}
 
-      {!task?.title && showPlaceholder && (
-        <div class="absolute left-[2.6em] pointer-events-none text-gray-400">New task</div>
-      )}
+function TaskContent({ id, task, contentRef, onCreate, currentDoc }: { task: Task } & Props) {
+  const ref = contentRef || useRef<HTMLDivElement | null>(null)
 
-      <div
-        contentEditable
-        ref={titleRef}
-        onKeyDown={onKeyDown}
-        onPaste={(e) => e.stopPropagation()}
-        class={classNames(
-          'task-title',
-          'flex-grow p-1',
-          task?.completed_at ? 'line-through text-gray-500' : ''
-        )}
-        placeholder="New task"
-      >
-        {task?.title || initialTitle}
-      </div>
+  useEffect(() => {
+    const div = ref.current
+    if (!div) return
 
-      {showGoToDoc && (
-        <div
-          class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
-              ml-3 max-w-[110px] overflow-hidden cursor-pointer overflow-ellipsis whitespace-nowrap"
-          onClick={goToDoc}
-        >
-          <DocumentIcon class="w-4 h-4 mr-1" />
-          {fileStore.idToFile.get()[task.doc!]?.name}
-        </div>
-      )}
+    if (task && div.textContent != task.title) {
+      div.innerText = task.title
+    }
 
+    const onFocusOut = async () => {
+      const title = div.textContent?.trim()
+      if (!task && !id && title) {
+        // task creation mode
+        const newTask = await taskStore.createTask({ title, doc: currentDoc })
+        onCreate?.(newTask)
+      } else if (task && title != task.title) {
+        // task editing mode
+        await taskStore.saveTask(task, { title })
+      }
+    }
+
+    div.addEventListener('focusout', onFocusOut)
+    return () => div.removeEventListener('focusout', onFocusOut)
+  }, [ref.current, task])
+
+  return <div contentEditable class="flex-1 px-1" ref={ref} />
+}
+
+function TaskActions({ task }: { task: Task }) {
+  return (
+    <>
       {task?.state && <div class="font-semibold text-sm text-blue-500 ml-2">IN PROGRESS</div>}
 
       {task?.due_at && (
@@ -244,13 +121,6 @@ export default ({
           {'!'.repeat(task.priority)}
         </div>
       ) : null}
-
-      <div
-        class="text-sm font-semibold text-slate-500 ml-3 whitespace-nowrap cursor-pointer"
-        onClick={clickShortCode}
-      >
-        {task?.short_code}
-      </div>
-    </NodeViewWrapper>
+    </>
   )
 }
