@@ -92,13 +92,11 @@ function hrInputRule(config: { find: InputRuleFinder; type: NodeType }) {
       const node = $start.node()
 
       const newNode = config.type.create()
-      const from = Math.max(1, range.from - 1)
+      const from = Math.max(0, range.from - 1)
       const to = Math.min(range.to, state.doc.nodeSize - 1)
 
       if (node == state.doc.lastChild) {
-        try {
-          state.tr.split(to)
-        } catch (e) {}
+        state.tr.insertText('', to).split(to)
       }
       state.tr.replaceWith(from, to, newNode)
     },

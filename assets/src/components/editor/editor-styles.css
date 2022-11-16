@@ -9,6 +9,7 @@
   line-height: 170%;
   margin-bottom: 200px;
   word-break: break-word;
+  min-width: 300px;
 
   @media print {
     margin-bottom: 0;
