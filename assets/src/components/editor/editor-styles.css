@@ -135,3 +135,45 @@
   user-select: none;
   white-space: nowrap;
 }
+
+ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+
+    > label {
+      flex: 0 0 auto;
+      margin-right: 0.5rem;
+      user-select: none;
+    }
+
+    > div {
+      flex: 1 1 auto;
+    }
+  }
+
+  input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    border-radius: 20%;
+    vertical-align: middle;
+    border: 1px solid #777;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"]:hover {
+    background: #ddd;
+  }
+
+  input[type="checkbox"]:checked {
+    appearance: auto;
+    background-color: blue;
+  }
+}

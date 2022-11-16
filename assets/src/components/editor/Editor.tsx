@@ -10,7 +10,9 @@ import * as Y from 'yjs'
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
 import Link from '@/components/editor/Link'
+import { SimpleTaskItem } from '@/components/editor/SimpleTaskItem'
 import { TaskItem } from '@/components/editor/TaskItem'
+import { TaskList } from '@/components/editor/TaskList'
 import { Video } from '@/components/editor/Video'
 import { WikiLink } from '@/components/editor/WikiLink'
 import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
@@ -118,7 +120,8 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           horizontalRule: false,
         }),
         HorizontalRule,
-        TaskItem,
+        TaskList,
+        SimpleTaskItem,
         Image,
         Video,
         WikiLink,
