@@ -25,13 +25,17 @@ type Props = {
 }
 
 export default function (props: Props) {
-  const { id, contentRef, onCreate } = props
+  const { id, taskList } = props
   const task = useStore(taskStore.taskMap)[id!]
 
   return (
     <>
       <TaskCheckbox task={task} />
-      <TaskContent task={task} {...props} />
+      {taskList ? (
+        <TaskContentInList task={task} {...props} />
+      ) : (
+        <TaskContentInDoc task={task} {...props} />
+      )}
       <TaskActions task={task} />
     </>
   )
@@ -47,7 +51,7 @@ function TaskCheckbox({ task }: { task: Task }) {
   }
 
   return (
-    <label class="mr-1 select-none">
+    <label contentEditable={false} class="mr-1 select-none">
       {task?.deleted_at ? (
         <div class="font-semibold text-sm text-gray-500 mr-2 ">DELETED</div>
       ) : task?.archived_at ? (
@@ -64,16 +68,55 @@ function TaskCheckbox({ task }: { task: Task }) {
   )
 }
 
-function TaskContent({ id, task, contentRef, onCreate, currentDoc }: { task: Task } & Props) {
+function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: { task: Task } & Props) {
+  const ref = contentRef || useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const div = ref.current
+    const contentElement = div?.children[0] as HTMLParagraphElement
+    if (!contentElement) return
+
+    if (task && contentElement.textContent != task.title) {
+      contentElement.innerText = task.title
+    }
+
+    const onFocusOut = async () => {
+      const title = contentElement.textContent?.trim()
+      if (!task && !id && title) {
+        // task creation mode
+        const newTask = await taskStore.createTask({ title, doc: currentDoc })
+        onCreate?.(newTask)
+      } else if (task && title != task.title) {
+        // task editing mode
+        await taskStore.saveTask(task, { title })
+      }
+    }
+
+    let hasFocus = false
+    const observer = new MutationObserver(function (mutations) {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName != 'class') return
+        if ((mutation.target as HTMLElement).className == 'has-focus') hasFocus = true
+        else if (hasFocus) {
+          hasFocus = false
+          onFocusOut()
+        }
+      })
+    })
+
+    observer.observe(contentElement, { attributes: true })
+    return () => observer.disconnect()
+  }, [ref.current, task])
+
+  return <div class="flex-1 px-1" ref={ref} />
+}
+
+function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { task: Task } & Props) {
   const ref = contentRef || useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const div = ref.current
     if (!div) return
-
-    if (task && div.textContent != task.title) {
-      div.innerText = task.title
-    }
 
     const onFocusOut = async () => {
       const title = div.textContent?.trim()
@@ -91,12 +134,16 @@ function TaskContent({ id, task, contentRef, onCreate, currentDoc }: { task: Tas
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [ref.current, task])
 
-  return <div contentEditable class="flex-1 px-1" ref={ref} />
+  return (
+    <div class="flex-1 px-1" ref={ref}>
+      {task.title}
+    </div>
+  )
 }
 
 function TaskActions({ task }: { task: Task }) {
   return (
-    <>
+    <div class="ml-2" contentEditable={false}>
       {task?.state && <div class="font-semibold text-sm text-blue-500 ml-2">IN PROGRESS</div>}
 
       {task?.due_at && (
@@ -121,6 +168,6 @@ function TaskActions({ task }: { task: Task }) {
           {'!'.repeat(task.priority)}
         </div>
       ) : null}
-    </>
+    </div>
   )
 }

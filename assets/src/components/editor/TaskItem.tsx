@@ -100,7 +100,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
   addNodeView() {
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const listItem = document.createElement('li')
-      listItem.contentEditable = 'false'
+      // listItem.contentEditable = 'false'
       const ref = createRef<HTMLDivElement>()
       const oldPos = typeof getPos === 'function' ? getPos() : editor.state.selection.$head.pos
 

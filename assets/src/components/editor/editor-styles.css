@@ -135,14 +135,3 @@
   user-select: none;
   white-space: nowrap;
 }
-
-ul[data-type="taskList"] {
-  list-style: none;
-  padding: 0;
-
-  li {
-    display: flex;
-    align-items: center;
-  }
-
-}

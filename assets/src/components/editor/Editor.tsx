@@ -26,6 +26,7 @@ import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/ut
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
+import Focus from '@tiptap/extension-focus'
 import Placeholder from '@tiptap/extension-placeholder'
 import StarterKit from '@tiptap/starter-kit'
 
@@ -129,6 +130,9 @@ const useEditor = (id: string | undefined, initialContent: any) => {
         Image,
         Video,
         WikiLink,
+        Focus.configure({
+          mode: 'deepest',
+        }),
         Link.configure({
           autolink: false,
           linkOnPaste: true,
