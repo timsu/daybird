@@ -34,6 +34,10 @@ export default (props: Props) => {
   const title = useStore(docStore.title)
   const project = useStore(projectStore.projectMap)[props.projectId!]
 
+  useEffect(() => {
+    fileStore.onOpenDoc(props.id!)
+  }, [props.id])
+
   return (
     <>
       <Helmet title={`${project?.name} | ${title || 'Loading'}`} />

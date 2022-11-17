@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { format } from 'date-fns'
-import { action, map } from 'nanostores'
+import { action, atom, map } from 'nanostores'
 import { route } from 'preact-router'
 import toast from 'react-hot-toast'
 
@@ -42,6 +42,8 @@ class FileStore {
   idToFile = map<FileMap>({})
 
   expanded = map<ExpansionMap>({})
+
+  currentDocParents = atom<string[]>([])
 
   // --- actions
 
@@ -344,6 +346,28 @@ class FileStore {
     } else {
       route(paths.DOC + '/' + file.projectId + '/' + file.id)
     }
+  }
+
+  onOpenDoc = (id: string) => {
+    const hasFiles = Object.keys(this.fileTree.get()).length > 0
+    if (!hasFiles) {
+      const unsub = this.fileTree.listen(() => {
+        unsub()
+        this.onOpenDoc(id)
+      })
+      return
+    }
+
+    const parents: string[] = []
+
+    while (true) {
+      const file = this.idToFile.get()[id]
+      parents.push(id)
+      if (!file || !file.parent) break
+      id = file.parent
+    }
+
+    this.currentDocParents.set(parents)
   }
 }
 

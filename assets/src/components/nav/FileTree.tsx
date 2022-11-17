@@ -5,6 +5,7 @@ import Match from 'preact-router/match'
 import { ContextMenuTrigger, triggerContextMenu } from '@/components/core/ContextMenu'
 import { paths } from '@/config'
 import { FileType, TreeFile } from '@/models'
+import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import {} from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -187,7 +188,8 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
   const item = node.file
 
   const expansionKey = projectId + '/' + item.id
-  const expanded = useStore(fileStore.expanded)[expansionKey]
+  const currentDocParents = useStore(fileStore.currentDocParents)
+  const expanded = useStore(fileStore.expanded)[expansionKey] || currentDocParents.includes(item.id)
 
   const setExpanded = (setting: boolean) => {
     fileStore.setExpanded(expansionKey, setting)
