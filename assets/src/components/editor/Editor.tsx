@@ -127,7 +127,9 @@ const useEditor = (id: string | undefined, initialContent: any) => {
         }),
         HorizontalRule,
         LegacyTaskItem,
-        TaskItem,
+        TaskItem.configure({
+          nested: true,
+        }),
         TaskList,
         Image,
         Video,

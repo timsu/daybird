@@ -85,7 +85,7 @@ ul[data-type="taskList"], .ProseMirror ul[data-type="taskList"] {
 
   li {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
   }
 
   li:hover .group-hover {

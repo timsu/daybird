@@ -68,6 +68,7 @@ function TaskCheckbox({ task }: { task: Task }) {
         onClick={toggleComplete}
         disabled={disabled}
         title={task?.deleted_at ? 'Deleted' : task?.archived_at ? 'Archived' : undefined}
+        tabIndex={-1}
       />
     </label>
   )
@@ -77,8 +78,10 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: PropsW
   const ref = contentRef || useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    const contentElement = ref.current
-    if (!contentElement) return
+    const div = ref.current
+    if (!div) return
+
+    const contentElement = div.children[0] as HTMLParagraphElement
 
     if (task && contentElement.textContent != task.title) {
       contentElement.innerText = task.title
@@ -108,7 +111,7 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: PropsW
       })
     })
 
-    observer.observe(contentElement, { attributes: true, subtree: true })
+    observer.observe(div, { attributes: true, subtree: true })
     return () => observer.disconnect()
   }, [task])
 
