@@ -1,3 +1,5 @@
+import { useEffect } from 'preact/hooks'
+
 import Helmet from '@/components/core/Helmet'
 import LandingLayout from '@/components/layout/LandingLayout'
 import { paths } from '@/config'
@@ -7,6 +9,8 @@ type Props = {
 }
 
 export default (props: Props) => {
+  useEffect(() => window.scrollTo(0, 0), [])
+
   return (
     <LandingLayout darkFooter>
       <div class="bg-lavender-50">
