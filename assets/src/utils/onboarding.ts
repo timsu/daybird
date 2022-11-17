@@ -1,7 +1,3 @@
-import { TaskItem } from '@/components/editor/LegacyTaskItem'
-import { Task } from '@/models'
-import { fileStore } from '@/stores/fileStore'
-import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 
 const paragraph = (text?: string) => ({

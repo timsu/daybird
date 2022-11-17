@@ -31,6 +31,8 @@ class DocStore {
 
   docCache: { [id: string]: any } = {}
 
+  showMenu = atom<boolean>(false)
+
   fileListener?: () => void | undefined
 
   // --- actions

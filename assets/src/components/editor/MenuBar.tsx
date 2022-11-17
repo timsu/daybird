@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 
-import { TaskItem } from '@/components/editor/LegacyTaskItem'
 import { classNames } from '@/utils'
 import { getOS } from '@/utils/os'
 import { CheckCircleIcon, CheckIcon, LinkIcon, ViewListIcon } from '@heroicons/react/outline'
@@ -40,14 +39,6 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
     return null
   }
 
-  const createTask = useCallback(() => {
-    const newNode = {
-      type: 'task',
-      attrs: { id: 'focus' },
-    }
-    editor.commands.insertContent(newNode)
-  }, [editor])
-
   const setLink = useCallback(() => {
     const previousUrl = editor.getAttributes('link').href
     if (previousUrl) {
@@ -67,8 +58,8 @@ export const MenuBar = ({ editor }: { editor: Editor }) => {
       className="menubar print:hidden flex overflow-hidden fixed bg-white sm:relative z-20 sm:z-0 top-[10px] w-full sm:w-auto"
     >
       <button
-        onClick={createTask}
-        disabled={!editor.can().chain().toggleNode('task', 'task').run()}
+        onClick={() => editor.chain().focus().toggleTaskList().run()}
+        disabled={!editor.can().chain().toggleTaskList().run()}
         className={editor.isActive('task') ? 'is-active' : ''}
         title="Insert Task"
       >
