@@ -87,4 +87,9 @@ ul[data-type="taskList"] {
     display: flex;
     align-items: center;
   }
+
+  li:hover .group-hover {
+    opacity: 1;
+    transition: opacity 200ms;
+  }
 }

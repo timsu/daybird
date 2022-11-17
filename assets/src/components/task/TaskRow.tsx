@@ -1,4 +1,5 @@
 import { format, isAfter, isSameYear } from 'date-fns'
+import { RenderableProps } from 'preact'
 import { MutableRef, useEffect, useRef, useState } from 'preact/hooks'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
@@ -11,7 +12,7 @@ import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames, debounce, DebounceStyle, logger } from '@/utils'
 import { isSafari } from '@/utils/os'
-import { DocumentIcon } from '@heroicons/react/outline'
+import { CalendarIcon, DocumentIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 import { NodeViewWrapper } from '@tiptap/react'
 
@@ -142,32 +143,66 @@ function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { tas
 }
 
 function TaskActions({ task }: { task: Task }) {
+  if (!task) return null
+
+  const showContextMenu = (e: MouseEvent) => {
+    const target = e.target as HTMLDivElement
+    const rect = target.getBoundingClientRect()
+    triggerContextMenu(rect.right - 240, rect.top, 'task-menu', task)
+    e.preventDefault()
+  }
+
   return (
-    <div class="ml-2" contentEditable={false}>
+    <div class="ml-2 flex items-center gap-2" contentEditable={false}>
       {task?.state && <div class="font-semibold text-sm text-blue-500 ml-2">IN PROGRESS</div>}
 
-      {task?.due_at && (
-        <div
-          class={
-            'font-semibold text-sm ml-2 cursor-pointer ' +
-            (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
-          }
-          onClick={(e) => showTaskDatePicker(task, e)}
-        >
-          {Task.renderDueDate(task)}
-        </div>
-      )}
+      <HoverButton visible={!!task.due_at} onClick={(e) => showTaskDatePicker(task, e)}>
+        {task.due_at ? (
+          <div
+            class={
+              'text-xs ' +
+              (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
+            }
+          >
+            {Task.renderDueDate(task)}
+          </div>
+        ) : (
+          <CalendarIcon class="h-4 w-4 opacity-50" />
+        )}
+      </HoverButton>
 
       {task?.priority ? (
         <div
           class={classNames(
-            'font-semibold text-sm ml-2',
+            'font-semibold text-xs ml-2',
             ['text-gray-500', 'text-yellow-500', 'text-orange-500', 'text-red-500'][task.priority]
           )}
         >
           {'!'.repeat(task.priority)}
         </div>
       ) : null}
+
+      <HoverButton onClick={showContextMenu}>
+        <DotsHorizontalIcon class="w-4 h-4 opacity-50" />
+      </HoverButton>
     </div>
+  )
+}
+
+const HoverButton = ({
+  onClick,
+  visible,
+  children,
+}: RenderableProps<{ visible?: boolean; onClick: (e: MouseEvent) => void }>) => {
+  return (
+    <button
+      class={classNames(
+        'group-hover text-sm p-1 rounded cursor-pointer hover:bg-gray-200 border border-transparent hover:border-gray-300',
+        visible ? '' : 'opacity-0'
+      )}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   )
 }
