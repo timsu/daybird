@@ -40,12 +40,12 @@ export default function () {
 
   return (
     <>
-      <div className="w-52 relative z-0">
+      <div className="w-52 xl:w-72 relative z-0">
         <div
           className="sm:hidden bg-gray-800/50 fixed left-0 top-0 w-full h-full z-20"
           onClick={() => uiStore.calendarOpen.set(false)}
         />
-        <div className="w-52 bg-white border-l fixed top-0 right-0 flex flex-col h-full pt-2 z-20">
+        <div className="w-52 xl:w-72 bg-white border-l fixed top-0 right-0 flex flex-col h-full pt-2 z-20">
           <MonthView currentDate={selectedDate} onSelect={onSelectDate} />
           <hr className="my-4" />
           <DayView date={selectedDate} />

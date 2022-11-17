@@ -52,14 +52,14 @@ export default function ({ children }: RenderableProps<{}>) {
       <Toaster />
       <SidebarMenu />
       {!sidebarHidden && (
-        <div className="hidden md:flex md:w-52 md:flex-col md:fixed md:inset-y-0 relative">
+        <div className="hidden md:flex md:w-52 xl:w-72 md:flex-col md:fixed md:inset-y-0 relative">
           <AppSidebar showHideButton />
         </div>
       )}
 
       <div
         className={classNames(
-          !sidebarHidden ? 'md:ml-52' : '',
+          !sidebarHidden ? 'md:ml-52 xl:ml-72' : '',
           'flex flex-col min-h-full print:h-auto bg-white'
         )}
       >
