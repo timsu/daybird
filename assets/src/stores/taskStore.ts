@@ -67,10 +67,12 @@ class TaskStore {
     this.updateTaskMap(Object.assign({}, task, attrs))
 
     const response = await API.updateTask(task.id, attrs)
-    this.updateTaskMap(response.task)
-    this.onTaskUpdated(response.task)
+    task = Task.fromJSON(response.task)
+    logger.info('TASKS - saved task', task)
+    this.updateTaskMap(task)
+    this.onTaskUpdated(task)
 
-    return response.task
+    return task
   }
 
   toggleArchived = async (task: Task) => {

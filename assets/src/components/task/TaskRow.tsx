@@ -1,6 +1,7 @@
 import { format, isAfter, isSameYear } from 'date-fns'
 import { RenderableProps } from 'preact'
 import { MutableRef, useEffect, useRef, useState } from 'preact/hooks'
+import { twMerge } from 'tailwind-merge'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import { showTaskDatePicker } from '@/components/task/TaskDatePicker'
@@ -28,6 +29,10 @@ type Props = {
 export default function (props: Props) {
   const { id, taskList } = props
   const task = useStore(taskStore.taskMap)[id!]
+
+  useEffect(() => {
+    if (id && id != 'undefined' && id != 'null') taskStore.loadTask(id)
+  }, [id])
 
   return (
     <>
@@ -151,9 +156,31 @@ function TaskActions({ task }: { task: Task }) {
     e.preventDefault()
   }
 
+  const nextPriority = ((task.priority || 0) + 1) % 4
+  const onClickPriority = () => {
+    taskStore.saveTask(task, { priority: nextPriority })
+  }
+
   return (
     <div class="ml-2 flex items-center gap-2" contentEditable={false}>
-      {task?.state && <div class="font-semibold text-sm text-blue-500 ml-2">IN PROGRESS</div>}
+      {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
+
+      <HoverButton
+        className="w-6 whitespace-nowrap"
+        visible={!!task.priority}
+        onClick={onClickPriority}
+      >
+        <div
+          class={classNames(
+            'font-semibold text-xs',
+            ['text-gray-500', 'text-yellow-500', 'text-orange-500', 'text-red-500'][
+              task.priority || 0
+            ]
+          )}
+        >
+          {'!'.repeat(task.priority || 1)}
+        </div>
+      </HoverButton>
 
       <HoverButton visible={!!task.due_at} onClick={(e) => showTaskDatePicker(task, e)}>
         {task.due_at ? (
@@ -170,17 +197,6 @@ function TaskActions({ task }: { task: Task }) {
         )}
       </HoverButton>
 
-      {task?.priority ? (
-        <div
-          class={classNames(
-            'font-semibold text-xs ml-2',
-            ['text-gray-500', 'text-yellow-500', 'text-orange-500', 'text-red-500'][task.priority]
-          )}
-        >
-          {'!'.repeat(task.priority)}
-        </div>
-      ) : null}
-
       <HoverButton onClick={showContextMenu}>
         <DotsHorizontalIcon class="w-4 h-4 opacity-50" />
       </HoverButton>
@@ -192,12 +208,18 @@ const HoverButton = ({
   onClick,
   visible,
   children,
-}: RenderableProps<{ visible?: boolean; onClick: (e: MouseEvent) => void }>) => {
+  className,
+}: RenderableProps<{
+  visible?: boolean
+  onClick: (e: MouseEvent) => void
+  className?: string
+}>) => {
   return (
     <button
-      class={classNames(
+      className={twMerge(
         'group-hover text-sm p-1 rounded cursor-pointer hover:bg-gray-200 border border-transparent hover:border-gray-300',
-        visible ? '' : 'opacity-0'
+        visible ? '' : 'opacity-0',
+        className || ''
       )}
       onClick={onClick}
     >
