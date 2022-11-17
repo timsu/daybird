@@ -22,6 +22,8 @@ type Props = {
   onCreate?: (task: Task | null) => void
 }
 
+type PropsWithTask = { task: Task } & Props
+
 export default function (props: Props) {
   const { id, taskList } = props
   const task = useStore(taskStore.taskMap)[id!]
@@ -71,7 +73,7 @@ function TaskCheckbox({ task }: { task: Task }) {
   )
 }
 
-function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: { task: Task } & Props) {
+function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: PropsWithTask) {
   const ref = contentRef || useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -113,7 +115,7 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: { task
   return <div class="flex-1 px-1" ref={ref} />
 }
 
-function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { task: Task } & Props) {
+function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: PropsWithTask) {
   const ref = contentRef || useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -150,7 +152,8 @@ function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { tas
   )
 }
 
-function TaskActions({ task, currentDoc, taskList }: { task: Task } & Props) {
+function TaskActions(props: PropsWithTask) {
+  const { task, currentDoc } = props
   const divRef = useRef<HTMLDivElement | null>(null)
   const tooltipRef = useRef<HTMLDivElement | null>(null)
   const showTaskOnboardingId = useStore(taskStore.showTaskOnboarding)
@@ -192,11 +195,6 @@ function TaskActions({ task, currentDoc, taskList }: { task: Task } & Props) {
     e.preventDefault()
   }
 
-  const nextPriority = ((task.priority || 0) + 1) % 4
-  const onClickPriority = () => {
-    taskStore.saveTask(task, { priority: nextPriority })
-  }
-
   const docName = task.doc && fileStore.idToFile.get()[task.doc]?.name
   const showGoToDoc = docName && task.doc != currentDoc && !isDailyFile(docName)
   const goToDoc = () => {
@@ -207,48 +205,15 @@ function TaskActions({ task, currentDoc, taskList }: { task: Task } & Props) {
     <div class="ml-2 flex items-center" contentEditable={false} ref={divRef}>
       <div class="h-[26px]" />
 
+      {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
+
       <HoverButton visible={showTaskOnboarding} onClick={showContextMenu}>
         <DotsHorizontalIcon class="w-4 h-4 opacity-50" />
       </HoverButton>
 
-      {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
+      <DueDateButton onboarding={showTaskOnboarding} {...props} />
 
-      <HoverButton
-        className="w-6 whitespace-nowrap"
-        visible={showTaskOnboarding || !!task.priority}
-        onClick={onClickPriority}
-      >
-        <div
-          class={classNames(
-            'font-semibold text-xs',
-            task.priority == 3
-              ? 'text-red-500'
-              : task.priority
-              ? 'text-orange-400'
-              : 'text-gray-500'
-          )}
-        >
-          {'!'.repeat(task.priority || 1)}
-        </div>
-      </HoverButton>
-
-      <HoverButton
-        visible={showTaskOnboarding || !!task.due_at}
-        onClick={(e) => showTaskDatePicker(task, e)}
-      >
-        {task.due_at ? (
-          <div
-            class={
-              'text-xs ' +
-              (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
-            }
-          >
-            {Task.renderDueDate(task)}
-          </div>
-        ) : (
-          <CalendarIcon class="h-4 w-4 opacity-50" />
-        )}
-      </HoverButton>
+      {task.priority && <PriorityButton onboarding={showTaskOnboarding} {...props} />}
 
       {showGoToDoc && (
         <div
@@ -264,6 +229,43 @@ function TaskActions({ task, currentDoc, taskList }: { task: Task } & Props) {
   )
 }
 
+const PriorityButton = ({ task, onboarding }: PropsWithTask & { onboarding: boolean }) => (
+  <HoverButton
+    className="w-6 whitespace-nowrap"
+    visible={onboarding || !!task.priority}
+    onClick={() => {
+      const nextPriority = ((task.priority || 0) + 1) % 4
+      taskStore.saveTask(task, { priority: nextPriority })
+    }}
+  >
+    <div
+      class={classNames(
+        'font-semibold text-xs',
+        task.priority == 3 ? 'text-red-500' : task.priority ? 'text-orange-400' : 'text-gray-500'
+      )}
+    >
+      {'!'.repeat(task.priority || 1)}
+    </div>
+  </HoverButton>
+)
+
+const DueDateButton = ({ task, onboarding }: PropsWithTask & { onboarding: boolean }) => (
+  <HoverButton visible={onboarding || !!task.due_at} onClick={(e) => showTaskDatePicker(task, e)}>
+    {task.due_at ? (
+      <div
+        class={
+          'text-xs ' +
+          (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
+        }
+      >
+        {Task.renderDueDate(task)}
+      </div>
+    ) : (
+      <CalendarIcon class="h-4 w-4 opacity-50" />
+    )}
+  </HoverButton>
+)
+
 const HoverButton = ({
   onClick,
   visible,
@@ -278,7 +280,7 @@ const HoverButton = ({
     <button
       className={twMerge(
         'group-hover text-sm p-1 rounded cursor-pointer hover:bg-gray-200 border border-transparent hover:border-gray-300',
-        visible ? '' : 'hidden opacity-0',
+        visible ? '' : 'opacity-0',
         className || ''
       )}
       onClick={onClick}

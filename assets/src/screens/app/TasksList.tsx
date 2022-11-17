@@ -98,7 +98,7 @@ export default (props: Props) => {
           <div class="text-sm text-gray-400 font-semibold">SORT: {Labels[sort]}</div>
         </Pressable>
 
-        <ul data-type="taskList">
+        <ul data-type="taskList" class="mb-20">
           {tasks.map((t) => (
             <li key={t.id} class="my-2">
               <TaskRow id={t.id} taskList />

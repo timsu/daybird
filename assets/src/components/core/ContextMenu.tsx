@@ -35,7 +35,16 @@ export const ContextMenuWithData = (
   const close = () => setOpen(false)
 
   const addHandler = (ref: HTMLDivElement | null) => {
-    if (ref) ref.addEventListener('click', close)
+    if (ref) {
+      ref.addEventListener('click', close)
+      setTimeout(() => {
+        const rect = ref.getBoundingClientRect()
+        if (rect.bottom > document.body.clientHeight)
+          setOpen((v) => ({ x: (v || rect).x, y: document.body.clientHeight - rect.height }))
+        if (rect.right > document.body.clientWidth)
+          setOpen((v) => ({ x: document.body.clientWidth - rect.width, y: (v || rect).y }))
+      }, 50)
+    }
   }
 
   return (
