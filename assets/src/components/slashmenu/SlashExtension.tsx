@@ -24,7 +24,7 @@ const SlashMenu = function ({ items, selectedIndex, selectItem }: MenuComponentP
       {items.map((item, index) => {
         return (
           <button
-            className={`text-left p-2 hover:bg-gray-400 flex ${
+            className={`text-left p-2 hover:bg-gray-400 text-sm flex ${
               index === selectedIndex ? 'bg-gray-300' : ''
             }`}
             key={index}

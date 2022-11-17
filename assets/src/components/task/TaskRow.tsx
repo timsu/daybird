@@ -131,12 +131,19 @@ function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { tas
       }
     }
 
+    div.addEventListener('keypress', (e) => {
+      e.stopPropagation()
+      if (e.key == 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+      }
+    })
+
     div.addEventListener('focusout', onFocusOut)
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [ref.current, task])
 
   return (
-    <div class="flex-1 px-1" ref={ref}>
+    <div class="flex-1 px-1" ref={ref} contentEditable>
       {task.title}
     </div>
   )

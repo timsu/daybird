@@ -40,10 +40,11 @@ class ProjectStore {
     (store, user: User) => {
       const projects = this.projects.get()
       const lastProjectId = user.meta.lp
-      let currentProject: Project | undefined = projects[0]
+      let currentProject: Project | undefined
       if (lastProjectId) {
         currentProject = projects.find((p) => p.id == lastProjectId)
       }
+      if (!currentProject) currentProject = projects[0]
       store.set(currentProject)
       if (currentProject) taskStore.loadTasks(currentProject)
     }

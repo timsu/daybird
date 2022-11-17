@@ -58,8 +58,10 @@ class DocStore {
       const response = (await API.readFile(project, id)) as string
       logger.info('DOCS - doc loaded', id, response.length)
       if (id != this.id.get()) return
-      this.document.set(response)
-      this.docCache[id] = response
+      if (response != cached) {
+        this.document.set(response)
+        this.docCache[id] = response
+      }
       localStorage.setItem(LS_LAST_DOC, project.id + '/' + id)
     } catch (e) {
       this.docError.set(unwrapError(e))
