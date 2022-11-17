@@ -73,8 +73,7 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: { task
   const ref = contentRef || useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    const div = ref.current
-    const contentElement = div?.children[0] as HTMLParagraphElement
+    const contentElement = ref.current
     if (!contentElement) return
 
     if (task && contentElement.textContent != task.title) {
@@ -93,7 +92,7 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: { task
       }
     }
 
-    let hasFocus = false
+    let hasFocus = true
     const observer = new MutationObserver(function (mutations) {
       mutations.forEach((mutation) => {
         if (mutation.attributeName != 'class') return
@@ -105,9 +104,9 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: { task
       })
     })
 
-    observer.observe(contentElement, { attributes: true })
+    observer.observe(contentElement, { attributes: true, subtree: true })
     return () => observer.disconnect()
-  }, [ref.current, task])
+  }, [task])
 
   return <div class="flex-1 px-1" ref={ref} />
 }

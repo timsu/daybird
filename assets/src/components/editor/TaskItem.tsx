@@ -153,7 +153,6 @@ export const TaskItem = Node.create<TaskItemOptions>({
         dom: listItem,
         contentDOM: ref.current,
         destroy: () => {
-          console.log('destroy nodes', pendingDeleted, node.attrs.id)
           if (pendingDeleted.includes(node.attrs.id)) {
             onDeleteTask(node.attrs.id)
           }
@@ -195,15 +194,13 @@ export const TaskItem = Node.create<TaskItemOptions>({
           }
           state.deleting = false
 
-          let result = true // true for keep, false for stop transaction
           const replaceSteps: number[] = []
           transaction.steps.forEach((step, index) => {
             if ((step as any).jsonID === 'replace') {
+              pendingDeleted = []
               replaceSteps.push(index)
             }
           })
-
-          pendingDeleted = []
 
           replaceSteps.forEach((index) => {
             const map = transaction.mapping.maps[index] as any
@@ -212,17 +209,11 @@ export const TaskItem = Node.create<TaskItemOptions>({
 
             state.doc.nodesBetween(oldStart, oldEnd, (node) => {
               if (node.type.name === 'task') {
-                console.log('you wanted this noize', node.attrs.id)
                 if (node.attrs.id && node.attrs.id != taskStore.deletedTask.get()?.id)
                   pendingDeleted.push(node.attrs.id)
-              } else if (node.type.name == 'taskList') {
-                console.log('deleto task list')
               }
             })
           })
-
-          console.log('adding to pending', pendingDeleted)
-
           return true
         },
       }),
