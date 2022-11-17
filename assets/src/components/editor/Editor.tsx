@@ -1,6 +1,7 @@
 import './editor-styles.css'
 
 import { decode } from 'base64-arraybuffer'
+import { endOfDay, isBefore } from 'date-fns'
 import { MutableRef, useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
@@ -23,7 +24,9 @@ import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { modalStore } from '@/stores/modalStore'
 import { taskStore } from '@/stores/taskStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
+import { useStore } from '@nanostores/preact'
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
@@ -157,9 +160,11 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     if (contentType == 'json') {
       setTimeout(() => editor.commands.setContent(initialContent), 0)
     }
+
     setTimeout(() => {
       if (modalStore.onboardingModal.get()) return
       editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run()
+      if (isToday) checkForDueTasks(editor)
     }, 50)
 
     return { editor, ydoc }
@@ -245,4 +250,46 @@ function useDeleteTaskListener(editor: Editor | null) {
     })
     return off
   }, [editor])
+}
+
+function checkForDueTasks(editor: Editor) {
+  const date = uiStore.calendarDate.get()
+  const threshold = endOfDay(date)
+
+  const today = new Date()
+  if (isBefore(threshold, today)) {
+    return
+  }
+
+  const tasks = taskStore.taskList
+    .get()
+    .filter((t) => t.due_at && !t.deleted_at && !t.completed_at)
+    .filter((t) => isBefore(new Date(t.due_at!), threshold))
+
+  logger.debug('[today] relevant tasks', tasks, threshold)
+  if (!tasks.length) return
+
+  const doc = editor.state.doc
+  const existing = new Set<string>()
+  doc.descendants((node, pos) => {
+    if (node.type.name == 'task' || node.type.name == 'taskItem') {
+      const id = node.attrs.id
+      existing.add(id)
+    }
+  })
+
+  const notInDoc = tasks.filter((t) => !existing.has(t.id))
+  logger.info('due tasks found', notInDoc)
+  if (notInDoc.length == 0) return
+
+  const content = tasks.map((t) => taskStore.taskItemForTask(t))
+  const wrapper = [
+    {
+      type: 'taskList',
+      content,
+    },
+    { type: 'paragraph' },
+  ]
+
+  editor.commands.insertContent(wrapper)
 }

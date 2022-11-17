@@ -170,8 +170,8 @@ function Members({ project, isAdmin }: ProjectArgs) {
 }
 
 function RenameProject({ project }: ProjectArgs) {
-  const [name, setName] = useState<string>()
-  const [shortcode, setShortcode] = useState<string>()
+  const [name, setName] = useState<string>(project.name)
+  const [shortcode, setShortcode] = useState<string>(project.shortcode)
   const [error, setError] = useState<string>()
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [success, setSuccess] = useState<boolean>(false)

@@ -51,20 +51,21 @@ function TaskCheckbox({ task }: { task: Task }) {
     })
   }
 
+  const disabled = !!task?.deleted_at || !!task?.archived_at
+
   return (
-    <label contentEditable={false} class="mr-1 -mt-1 select-none">
-      {task?.deleted_at ? (
-        <div class="font-semibold text-xs text-gray-500">DELETED</div>
-      ) : task?.archived_at ? (
-        <div class="font-semibold text-xs text-gray-500">ARCHIVED</div>
-      ) : (
-        <input
-          checked={!!task?.completed_at}
-          type="checkbox"
-          class="rounded border-gray-400 cursor-pointer"
-          onClick={toggleComplete}
-        />
-      )}
+    <label contentEditable={false} class="mr-1 select-none">
+      <input
+        checked={!!task?.completed_at}
+        type="checkbox"
+        class={classNames(
+          'rounded border-gray-400 cursor-pointer -mt-1',
+          disabled ? 'bg-gray-300' : ''
+        )}
+        onClick={toggleComplete}
+        disabled={disabled}
+        title={task?.deleted_at ? 'Deleted' : task?.archived_at ? 'Archived' : undefined}
+      />
     </label>
   )
 }
@@ -152,7 +153,7 @@ function TaskActions({ task }: { task: Task }) {
       const container = document.createElement('div')
       render(
         <div ref={tooltipRef} class="bg-black text-white p-2 rounded shadow text-sm w-40">
-          You can set a due date and other options on tasks.
+          👆 You can set a due date and other options on tasks.
         </div>,
         container
       )

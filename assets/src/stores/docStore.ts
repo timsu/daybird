@@ -85,7 +85,7 @@ class DocStore {
     // add items to delete
     const positionsToDelete: { from: number; to: number }[] = []
     doc.descendants((node, pos) => {
-      if (node.type.name == NODE_NAME) {
+      if (node.type.name == 'task' || node.type.name == 'taskItem') {
         const id = node.attrs.id
         if (!id) return
         const task = tasks[id]
