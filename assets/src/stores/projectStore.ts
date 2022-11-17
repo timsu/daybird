@@ -28,7 +28,7 @@ class ProjectStore {
   updateProjects = action(this.projects, 'updateProjects', (store, projects: Project[]) => {
     if (authStore.debugMode()) (window as any)['projectStore'] = projectStore
 
-    logger.info('PROJECTS - update', projects)
+    logger.debug('PROJECTS - update', projects)
     store.set(projects)
     this.activeProjects.set(projects.filter((p) => !p.archived_at && !p.deleted_at))
     this.updateProjectMap(projects)

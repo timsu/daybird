@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { format } from 'date-fns'
-import { action, map } from 'nanostores'
+import { action, atom, map } from 'nanostores'
 import { route } from 'preact-router'
 import toast from 'react-hot-toast'
 
@@ -43,6 +43,8 @@ class FileStore {
 
   expanded = map<ExpansionMap>({})
 
+  currentDocParents = atom<string[]>([])
+
   // --- actions
 
   getFilesFor = (project: Project) => {
@@ -67,7 +69,7 @@ class FileStore {
       const response = await API.listFiles(project)
       const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
 
-      logger.info('FILES - loaded files for project', project.name, sortFiles(files))
+      logger.debug('FILES - loaded files for project', project.name, sortFiles(files))
       this.updateFiles(project.id, files)
 
       if (!this.topics[project.id]) this.initTopic(project)
@@ -344,6 +346,28 @@ class FileStore {
     } else {
       route(paths.DOC + '/' + file.projectId + '/' + file.id)
     }
+  }
+
+  onOpenDoc = (id: string) => {
+    const hasFiles = Object.keys(this.fileTree.get()).length > 0
+    if (!hasFiles) {
+      const unsub = this.fileTree.listen(() => {
+        unsub()
+        this.onOpenDoc(id)
+      })
+      return
+    }
+
+    const parents: string[] = []
+
+    while (true) {
+      const file = this.idToFile.get()[id]
+      parents.push(id)
+      if (!file || !file.parent) break
+      id = file.parent
+    }
+
+    this.currentDocParents.set(parents)
   }
 }
 

@@ -26,6 +26,8 @@ class TaskStore {
 
   deletedTask = atom<Task>()
 
+  showTaskOnboarding = atom<string | null>(null)
+
   // --- actions
 
   updateTaskMap = action(this.taskMap, 'updateTaskMap', (store, task: Task) => {
@@ -52,25 +54,36 @@ class TaskStore {
     this.updateTaskMap(response.task)
   }
 
+  showOnboardingForNextTask: boolean = false
   createTask = async (attrs: Partial<Task>) => {
     const project = projectStore.currentProject.get()
     assertIsDefined(project, 'has project')
 
     const response = await API.createTask(project, attrs)
+    const task = Task.fromJSON(response.task)
+
     logger.info('TASKS - create', response)
-    this.updateTaskMap(response.task)
-    this.taskList.set([...this.taskList.get(), response.task])
-    return response.task
+    this.updateTaskMap(task)
+    this.taskList.set([...this.taskList.get(), task])
+
+    if (this.showOnboardingForNextTask) {
+      this.showOnboardingForNextTask = false
+      this.showTaskOnboarding.set(task.id)
+    }
+
+    return task
   }
 
   saveTask = async (task: Task, attrs: Partial<Task>) => {
     this.updateTaskMap(Object.assign({}, task, attrs))
 
     const response = await API.updateTask(task.id, attrs)
-    this.updateTaskMap(response.task)
-    this.onTaskUpdated(response.task)
+    task = Task.fromJSON(response.task)
+    logger.info('TASKS - saved task', task)
+    this.updateTaskMap(task)
+    this.onTaskUpdated(task)
 
-    return response.task
+    return task
   }
 
   toggleArchived = async (task: Task) => {

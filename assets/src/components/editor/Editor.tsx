@@ -9,8 +9,10 @@ import * as Y from 'yjs'
 
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
+import { LegacyTaskItem } from '@/components/editor/LegacyTaskItem'
 import Link from '@/components/editor/Link'
 import { TaskItem } from '@/components/editor/TaskItem'
+import { TaskList } from '@/components/editor/TaskList'
 import { Video } from '@/components/editor/Video'
 import { WikiLink } from '@/components/editor/WikiLink'
 import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
@@ -25,6 +27,7 @@ import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/ut
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
+import Focus from '@tiptap/extension-focus'
 import Placeholder from '@tiptap/extension-placeholder'
 import StarterKit from '@tiptap/starter-kit'
 
@@ -79,7 +82,6 @@ const useEditor = (id: string | undefined, initialContent: any) => {
   // clean up on unmount
   useEffect(() => {
     return () => {
-      logger.info('cleaning up editors')
       if (prevEditor.current) prevEditor.current.destroy()
       if (prevDoc.current) prevDoc.current.destroy()
     }
@@ -98,11 +100,14 @@ const useEditor = (id: string | undefined, initialContent: any) => {
 
     try {
       if (contentType == 'ydoc') {
-        const array = new Uint8Array(decode(initialContent))
+        const array =
+          initialContent instanceof Uint8Array
+            ? initialContent
+            : new Uint8Array(decode(initialContent))
         Y.applyUpdate(ydoc, array)
       }
     } catch (e) {
-      logger.error('error loading', e)
+      logger.error('error loading', e, initialContent)
     }
 
     const provider = new WebrtcProvider(id, ydoc)
@@ -118,10 +123,15 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           horizontalRule: false,
         }),
         HorizontalRule,
+        LegacyTaskItem,
         TaskItem,
+        TaskList,
         Image,
         Video,
         WikiLink,
+        Focus.configure({
+          mode: 'deepest',
+        }),
         Link.configure({
           autolink: false,
           linkOnPaste: true,
@@ -224,9 +234,12 @@ function useDeleteTaskListener(editor: Editor | null) {
       const pos = editor.view.posAtDOM(element, 0)
       if (!pos) return
 
+      const node = editor.state.doc.nodeAt(pos)
+      const size = node?.nodeSize || 1
+
       editor
         .chain()
-        .deleteRange({ from: pos - 1, to: pos + 1 })
+        .deleteRange({ from: pos - 1, to: pos + size + 1 })
         .focus()
         .run()
     })

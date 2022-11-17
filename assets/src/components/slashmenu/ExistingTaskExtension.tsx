@@ -1,7 +1,7 @@
 import { task } from 'nanostores'
 import { PluginKey } from 'prosemirror-state'
 
-import { NODE_NAME } from '@/components/editor/TaskItem'
+import { NODE_NAME } from '@/components/editor/LegacyTaskItem'
 import { MenuComponentProps } from '@/components/slashmenu/CommandListController'
 import renderItems from '@/components/slashmenu/renderItems'
 import { Task, TaskType } from '@/models'
@@ -27,6 +27,7 @@ const TaskMenu = function ({ items, selectedIndex, selectItem }: MenuComponentPr
             }`}
             key={index}
             onClick={() => selectItem(index)}
+            ref={(ref) => ref && index === selectedIndex && ref.scrollIntoView()}
           >
             <div class="flex-1">{item.title}</div>
             {item.short_code && <div class="opacity-50">{item.short_code}</div>}
@@ -77,11 +78,34 @@ const ExistingTasksExtension = Extension.create<ExtensionOptions>({
         render: renderItems(TaskMenu),
         command: ({ editor, range, props }) => {
           if (!props.id) return editor.chain().deleteRange(range).focus().run()
-          const newNode = {
-            type: 'task',
+
+          const taskItem = {
+            type: 'taskItem',
             attrs: { id: props.id },
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: props.title,
+                  },
+                ],
+              },
+            ],
           }
-          editor.chain().deleteRange(range).insertContent(newNode).focus().run()
+
+          if (editor.isActive('taskList')) {
+            const currentNode = editor.state.selection.$head.node()
+            let chain = editor.chain()
+            chain.deleteNode('taskItem').insertContent(taskItem).focus().run()
+          } else {
+            const taskList = {
+              type: 'taskList',
+              content: [taskItem],
+            }
+            editor.chain().deleteRange(range).insertContent(taskList).focus().run()
+          }
         },
       },
     }

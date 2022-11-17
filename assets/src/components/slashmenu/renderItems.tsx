@@ -1,5 +1,4 @@
 import { createRef, FunctionalComponent, JSX, render } from 'preact'
-import { useRef } from 'preact/hooks'
 import tippy, { Instance } from 'tippy.js'
 
 import CommandsListController, {
