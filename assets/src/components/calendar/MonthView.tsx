@@ -19,31 +19,28 @@ export default (props: Props) => {
   const currentProject = useStore(projectStore.currentProject)
   const fileTree = useStore(fileStore.fileTree)
 
-  const specialDaysFn = useCallback(
-    (activeDate: Date) => {
-      if (!currentProject) return
-      const files = fileTree[currentProject.id]
-      if (!files) return
-      const [year, month] = format(activeDate, 'yyyy-MM').split('-')
+  const specialDaysFn = (activeDate: Date) => {
+    if (!currentProject) return
+    const files = fileTree[currentProject.id]
+    if (!files) return
+    const [year, month] = format(activeDate, 'yyyy-MM').split('-')
 
-      const yearFolder = files.find((f) => f.file.type == FileType.FOLDER && f.file.name == year)
-      if (!yearFolder) return { days: {}, class: '' }
+    const yearFolder = files.find((f) => f.file.type == FileType.FOLDER && f.file.name == year)
+    if (!yearFolder) return { days: {}, class: '' }
 
-      const monthFolder = yearFolder.nodes!.find(
-        (f) => f.file.type == FileType.FOLDER && f.file.name == month
-      )
-      if (!monthFolder) return { days: {}, class: '' }
+    const monthFolder = yearFolder.nodes!.find(
+      (f) => f.file.type == FileType.FOLDER && f.file.name == month
+    )
+    if (!monthFolder) return { days: {}, class: '' }
 
-      const days: JournalDays = {}
-      monthFolder.nodes!.forEach((f) => {
-        if (f.file.provisional) return
-        const [_y, _m, d] = f.label.split('-')
-        if (d) days[d.replace(/^0/, '')] = true
-      })
-      return { days: days, class: 'text-orange-500 font-semibold' }
-    },
-    [currentProject, fileTree]
-  )
+    const days: JournalDays = {}
+    monthFolder.nodes!.forEach((f) => {
+      if (f.file.provisional) return
+      const [_y, _m, d] = f.label.split('-')
+      if (d) days[d.replace(/^0/, '')] = true
+    })
+    return { days: days, class: 'text-orange-500 font-semibold' }
+  }
 
   return <CalendarWidget {...props} specialDaysFn={specialDaysFn} />
 }

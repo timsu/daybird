@@ -31,7 +31,7 @@ export default ({ currentDate, onSelect, specialDaysFn }: Props) => {
 
   useEffect(() => {
     if (specialDaysFn) setSpecialDays(specialDaysFn(activeDate))
-  }, [activeDate])
+  }, [activeDate, specialDaysFn])
 
   const getHeader = () => {
     return (
