@@ -198,6 +198,7 @@ function TaskActions({ task }: { task: Task }) {
 
   return (
     <div class="ml-2 flex items-center" contentEditable={false} ref={divRef}>
+      <div class="h-[26px]" />
       {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
 
       <HoverButton

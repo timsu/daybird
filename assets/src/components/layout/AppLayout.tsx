@@ -48,7 +48,7 @@ export default function ({ children }: RenderableProps<{}>) {
   }
 
   return (
-    <div class="w-full h-full" style={style}>
+    <div class="w-full h-full min-w-[300px]" style={style}>
       <Toaster />
       <SidebarMenu />
       {!sidebarHidden && (

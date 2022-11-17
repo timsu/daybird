@@ -79,7 +79,7 @@ span.grippy::after {
 }
 
 
-ul[data-type="taskList"] {
+ul[data-type="taskList"], .ProseMirror ul[data-type="taskList"] {
   list-style: none;
   padding: 0;
 
