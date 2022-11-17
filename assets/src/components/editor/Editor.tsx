@@ -9,6 +9,7 @@ import * as Y from 'yjs'
 
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
 import { Image } from '@/components/editor/Image'
+import { LegacyTaskItem } from '@/components/editor/LegacyTaskItem'
 import Link from '@/components/editor/Link'
 import { TaskItem } from '@/components/editor/TaskItem'
 import { TaskList } from '@/components/editor/TaskList'
@@ -81,7 +82,6 @@ const useEditor = (id: string | undefined, initialContent: any) => {
   // clean up on unmount
   useEffect(() => {
     return () => {
-      logger.info('cleaning up editors')
       if (prevEditor.current) prevEditor.current.destroy()
       if (prevDoc.current) prevDoc.current.destroy()
     }
@@ -123,10 +123,9 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           horizontalRule: false,
         }),
         HorizontalRule,
+        LegacyTaskItem,
+        TaskItem,
         TaskList,
-        TaskItem.configure({
-          nested: true,
-        }),
         Image,
         Video,
         WikiLink,

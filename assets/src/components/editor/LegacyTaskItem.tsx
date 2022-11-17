@@ -3,6 +3,7 @@ import { NodeType } from 'prosemirror-model'
 import { Plugin, PluginKey } from 'prosemirror-state'
 import toast from 'react-hot-toast'
 
+import LegacyTaskRow from '@/components/task/LegacyTaskRow'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
 import { docStore } from '@/stores/docStore'
@@ -25,7 +26,7 @@ declare module 'prosemirror-state' {
 
 export const NODE_NAME = 'task'
 
-export const TaskItem = Node.create<TaskItemOptions>({
+export const LegacyTaskItem = Node.create<TaskItemOptions>({
   name: NODE_NAME,
 
   // on FF / Safari, draggable prevents editing contents
@@ -85,7 +86,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
           const newPos = getPos() || oldPos
           view.dispatch(view.state.tr.setNodeMarkup(newPos, undefined, newAttrs))
         }
-        if (task) TaskItem.options.postCreateTask?.(task)
+        if (task) LegacyTaskItem.options.postCreateTask?.(task)
         return true
       }
 
@@ -95,10 +96,9 @@ export const TaskItem = Node.create<TaskItemOptions>({
       }
 
       const listItem = render(
-        <TaskRow
+        <LegacyTaskRow
           id={node.attrs.id}
           initialTitle={node.attrs.title}
-          focus={node.attrs.focus}
           onCreate={onCreateTask}
           currentDoc={docStore.id.get()}
         />,

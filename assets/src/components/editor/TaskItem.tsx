@@ -21,14 +21,11 @@ export const inputRegex = /^\s*(\[([( |x])?\])\s$/
 declare module 'prosemirror-state' {
   interface EditorState {
     deleting: boolean
-    tasksToDelete: string[]
   }
 }
 
 export const TaskItem = Node.create<TaskItemOptions>({
-  name: 'task',
-
-  potentialDelete: new Set<string>(),
+  name: 'taskItem',
 
   addOptions() {
     return {
@@ -60,6 +57,10 @@ export const TaskItem = Node.create<TaskItemOptions>({
     return [
       {
         tag: `li[data-type="${this.name}"]`,
+        priority: 51,
+      },
+      {
+        tag: `div[data-type="${this.name}"]`,
         priority: 51,
       },
     ]
@@ -104,7 +105,6 @@ export const TaskItem = Node.create<TaskItemOptions>({
   addNodeView() {
     return ({ node, HTMLAttributes, getPos, editor }) => {
       const listItem = document.createElement('li')
-      // listItem.contentEditable = 'false'
       const ref = createRef<HTMLDivElement>()
       const oldPos = typeof getPos === 'function' ? getPos() : editor.state.selection.$head.pos
 

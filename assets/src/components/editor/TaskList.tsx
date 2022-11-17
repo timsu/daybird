@@ -21,7 +21,7 @@ export const TaskList = Node.create<TaskListOptions>({
 
   addOptions() {
     return {
-      itemTypeName: 'task',
+      itemTypeName: 'taskItem',
       HTMLAttributes: {},
     }
   },
