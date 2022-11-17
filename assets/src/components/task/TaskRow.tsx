@@ -59,9 +59,9 @@ function TaskCheckbox({ task }: { task: Task }) {
   return (
     <label contentEditable={false} class="mr-1 select-none">
       {task?.deleted_at ? (
-        <div class="font-semibold text-sm text-gray-500 mr-2 ">DELETED</div>
+        <div class="font-semibold text-xs text-gray-500">DELETED</div>
       ) : task?.archived_at ? (
-        <div class="font-semibold text-sm text-gray-500 mr-2 ">ARCHIVED</div>
+        <div class="font-semibold text-xs text-gray-500">ARCHIVED</div>
       ) : (
         <input
           checked={!!task?.completed_at}
@@ -162,7 +162,7 @@ function TaskActions({ task }: { task: Task }) {
   }
 
   return (
-    <div class="ml-2 flex items-center gap-2" contentEditable={false}>
+    <div class="ml-2 flex items-center" contentEditable={false}>
       {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
 
       <HoverButton
@@ -173,9 +173,11 @@ function TaskActions({ task }: { task: Task }) {
         <div
           class={classNames(
             'font-semibold text-xs',
-            ['text-gray-500', 'text-yellow-500', 'text-orange-500', 'text-red-500'][
-              task.priority || 0
-            ]
+            task.priority == 3
+              ? 'text-red-500'
+              : task.priority
+              ? 'text-orange-400'
+              : 'text-gray-500'
           )}
         >
           {'!'.repeat(task.priority || 1)}
