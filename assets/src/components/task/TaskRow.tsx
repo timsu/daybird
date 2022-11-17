@@ -52,7 +52,7 @@ function TaskCheckbox({ task }: { task: Task }) {
   }
 
   return (
-    <label contentEditable={false} class="mr-1 select-none">
+    <label contentEditable={false} class="mr-1 -mt-1 select-none">
       {task?.deleted_at ? (
         <div class="font-semibold text-xs text-gray-500">DELETED</div>
       ) : task?.archived_at ? (
@@ -159,7 +159,7 @@ function TaskActions({ task }: { task: Task }) {
       const rect = divRef.current?.getBoundingClientRect()!
       if (!rect.top) return
 
-      const instance = tippy('body', {
+      tippy('body', {
         getReferenceClientRect: () => rect,
         appendTo: () => document.body,
         content: container,
