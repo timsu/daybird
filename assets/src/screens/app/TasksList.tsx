@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks'
 
 import Helmet from '@/components/core/Helmet'
 import AppHeader from '@/components/layout/AppHeader'
+import LegacyTaskRow from '@/components/task/LegacyTaskRow'
 import TaskRow from '@/components/task/TaskRow'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
@@ -37,7 +38,7 @@ export default (props: Props) => {
       </AppHeader>
 
       <div class="max-w-7xl px-4 my-8 sm:px-6 md:px-8">
-        <TaskRow id={undefined} newTaskMode />
+        <LegacyTaskRow id={undefined} newTaskMode />
       </div>
 
       <hr />

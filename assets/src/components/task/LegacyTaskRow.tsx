@@ -83,9 +83,9 @@ export default ({
 
       if (!task) {
         const doc = docStore.id.get()
+        div.innerText = '' // need to clear div text so it gets re-populated when id comes in
         const newTask = await taskStore.createTask({ title, doc })
         onCreate?.(newTask)
-        div.innerText = '' // need to clear div text so it gets re-populated when id comes in
         setSavedId(newTask.id)
         return newTask
       } else {
@@ -107,10 +107,9 @@ export default ({
               if (!task) return
               setSavedId(undefined)
               setPlaceholder(true)
-              taskStore.taskList.set([task, ...taskStore.taskList.get()])
             },
             500,
-            DebounceStyle.IGNORE_NEW
+            DebounceStyle.IMMEDIATE_THEN_WAIT
           )
         }
       })
@@ -173,7 +172,7 @@ export default ({
         taskList ? '' : 'border border-transparent hover:border-gray-200 -ml-4'
       )}
     >
-      {!taskList && !isSafari && (
+      {!taskList && !isSafari && !newTaskMode && (
         <span data-drag-handle="" class="-ml-2 drag-handle grippy invisible group-hover:visible" />
       )}
 
