@@ -87,14 +87,12 @@ export default () => {
 
             <hr />
 
-            {task.doc &&
-              (!isDocPage ||
-                (task.doc != docStore.id.get() && (
-                  <ContextMenuItem onClick={() => fileStore.openDoc(task.doc)}>
-                    <DocumentIcon class="h-4 w-4 mr-2 text-gray-500" />
-                    View original note
-                  </ContextMenuItem>
-                )))}
+            {task.doc && (!isDocPage || task.doc != docStore.id.get()) && (
+              <ContextMenuItem onClick={() => fileStore.openDoc(task.doc)}>
+                <DocumentIcon class="h-4 w-4 mr-2 text-gray-500" />
+                View original note
+              </ContextMenuItem>
+            )}
             {isDocPage && (
               <ContextMenuItem onClick={() => taskStore.deletedTask.set(task)}>
                 <EyeOffIcon class="h-4 w-4 mr-2 text-gray-500" />

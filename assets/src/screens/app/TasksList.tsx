@@ -9,6 +9,7 @@ import AppHeader from '@/components/layout/AppHeader'
 import LegacyTaskRow from '@/components/task/LegacyTaskRow'
 import TaskRow from '@/components/task/TaskRow'
 import { Task } from '@/models'
+import { docStore } from '@/stores/docStore'
 import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { CheckIcon } from '@heroicons/react/outline'
@@ -66,6 +67,7 @@ export default (props: Props) => {
       projectStore.setCurrentProject(project)
       taskStore.loadTasks(project)
     }
+    docStore.id.set(undefined)
   }, [project?.id])
 
   if (!project) return null

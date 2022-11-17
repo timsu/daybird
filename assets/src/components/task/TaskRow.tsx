@@ -7,9 +7,10 @@ import tippy from 'tippy.js'
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import { showTaskDatePicker } from '@/components/task/TaskDatePicker'
 import { Task } from '@/models'
+import { fileStore, isDailyFile } from '@/stores/fileStore'
 import { taskStore } from '@/stores/taskStore'
 import { classNames } from '@/utils'
-import { CalendarIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
+import { CalendarIcon, DocumentIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
@@ -37,7 +38,7 @@ export default function (props: Props) {
       ) : (
         <TaskContentInDoc task={task} {...props} />
       )}
-      <TaskActions task={task} />
+      <TaskActions task={task} {...props} />
     </>
   )
 }
@@ -149,7 +150,7 @@ function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { tas
   )
 }
 
-function TaskActions({ task }: { task: Task }) {
+function TaskActions({ task, currentDoc, taskList }: { task: Task } & Props) {
   const divRef = useRef<HTMLDivElement | null>(null)
   const tooltipRef = useRef<HTMLDivElement | null>(null)
   const showTaskOnboardingId = useStore(taskStore.showTaskOnboarding)
@@ -196,9 +197,20 @@ function TaskActions({ task }: { task: Task }) {
     taskStore.saveTask(task, { priority: nextPriority })
   }
 
+  const docName = task.doc && fileStore.idToFile.get()[task.doc]?.name
+  const showGoToDoc = docName && task.doc != currentDoc && !isDailyFile(docName)
+  const goToDoc = () => {
+    fileStore.openDoc(task.doc!)
+  }
+
   return (
     <div class="ml-2 flex items-center" contentEditable={false} ref={divRef}>
       <div class="h-[26px]" />
+
+      <HoverButton visible={showTaskOnboarding} onClick={showContextMenu}>
+        <DotsHorizontalIcon class="w-4 h-4 opacity-50" />
+      </HoverButton>
+
       {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
 
       <HoverButton
@@ -238,9 +250,16 @@ function TaskActions({ task }: { task: Task }) {
         )}
       </HoverButton>
 
-      <HoverButton visible={showTaskOnboarding} onClick={showContextMenu}>
-        <DotsHorizontalIcon class="w-4 h-4 opacity-50" />
-      </HoverButton>
+      {showGoToDoc && (
+        <div
+          class="flex items-center text-sm text-blue-500 hover:bg-blue-200/75 rounded
+              ml-3 max-w-[110px] overflow-hidden cursor-pointer overflow-ellipsis whitespace-nowrap"
+          onClick={goToDoc}
+        >
+          <DocumentIcon class="w-4 h-4 mr-1" />
+          {fileStore.idToFile.get()[task.doc!]?.name}
+        </div>
+      )}
     </div>
   )
 }
