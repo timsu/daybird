@@ -1,4 +1,4 @@
-import { render } from 'preact'
+import { createRef, render } from 'preact'
 import { NodeType } from 'prosemirror-model'
 import { Plugin, PluginKey } from 'prosemirror-state'
 import toast from 'react-hot-toast'
@@ -72,7 +72,9 @@ export const LegacyTaskItem = Node.create<TaskItemOptions>({
 
   addNodeView() {
     return ({ node, extension, getPos, editor }) => {
-      const container = document.createElement('div')
+      const container = document.createElement('ul')
+      container.dataset.type = 'taskList'
+
       const oldPos = typeof getPos === 'function' ? getPos() : editor.state.selection.$head.pos
 
       const onCreateTask = (task: Task | null) => {
@@ -95,19 +97,22 @@ export const LegacyTaskItem = Node.create<TaskItemOptions>({
         ;(node.attrs as any).focus = true
       }
 
-      const listItem = render(
-        <LegacyTaskRow
-          id={node.attrs.id}
-          initialTitle={node.attrs.title}
-          onCreate={onCreateTask}
-          currentDoc={docStore.id.get()}
-        />,
+      const contentRef = createRef()
+      render(
+        <li>
+          <TaskRow
+            id={node.attrs.id}
+            contentRef={contentRef}
+            onCreate={onCreateTask}
+            currentDoc={docStore.id.get()}
+          />
+        </li>,
         container
       )
 
       return {
         dom: container,
-        contentDOM: listItem,
+        contentDOM: contentRef.current,
       }
     }
   },
