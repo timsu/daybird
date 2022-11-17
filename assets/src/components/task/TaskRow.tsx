@@ -51,20 +51,21 @@ function TaskCheckbox({ task }: { task: Task }) {
     })
   }
 
+  const disabled = !!task?.deleted_at || !!task?.archived_at
+
   return (
     <label contentEditable={false} class="mr-1 select-none">
-      {task?.deleted_at ? (
-        <div class="font-semibold text-xs text-gray-500">DELETED</div>
-      ) : task?.archived_at ? (
-        <div class="font-semibold text-xs text-gray-500">ARCHIVED</div>
-      ) : (
-        <input
-          checked={!!task?.completed_at}
-          type="checkbox"
-          class="rounded border-gray-400 cursor-pointer"
-          onClick={toggleComplete}
-        />
-      )}
+      <input
+        checked={!!task?.completed_at}
+        type="checkbox"
+        class={classNames(
+          'rounded border-gray-400 cursor-pointer -mt-1',
+          disabled ? 'bg-gray-300' : ''
+        )}
+        onClick={toggleComplete}
+        disabled={disabled}
+        title={task?.deleted_at ? 'Deleted' : task?.archived_at ? 'Archived' : undefined}
+      />
     </label>
   )
 }
@@ -130,12 +131,19 @@ function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { tas
       }
     }
 
+    div.addEventListener('keypress', (e) => {
+      e.stopPropagation()
+      if (e.key == 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+      }
+    })
+
     div.addEventListener('focusout', onFocusOut)
     return () => div.removeEventListener('focusout', onFocusOut)
   }, [ref.current, task])
 
   return (
-    <div class="flex-1 px-1" ref={ref}>
+    <div class="flex-1 px-1" ref={ref} contentEditable>
       {task.title}
     </div>
   )
@@ -152,14 +160,14 @@ function TaskActions({ task }: { task: Task }) {
       const container = document.createElement('div')
       render(
         <div ref={tooltipRef} class="bg-black text-white p-2 rounded shadow text-sm w-40">
-          You can set a due date and other options on tasks.
+          👆 You can set a due date and other options on tasks.
         </div>,
         container
       )
       const rect = divRef.current?.getBoundingClientRect()!
       if (!rect.top) return
 
-      const instance = tippy('body', {
+      tippy('body', {
         getReferenceClientRect: () => rect,
         appendTo: () => document.body,
         content: container,
@@ -250,7 +258,7 @@ const HoverButton = ({
     <button
       className={twMerge(
         'group-hover text-sm p-1 rounded cursor-pointer hover:bg-gray-200 border border-transparent hover:border-gray-300',
-        visible ? '' : 'opacity-0',
+        visible ? '' : 'hidden opacity-0',
         className || ''
       )}
       onClick={onClick}

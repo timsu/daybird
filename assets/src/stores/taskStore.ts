@@ -8,6 +8,7 @@ import { authStore } from '@/stores/authStore'
 import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { assertIsDefined, logger } from '@/utils'
+import { JSONContent } from '@tiptap/react'
 
 export type TaskMap = { [id: string]: Task }
 
@@ -120,6 +121,22 @@ class TaskStore {
 
     this.taskList.set(this.taskList.get().map((t) => (t.id == task.id ? task : t)))
   }
+
+  taskItemForTask = (task: Task): JSONContent => ({
+    type: 'taskItem',
+    attrs: { id: task.id },
+    content: [
+      {
+        type: 'paragraph',
+        content: [
+          {
+            type: 'text',
+            text: task.title,
+          },
+        ],
+      },
+    ],
+  })
 }
 
 export const taskStore = new TaskStore()

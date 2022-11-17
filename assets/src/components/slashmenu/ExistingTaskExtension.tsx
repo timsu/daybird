@@ -79,22 +79,7 @@ const ExistingTasksExtension = Extension.create<ExtensionOptions>({
         command: ({ editor, range, props }) => {
           if (!props.id) return editor.chain().deleteRange(range).focus().run()
 
-          const taskItem = {
-            type: 'taskItem',
-            attrs: { id: props.id },
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: props.title,
-                  },
-                ],
-              },
-            ],
-          }
-
+          const taskItem = taskStore.taskItemForTask(props)
           if (editor.isActive('taskList')) {
             const currentNode = editor.state.selection.$head.node()
             let chain = editor.chain()

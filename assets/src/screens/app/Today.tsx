@@ -204,7 +204,6 @@ const TodayDoc = ({ date }: { date: Date }) => {
         if (value === undefined) return
         logger.debug('[today] post-load check for onboarding etc', value?.length)
         uiStore.checkForOnboarding()
-        checkForDueTasks(date)
         unsub()
       })
 
@@ -213,42 +212,7 @@ const TodayDoc = ({ date }: { date: Date }) => {
     }
   }, [todayDocId])
 
-  logger.debug('[today] rendar', todayDocId)
-
   if (!todayDocId) return null
 
   return <Document projectId={project?.id} id={todayDocId} />
-}
-
-function checkForDueTasks(date: Date) {
-  const today = new Date()
-  if (isBefore(date, today)) {
-    logger.debug('[today] task check but day is past')
-    return
-  }
-
-  const threshold = endOfDay(date)
-  const tasks = taskStore.taskList
-    .get()
-    .filter((t) => t.due_at && !t.deleted_at && !t.completed_at)
-    .filter((t) => isBefore(new Date(t.due_at!), threshold))
-
-  logger.debug('[today] relevant tasks', tasks, threshold)
-  if (!tasks.length) return
-  logger.info('due tasks found', tasks)
-
-  const content = tasks
-    .map(
-      (t) =>
-        ({
-          type: 'task',
-          attrs: { id: t.id, ref: true },
-        } as JSONContent)
-    )
-    .concat([{ type: 'paragraph' }])
-
-  setTimeout(() => {
-    if (docStore.document.get()) return
-    window.editor?.chain().insertContent(content).focus().run()
-  }, 500)
 }

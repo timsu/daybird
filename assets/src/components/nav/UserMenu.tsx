@@ -16,6 +16,7 @@ const toggleFocusMode = () => {
   const setting = !uiStore.sidebarHidden.get()
   uiStore.sidebarHidden.set(setting)
   uiStore.calendarOpen.set(!setting)
+  uiStore.manualCalendarOpen = !setting
 }
 
 const userNavigation = [

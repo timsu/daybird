@@ -58,8 +58,10 @@ class DocStore {
       const response = (await API.readFile(project, id)) as string
       logger.info('DOCS - doc loaded', id, response.length)
       if (id != this.id.get()) return
-      this.document.set(response)
-      this.docCache[id] = response
+      if (response != cached) {
+        this.document.set(response)
+        this.docCache[id] = response
+      }
       localStorage.setItem(LS_LAST_DOC, project.id + '/' + id)
     } catch (e) {
       this.docError.set(unwrapError(e))
@@ -85,7 +87,7 @@ class DocStore {
     // add items to delete
     const positionsToDelete: { from: number; to: number }[] = []
     doc.descendants((node, pos) => {
-      if (node.type.name == NODE_NAME) {
+      if (node.type.name == 'task' || node.type.name == 'taskItem') {
         const id = node.attrs.id
         if (!id) return
         const task = tasks[id]

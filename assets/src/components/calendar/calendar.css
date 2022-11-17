@@ -1,4 +1,4 @@
-#ec { font-size: 80%; overflow: scroll }
+#ec { font-size: 80%; overflow-y: scroll }
 .ec-toolbar { display: none }
 .ec-time, .ec-line {
   height: 20px;

@@ -12,7 +12,7 @@ import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { logger } from '@/utils'
 import doOnboarding from '@/utils/onboarding'
-import { getOS, isChrome, isMobile, isSafari } from '@/utils/os'
+import { getOS, isChrome, isEdge, isMobile, isSafari } from '@/utils/os'
 
 const SLEEP_CHECK_INTERVAL = 30_000
 const LS_RECENT_FILES = 'rf'
@@ -161,8 +161,12 @@ class UIStore {
     else if (getOS() == 'ios') {
       if (isSafari) alert('Press the share button at the bottom and select "Add to Home Screen')
       else alert('Please open this site in Safari to add it to your home screen')
+    } else if (isEdge) {
+      alert(
+        "Use the 'Apps' item inside your browser's top-right menu button to install Daybird as a local app"
+      )
     } else if (isChrome) {
-      alert("Use your browser's menu to install Daybird as a local app")
+      alert("Use your browser's top-right menu button to install Daybird as a local app")
     } else {
       alert('Only Chrome and Firefox support adding Daybird to your homescreen')
     }

@@ -8,7 +8,7 @@ import { ModalWithoutPadding } from '@/components/modals/Modal'
 import { paths } from '@/config'
 import useShortcut, { checkShortcut } from '@/hooks/useShortcut'
 import { File, FileType } from '@/models'
-import { DOC_EXT, fileStore } from '@/stores/fileStore'
+import { DOC_EXT, fileStore, isDailyFile } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
@@ -65,7 +65,9 @@ function QuickSearchBody({ close }: { close: () => void }) {
       const recentResults: SearchResult[] = uiStore.recentFiles
         .map(({ id, projectId, title }) => {
           const f: File | undefined = allFiles[id]
-          const href = `${paths.DOC}/${projectId}/${id}`
+          const href = isDailyFile(title)
+            ? `${paths.TODAY}?d=${title}`
+            : `${paths.DOC}/${projectId}/${id}`
           if (href == location.pathname) return null
           const project = projects.find((p) => p.id == projectId)
           return {
@@ -110,7 +112,9 @@ function QuickSearchBody({ close }: { close: () => void }) {
                 type: 'file',
                 name: f.name,
                 desc: project!.name,
-                href: `${paths.DOC}/${project!.id}/${f.id}`,
+                href: isDailyFile(f.name)
+                  ? `${paths.TODAY}?d=${f.name}`
+                  : `${paths.DOC}/${projectId}/${f.id}`,
                 score: stringSimilarity(searchText, f.name, substringLength),
               } as SearchResult)
           )
