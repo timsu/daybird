@@ -1,9 +1,6 @@
-import { render } from 'preact'
-import tippy from 'tippy.js'
-
 import { ContextMenuItem, ContextMenuWithData } from '@/components/core/ContextMenu'
 import Pressable from '@/components/core/Pressable'
-import TaskDatePicker, { showTaskDatePicker } from '@/components/task/TaskDatePicker'
+import { showTaskDatePicker } from '@/components/task/TaskDatePicker'
 import { paths } from '@/config'
 import { Task, TaskState, TaskType } from '@/models'
 import { docStore } from '@/stores/docStore'

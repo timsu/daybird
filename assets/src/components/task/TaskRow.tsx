@@ -1,21 +1,16 @@
-import { format, isAfter, isSameYear } from 'date-fns'
-import { RenderableProps } from 'preact'
-import { MutableRef, useEffect, useRef, useState } from 'preact/hooks'
+import { isAfter } from 'date-fns'
+import { createRef, render, RenderableProps } from 'preact'
+import { MutableRef, useEffect, useRef } from 'preact/hooks'
 import { twMerge } from 'tailwind-merge'
+import tippy from 'tippy.js'
 
 import { triggerContextMenu } from '@/components/core/ContextMenu'
 import { showTaskDatePicker } from '@/components/task/TaskDatePicker'
-import { paths } from '@/config'
 import { Task } from '@/models'
-import { docStore } from '@/stores/docStore'
-import { fileStore, isDailyFile } from '@/stores/fileStore'
-import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
-import { classNames, debounce, DebounceStyle, logger } from '@/utils'
-import { isSafari } from '@/utils/os'
-import { CalendarIcon, DocumentIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
+import { classNames } from '@/utils'
+import { CalendarIcon, DotsHorizontalIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
-import { NodeViewWrapper } from '@tiptap/react'
 
 type Props = {
   id: string | undefined
@@ -147,6 +142,38 @@ function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: { tas
 }
 
 function TaskActions({ task }: { task: Task }) {
+  const divRef = useRef<HTMLDivElement | null>(null)
+  const tooltipRef = useRef<HTMLDivElement | null>(null)
+  const showTaskOnboardingId = useStore(taskStore.showTaskOnboarding)
+  const showTaskOnboarding = !!showTaskOnboardingId && showTaskOnboardingId == task?.id
+
+  useEffect(() => {
+    if (showTaskOnboarding) {
+      const container = document.createElement('div')
+      render(
+        <div ref={tooltipRef} class="bg-black text-white p-2 rounded shadow text-sm w-40">
+          You can set a due date and other options on tasks.
+        </div>,
+        container
+      )
+      const rect = divRef.current?.getBoundingClientRect()!
+      if (!rect.top) return
+
+      const instance = tippy('body', {
+        getReferenceClientRect: () => rect,
+        appendTo: () => document.body,
+        content: container,
+        showOnCreate: true,
+        trigger: 'manual',
+        placement: 'bottom',
+        arrow: true,
+        theme: 'dark',
+      })
+
+      divRef.current?.addEventListener('click', () => taskStore.showTaskOnboarding.set(null))
+    }
+  }, [showTaskOnboarding])
+
   if (!task) return null
 
   const showContextMenu = (e: MouseEvent) => {
@@ -162,12 +189,12 @@ function TaskActions({ task }: { task: Task }) {
   }
 
   return (
-    <div class="ml-2 flex items-center" contentEditable={false}>
+    <div class="ml-2 flex items-center" contentEditable={false} ref={divRef}>
       {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
 
       <HoverButton
         className="w-6 whitespace-nowrap"
-        visible={!!task.priority}
+        visible={showTaskOnboarding || !!task.priority}
         onClick={onClickPriority}
       >
         <div
@@ -184,7 +211,10 @@ function TaskActions({ task }: { task: Task }) {
         </div>
       </HoverButton>
 
-      <HoverButton visible={!!task.due_at} onClick={(e) => showTaskDatePicker(task, e)}>
+      <HoverButton
+        visible={showTaskOnboarding || !!task.due_at}
+        onClick={(e) => showTaskDatePicker(task, e)}
+      >
         {task.due_at ? (
           <div
             class={
@@ -199,7 +229,7 @@ function TaskActions({ task }: { task: Task }) {
         )}
       </HoverButton>
 
-      <HoverButton onClick={showContextMenu}>
+      <HoverButton visible={showTaskOnboarding} onClick={showContextMenu}>
         <DotsHorizontalIcon class="w-4 h-4 opacity-50" />
       </HoverButton>
     </div>

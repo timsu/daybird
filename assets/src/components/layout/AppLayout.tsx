@@ -1,3 +1,5 @@
+import 'tippy.js/themes/light.css'
+
 import { format } from 'date-fns'
 import { RenderableProps } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
@@ -16,8 +18,6 @@ import useSwipe from '@/hooks/useSwipe'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { useStore } from '@nanostores/preact'
-
-import AppHeader from './AppHeader'
 
 export default function ({ children }: RenderableProps<{}>) {
   const sidebarMenuOpen = useStore(uiStore.sidebarMenuOpen)
