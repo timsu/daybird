@@ -258,7 +258,7 @@ const HoverButton = ({
     <button
       className={twMerge(
         'group-hover text-sm p-1 rounded cursor-pointer hover:bg-gray-200 border border-transparent hover:border-gray-300',
-        visible ? '' : 'opacity-0',
+        visible ? '' : 'hidden opacity-0',
         className || ''
       )}
       onClick={onClick}

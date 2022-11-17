@@ -89,6 +89,7 @@ ul[data-type="taskList"] {
   }
 
   li:hover .group-hover {
+    display: block;
     opacity: 1;
     transition: opacity 200ms;
   }
