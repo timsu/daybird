@@ -234,9 +234,12 @@ function useDeleteTaskListener(editor: Editor | null) {
       const pos = editor.view.posAtDOM(element, 0)
       if (!pos) return
 
+      const node = editor.state.doc.nodeAt(pos)
+      const size = node?.nodeSize || 1
+
       editor
         .chain()
-        .deleteRange({ from: pos - 1, to: pos + 1 })
+        .deleteRange({ from: pos - 1, to: pos + size + 1 })
         .focus()
         .run()
     })

@@ -69,7 +69,7 @@ class FileStore {
       const response = await API.listFiles(project)
       const files: File[] = response.files.map((f) => File.fromJSON(f, project.id))
 
-      logger.info('FILES - loaded files for project', project.name, sortFiles(files))
+      logger.debug('FILES - loaded files for project', project.name, sortFiles(files))
       this.updateFiles(project.id, files)
 
       if (!this.topics[project.id]) this.initTopic(project)

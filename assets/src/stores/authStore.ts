@@ -43,7 +43,7 @@ class AuthStore {
     if (!tokens?.access) throw 'Tokens were invalid'
 
     const response = await API.listProjects()
-    logger.info('AUTH - logged in', response)
+    logger.debug('AUTH - logged in', response)
 
     if (
       tokens &&
@@ -66,7 +66,7 @@ class AuthStore {
   }
 
   saveTokens = async (tokens: AuthTokenPair) => {
-    logger.info('AUTH —— saving tokens', tokens)
+    logger.debug('AUTH —— saving tokens', tokens)
     await localStorage.setItem(LS_AUTH_TOKENS, JSON.stringify(tokens))
   }
 
