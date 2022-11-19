@@ -1,6 +1,6 @@
 import { isAfter } from 'date-fns'
 import { createRef, render, RenderableProps } from 'preact'
-import { MutableRef, useEffect, useRef } from 'preact/hooks'
+import { MutableRef, useEffect, useRef, useState } from 'preact/hooks'
 import { twMerge } from 'tailwind-merge'
 import tippy from 'tippy.js'
 
@@ -118,15 +118,16 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: PropsW
   return <div class="flex-1 px-1" ref={ref} />
 }
 
-function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: PropsWithTask) {
-  const ref = contentRef || useRef<HTMLDivElement | null>(null)
+function TaskContentInList({ id, task, onCreate, currentDoc }: PropsWithTask) {
+  const ref = useRef<HTMLInputElement | null>(null)
+  const [title, setTitle] = useState(task.title)
 
   useEffect(() => {
     const div = ref.current
     if (!div) return
 
     const onFocusOut = async () => {
-      const title = div.textContent?.trim()
+      const title = div.value.trim()
       if (!task && !id && title) {
         // task creation mode
         const newTask = await taskStore.createTask({ title, doc: currentDoc })
@@ -137,21 +138,29 @@ function TaskContentInList({ id, task, contentRef, onCreate, currentDoc }: Props
       }
     }
 
-    div.addEventListener('keypress', (e) => {
+    const onKeyPress = (e: KeyboardEvent) => {
       e.stopPropagation()
       if (e.key == 'Enter' && !e.shiftKey) {
         e.preventDefault()
       }
-    })
+    }
 
     div.addEventListener('focusout', onFocusOut)
-    return () => div.removeEventListener('focusout', onFocusOut)
+    div.addEventListener('keypress', onKeyPress)
+    return () => {
+      div.removeEventListener('focusout', onFocusOut)
+      div.removeEventListener('keypress', onKeyPress)
+    }
   }, [ref.current, task])
 
   return (
-    <div class="flex-1 px-1" ref={ref} contentEditable>
-      {task.title}
-    </div>
+    <input
+      type="text"
+      class="flex-1 px-1 border-0 p-0 rounded"
+      ref={ref}
+      value={title}
+      onChange={(e) => setTitle((e.target as HTMLInputElement).value)}
+    />
   )
 }
 

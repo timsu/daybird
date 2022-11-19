@@ -126,6 +126,7 @@ export default ({
   // --- actions
 
   const toggleComplete = () => {
+    if (!task) return
     taskStore.saveTask(task, {
       completed_at: task.completed_at ? null : new Date().toISOString(),
       state: null,
