@@ -2,7 +2,7 @@ import { action, atom } from 'nanostores'
 import { route, RouterOnChangeArgs } from 'preact-router'
 
 import { API } from '@/api'
-import { config } from '@/config'
+import { config, paths } from '@/config'
 import { File, User } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
@@ -69,7 +69,7 @@ class UIStore {
     if (ctx.previous && !this.goingBack) {
       let prevPaths = this.prevPaths.get()
       // if we're going to the previous path, don't modify prev paths
-      if (prevPaths[0] != ctx.url) {
+      if (prevPaths[0] != ctx.url && ctx.previous != paths.APP) {
         prevPaths = prevPaths.filter((p) => p != ctx.previous).slice(0, PREV_PATH_LENGTH)
         prevPaths.unshift(ctx.previous)
         this.prevPaths.set(prevPaths)
