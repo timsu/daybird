@@ -89,7 +89,7 @@ ul[data-type="taskList"], .ProseMirror ul[data-type="taskList"] {
   }
 
   li:hover .group-hover {
-    display: block;
+    display: flex;
     opacity: 1;
     transition: opacity 200ms;
   }
