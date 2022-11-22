@@ -204,7 +204,22 @@ class FileStore {
   }
 
   moveFile = async (projectId: string, file: File, newParent: string | null) => {
-    if (newParent == file.parent) return
+    if (newParent == file.id || newParent == file.parent) return
+
+    // detect circular loops
+    let allowed = true
+    const fileMap = this.idToFile.get()
+    let node: string | null | undefined = newParent
+    while (node != null) {
+      const parentFile: File | undefined = fileMap[node]
+      if (parentFile.id == file.id) {
+        allowed = false
+        break
+      }
+      node = parentFile.parent
+    }
+
+    if (!allowed) return
 
     logger.info('set new file parent', file, newParent)
     file.parent = newParent

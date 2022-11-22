@@ -119,15 +119,14 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: PropsW
 }
 
 function TaskContentInList({ id, task, onCreate, currentDoc }: PropsWithTask) {
-  const ref = useRef<HTMLInputElement | null>(null)
-  const [title, setTitle] = useState(task.title)
+  const ref = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const div = ref.current
     if (!div) return
 
     const onFocusOut = async () => {
-      const title = div.value.trim()
+      const title = div.innerText.trim()
       if (!task && !id && title) {
         // task creation mode
         const newTask = await taskStore.createTask({ title, doc: currentDoc })
@@ -145,22 +144,26 @@ function TaskContentInList({ id, task, onCreate, currentDoc }: PropsWithTask) {
       }
     }
 
+    const onPaste = (e: ClipboardEvent) => {
+      e.preventDefault()
+      const text = e.clipboardData?.getData('text/plain')
+      document.execCommand('insertHTML', false, text)
+    }
+
+    div.addEventListener('paste', onPaste)
     div.addEventListener('focusout', onFocusOut)
     div.addEventListener('keypress', onKeyPress)
     return () => {
       div.removeEventListener('focusout', onFocusOut)
       div.removeEventListener('keypress', onKeyPress)
+      div.removeEventListener('paste', onPaste)
     }
   }, [ref.current, task])
 
   return (
-    <input
-      type="text"
-      class="flex-1 px-1 border-0 p-0 rounded"
-      ref={ref}
-      value={title}
-      onChange={(e) => setTitle((e.target as HTMLInputElement).value)}
-    />
+    <div contentEditable class="flex-1 px-1 border-0 p-0 rounded" ref={ref}>
+      {task.title}
+    </div>
   )
 }
 
@@ -213,19 +216,43 @@ function TaskActions(props: PropsWithTask) {
     fileStore.openDoc(task.doc!)
   }
 
+  const buttonVisible = Boolean(showTaskOnboarding || task.due_at || task.priority)
+
   return (
     <div class="ml-2 flex items-center" contentEditable={false} ref={divRef}>
       <div class="h-[26px]" />
 
       {task?.state && <div class="font-semibold text-xs text-blue-500">IN PROGRESS</div>}
 
-      <HoverButton visible={showTaskOnboarding} onClick={showContextMenu}>
-        <DotsHorizontalIcon class="w-4 h-4 opacity-50" />
+      <HoverButton visible={buttonVisible} onClick={showContextMenu}>
+        {!task.due_at && !task.priority && <DotsHorizontalIcon class="w-4 h-4 opacity-50" />}
+
+        {task.priority && (
+          <div
+            class={classNames(
+              'font-semibold text-xs',
+              task.priority == 3
+                ? 'text-red-500'
+                : task.priority
+                ? 'text-orange-400'
+                : 'text-gray-500'
+            )}
+          >
+            {'!'.repeat(task.priority || 1)}
+          </div>
+        )}
+
+        {task.due_at && (
+          <div
+            class={
+              'text-xs ' +
+              (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
+            }
+          >
+            {Task.renderDueDate(task)}
+          </div>
+        )}
       </HoverButton>
-
-      <DueDateButton onboarding={showTaskOnboarding} {...props} />
-
-      {task.priority && <PriorityButton onboarding={showTaskOnboarding} {...props} />}
 
       {showGoToDoc && (
         <div
@@ -241,43 +268,6 @@ function TaskActions(props: PropsWithTask) {
   )
 }
 
-const PriorityButton = ({ task, onboarding }: PropsWithTask & { onboarding: boolean }) => (
-  <HoverButton
-    className="w-6 whitespace-nowrap"
-    visible={onboarding || !!task.priority}
-    onClick={() => {
-      const nextPriority = ((task.priority || 0) + 1) % 4
-      taskStore.saveTask(task, { priority: nextPriority })
-    }}
-  >
-    <div
-      class={classNames(
-        'font-semibold text-xs',
-        task.priority == 3 ? 'text-red-500' : task.priority ? 'text-orange-400' : 'text-gray-500'
-      )}
-    >
-      {'!'.repeat(task.priority || 1)}
-    </div>
-  </HoverButton>
-)
-
-const DueDateButton = ({ task, onboarding }: PropsWithTask & { onboarding: boolean }) => (
-  <HoverButton visible={onboarding || !!task.due_at} onClick={(e) => showTaskDatePicker(task, e)}>
-    {task.due_at ? (
-      <div
-        class={
-          'text-xs ' +
-          (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
-        }
-      >
-        {Task.renderDueDate(task)}
-      </div>
-    ) : (
-      <CalendarIcon class="h-4 w-4 opacity-50" />
-    )}
-  </HoverButton>
-)
-
 const HoverButton = ({
   onClick,
   visible,
@@ -291,7 +281,8 @@ const HoverButton = ({
   return (
     <button
       className={twMerge(
-        'group-hover text-sm p-1 rounded cursor-pointer hover:bg-gray-200 border border-transparent hover:border-gray-300',
+        'group-hover text-sm p-1 rounded cursor-pointer hover:bg-gray-200 border border-transparent',
+        'hover:border-gray-300 flex gap-2 whitespace-nowrap',
         visible ? '' : 'opacity-0',
         className || ''
       )}

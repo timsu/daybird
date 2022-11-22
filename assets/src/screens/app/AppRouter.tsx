@@ -1,7 +1,7 @@
-import Router from 'preact-router'
+import Router, { route } from 'preact-router'
+import { useEffect } from 'preact/hooks'
 
 import { paths } from '@/config'
-import Dashboard from '@/screens/app/Dashboard'
 import DocScreen from '@/screens/app/DocScreen'
 import ProjectsList from '@/screens/app/ProjectsList'
 import ProjectView from '@/screens/app/ProjectView'
@@ -12,7 +12,6 @@ import { uiStore } from '@/stores/uiStore'
 
 export default () => (
   <Router onChange={uiStore.routerOnChange}>
-    <Dashboard path={paths.APP} />
     <Today path={paths.TODAY} />
     <ProjectsList path={paths.PROJECTS} />
     <ProjectView path={paths.PROJECTS + '/:id'} />
@@ -20,5 +19,13 @@ export default () => (
     <TasksList path={paths.TASKS + '/:projectId'} />
     <DocScreen path={paths.DOC + '/:projectId/:id'} />
     <Settings path={paths.SETTINGS} />
+    <Redirect path={paths.APP} to={paths.TODAY} />
   </Router>
 )
+
+const Redirect = ({ to }: { to: string; path: string }) => {
+  useEffect(() => {
+    route(to)
+  }, [])
+  return null
+}
