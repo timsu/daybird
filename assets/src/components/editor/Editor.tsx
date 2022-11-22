@@ -166,7 +166,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     setTimeout(() => {
       if (modalStore.onboardingModal.get()) return
       editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run()
-      if (isToday) checkForDueTasks(editor)
+      // if (isToday) checkForDueTasks(editor)
     }, 50)
 
     return { editor, ydoc }
