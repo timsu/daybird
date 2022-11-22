@@ -63,7 +63,7 @@ export function fileListToTree(files: File[]): TreeFile[] {
 
   files.forEach((file) => {
     const treeFile = treeMap[file.id]
-    const parent = file.parent && file.parent != file.id && treeMap[file.parent]
+    const parent = file.parent && treeMap[file.parent]
 
     if (parent) parent.nodes?.push(treeFile)
     else roots.push(treeFile)

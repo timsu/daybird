@@ -5,11 +5,13 @@ defmodule SequenceWeb.DocsView do
   alias Sequence.Utils
 
   def render_doc(doc) do
+    uuid = Utils.no_dash(doc.uuid)
+    parent = if(doc.parent, do: Utils.no_dash(doc.parent))
     %{
-      id: Utils.no_dash(doc.uuid),
+      id: uuid,
       name: doc.name,
       type: doc.type,
-      parent: if(doc.parent, do: Utils.no_dash(doc.parent)),
+      parent: if(parent != uuid, do: parent),
       archived_at: doc.archived_at,
       deleted_at: doc.deleted_at
     }
