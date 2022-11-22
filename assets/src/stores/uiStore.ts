@@ -144,7 +144,7 @@ class UIStore {
     projects.forEach((p) => {
       fileStore.loadFiles(p)
     })
-    const currentDoc = docStore.id.get()
+    const currentDoc = docStore.doc.get()?.id
     if (currentDoc) {
       docStore.loadDoc(projectStore.currentProject.get()!, currentDoc)
     }

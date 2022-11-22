@@ -67,7 +67,7 @@ export default (props: Props) => {
       projectStore.setCurrentProject(project)
       taskStore.loadTasks(project)
     }
-    docStore.id.set(undefined)
+    docStore.doc.set(undefined)
   }, [project?.id])
 
   if (!project) return null

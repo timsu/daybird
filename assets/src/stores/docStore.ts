@@ -1,5 +1,6 @@
 import { decode } from 'base64-arraybuffer'
 import { atom } from 'nanostores'
+import toast from 'react-hot-toast'
 
 import { API } from '@/api'
 import { NODE_NAME } from '@/components/editor/LegacyTaskItem'
@@ -14,18 +15,16 @@ export type ProjectMap = { [id: string]: Project }
 
 export const LS_LAST_DOC = 'ld'
 
+type Doc = {
+  id: string
+  title?: string
+  contents?: string
+}
+
 class DocStore {
   // --- stores
 
-  id = atom<string | undefined>()
-
-  title = atom<string | undefined>()
-
-  document = atom<any | undefined>()
-
-  version = atom<number>(0)
-
-  docError = atom<string | undefined>()
+  doc = atom<Doc | undefined>()
 
   dirty = atom<boolean>(false)
 
@@ -43,28 +42,40 @@ class DocStore {
     const cached = this.docCache[id]
     const file = fileStore.idToFile.get()[id]
 
-    this.id.set(id)
-    this.title.set(file?.name)
-    this.document.set(cached)
-    this.docError.set(undefined)
+    this.doc.set({
+      id,
+      title: file?.name,
+      contents: cached,
+    })
 
     this.fileListener?.()
-    this.fileListener = fileStore.idToFile.subscribe((fileMap) => {
-      const file = fileMap[id]
-      if (file) setTimeout(() => this.title.set(file.name), 0)
-    })
+    if (!file) {
+      this.fileListener = fileStore.idToFile.subscribe((fileMap) => {
+        const file = fileMap[id]
+        const doc = this.doc.get()
+        if (!doc || !file) return
+        this.doc.set({
+          ...doc,
+          title: file.name,
+        })
+      })
+    } else {
+      this.fileListener = undefined
+    }
 
     try {
       const response = (await API.readFile(project, id)) as string
       logger.info('DOCS - doc loaded', id, response.length)
-      if (id != this.id.get()) return
-      if (response != cached) {
-        this.document.set(response)
+
+      const doc = this.doc.get()!
+      if (id != doc.id) return
+      if (response != doc.contents) {
+        this.doc.set({ ...doc, contents: response })
         this.docCache[id] = response
       }
       localStorage.setItem(LS_LAST_DOC, project.id + '/' + id)
     } catch (e) {
-      this.docError.set(unwrapError(e))
+      toast.error(unwrapError(e))
       localStorage.removeItem(LS_LAST_DOC)
     }
   }
@@ -75,7 +86,7 @@ class DocStore {
       await API.writeFile(project, id, contents)
       if (this.docCache[id]) this.docCache[id] = contents
     } catch (e) {
-      this.docError.set(unwrapError(e))
+      toast.error(unwrapError(e))
     }
   }
 

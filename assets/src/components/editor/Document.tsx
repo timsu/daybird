@@ -13,7 +13,7 @@ import { useStore } from '@nanostores/preact'
 // document is a higher-order component that manages the doc object
 export default ({ projectId, id }: { projectId?: string; id?: string }) => {
   const project = useStore(projectStore.projectMap)[projectId!]
-  const contents = useStore(docStore.document)
+  const doc = useStore(docStore.doc)
 
   useEffect(() => {
     if (project) {
@@ -25,7 +25,7 @@ export default ({ projectId, id }: { projectId?: string; id?: string }) => {
       const file = fileStore.idToFile.get()[id]
 
       if (file && !file.provisional) {
-        setTimeout(() => uiStore.addRecentNote(id, project.id, docStore.title.get()!), 50)
+        setTimeout(() => uiStore.addRecentNote(id, project.id, file.name!), 50)
       }
     }
   }, [project, projectId, id])
@@ -40,12 +40,14 @@ export default ({ projectId, id }: { projectId?: string; id?: string }) => {
 
   if (!project) return null
 
-  if (contents === undefined)
+  if (!doc || doc.contents === undefined)
     return (
       <div className="flex justify-center mt-10">
         <Loader size={40} />
       </div>
     )
 
-  return <Editor project={project} id={id} contents={contents} saveContents={saveContents} />
+  return (
+    <Editor project={project} id={doc.id} contents={doc.contents} saveContents={saveContents} />
+  )
 }

@@ -30,8 +30,7 @@ type Props = {
 const LS_TASKS_INSERTED = 'dti:'
 
 export default (props: Props) => {
-  const docError = useStore(docStore.docError)
-  const title = useStore(docStore.title)
+  const doc = useStore(docStore.doc)!
   const project = useStore(projectStore.projectMap)[props.projectId!]
 
   useEffect(() => {
@@ -40,12 +39,12 @@ export default (props: Props) => {
 
   return (
     <>
-      <Helmet title={`${project?.name} | ${title || 'Loading'}`} />
+      <Helmet title={`${project?.name} | ${doc.title || 'Loading'}`} />
 
       <AppHeader>
         <div class="flex items-center gap-4 overflow-hidden">
           <h1 class="text-xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden overflow-ellipsis">
-            {title}
+            {doc.title}
           </h1>
           <Pressable
             onClick={(e) => {
@@ -64,14 +63,6 @@ export default (props: Props) => {
       <DocMenu />
 
       <div class="flex flex-col grow w-full px-6">
-        <CSSTransition appear in={!!docError} classNames="fade" duration={500}>
-          <div class="relative bg-red-500">
-            <Banner onClose={() => docStore.docError.set(undefined)}>
-              <p>{docError}</p>
-            </Banner>
-          </div>
-        </CSSTransition>
-
         <Document projectId={props.projectId} id={props.id} />
       </div>
     </>

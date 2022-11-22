@@ -104,7 +104,7 @@ export const LegacyTaskItem = Node.create<TaskItemOptions>({
             id={node.attrs.id}
             contentRef={contentRef}
             onCreate={onCreateTask}
-            currentDoc={docStore.id.get()}
+            currentDoc={docStore.doc.get()?.id}
           />
         </li>,
         container
