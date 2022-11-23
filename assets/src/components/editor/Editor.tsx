@@ -23,6 +23,7 @@ import { Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { modalStore } from '@/stores/modalStore'
+import { projectStore } from '@/stores/projectStore'
 import { taskStore } from '@/stores/taskStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
@@ -174,6 +175,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
 }
 
 // hook to autosave when doc is modified
+let autoAddingTasks = false
 function useAutosave(
   props: Props,
   editor: Editor | null,
@@ -203,6 +205,7 @@ function useAutosave(
     }) => {
       // ignore non-local changes
       if (transaction && isChangeOrigin(transaction)) return
+      if (autoAddingTasks) return
 
       docStore.dirty.set(true)
       debounce(
@@ -263,9 +266,10 @@ function checkForDueTasks(editor: Editor) {
     return
   }
 
-  const tasks = taskStore.taskList
+  const projectId = projectStore.currentProject.get()!.id
+  const tasks = taskStore.taskLists
     .get()
-    .filter((t) => t.due_at && !t.deleted_at && !t.completed_at)
+    [projectId].filter((t) => t.due_at && !t.deleted_at && !t.completed_at)
     .filter((t) => isBefore(new Date(t.due_at!), threshold))
 
   logger.debug('[today] relevant tasks', tasks, threshold)
@@ -293,5 +297,7 @@ function checkForDueTasks(editor: Editor) {
     { type: 'paragraph' },
   ]
 
+  autoAddingTasks = true
   editor.commands.insertContent(wrapper)
+  autoAddingTasks = false
 }

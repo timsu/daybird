@@ -189,7 +189,7 @@ class FileStore {
   }
 
   handleWikiLink = async (linkName: string) => {
-    const currentDocId = docStore.id.get()
+    const currentDocId = docStore.doc.get()?.id
     if (!currentDocId) return
     const file = this.idToFile.get()[currentDocId]
     if (!file) return
@@ -230,7 +230,7 @@ class FileStore {
       await API.updateFile(file.projectId || projectId, file.id, { parent: newParent, projectId })
       this.topics[projectId]?.setSharedKey(KEY_TREECHANGE, Date.now())
     } catch (e) {
-      docStore.docError.set(unwrapError(e))
+      toast.error(unwrapError(e))
     }
 
     // if project move
@@ -257,18 +257,23 @@ class FileStore {
     file.name = name
     this.files.notify()
 
-    if (file.id == docStore.id.get()) docStore.title.set(name)
+    if (file.id == docStore.doc.get()?.id) {
+      docStore.doc.set({
+        ...docStore.doc.get()!,
+        title: name,
+      })
+    }
     this.topics[projectId]?.setSharedKey(KEY_RENAME + file.id, name)
 
     try {
       await API.updateFile(projectId, file.id, { name })
     } catch (e) {
-      docStore.docError.set(unwrapError(e))
+      toast.error(unwrapError(e))
     }
   }
 
   deleteFile = async (project: Project, file: File, archive?: boolean) => {
-    if (!location.pathname.includes(paths.DOC) && docStore.id.get() == file.id) {
+    if (!location.pathname.includes(paths.DOC) && docStore.doc.get()?.id == file.id) {
       // special case for daily notes: just clear the document
       window.editor?.commands.clearContent(true)
       return
@@ -330,7 +335,12 @@ class FileStore {
           file.name = value
           this.fileTree.notify()
         }
-        if (docStore.id.get() == id) docStore.title.set(value)
+        if (docStore.doc.get()?.id == id) {
+          docStore.doc.set({
+            ...docStore.doc.get()!,
+            title: value,
+          })
+        }
       }
     })
   }

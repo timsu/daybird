@@ -167,7 +167,7 @@ function ProjectTree({ project }: { project: Project }) {
 
   const onNewFile = (type: FileType) => (e: Event) => {
     e.stopPropagation()
-    const currentFileId = docStore.id.get()
+    const currentFileId = docStore.doc.get()?.id
     const currentFile = currentFileId && fileStore.idToFile.get()[currentFileId]
     const currentProject = projectStore.currentProject.get()?.id == project.id
 

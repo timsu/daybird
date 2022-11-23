@@ -135,7 +135,7 @@ export const TaskItem = Node.create<TaskItemOptions>({
           id={node.attrs.id}
           contentRef={ref}
           onCreate={onCreateTask}
-          currentDoc={docStore.id.get()}
+          currentDoc={docStore.doc.get()?.id}
         />,
         listItem
       )

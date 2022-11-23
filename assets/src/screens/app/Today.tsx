@@ -101,7 +101,7 @@ export default (props: Props) => {
               const pos = (e.target as HTMLDivElement).getBoundingClientRect()
               triggerContextMenu(pos.left, pos.top, 'doc-menu', {
                 dailyNote: true,
-                docId: docStore.id.get(),
+                docId: docStore.doc.get()?.id,
                 projectId: project?.id,
               })
             }}
@@ -200,9 +200,8 @@ const TodayDoc = ({ date }: { date: Date }) => {
     if (!project || !todayDocId) return
 
     if (!fileStore.idToFile.get()[todayDocId]) {
-      const unsub = docStore.document.listen((value) => {
-        if (value === undefined) return
-        logger.debug('[today] post-load check for onboarding etc', value?.length)
+      const unsub = docStore.doc.listen((doc) => {
+        if (doc?.contents === undefined) return
         uiStore.checkForOnboarding()
         unsub()
       })

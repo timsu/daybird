@@ -51,7 +51,7 @@ export default (props: Props) => {
   const project = useStore(projectStore.projectMap)[
     props.projectId || projectStore.currentProject.get()?.id || ''
   ]
-  const allTasks = useStore(taskStore.taskList)
+  const allTasks = useStore(taskStore.taskLists)[project.id]
 
   const [tasks, setTasks] = useState<Task[]>([])
   const [sort, setSort] = useState<SortType>(SortType.OLDEST)
@@ -67,7 +67,7 @@ export default (props: Props) => {
       projectStore.setCurrentProject(project)
       taskStore.loadTasks(project)
     }
-    docStore.id.set(undefined)
+    docStore.doc.set(undefined)
   }, [project?.id])
 
   if (!project) return null

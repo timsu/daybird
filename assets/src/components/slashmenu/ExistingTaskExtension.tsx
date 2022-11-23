@@ -42,7 +42,8 @@ const loadTasks = ({ query, editor }: { query: string; editor: Editor }) => {
   const lowerQuery = query.toLowerCase()
 
   const tasksInDoc = new Set<string>()
-  const allTasks = taskStore.taskList.get()
+  const projectId = projectStore.currentProject.get()!.id
+  const allTasks = taskStore.taskLists.get()[projectId]
   const doc = editor.state.doc
   doc.descendants((node, pos) => {
     if (node.type.name == NODE_NAME) {
