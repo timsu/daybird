@@ -29,7 +29,9 @@ export default function (props: Props) {
   const task = useStore(taskStore.taskMap)[id!]
 
   useEffect(() => {
-    if (id && id != 'undefined' && id != 'null') taskStore.loadTask(id)
+    if (id && id != 'undefined' && id != 'null') {
+      taskStore.loadTask(id)
+    }
   }, [id])
 
   return (
@@ -84,7 +86,7 @@ function TaskContentInDoc({ id, task, contentRef, onCreate, currentDoc }: PropsW
     const contentElement = div.children[0] as HTMLParagraphElement
 
     if (task && contentElement.textContent != task.title) {
-      contentElement.innerText = task.title
+      div.innerText = task.title
     }
 
     const onFocusOut = async () => {
