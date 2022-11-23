@@ -21,7 +21,7 @@ class TaskStore {
 
   // --- stores
 
-  taskList = atom<Task[]>([])
+  taskLists = map<{ [projectId: string]: Task[] }>({})
 
   taskMap = map<TaskMap>({})
 
@@ -44,7 +44,7 @@ class TaskStore {
     const taskMap = this.taskMap.get()
     tasks.forEach((t) => (taskMap[t.id] = t))
     this.taskMap.notify()
-    this.taskList.set(tasks)
+    this.taskLists.setKey(project.id, tasks)
     return tasks
   }
 
@@ -65,7 +65,10 @@ class TaskStore {
 
     logger.info('TASKS - create', response)
     this.updateTaskMap(task)
-    this.taskList.set([...this.taskList.get(), task])
+
+    const projectId = project.id
+    const newList = [...(this.taskLists.get()[projectId] || []), task]
+    this.taskLists.setKey(projectId, newList)
 
     if (this.showOnboardingForNextTask) {
       this.showOnboardingForNextTask = false
@@ -97,7 +100,9 @@ class TaskStore {
 
   deleteTask = async (task: Task) => {
     this.deletedTask.set(task)
-    this.taskList.set(this.taskList.get().filter((t) => t.id != task.id))
+    const projectId = projectStore.currentProject.get()!.id
+    const newList = (this.taskLists.get()[projectId] || []).filter((t) => t.id != task.id)
+    this.taskLists.setKey(projectId, newList)
     this.saveTask(task, { deleted_at: new Date().toISOString() })
   }
 
@@ -116,10 +121,11 @@ class TaskStore {
   }
 
   onTaskUpdated = (task: Task) => {
-    const projectId = projectStore.currentProject.get()?.id
+    const projectId = projectStore.currentProject.get()!.id
     this.topics[projectId!]?.setSharedKey(`${KEY_TASK}${task.id}`, Date.now())
 
-    this.taskList.set(this.taskList.get().map((t) => (t.id == task.id ? task : t)))
+    const newList = (this.taskLists.get()[projectId] || []).map((t) => (t.id == task.id ? task : t))
+    this.taskLists.setKey(projectId, newList)
   }
 
   taskItemForTask = (task: Task): JSONContent => ({
