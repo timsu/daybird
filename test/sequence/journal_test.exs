@@ -21,7 +21,8 @@ defmodule Sequence.JournalTest do
     end
 
     test "create_daily_note/1 with valid data creates a daily_note" do
-      valid_attrs = %{date: "some date", snippet: "some snippet", uuid: "7488a646-e31f-11e4-aace-600308960662"}
+      valid_attrs = %{creator_id: 1, project_id: 1, date: "some date", snippet: "some snippet",
+        uuid: "7488a646-e31f-11e4-aace-600308960662"}
 
       assert {:ok, %DailyNote{} = daily_note} = Journal.create_daily_note(valid_attrs)
       assert daily_note.date == "some date"
@@ -35,10 +36,10 @@ defmodule Sequence.JournalTest do
 
     test "update_daily_note/2 with valid data updates the daily_note" do
       daily_note = daily_note_fixture()
-      update_attrs = %{date: "some updated date", snippet: "some updated snippet", uuid: "7488a646-e31f-11e4-aace-600308960668"}
+      update_attrs = %{date: "date 2", snippet: "some updated snippet", uuid: "7488a646-e31f-11e4-aace-600308960668"}
 
       assert {:ok, %DailyNote{} = daily_note} = Journal.update_daily_note(daily_note, update_attrs)
-      assert daily_note.date == "some updated date"
+      assert daily_note.date == "date 2"
       assert daily_note.snippet == "some updated snippet"
       assert daily_note.uuid == "7488a646-e31f-11e4-aace-600308960668"
     end
@@ -79,12 +80,13 @@ defmodule Sequence.JournalTest do
     end
 
     test "create_summary/1 with valid data creates a summary" do
-      valid_attrs = %{date: "some date", snippet: "some snippet", type: "some type", uuid: "7488a646-e31f-11e4-aace-600308960662"}
+      valid_attrs = %{creator_id: 1, project_id: 1, date: "some date", snippet: "some snippet",
+        type: "type1", uuid: "7488a646-e31f-11e4-aace-600308960662"}
 
       assert {:ok, %Summary{} = summary} = Journal.create_summary(valid_attrs)
       assert summary.date == "some date"
       assert summary.snippet == "some snippet"
-      assert summary.type == "some type"
+      assert summary.type == "type1"
       assert summary.uuid == "7488a646-e31f-11e4-aace-600308960662"
     end
 
@@ -94,12 +96,12 @@ defmodule Sequence.JournalTest do
 
     test "update_summary/2 with valid data updates the summary" do
       summary = summary_fixture()
-      update_attrs = %{date: "some updated date", snippet: "some updated snippet", type: "some updated type", uuid: "7488a646-e31f-11e4-aace-600308960668"}
+      update_attrs = %{date: "date 2", snippet: "some updated snippet", type: "type2", uuid: "7488a646-e31f-11e4-aace-600308960668"}
 
       assert {:ok, %Summary{} = summary} = Journal.update_summary(summary, update_attrs)
-      assert summary.date == "some updated date"
+      assert summary.date == "date 2"
       assert summary.snippet == "some updated snippet"
-      assert summary.type == "some updated type"
+      assert summary.type == "type2"
       assert summary.uuid == "7488a646-e31f-11e4-aace-600308960668"
     end
 

@@ -11,9 +11,10 @@ defmodule Sequence.JournalFixtures do
     {:ok, daily_note} =
       attrs
       |> Enum.into(%{
-        date: "some date",
+        date: "2022-01-01",
         snippet: "some snippet",
-        uuid: "7488a646-e31f-11e4-aace-600308960662"
+        project_id: 1,
+        creator_id: 1
       })
       |> Sequence.Journal.create_daily_note()
 
@@ -27,10 +28,11 @@ defmodule Sequence.JournalFixtures do
     {:ok, summary} =
       attrs
       |> Enum.into(%{
-        date: "some date",
+        date: "2020-W05",
         snippet: "some snippet",
-        type: "some type",
-        uuid: "7488a646-e31f-11e4-aace-600308960662"
+        type: "week",
+        project_id: 1,
+        creator_id: 1
       })
       |> Sequence.Journal.create_summary()
 
