@@ -11,7 +11,7 @@ import TaskContextMenu from '@/components/menus/TaskContextMenu'
 import DeleteTaskModal from '@/components/modals/DeleteTaskModal'
 import OnboardingModal from '@/components/modals/OnboardingModal'
 import QuickFindModal from '@/components/modals/QuickFindModal'
-import ShorctutsModal from '@/components/modals/ShorctutsModal'
+import ShortcutsModal from '@/components/modals/ShortcutsModal'
 import AppSidebar from '@/components/nav/AppSidebar'
 import { SidebarMenu } from '@/components/nav/SidebarMenu'
 import useSwipe from '@/hooks/useSwipe'
@@ -72,7 +72,7 @@ export default function ({ children }: RenderableProps<{}>) {
         <DeleteTaskModal />
         <QuickFindModal />
         <OnboardingModal />
-        <ShorctutsModal />
+        <ShortcutsModal />
       </div>
     </div>
   )

@@ -7,7 +7,11 @@ defmodule SequenceWeb.PageController do
   end
 
   def app(conn, _params) do
-    render conn, "app.html", entry: "app", quill: true
+    render conn, "app.html", entry: "app"
+  end
+
+  def insight(conn, _params) do
+    render conn, "app.html", entry: "insight"
   end
 
   def auth(conn, _params) do

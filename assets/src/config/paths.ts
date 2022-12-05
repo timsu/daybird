@@ -18,4 +18,14 @@ export const paths = {
   DOC: '/app/docs',
 
   SETTINGS: '/app/settings',
+
+  // --- insight loop
+
+  JOURNAL: '/insight/journal',
+
+  INSIGHTS: '/insight/insights',
+
+  STATS: '/insight/stats',
+
+  PROFILE: '/insight/profile',
 }

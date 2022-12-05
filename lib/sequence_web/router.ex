@@ -199,6 +199,7 @@ defmodule SequenceWeb.Router do
     pipe_through :logging
 
     get "/app/*path", PageController, :app
+    get "/insight/*path", PageController, :insight
 
     get "/signup", PageController, :auth
     get "/signin", PageController, :auth
