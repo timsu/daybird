@@ -60,7 +60,7 @@ function JournalDays() {
     const start = format(subDays(endDate, dayCount), 'yyyy-MM-dd')
     const end = format(endDate, 'yyyy-MM-dd')
     journalStore.loadNotes(project, start, end)
-  }, [project, endDate])
+  }, [project?.id, dateParam])
 
   if (!project || !notes) return <Loader class="mx-auto" />
 

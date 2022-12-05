@@ -4,6 +4,7 @@ import { useEffect, useState } from 'preact/hooks'
 import Tooltip from '@/components/core/Tooltip'
 import { paths } from '@/config'
 import { projectStore } from '@/stores/projectStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames, mediumColorFor } from '@/utils'
 import { ViewListIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -64,7 +65,7 @@ export default function () {
             )}
             onClick={() => {
               projectStore.setCurrentProject(p)
-              route(paths.TODAY)
+              route(uiStore.insightLoop ? paths.JOURNAL : paths.TODAY)
               setPillsOpen(false)
             }}
           >

@@ -58,7 +58,8 @@ export default ({ showHideButton }: { showHideButton?: boolean }) => {
           </>
         ) : (
           <>
-            {!uiStore.insightLoop && <ProjectDropdown />}
+            {insightLoop && <div className="text-blue-600 font-bold p-3">InsightLoop</div>}
+            <ProjectDropdown />
             <Links />
             <Projects />
           </>
@@ -87,9 +88,7 @@ function Links() {
 
   return (
     <nav className="px-2 space-y-1">
-      {insightLoop ? (
-        <div className="text-blue-600 font-bold py-3">InsightLoop</div>
-      ) : (
+      {!insightLoop && (
         <div className="flex-1 flex">
           <form
             className="w-full flex md:ml-0 bg-white/80 rounded-md px-2 mt-2 mb-4 border hover:ring"

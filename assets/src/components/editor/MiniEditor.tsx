@@ -104,9 +104,6 @@ const useEditor = (id: string | undefined, initialContent: any) => {
       logger.error('error loading', e, initialContent)
     }
 
-    const isToday = location.pathname.startsWith(paths.TODAY)
-
-    const user = authStore.loggedInUser.get()!
     const editor = (prevEditor.current = new Editor({
       extensions: [
         StarterKit.configure({
