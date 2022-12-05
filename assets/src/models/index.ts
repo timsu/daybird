@@ -1,6 +1,7 @@
 export * from './daily_note'
 export * from './doc'
 export * from './file'
+export * from './insight'
 export * from './oauth_token'
 export * from './project'
 export * from './task'
