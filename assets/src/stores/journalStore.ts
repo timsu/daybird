@@ -54,7 +54,7 @@ class JournalStore {
     const response = await API.saveNote(project, date, contents, snippet)
     const note = DailyNote.fromJSON(response.note, project.id)
     const notes = this.notes.get() || {}
-    this.notes.set({ ...notes, [note.id]: note })
+    this.notes.set({ ...notes, [note.date]: note })
     return note
   }
 }

@@ -62,7 +62,7 @@ export default (props: Props) => {
 
   return (
     <div class={classNames(props.className, 'overflow-y-scroll print:max-w-none print:p-0')}>
-      <div ref={editorRef} class="mt-4 h-full" />
+      <div ref={editorRef} class="h-full" />
     </div>
   )
 }
@@ -176,7 +176,9 @@ function useAutosave(
     docStore.dirty.set(false)
 
     const save = () => {
-      const snippet = editor.getText().substring(0, 99).trim()
+      const text = editor.getText()
+      let snippet = text.substring(0, 96).trim()
+      if (text.length > 96) snippet = snippet + '...'
       saveContents(project, id!, Y.encodeStateAsUpdate(ydoc), snippet)
     }
 
