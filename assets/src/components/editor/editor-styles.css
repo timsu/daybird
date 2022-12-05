@@ -4,10 +4,13 @@
     @apply shadow-none ring-0 border-0 outline-none;
 }
 
+.doc .ProseMirror {
+  margin-bottom: 200px;
+}
+
 .ProseMirror {
   height: 100%;
   line-height: 170%;
-  margin-bottom: 200px;
   word-break: break-word;
   min-width: 300px;
 

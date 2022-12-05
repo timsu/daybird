@@ -391,6 +391,33 @@ class APIService {
     return response.data
   }
 
+  // notes
+
+  async listNotes(project: Project, start: string, end: string): Promise<R.NotesResponse> {
+    const response = await this.axios.get(
+      `${this.endpoint}/daily_notes?project_id=${project.id}&start=${start}&end=${end}`
+    )
+    return response.data
+  }
+
+  async saveNote(
+    project: Project,
+    date: string,
+    contents: any,
+    snippet: string,
+    id?: string
+  ): Promise<R.NoteResponse> {
+    const response = await this.axios.post(
+      `${this.endpoint}/daily_notes/${date}?project_id=${project.id}`,
+      {
+        contents,
+        snippet,
+        id,
+      }
+    )
+    return response.data
+  }
+
   // misc
 
   async githash(): Promise<{ hash: string }> {

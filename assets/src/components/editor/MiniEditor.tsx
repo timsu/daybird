@@ -45,20 +45,13 @@ type Props = {
   project: Project
   id?: string
   contents?: any
-  saveContents: (project: Project, id: string, contents: any) => void
+  className?: string
+  saveContents: (project: Project, id: string, contents: any, snippet: string) => void
 }
 
 const SAVE_INTERVAL = 5_000
 
-const PLACEHOLDER_TODAY =
-  "What's important today?\n\nStart typing to create a note.\n\n" +
-  'Type "/" to insert a task or add formatting.\n\n' +
-  'Have fun!'
-
-const PLACEHOLDER_DOC =
-  'Start typing to create a note.\n\n' +
-  'Type "/" to insert a task or add formatting.\n\n' +
-  'Have fun!'
+const PLACEHOLDER = "What's on your mind?"
 
 export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
@@ -66,13 +59,10 @@ export default (props: Props) => {
   const { id, contents } = props
   const { editor, ydoc } = useEditor(props.project?.id + '/' + id, contents)
   useAutosave(props, editor, ydoc, editorRef)
-  useDeleteTaskListener(editor)
 
   return (
-    <div
-      class={classNames('max-w-2xl mx-auto w-full h-auto grow pb-20', 'print:max-w-none print:p-0')}
-    >
-      <div ref={editorRef} class="mt-4 h-full doc" />
+    <div class={classNames(props.className, 'overflow-y-scroll print:max-w-none print:p-0')}>
+      <div ref={editorRef} class="mt-4 h-full" />
     </div>
   )
 }
@@ -114,8 +104,6 @@ const useEditor = (id: string | undefined, initialContent: any) => {
       logger.error('error loading', e, initialContent)
     }
 
-    const provider = new WebrtcProvider(id, ydoc)
-
     const isToday = location.pathname.startsWith(paths.TODAY)
 
     const user = authStore.loggedInUser.get()!
@@ -127,7 +115,6 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           horizontalRule: false,
         }),
         HorizontalRule,
-        LegacyTaskItem,
         TaskItem.configure({
           nested: true,
         }),
@@ -143,19 +130,12 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           linkOnPaste: true,
         }),
         Placeholder.configure({
-          placeholder: isToday ? PLACEHOLDER_TODAY : PLACEHOLDER_DOC,
+          placeholder: PLACEHOLDER,
         }),
         SlashExtension,
         ExistingTasksExtension,
         Collaboration.configure({
           document: ydoc,
-        }),
-        CollaborationCursor.configure({
-          provider: provider,
-          user: {
-            name: user.name,
-            color: lightColorFor(user.id),
-          },
         }),
       ],
     }))
@@ -165,9 +145,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
     }
 
     setTimeout(() => {
-      if (modalStore.onboardingModal.get()) return
       editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run()
-      if (isToday) checkForDueTasks(editor)
     }, 50)
 
     return { editor, ydoc }
@@ -196,6 +174,12 @@ function useAutosave(
 
     currentFile.current = id
     docStore.dirty.set(false)
+
+    const save = () => {
+      const snippet = editor.getText().substring(0, 99).trim()
+      saveContents(project, id!, Y.encodeStateAsUpdate(ydoc), snippet)
+    }
+
     const textChangeHandler = ({
       editor,
       transaction,
@@ -212,7 +196,7 @@ function useAutosave(
         'save-' + id,
         () => {
           if (id != currentFile.current) return
-          saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+          save()
           docStore.dirty.set(false)
         },
         SAVE_INTERVAL,
@@ -221,83 +205,13 @@ function useAutosave(
     }
     editor.on('update', textChangeHandler)
     window.onbeforeunload = () => {
-      if (docStore.dirty.get()) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+      if (docStore.dirty.get()) save()
     }
 
     return () => {
       editor.off('update', textChangeHandler)
-      if (docStore.dirty.get()) saveContents(project, id!, Y.encodeStateAsUpdate(ydoc))
+      if (docStore.dirty.get()) save()
       window.onbeforeunload = null
     }
   }, [editor])
-}
-
-// hook to look for deleted tasks and remove from the document
-function useDeleteTaskListener(editor: Editor | null) {
-  useEffect(() => {
-    const off = taskStore.deletedTask.listen((task) => {
-      if (!task || !editor) return
-      // remove all references to this item in the quill document
-      const element = document.getElementById('task-' + task.id)
-      if (!element) return
-
-      const pos = editor.view.posAtDOM(element, 0)
-      if (!pos) return
-
-      const node = editor.state.doc.nodeAt(pos)
-      const size = node?.nodeSize || 1
-
-      editor
-        .chain()
-        .deleteRange({ from: pos - 1, to: pos + size + 1 })
-        .focus()
-        .run()
-    })
-    return off
-  }, [editor])
-}
-
-function checkForDueTasks(editor: Editor) {
-  const date = uiStore.calendarDate.get()
-  const threshold = endOfDay(date)
-
-  const today = new Date()
-  if (isBefore(threshold, today)) {
-    return
-  }
-
-  const projectId = projectStore.currentProject.get()!.id
-  const tasks = taskStore.taskLists
-    .get()
-    [projectId].filter((t) => t.due_at && !t.deleted_at && !t.completed_at)
-    .filter((t) => isBefore(new Date(t.due_at!), threshold))
-
-  logger.debug('[today] relevant tasks', tasks, threshold)
-  if (!tasks.length) return
-
-  const doc = editor.state.doc
-  const existing = new Set<string>()
-  doc.descendants((node, pos) => {
-    if (node.type.name == 'task' || node.type.name == 'taskItem') {
-      const id = node.attrs.id
-      existing.add(id)
-    }
-  })
-
-  const notInDoc = tasks.filter((t) => !existing.has(t.id))
-  logger.info('due tasks found', notInDoc)
-  if (notInDoc.length == 0) return
-
-  const content = tasks.map((t) => taskStore.taskItemForTask(t))
-  const wrapper = [
-    {
-      type: 'taskList',
-      content,
-    },
-    { type: 'paragraph' },
-  ]
-
-  autoAddingTasks = true
-  editor.commands.insertContent(wrapper)
-  autoAddingTasks = false
 }

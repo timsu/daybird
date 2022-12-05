@@ -8,6 +8,15 @@ defmodule Sequence.Journal do
 
   alias Sequence.Journal.DailyNote
 
+  def get_daily_notes(project_id, start_date, end_date) do
+    Repo.all(from n in DailyNote, where: n.project_id == ^project_id and n.date >= ^start_date and
+      n.date <= ^end_date, limit: 31)
+  end
+
+  def get_daily_note(project_id, date) do
+    Repo.one(from n in DailyNote, where: n.project_id == ^project_id and n.date == ^date)
+  end
+
   @doc """
   Returns the list of daily_notes.
 

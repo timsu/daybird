@@ -105,6 +105,9 @@ defmodule SequenceWeb.Router do
     get "/doc", DocsController, :get_doc
     post "/doc", DocsController, :save_doc
 
+    get "/daily_notes", JournalController, :list_notes
+    post "/daily_notes/:date", JournalController, :save_note
+
     resources "/teams", TeamsController
 
     get "/domain_info", TeamsController, :domain_info

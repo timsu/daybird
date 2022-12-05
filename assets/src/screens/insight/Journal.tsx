@@ -1,8 +1,15 @@
 import { format, subDays } from 'date-fns'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
+import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
+import Loader from '@/components/core/Loader'
+import DailyNote from '@/components/editor/DailyNote'
+import MiniEditor from '@/components/editor/MiniEditor'
 import AppHeader from '@/components/layout/AppHeader'
+import { journalStore } from '@/stores/journalStore'
+import { projectStore } from '@/stores/projectStore'
+import { useStore } from '@nanostores/preact'
 
 type Props = {
   path: string
@@ -29,10 +36,21 @@ export default (props: Props) => {
 }
 
 function JournalDays() {
-  const [dayCount, setDayCount] = useState(14)
+  const project = useStore(projectStore.currentProject)
+  const notes = useStore(journalStore.notes)
+  const [dayCount, setDayCount] = useState(7)
 
   const days = Array(dayCount).fill(0)
   const today = new Date()
+
+  useEffect(() => {
+    if (!project) return
+    const start = format(subDays(today, dayCount), 'yyyy-MM-dd')
+    const end = format(today, 'yyyy-MM-dd')
+    journalStore.loadNotes(project, start, end)
+  }, [project])
+
+  if (!project || !notes) return <Loader class="mx-auto" />
 
   return (
     <>
@@ -42,6 +60,7 @@ function JournalDays() {
         const dayName = format(date, 'EEEE')
         const localeDate = format(date, 'P')
         const isToday = d == 0
+        const note = notes[title]
 
         return (
           <div class="border-b p-4">
@@ -52,10 +71,24 @@ function JournalDays() {
               </div>
               <div class="opacity-50">{localeDate}</div>
             </div>
-            <div class="opacity-50 italic">No journal entry for this day</div>
+            {isToday ? (
+              <DailyNote date={title} id={note?.id} project={project} />
+            ) : note ? (
+              <div class="border-l-2 border-blue-600 pl-2">{note.snippet}</div>
+            ) : (
+              <div class="opacity-50 italic">No journal entry for this day</div>
+            )}
           </div>
         )
       })}
+
+      <div class="pt-10">
+        <Button onClick={() => {}}>Previous week</Button>
+      </div>
     </>
   )
+}
+
+const Today = () => {
+  return
 }

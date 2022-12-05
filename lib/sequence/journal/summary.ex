@@ -21,7 +21,7 @@ defmodule Sequence.Journal.Summary do
     summary
     |> cast(attrs, [:date, :snippet, :type, :uuid, :creator_id, :project_id])
     |> Repo.generate_uuid
-    |> validate_required([:date, :uuid, :type, :creator_id, :project_id])
+    |> validate_required([:date, :uuid, :type, :creator_id])
     |> Repo.truncate(:snippet, 100)
     |> unique_constraint(:uuid)
   end
