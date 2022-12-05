@@ -14,6 +14,7 @@ export default () => {
   const user = useStore(authStore.loggedInUser)
 
   useEffect(() => {
+    uiStore.insightLoop = true
     if (user === undefined) authStore.init()
     else if (user === null) location.href = paths.SIGNIN
     else {

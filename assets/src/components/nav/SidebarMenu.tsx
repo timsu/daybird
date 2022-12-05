@@ -1,13 +1,10 @@
 import { Fragment } from 'preact'
 
-import FileContextMenu from '@/components/menus/FileContextMenu'
 import AppSidebar, { SidebarModals } from '@/components/nav/AppSidebar'
 import { uiStore } from '@/stores/uiStore'
 import { Dialog, Transition } from '@headlessui/react'
 import { XIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
-
-import { SidebarProps } from '../layout/AppLayout'
 
 export function SidebarMenu() {
   const sidebarOpen = useStore(uiStore.sidebarMenuOpen)

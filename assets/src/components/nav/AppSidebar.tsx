@@ -21,7 +21,10 @@ import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
 import { classNames, ctrlOrCommand } from '@/utils'
 import { isMobile } from '@/utils/os'
-import { CalendarIcon, CheckIcon, HomeIcon, SearchIcon } from '@heroicons/react/outline'
+import {
+    CalendarIcon, ChartBarIcon, CheckIcon, HomeIcon, LightBulbIcon, PencilIcon,
+    PresentationChartLineIcon, SearchIcon
+} from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 type NavItem = {
@@ -34,13 +37,16 @@ type NavItem = {
 export default ({ showHideButton }: { showHideButton?: boolean }) => {
   const projects = useStore(projectStore.activeProjects)
   const date = useStore(uiStore.calendarDate)
+  const insightLoop = uiStore.insightLoop
 
   // generate two random colors from today's date
   const gradientColor1 = uniqolor(format(date, 'd MMMM EEEE'), { lightness: [85, 97] }).color
   const gradientColor2 = uniqolor(format(date, 'EEEE M<MM d'), { lightness: [85, 97] }).color
 
   const style = {
-    background: `linear-gradient(320deg, ${gradientColor1} 0%, ${gradientColor2} 100%)`,
+    background: insightLoop
+      ? '#fafafa'
+      : `linear-gradient(320deg, ${gradientColor1} 0%, ${gradientColor2} 100%)`,
   }
 
   return (
@@ -52,7 +58,7 @@ export default ({ showHideButton }: { showHideButton?: boolean }) => {
           </>
         ) : (
           <>
-            <ProjectDropdown />
+            {!uiStore.insightLoop && <ProjectDropdown />}
             <Links />
             <Projects />
           </>
@@ -63,41 +69,52 @@ export default ({ showHideButton }: { showHideButton?: boolean }) => {
 }
 
 function Links() {
-  let navigation: NavItem[] = [
-    { name: 'Today', href: paths.TODAY, icon: HomeIcon },
-    {
-      name: 'All Tasks',
-      href: paths.TASKS + '/' + projectStore.currentProject.get()?.id,
-      icon: CheckIcon,
-    },
-  ].filter(Boolean) as NavItem[]
+  const insightLoop = uiStore.insightLoop
+  let navigation: NavItem[] = insightLoop
+    ? [
+        { name: 'Journal', href: paths.JOURNAL, icon: PencilIcon },
+        { name: 'Insights', href: paths.INSIGHTS, icon: LightBulbIcon },
+        { name: 'Stats', href: paths.STATS, icon: ChartBarIcon },
+      ]
+    : [
+        { name: 'Today', href: paths.TODAY, icon: HomeIcon },
+        {
+          name: 'All Tasks',
+          href: paths.TASKS + '/' + projectStore.currentProject.get()?.id,
+          icon: CheckIcon,
+        },
+      ]
 
   return (
     <nav className="px-2 space-y-1">
-      <div className="flex-1 flex">
-        <form
-          className="w-full flex md:ml-0 bg-white/80 rounded-md px-2 mt-2 mb-4 border hover:ring"
-          action="#"
-          method="GET"
-        >
-          <label htmlFor="search-field" className="sr-only">
-            Navigate
-          </label>
-          <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-            <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-              <SearchIcon className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div
-              className="w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-500
+      {insightLoop ? (
+        <div className="text-blue-600 font-bold py-3">InsightLoop</div>
+      ) : (
+        <div className="flex-1 flex">
+          <form
+            className="w-full flex md:ml-0 bg-white/80 rounded-md px-2 mt-2 mb-4 border hover:ring"
+            action="#"
+            method="GET"
+          >
+            <label htmlFor="search-field" className="sr-only">
+              Navigate
+            </label>
+            <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+              <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+                <SearchIcon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div
+                className="w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-500
                 focus:outline-none focus:placeholder-gray-400 focus:ring-0
                 focus:border-transparent sm:text-sm cursor-pointer flex items-center"
-              onClick={() => modalStore.quickFindModal.set(true)}
-            >
-              Navigate {!isMobile && `(${ctrlOrCommand()}+P)`}
+                onClick={() => modalStore.quickFindModal.set(true)}
+              >
+                Navigate {!isMobile && `(${ctrlOrCommand()}+P)`}
+              </div>
             </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      )}
       {navigation.map((item) => (
         <Match path={item.href}>
           {({ matches, url }: { matches: boolean; url: string }) => (

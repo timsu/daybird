@@ -32,6 +32,8 @@ class UIStore {
 
   isPWA = window.matchMedia('(display-mode: standalone)').matches
 
+  insightLoop = false
+
   path = atom<string>()
   prevPaths = atom<string[]>([])
 

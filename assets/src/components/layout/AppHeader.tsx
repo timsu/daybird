@@ -54,18 +54,20 @@ export default function AppHeader(p: RenderableProps<Props>) {
           <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
         </button>
       )}
-      {prevPaths.length > 0 && (
+      {prevPaths.length > 0 ? (
         <button
           type="button"
-          className="text-gray-400 ml-4 md:block hover:bg-gray-100 rounded-md"
+          className="text-gray-400 ml-1 md:block hover:bg-gray-100 rounded-md"
           onClick={() => uiStore.goBack()}
           title="Previous Page"
         >
           <ChevronLeftIcon className="h-6 w-6" aria-hidden="true" />
         </button>
+      ) : (
+        <div class="w-8" />
       )}
 
-      <div className="flex-1 sm:px-4 flex justify-between select-none pt-1 overflow-hidden">
+      <div className="flex-1 sm:px-2 flex justify-between select-none pt-1 overflow-hidden">
         {p.children}
       </div>
       <div className="mr-4 flex items-center">

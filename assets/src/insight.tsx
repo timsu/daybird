@@ -1,7 +1,8 @@
-import { render } from 'preact'
-import App from './screens/app/App'
-
 import '@/styles/index.css'
 import 'vite/modulepreload-polyfill'
 
-render(<App />, document.getElementById('app')!)
+import { render } from 'preact'
+
+import Insight from '@/screens/insight/Insight'
+
+render(<Insight />, document.getElementById('app')!)
