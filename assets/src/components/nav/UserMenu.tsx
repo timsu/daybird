@@ -26,6 +26,9 @@ const userNavigation = [
     onClick: toggleFocusMode,
   },
   { name: 'User Settings', href: paths.SETTINGS },
+  uiStore.insightLoop
+    ? { name: 'Switch to Daybird', href: paths.TODAY }
+    : { name: 'Try InsightLoop', href: paths.JOURNAL },
   uiStore.isPWA ? null : { name: 'Install Daybird App', onClick: () => uiStore.installAction() },
   {
     name: 'Keyboard Shortcuts',
