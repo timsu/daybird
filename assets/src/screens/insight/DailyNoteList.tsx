@@ -1,11 +1,17 @@
-import { add, format, isAfter, isBefore, isSameWeek, parse, startOfDay, sub } from 'date-fns'
+import {
+    add, differenceInDays, format, isAfter, isBefore, isSameWeek, parse, startOfDay, sub
+} from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
 import { v4 as uuid } from 'uuid'
 
+import { API } from '@/api'
 import Button from '@/components/core/Button'
 import Loader from '@/components/core/Loader'
 import DailyNoteEditor from '@/components/editor/DailyNoteEditor'
-import { DailyNote, dateToPeriodDateString, endOfDatePeriod, Period, Project } from '@/models'
+import ReadOnlyEditor from '@/components/editor/ReadOnlyEditor'
+import {
+    DailyNote, dateToPeriodDateString, endOfDatePeriod, Period, periodFormatString, Project
+} from '@/models'
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
 import { logger, toTitleCase } from '@/utils'
@@ -56,12 +62,7 @@ export default function ({ period }: { period: Period }) {
       {entries.map((_, i) => {
         const partialDate = sub(endDate, iteration(i))
         const date = endOfDatePeriod(period, partialDate)
-        const title =
-          period == Period.DAY
-            ? isSameWeek(date, today)
-              ? format(date, 'EEEE')
-              : format(date, 'EEEE, MMMM do')
-            : toTitleCase(period) + ' ending ' + format(date, 'P')
+        const title = dateTitle(period, date, today)
         const isThisPeriod = isBefore(today, date) && isAfter(today, sub(date, iteration(1)))
         const dateString = dateToPeriodDateString(period, date)
         const note: DailyNote | undefined = notes[dateString]
@@ -77,7 +78,15 @@ export default function ({ period }: { period: Period }) {
             </div>
 
             {editingDate == dateString ? (
-              <InsightEditor period={period} date={dateString} project={project} note={note} />
+              <InsightEditor
+                period={period}
+                date={dateString}
+                project={project}
+                note={note}
+                startDate={sub(date, iteration(1))}
+                endDate={date}
+                doneEditing={() => setEditingDate(undefined)}
+              />
             ) : (
               <div class="group relative cursor-pointer" onClick={() => setEditingDate(dateString)}>
                 <div class="group-hover:visible invisible absolute -left-6 top-1">
@@ -115,16 +124,67 @@ export default function ({ period }: { period: Period }) {
   )
 }
 
+const dateTitle = (period: Period, date: Date, today: Date) =>
+  period == Period.DAY
+    ? Math.abs(differenceInDays(date, today)) < 6
+      ? format(date, 'EEEE')
+      : format(date, 'EEEE, MMMM do')
+    : toTitleCase(period) + ' ending ' + format(date, 'P')
+
 const InsightEditor = ({
   project,
   period,
   date,
   note,
+  startDate,
+  endDate,
+  doneEditing,
 }: {
   project: Project
   period: Period
   date: string
   note?: DailyNote
+  startDate: Date
+  endDate: Date
+  doneEditing: () => void
 }) => {
-  return <DailyNoteEditor date={date} id={note?.id || uuid()} project={project} type={period} />
+  if (period == Period.DAY)
+    return (
+      <div>
+        <DailyNoteEditor date={date} id={note?.id || uuid()} project={project} type={period} />
+        <Button onClick={doneEditing}>Done</Button>
+      </div>
+    )
+
+  const [reviewNotes, setReviewNotes] = useState<DailyNote[]>([])
+  const reviewPeriod =
+    period == Period.WEEK ? Period.DAY : period == Period.MONTH ? Period.WEEK : Period.MONTH
+  useEffect(() => {
+    const start = dateToPeriodDateString(reviewPeriod, add(startDate, { days: 1 }))
+    const end = dateToPeriodDateString(reviewPeriod, endDate)
+    API.listNotes(project, reviewPeriod, start, end).then((r) => setReviewNotes(r.notes))
+  }, [period, date])
+
+  return (
+    <div>
+      {reviewNotes.length > 0 && (
+        <div class="my-2">
+          {reviewNotes.map((note) => (
+            <div class="my-2 border-l-2 border-blue-400 pl-2">
+              <div class="font-bold">
+                {dateTitle(
+                  reviewPeriod,
+                  parse(note.date, periodFormatString(reviewPeriod), endDate),
+                  new Date()
+                )}
+              </div>
+              <ReadOnlyEditor project={project} id={note.id} />
+            </div>
+          ))}
+        </div>
+      )}
+      <DailyNoteEditor date={date} id={note?.id || uuid()} project={project} type={period} />
+      <Button onClick={doneEditing}>Done</Button>
+    </div>
+  )
 }

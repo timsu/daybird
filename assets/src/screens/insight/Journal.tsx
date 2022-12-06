@@ -20,7 +20,7 @@ export default (props: Props) => {
         </div>
       </AppHeader>
 
-      <div class="flex flex-col grow w-full px-6 max-w-2xl">
+      <div class="flex flex-col grow w-full px-6 max-w-4xl">
         <DailyNoteList period={Period.DAY} />
       </div>
     </>

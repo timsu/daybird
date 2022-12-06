@@ -1,11 +1,9 @@
 import './editor-styles.css'
 
 import { decode } from 'base64-arraybuffer'
-import { endOfDay, isBefore } from 'date-fns'
 import { MutableRef, useEffect, useMemo, useRef } from 'preact/hooks'
 import { Transaction } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
-import { WebrtcProvider } from 'y-webrtc'
 import * as Y from 'yjs'
 
 import { HorizontalRule } from '@/components/editor/HorizontalRule'
@@ -18,19 +16,11 @@ import { Video } from '@/components/editor/Video'
 import { WikiLink } from '@/components/editor/WikiLink'
 import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension'
 import SlashExtension from '@/components/slashmenu/SlashExtension'
-import { paths } from '@/config'
 import { Project } from '@/models'
-import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
-import { modalStore } from '@/stores/modalStore'
-import { projectStore } from '@/stores/projectStore'
-import { taskStore } from '@/stores/taskStore'
-import { uiStore } from '@/stores/uiStore'
 import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
-import { useStore } from '@nanostores/preact'
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
-import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import Focus from '@tiptap/extension-focus'
 import Placeholder from '@tiptap/extension-placeholder'
 import StarterKit from '@tiptap/starter-kit'
@@ -46,30 +36,34 @@ type Props = {
   id?: string
   contents?: any
   className?: string
-  saveContents: (project: Project, id: string, contents: any, snippet: string) => void
+  readOnly?: boolean
+  placeholder?: string
+  saveContents?: (project: Project, id: string, contents: any, snippet: string) => void
 }
 
 const SAVE_INTERVAL = 5_000
 
-const PLACEHOLDER = "What's on your mind?"
-
 export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
 
-  const { id, contents } = props
-  const { editor, ydoc } = useEditor(props.project?.id + '/' + id, contents)
+  const { id, contents, placeholder, readOnly } = props
+
+  const { editor, ydoc } = useEditor(props.project?.id + '/' + id, contents, placeholder, !readOnly)
   useAutosave(props, editor, ydoc, editorRef)
 
   return (
-    <div class={classNames(props.className, 'overflow-y-scroll print:max-w-none print:p-0')}>
-      <div ref={editorRef} class="h-full" />
-    </div>
+    <div ref={editorRef} class={classNames(props.className, 'print:max-w-none print:p-0')}></div>
   )
 }
 
 // hook to initialize the editor
 
-const useEditor = (id: string | undefined, initialContent: any) => {
+const useEditor = (
+  id: string | undefined,
+  initialContent: any,
+  placeholder: string | undefined,
+  editable: boolean
+) => {
   const prevEditor = useRef<Editor>()
   const prevDoc = useRef<Y.Doc>()
 
@@ -127,7 +121,7 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           linkOnPaste: true,
         }),
         Placeholder.configure({
-          placeholder: PLACEHOLDER,
+          placeholder,
         }),
         SlashExtension,
         ExistingTasksExtension,
@@ -135,22 +129,24 @@ const useEditor = (id: string | undefined, initialContent: any) => {
           document: ydoc,
         }),
       ],
+      editable,
     }))
 
     if (contentType == 'json') {
       setTimeout(() => editor.commands.setContent(initialContent), 0)
     }
 
-    setTimeout(() => {
-      editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run()
-    }, 50)
+    if (editable) {
+      setTimeout(() => {
+        editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run()
+      }, 50)
+    }
 
     return { editor, ydoc }
   }, [id, initialContent])
 }
 
 // hook to autosave when doc is modified
-let autoAddingTasks = false
 function useAutosave(
   props: Props,
   editor: Editor | null,
@@ -165,9 +161,11 @@ function useAutosave(
 
     window.editor = editor
     if (editorRef.current && !editorRef.current.children.length) {
-      const proseMirror = editor.options.element.querySelector('.ProseMirror')
+      const proseMirror = editor.options.element?.querySelector('.ProseMirror')
       editorRef.current.appendChild(proseMirror!)
     }
+
+    if (!saveContents) return
 
     currentFile.current = id
     docStore.dirty.set(false)
@@ -188,7 +186,6 @@ function useAutosave(
     }) => {
       // ignore non-local changes
       if (transaction && isChangeOrigin(transaction)) return
-      if (autoAddingTasks) return
 
       docStore.dirty.set(true)
       debounce(

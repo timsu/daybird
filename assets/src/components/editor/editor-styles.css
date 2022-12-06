@@ -5,11 +5,12 @@
 }
 
 .doc .ProseMirror {
+  height: 100%;
   margin-bottom: 200px;
 }
 
 .ProseMirror {
-  height: 100%;
+  margin-bottom: 20px;
   line-height: 170%;
   word-break: break-word;
   min-width: 300px;

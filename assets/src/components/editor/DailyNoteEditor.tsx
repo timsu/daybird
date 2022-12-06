@@ -36,13 +36,16 @@ export default ({ project, date, id, type }: Props) => {
       </div>
     )
 
+  const placeholder = type == Period.DAY ? "What's on your mind?" : 'Your insights looking back...'
+
   return (
     <MiniEditor
-      className="h-1 min-h-[14rem]"
+      className="min-h-[14rem]"
       project={project}
       id={doc.id}
       contents={doc.contents}
       saveContents={saveContents}
+      placeholder={placeholder}
     />
   )
 }
