@@ -61,7 +61,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install lcov and openssl
-      run: sudo apt-get install -y lcov openssl
+      run: sudo apt-get install -y lcov openssl libtinfo5
     - name: Setup elixir
       uses: actions/setup-elixir@v1
       with:
