@@ -35,7 +35,8 @@ export default function () {
   if (!calendarOpen) return null
 
   const onSelectDate = (d: Date) => {
-    route(paths.TODAY + '?d=' + format(d, 'yyyy-MM-dd'))
+    if (uiStore.insightLoop) route(paths.JOURNAL + '?d=' + format(d, 'yyyy-MM-dd'))
+    else route(paths.TODAY + '?d=' + format(d, 'yyyy-MM-dd'))
   }
 
   return (
