@@ -11,7 +11,7 @@ defmodule SequenceWeb.PageController do
   end
 
   def insight(conn, _params) do
-    render conn, "app.html", entry: "insight"
+    render conn, "app.html", pwa: "/pwa-insight.json", entry: "insight", title: "InsightLoop"
   end
 
   def auth(conn, _params) do
