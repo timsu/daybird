@@ -84,7 +84,6 @@ class AuthStore {
     const response = await API.createAccount(name, email, password)
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
-
     this.postAuth()
   }
 
@@ -94,13 +93,14 @@ class AuthStore {
     const response = await API.logInElseSignUpOAuth(provider, token)
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
-    location.href = paths.TODAY
+    this.postAuth()
   }
 
   signIn = async (email: string, password: string) => {
     const response = await API.signIn(email, password)
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
+    this.postAuth()
   }
 
   postAuth = () => {
