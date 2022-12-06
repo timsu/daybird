@@ -1,4 +1,4 @@
-import { endOfMonth, endOfWeek, endOfYear } from 'date-fns'
+import { endOfDay, endOfMonth, endOfWeek, endOfYear, format } from 'date-fns'
 
 import { weekStartLocale } from '@/utils'
 
@@ -39,6 +39,22 @@ export function endOfDatePeriod(period: Period, date: Date) {
       return endOfMonth(date)
     case Period.YEAR:
       return endOfYear(date)
+    case Period.DAY:
+    default:
+      return endOfDay(date)
   }
-  return date
+}
+
+export function dateToPeriodDateString(period: Period, date: Date) {
+  switch (period) {
+    case Period.WEEK:
+      return format(date, 'RRRR--II')
+    case Period.MONTH:
+      return format(date, 'YYYY-MM')
+    case Period.YEAR:
+      return format(date, 'YYYY')
+    case Period.DAY:
+    default:
+      return format(date, 'yyyy-MM-dd')
+  }
 }
