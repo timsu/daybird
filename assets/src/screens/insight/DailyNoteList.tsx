@@ -95,7 +95,9 @@ export default function ({ period }: { period: Period }) {
                 {note ? (
                   <div class="border-l-2 border-blue-400 pl-2">{note.snippet}</div>
                 ) : (
-                  <div class="opacity-50 italic">No insight yet</div>
+                  <div class="opacity-50 italic">
+                    {period == Period.DAY ? 'No journal entry for this day' : 'No insight yet'}
+                  </div>
                 )}
               </div>
             )}
