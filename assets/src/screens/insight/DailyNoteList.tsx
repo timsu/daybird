@@ -1,5 +1,5 @@
 import {
-    add, differenceInDays, format, isAfter, isBefore, isSameWeek, parse, startOfDay, sub
+    add, differenceInDays, format, isAfter, isBefore, isSameWeek, isSameYear, parse, startOfDay, sub
 } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
 import { v4 as uuid } from 'uuid'
@@ -129,6 +129,12 @@ const dateTitle = (period: Period, date: Date, today: Date) =>
     ? Math.abs(differenceInDays(date, today)) < 6
       ? format(date, 'EEEE')
       : format(date, 'EEEE, MMMM do')
+    : period == Period.MONTH
+    ? isSameYear(date, today)
+      ? format(date, 'MMMM')
+      : format(date, 'MMMM yyyy')
+    : period == Period.YEAR
+    ? format(date, 'yyyy')
     : toTitleCase(period) + ' ending ' + format(date, 'P')
 
 const InsightEditor = ({

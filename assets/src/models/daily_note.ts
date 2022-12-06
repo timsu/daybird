@@ -49,9 +49,9 @@ export function periodFormatString(period: Period) {
   return period == Period.WEEK
     ? 'RRRR--II'
     : period == Period.MONTH
-    ? 'YYYY-MM'
+    ? 'yyyy-MM'
     : period == Period.YEAR
-    ? 'YYYY'
+    ? 'yyyy'
     : 'yyyy-MM-dd'
 }
 
