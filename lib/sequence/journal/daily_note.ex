@@ -9,6 +9,7 @@ defmodule Sequence.Journal.DailyNote do
     field :date, :string
     field :snippet, :string
     field :uuid, Ecto.UUID
+    field :meta, :map
 
     belongs_to :creator, User
     belongs_to :project, Project
@@ -19,7 +20,7 @@ defmodule Sequence.Journal.DailyNote do
   @doc false
   def changeset(daily_note, attrs) do
     daily_note
-    |> cast(attrs, [:type, :date, :snippet, :uuid, :creator_id, :project_id])
+    |> cast(attrs, [:type, :date, :snippet, :uuid, :creator_id, :project_id, :meta])
     |> Repo.generate_uuid
     |> validate_required([:type, :date, :uuid, :creator_id])
     |> Repo.truncate(:snippet, 100)
