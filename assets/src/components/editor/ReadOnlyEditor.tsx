@@ -14,7 +14,6 @@ export default ({ project, id }: Props) => {
     API.readFile(project, id).then(setContents)
   }, [project, id])
 
-  console.log('read only editor', id, contents)
   if (!contents === undefined) return null
 
   return (
