@@ -5,6 +5,7 @@ defmodule Sequence.Journal.DailyNote do
   alias Sequence.{Repo, Users.User, Projects.Project}
 
   schema "daily_notes" do
+    field :type, :string
     field :date, :string
     field :snippet, :string
     field :uuid, Ecto.UUID
@@ -18,9 +19,9 @@ defmodule Sequence.Journal.DailyNote do
   @doc false
   def changeset(daily_note, attrs) do
     daily_note
-    |> cast(attrs, [:date, :snippet, :uuid, :creator_id, :project_id])
+    |> cast(attrs, [:type, :date, :snippet, :uuid, :creator_id, :project_id])
     |> Repo.generate_uuid
-    |> validate_required([:date, :uuid, :creator_id])
+    |> validate_required([:type, :date, :uuid, :creator_id])
     |> Repo.truncate(:snippet, 100)
     |> unique_constraint(:uuid)
   end

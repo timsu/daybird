@@ -3,6 +3,7 @@ defmodule Sequence.Repo.Migrations.CreateDailyNotes do
 
   def change do
     create table(:daily_notes) do
+      add :type, :string, size: 5
       add :date, :string, size: 10
       add :snippet, :string, size: 150
       add :uuid, :uuid
@@ -13,6 +14,6 @@ defmodule Sequence.Repo.Migrations.CreateDailyNotes do
     end
 
     create index(:daily_notes, [:uuid])
-    create index(:daily_notes, [:project_id, :date])
+    create index(:daily_notes, [:project_id, :date, :type])
   end
 end

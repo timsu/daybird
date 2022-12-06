@@ -11,6 +11,7 @@ defmodule Sequence.JournalFixtures do
     {:ok, daily_note} =
       attrs
       |> Enum.into(%{
+        type: "type",
         date: "2022-01-01",
         snippet: "some snippet",
         project_id: 1,
@@ -21,21 +22,4 @@ defmodule Sequence.JournalFixtures do
     daily_note
   end
 
-  @doc """
-  Generate a summary.
-  """
-  def summary_fixture(attrs \\ %{}) do
-    {:ok, summary} =
-      attrs
-      |> Enum.into(%{
-        date: "2020-W05",
-        snippet: "some snippet",
-        type: "week",
-        project_id: 1,
-        creator_id: 1
-      })
-      |> Sequence.Journal.create_summary()
-
-    summary
-  end
 end
