@@ -113,7 +113,7 @@ export default () => {
         <ErrorMessage error={error} />
 
         <div className="mt-4 flex justify-center">
-          <a href={paths.SIGNIN} className="text-lavender-400 text-sm">
+          <a href={paths.SIGNIN + location.search} className="text-lavender-400 text-sm">
             Meant to sign in?
           </a>
         </div>

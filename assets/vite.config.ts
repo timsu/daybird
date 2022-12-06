@@ -60,6 +60,7 @@ export default defineConfig({
         landing: 'src/landing.tsx',
         auth: 'src/auth.tsx',
         app: 'src/app.tsx',
+        insight: 'src/insight.tsx',
       },
       output: {
         entryFileNames: 'js/[name]-[hash].js',

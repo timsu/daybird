@@ -56,7 +56,7 @@ defmodule Sequence.Projects do
     project
   end
 
-  @spec project_by_uuid(binary, binary) :: {:error, :not_found} | {:ok, Project.t()}
+  @spec project_by_uuid(User.t() | binary, binary) :: {:error, :not_found} | {:ok, Project.t()}
   def project_by_uuid(nil, _uuid), do: {:error, :not_found}
   def project_by_uuid(_user_id, nil), do: {:error, :not_found}
 

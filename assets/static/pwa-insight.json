@@ -1,0 +1,31 @@
+{
+  "name": "InsightLoop",
+  "short_name": "InsightLoop",
+  "id": "/insight?source=pwa",
+  "start_url": "/insight?source=pwa",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#f9fafb",
+  "icons": [
+    {
+      "src": "/images/icon-512.png",
+      "type": "image/png", "sizes": "512x512"
+    },
+    {
+      "src": "/images/icon-256.png",
+      "type": "image/png", "sizes": "256x256"
+    },
+    {
+      "src": "/images/icon-144.png",
+      "type": "image/png", "sizes": "144x144"
+    },
+    {
+      "src": "/images/icon-96.png",
+      "type": "image/png", "sizes": "96x96"
+    },
+    {
+      "src": "/images/icon-48.png",
+      "type": "image/png","sizes": "48x48"
+    }
+  ]
+}

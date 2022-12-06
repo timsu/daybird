@@ -36,7 +36,15 @@ class DocStore {
 
   // --- actions
 
-  loadDoc = async (project: Project, id: string) => {
+  initEmptyDoc = (title: string) => {
+    this.doc.set({
+      id: '',
+      title,
+      contents: '',
+    })
+  }
+
+  loadDoc = async (project: Project, id: string, skipLoadTitle = false) => {
     if (authStore.debugMode()) (window as any)['docStore'] = docStore
 
     const cached = this.docCache[id]
@@ -49,7 +57,7 @@ class DocStore {
     })
 
     this.fileListener?.()
-    if (!file) {
+    if (!file && !skipLoadTitle) {
       this.fileListener = fileStore.idToFile.subscribe((fileMap) => {
         const file = fileMap[id]
         const doc = this.doc.get()

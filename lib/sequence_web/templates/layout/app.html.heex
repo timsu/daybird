@@ -8,7 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Daybird"/>
     <meta name="theme-color" content="#f9fafb"/>
     <link rel="icon" href="/favicon.ico?v=2"/>
-    <link rel="manifest" href={if Sequence.dev?, do: "/pwa-local.json", else: "/pwa.json"}>
+    <link rel="manifest" href={
+      assigns[:pwa] || (if Sequence.dev?, do: "/pwa-local.json", else: "/pwa.json")}>
 
     <%
       title = if assigns[:title], do: "Daybird | #{assigns[:title]}", else: "Daybird"

@@ -18,7 +18,8 @@ defmodule SequenceWeb.Router do
       Plug.Static,
       at: "/", from: :sequence,
       gzip: true,
-      only: ~w(assets js css sounds favicon.ico robots.txt version.json pwa.json pwa-local.json serviceworker.js)
+      only: ~w(assets js css sounds favicon.ico robots.txt version.json pwa.json
+        pwa-local.json pwa-insight.json serviceworker.js)
     )
   end
 
@@ -104,6 +105,9 @@ defmodule SequenceWeb.Router do
 
     get "/doc", DocsController, :get_doc
     post "/doc", DocsController, :save_doc
+
+    get "/daily_notes", JournalController, :list_notes
+    post "/daily_notes/:date", JournalController, :save_note
 
     resources "/teams", TeamsController
 
@@ -199,6 +203,7 @@ defmodule SequenceWeb.Router do
     pipe_through :logging
 
     get "/app/*path", PageController, :app
+    get "/insight/*path", PageController, :insight
 
     get "/signup", PageController, :auth
     get "/signin", PageController, :auth

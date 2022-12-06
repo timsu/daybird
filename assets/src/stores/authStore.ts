@@ -84,8 +84,7 @@ class AuthStore {
     const response = await API.createAccount(name, email, password)
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
-
-    location.href = paths.TODAY
+    this.postAuth()
   }
 
   logInElseSignUpOAuth = async (provider: OAuthProvider, token: string) => {
@@ -94,15 +93,21 @@ class AuthStore {
     const response = await API.logInElseSignUpOAuth(provider, token)
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
-    location.href = paths.TODAY
+    this.postAuth()
   }
 
   signIn = async (email: string, password: string) => {
     const response = await API.signIn(email, password)
     const tokens = { refresh: { token: response.token! } }
     this.saveTokens(tokens)
+    this.postAuth()
+  }
 
-    location.href = paths.TODAY
+  postAuth = () => {
+    const search = new URLSearchParams(location.search)
+    const postRedirect = search.get('path') || paths.TODAY
+
+    location.href = postRedirect.match(/^\/[^\/]+/) ? postRedirect : paths.APP
   }
 
   logout = () => {

@@ -2,7 +2,7 @@ import { logger } from '@/utils/logger'
 import { isMac } from '@/utils/os'
 
 /** join class names */
-export function classNames(...classes: string[]) {
+export function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(' ')
 }
 
