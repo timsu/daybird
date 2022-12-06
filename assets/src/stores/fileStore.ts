@@ -14,6 +14,7 @@ import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
+import { uiStore } from '@/stores/uiStore'
 import { assertIsDefined, logger, unwrapError } from '@/utils'
 
 export const DOC_EXT = '.seq'
@@ -100,7 +101,7 @@ class FileStore {
     this.updateFiles(projectId, newFiles)
     this.topics[projectId]?.setSharedKey(KEY_TREECHANGE, Date.now())
 
-    if (type == FileType.DOC) route(paths.DOC + '/' + projectId + '/' + response.file.id)
+    if (type == FileType.DOC) route(this.rootPath() + '/' + projectId + '/' + response.file.id)
   }
 
   dailyFileTitle = (date?: Date) => format(date || new Date(), 'yyyy-MM-dd')
@@ -247,8 +248,8 @@ class FileStore {
       const oldFiles = (files[oldProject] || []).filter((f) => f.id != file.id)
       this.updateFiles(oldProject, oldFiles)
 
-      if (location.pathname == `${paths.DOC}/${oldProject}/${file.id}`) {
-        location.pathname = `${paths.DOC}/${newProject}/${file.id}`
+      if (location.pathname == `${this.rootPath()}/${oldProject}/${file.id}`) {
+        location.pathname = `${this.rootPath()}/${newProject}/${file.id}`
       }
     }
   }
@@ -273,7 +274,7 @@ class FileStore {
   }
 
   deleteFile = async (project: Project, file: File, archive?: boolean) => {
-    if (!location.pathname.includes(paths.DOC) && docStore.doc.get()?.id == file.id) {
+    if (!location.pathname.includes(this.rootPath()) && docStore.doc.get()?.id == file.id) {
       // special case for daily notes: just clear the document
       window.editor?.commands.clearContent(true)
       return
@@ -297,7 +298,7 @@ class FileStore {
     this.updateFiles(project.id, newFiles)
 
     if (location.pathname.includes(encodeURI(file.id))) {
-      route(paths.TODAY)
+      route(uiStore.insightLoop ? paths.JOURNAL : paths.TODAY)
     }
   }
 
@@ -369,9 +370,11 @@ class FileStore {
       }
       route(paths.TODAY + '?d=' + file.name)
     } else {
-      route(paths.DOC + '/' + file.projectId + '/' + file.id)
+      route(this.rootPath() + '/' + file.projectId + '/' + file.id)
     }
   }
+
+  rootPath = () => (uiStore.insightLoop ? paths.INSIGHT_DOC : paths.DOC)
 
   onOpenDoc = (id: string) => {
     const hasFiles = Object.keys(this.fileTree.get()).length > 0

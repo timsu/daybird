@@ -9,6 +9,7 @@ import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import {} from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames } from '@/utils'
 import { isMobile } from '@/utils/os'
 import {
@@ -116,7 +117,8 @@ type ChildProps = {
 
 function FileNode({ indent, node, projectId }: ChildProps) {
   const item = node.file
-  const href = `${paths.DOC}/${projectId}/${item.id}`
+  const rootPath = uiStore.insightLoop ? paths.INSIGHT_DOC : paths.DOC
+  const href = `${rootPath}/${projectId}/${item.id}`
 
   const onContextMenu = (target: HTMLElement) => {
     const rect = target.getBoundingClientRect()

@@ -28,4 +28,6 @@ export const paths = {
   STATS: '/insight/stats',
 
   PROFILE: '/insight/profile',
+
+  INSIGHT_DOC: '/insight/docs',
 }

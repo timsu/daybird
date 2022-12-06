@@ -14,7 +14,7 @@ export default () => (
     <Journal path={paths.JOURNAL} />
     <Insights path={paths.INSIGHTS} />
     <Stats path={paths.STATS} />
-    <DocScreen path={paths.DOC + '/:projectId/:id'} />
+    <DocScreen path={paths.INSIGHT_DOC + '/:projectId/:id'} />
     <Settings path={paths.SETTINGS} />
     <Redirect path={'/insight'} to={paths.JOURNAL} />
   </Router>
