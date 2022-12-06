@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 
 import { API } from '@/api'
 import { config } from '@/config'
-import { DailyNote, Project } from '@/models'
+import { DailyNote, Period, Project } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { unwrapError } from '@/utils'
@@ -21,14 +21,14 @@ class JournalStore {
 
   // --- actions
 
-  loadNotes = async (project: Project, start: string, end: string) => {
+  loadNotes = async (project: Project, type: Period, start: string, end: string) => {
     if (this.project?.id != project.id) {
       this.notes.set(undefined)
       this.project = project
     }
 
     try {
-      const response = await API.listNotes(project, start, end)
+      const response = await API.listNotes(project, type, start, end)
       const notes: DailyNote[] = response.notes.map((f) => DailyNote.fromJSON(f, project.id))
 
       const noteMap = this.notes.get() || {}
@@ -50,8 +50,15 @@ class JournalStore {
     }
   }
 
-  saveNote = async (project: Project, date: string, contents: any, snippet: string) => {
-    const response = await API.saveNote(project, date, contents, snippet)
+  saveNote = async (
+    project: Project,
+    type: Period,
+    date: string,
+    contents: any,
+    snippet: string,
+    id?: string
+  ) => {
+    const response = await API.saveNote(project, type, date, contents, snippet, id)
     const note = DailyNote.fromJSON(response.note, project.id)
     const notes = this.notes.get() || {}
     this.notes.set({ ...notes, [note.date]: note })

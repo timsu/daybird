@@ -5,7 +5,7 @@ defmodule SequenceWeb.JournalController do
 
   action_fallback SequenceWeb.FallbackController
 
-  alias Sequence.{Journal, Projects}
+  alias Sequence.{Journal, Projects, Utils}
 
   # GET /daily_notes
   def list_notes(conn, %{ "project_id" => project_uuid, "type" => type,
@@ -25,7 +25,8 @@ defmodule SequenceWeb.JournalController do
       {:ok, note} = case Journal.get_daily_note(project.id, type, date) do
         nil ->
           Journal.create_daily_note(%{ creator_id: user.id, project_id: project.id,
-            date: date, type: type, snippet: snippet, uuid: params["id"] })
+            date: date, type: type, snippet: snippet,
+            uuid: if(params["id"], do: Utils.uuid_to_base16(params["id"])) })
         note ->
           if note.snippet != snippet do
             Journal.update_daily_note(note, %{ snippet: snippet })

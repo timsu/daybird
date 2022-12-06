@@ -2,14 +2,16 @@ import { useEffect } from 'preact/hooks'
 
 import Loader from '@/components/core/Loader'
 import MiniEditor from '@/components/editor/MiniEditor'
-import { Project } from '@/models'
+import { Period, Project } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
 import { useStore } from '@nanostores/preact'
 
+type Props = { project: Project; date: string; id?: string; type: Period }
+
 // document is a higher-order component that manages the doc object
-export default ({ project, date, id }: { project: Project; date: string; id?: string }) => {
+export default ({ project, date, id, type }: Props) => {
   const doc = useStore(docStore.doc)
 
   useEffect(() => {
@@ -21,10 +23,8 @@ export default ({ project, date, id }: { project: Project; date: string; id?: st
   }, [project, id])
 
   const saveContents = (project: Project, id: string, contents: any, snippet: string) => {
-    if (id) docStore.saveDoc(project, id, contents)
-    journalStore.saveNote(project, date, contents, snippet).then((note) => {
-      if (!id) docStore.saveDoc(project, note.id, contents)
-    })
+    docStore.saveDoc(project, id, contents)
+    journalStore.saveNote(project, type, date, contents, snippet, id)
   }
 
   if (!project) return null

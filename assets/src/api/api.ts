@@ -3,8 +3,8 @@ import { encode } from 'base64-arraybuffer'
 
 import { config, OAuthProvider } from '@/config'
 import {
-    AuthToken, AuthTokenPair, File as LNFile, FileType, OAuthToken, Project, ProjectRole, Task,
-    Team, User
+    AuthToken, AuthTokenPair, File as LNFile, FileType, OAuthToken, Period, Project, ProjectRole,
+    Task, Team, User
 } from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
@@ -393,15 +393,21 @@ class APIService {
 
   // notes
 
-  async listNotes(project: Project, start: string, end: string): Promise<R.NotesResponse> {
+  async listNotes(
+    project: Project,
+    type: Period,
+    start: string,
+    end: string
+  ): Promise<R.NotesResponse> {
     const response = await this.axios.get(
-      `${this.endpoint}/daily_notes?project_id=${project.id}&start=${start}&end=${end}`
+      `${this.endpoint}/daily_notes?project_id=${project.id}&start=${start}&end=${end}&type=${type}`
     )
     return response.data
   }
 
   async saveNote(
     project: Project,
+    type: Period,
     date: string,
     contents: any,
     snippet: string,
@@ -410,6 +416,7 @@ class APIService {
     const response = await this.axios.post(
       `${this.endpoint}/daily_notes/${date}?project_id=${project.id}`,
       {
+        type,
         contents,
         snippet,
         id,

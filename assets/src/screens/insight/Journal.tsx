@@ -1,12 +1,13 @@
 import { addDays, format, isBefore, parse, startOfDay, subDays } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
+import { v4 as uuid } from 'uuid'
 
 import Button from '@/components/core/Button'
 import Helmet from '@/components/core/Helmet'
 import Loader from '@/components/core/Loader'
 import DailyNote from '@/components/editor/DailyNote'
-import MiniEditor from '@/components/editor/MiniEditor'
 import AppHeader from '@/components/layout/AppHeader'
+import { Period } from '@/models'
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
 import { logger } from '@/utils'
@@ -59,7 +60,7 @@ function JournalDays() {
     if (!project) return
     const start = format(subDays(endDate, dayCount), 'yyyy-MM-dd')
     const end = format(endDate, 'yyyy-MM-dd')
-    journalStore.loadNotes(project, start, end)
+    journalStore.loadNotes(project, Period.DAY, start, end)
   }, [project?.id, dateParam])
 
   if (!project || !notes) return <Loader class="mx-auto" />
@@ -84,7 +85,7 @@ function JournalDays() {
               <div class="opacity-50">{localeDate}</div>
             </div>
             {editingDate == title ? (
-              <DailyNote date={title} id={note?.id} project={project} />
+              <DailyNote date={title} id={note?.id || uuid()} project={project} type={Period.DAY} />
             ) : (
               <div class="group relative cursor-pointer" onClick={() => setEditingDate(title)}>
                 <div class="group-hover:visible invisible absolute -left-6 top-1">
