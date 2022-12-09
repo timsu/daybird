@@ -18,6 +18,7 @@ import ExistingTasksExtension from '@/components/slashmenu/ExistingTaskExtension
 import SlashExtension from '@/components/slashmenu/SlashExtension'
 import { Project } from '@/models'
 import { docStore } from '@/stores/docStore'
+import { uiStore } from '@/stores/uiStore'
 import { classNames, debounce, DebounceStyle, lightColorFor, logger } from '@/utils'
 import { Editor } from '@tiptap/core'
 import Collaboration, { isChangeOrigin } from '@tiptap/extension-collaboration'
@@ -136,7 +137,7 @@ const useEditor = (
       setTimeout(() => editor.commands.setContent(initialContent), 0)
     }
 
-    if (editable) {
+    if (editable && !uiStore.reactNative) {
       setTimeout(() => {
         editor.chain().setTextSelection(editor.state.doc.nodeSize).focus().run()
       }, 50)
