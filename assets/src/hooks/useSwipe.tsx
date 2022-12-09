@@ -1,9 +1,10 @@
 import { useEffect } from 'preact/hooks'
 
+import { uiStore } from '@/stores/uiStore'
 import { isMobile } from '@/utils/os'
 
 export default (onSwipe: (direction: 'left' | 'right') => void, el?: HTMLElement) => {
-  if (!isMobile) return
+  if (!isMobile || uiStore.reactNative) return
 
   useEffect(() => {
     el = el || document.body
