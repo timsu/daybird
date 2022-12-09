@@ -34,6 +34,8 @@ class UIStore {
 
   insightLoop = false
 
+  reactNative = location.search?.includes('?app')
+
   path = atom<string>()
   prevPaths = atom<string[]>([])
 
