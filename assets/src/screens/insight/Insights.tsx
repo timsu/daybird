@@ -30,7 +30,7 @@ export default (props: Props) => {
           {[Period.WEEK, Period.MONTH, Period.YEAR].map((p) => (
             <div
               class={classNames(
-                'w-32 p-4 border-b text-sm font-bold text-center hover:bg-gray-200 cursor-pointer',
+                'flex-1 sm:max-w-[12rem] p-4 border-b text-sm font-bold text-center hover:bg-gray-200 cursor-pointer',
                 'tracking-wide select-none',
                 p == period ? 'border-b-blue-400 text-blue-400' : ''
               )}
