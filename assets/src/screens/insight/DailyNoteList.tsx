@@ -93,7 +93,9 @@ export default function ({ period }: { period: Period }) {
                   <PencilIcon class="w-4 h-4 opacity-50" />
                 </div>
                 {note ? (
-                  <div class="border-l-2 border-blue-400 pl-2 whitespace-pre">{note.snippet}</div>
+                  <div class="border-l-2 border-blue-400 pl-2 whitespace-pre-wrap">
+                    {note.snippet}
+                  </div>
                 ) : (
                   <div class="opacity-50 italic">
                     {period == Period.DAY ? 'No journal entry for this day' : 'No insight yet'}

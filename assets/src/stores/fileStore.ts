@@ -44,8 +44,6 @@ class FileStore {
 
   expanded = map<ExpansionMap>({})
 
-  currentDocParents = atom<string[]>([])
-
   // --- actions
 
   getFilesFor = (project: Project) => {
@@ -387,15 +385,21 @@ class FileStore {
     }
 
     const parents: string[] = []
+    let projectId: string | undefined
 
     while (true) {
       const file = this.idToFile.get()[id]
+      if (!projectId) projectId = file.projectId
       parents.push(id)
       if (!file || !file.parent) break
       id = file.parent
     }
 
-    this.currentDocParents.set(parents)
+    parents.forEach((p) => {
+      const expansionKey = projectId + '/' + p
+      this.expanded.get()[expansionKey] = true
+    })
+    this.expanded.notify()
   }
 }
 
