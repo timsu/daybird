@@ -44,6 +44,8 @@ type Props = {
 
 const SAVE_INTERVAL = 5_000
 
+const SNIPPET_LENGTH = 252
+
 export default (props: Props) => {
   const editorRef = useRef<HTMLDivElement | null>(null)
 
@@ -173,8 +175,8 @@ function useAutosave(
 
     const save = () => {
       const text = editor.getText()
-      let snippet = text.substring(0, 96).trim()
-      if (text.length > 96) snippet = snippet + '...'
+      let snippet = text.substring(0, SNIPPET_LENGTH).trim()
+      if (text.length > SNIPPET_LENGTH) snippet = snippet + '...'
       saveContents(project, id!, Y.encodeStateAsUpdate(ydoc), snippet)
     }
 
