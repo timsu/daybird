@@ -37,6 +37,18 @@ export interface GEvent {
   updated: string
   colorId?: string
   description?: string
+  conferenceData?: {
+    conferenceSolution: {
+      iconUri: string
+      key: { type: string }
+      name: string
+    }
+    entryPoints: {
+      entryPointType: string
+      label: string
+      uri: string
+    }[]
+  }
   email: string
 }
 

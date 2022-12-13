@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import GoogleServerOAuth, {
     CALENDAR_SCOPES, GoogleResponse, PROFILE_SCOPES, scopesInclude
 } from '@/components/auth/GoogleServerOAuth'
+import Button from '@/components/core/Button'
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Loader from '@/components/core/Loader'
 import Pressable from '@/components/core/Pressable'
@@ -248,6 +249,18 @@ function TooltipContents({ ev }: { ev: GEvent }) {
       <div class="max-h-12 text-ellipsis overflow-hidden">
         <div>{ev.summary}</div>
       </div>
+      {ev.conferenceData && (
+        <a
+          href={ev.conferenceData.entryPoints?.[0].uri}
+          target="_blank"
+          class="my-1 bg-blue-700 p-2 rounded-md inline-flex items-center text-white text-sm font-semibold"
+        >
+          {ev.conferenceData.conferenceSolution?.iconUri && (
+            <img src={ev.conferenceData.conferenceSolution?.iconUri} class="h-4 w-4 mr-2" />
+          )}
+          {ev.conferenceData.conferenceSolution?.name}
+        </a>
+      )}
       {ev.location && (
         <div class="text-sm overflow-hidden text-ellipsis">
           <Linkify options={options}>{ev.location}</Linkify>
