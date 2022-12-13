@@ -36,6 +36,7 @@ export interface GEvent {
   created: string
   updated: string
   colorId?: string
+  description?: string
   email: string
 }
 
