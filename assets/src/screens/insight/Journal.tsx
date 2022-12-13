@@ -14,14 +14,12 @@ export default (props: Props) => {
       <Helmet title={'Daily Journal'} />
 
       <AppHeader>
-        <div class="flex flex-1 gap-2 items-center relative overflow-hidden">
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden overflow-ellipsis">
-            Daily Journal
-          </h1>
-        </div>
+        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 whitespace-nowrap overflow-hidden overflow-ellipsis">
+          Daily Journal
+        </h1>
       </AppHeader>
 
-      <div class="flex flex-col grow w-full px-6 max-w-4xl">
+      <div class="flex flex-col grow w-full px-2 sm:px-6 max-w-4xl">
         {!uiStore.insightLoop && (
           <div class="m-4 bg-yellow-100 rounded-md border-yellow-300 border p-4">
             Daily Journal is a sneak peek at an experimental new product called InsightLoop. Write a

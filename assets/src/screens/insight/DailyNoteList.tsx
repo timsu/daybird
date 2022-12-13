@@ -105,7 +105,7 @@ export default function ({ period }: { period: Period }) {
         )
       })}
 
-      <div class="pt-10 flex">
+      <div class="my-10 flex">
         <a
           href={location.pathname + '?d=' + format(sub(endDate, iteration(lookBack)), 'yyyy-MM-dd')}
         >

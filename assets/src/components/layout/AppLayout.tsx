@@ -64,7 +64,7 @@ export default function ({ children }: RenderableProps<{}>) {
         )}
       >
         <div className="flex-1 flex">
-          <main className="flex flex-1 flex-col mt-1">{children}</main>
+          <main className="flex flex-1 flex-col mt-1 overflow-x-hidden">{children}</main>
           <CalendarRail />
         </div>
 
