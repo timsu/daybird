@@ -29,6 +29,8 @@
     "copy-to-clipboard": "^3.3.2",
     "date-fns": "^2.29.3",
     "events": "^3.3.0",
+    "linkify-react": "^4.0.2",
+    "linkifyjs": "^4.0.2",
     "lodash": "^4.17.21",
     "lodash.flatten": "^4.4.0",
     "nanostores": "^0.5.12",

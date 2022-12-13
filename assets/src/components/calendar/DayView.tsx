@@ -2,6 +2,7 @@ import '@event-calendar/core/index.css'
 import './calendar.css'
 
 import { format, getHours } from 'date-fns'
+import Linkify from 'linkify-react'
 import { flatten } from 'lodash'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
@@ -231,13 +232,40 @@ function Events({ date }: Props) {
 }
 
 function TooltipContents({ ev }: { ev: GEvent }) {
+  const options = {
+    render: ({ attributes, content }: any) => {
+      const { href, ...props } = attributes
+      return (
+        <a href={href} class="text-blue-600 underline" {...props}>
+          {content}
+        </a>
+      )
+    },
+  }
+
   return (
     <>
       <div class="max-h-12 text-ellipsis overflow-hidden">
         <div>{ev.summary}</div>
       </div>
-      {ev.location && <div class="text-sm">{ev.location}</div>}
-      <div class="text-sm">{ev.calendar}</div>
+      {ev.location && (
+        <div class="text-sm overflow-hidden text-ellipsis">
+          <Linkify options={options}>{ev.location}</Linkify>
+        </div>
+      )}
+      {ev.description && (
+        <div class="text-xs max-h-[8rem] whitespace-pre-wrap rounded bg-gray-100 p-1 my-1 overflow-scroll text-ellipsis">
+          <Linkify options={options}>{ev.description || ''}</Linkify>
+        </div>
+      )}
+      <div class="flex">
+        <div class="text-sm flex-1">{ev.calendar}</div>
+        {ev.htmlLink && (
+          <a href={ev.htmlLink} target="_blank" class="text-sm text-blue-600">
+            View / Edit
+          </a>
+        )}
+      </div>
     </>
   )
 }

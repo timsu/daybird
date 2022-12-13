@@ -190,8 +190,7 @@ function FolderNode({ indent, node, projectId }: ChildProps) {
   const item = node.file
 
   const expansionKey = projectId + '/' + item.id
-  const currentDocParents = useStore(fileStore.currentDocParents)
-  const expanded = useStore(fileStore.expanded)[expansionKey] || currentDocParents.includes(item.id)
+  const expanded = useStore(fileStore.expanded)[expansionKey]
 
   const setExpanded = (setting: boolean) => {
     fileStore.setExpanded(expansionKey, setting)

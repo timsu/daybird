@@ -93,7 +93,9 @@ export default function ({ period }: { period: Period }) {
                   <PencilIcon class="w-4 h-4 opacity-50" />
                 </div>
                 {note ? (
-                  <div class="border-l-2 border-blue-400 pl-2">{note.snippet}</div>
+                  <div class="border-l-2 border-blue-400 pl-2 whitespace-pre-wrap">
+                    {note.snippet}
+                  </div>
                 ) : (
                   <div class="opacity-50 italic">
                     {period == Period.DAY ? 'No journal entry for this day' : 'No insight yet'}
@@ -105,7 +107,7 @@ export default function ({ period }: { period: Period }) {
         )
       })}
 
-      <div class="pt-10 flex">
+      <div class="my-10 flex">
         <a
           href={location.pathname + '?d=' + format(sub(endDate, iteration(lookBack)), 'yyyy-MM-dd')}
         >

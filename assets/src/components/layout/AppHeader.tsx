@@ -31,7 +31,9 @@ export default function AppHeader(p: RenderableProps<Props>) {
     return () => window.removeEventListener('scroll', listener)
   }, [hasShadow])
 
-  if (uiStore.reactNative) return null
+  if (uiStore.reactNative) {
+    return null
+  }
 
   return (
     <div

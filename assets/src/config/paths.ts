@@ -19,6 +19,10 @@ export const paths = {
 
   SETTINGS: '/app/settings',
 
+  DB_JOURNAL: '/app/journal',
+
+  DB_INSIGHTS: '/app/insights',
+
   // --- insight loop
 
   JOURNAL: '/insight/journal',
