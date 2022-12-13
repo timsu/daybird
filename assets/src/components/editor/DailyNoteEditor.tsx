@@ -36,7 +36,7 @@ export default ({ project, date, id, type }: Props) => {
       </div>
     )
 
-  const placeholder = type == Period.DAY ? "What's on your mind?" : 'Your insights looking back...'
+  const placeholder = `What was the highlight of your ${type}?`
 
   return (
     <MiniEditor

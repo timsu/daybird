@@ -23,7 +23,7 @@ defmodule Sequence.Journal.DailyNote do
     |> cast(attrs, [:type, :date, :snippet, :uuid, :creator_id, :project_id, :meta])
     |> Repo.generate_uuid
     |> validate_required([:type, :date, :uuid, :creator_id])
-    |> Repo.truncate(:snippet, 100)
+    |> Repo.truncate(:snippet, 255)
     |> unique_constraint(:uuid)
   end
 end

@@ -84,6 +84,8 @@ function Links() {
           href: paths.TASKS + '/' + projectStore.currentProject.get()?.id,
           icon: CheckIcon,
         },
+        { name: 'Journal', href: paths.DB_JOURNAL, icon: PencilIcon },
+        { name: 'Insights', href: paths.DB_INSIGHTS, icon: LightBulbIcon },
       ]
 
   return (

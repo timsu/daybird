@@ -8,6 +8,8 @@ import ProjectView from '@/screens/app/ProjectView'
 import Settings from '@/screens/app/Settings'
 import TasksList from '@/screens/app/TasksList'
 import Today from '@/screens/app/Today'
+import Insights from '@/screens/insight/Insights'
+import Journal from '@/screens/insight/Journal'
 import { uiStore } from '@/stores/uiStore'
 
 export default () => (
@@ -19,6 +21,8 @@ export default () => (
     <TasksList path={paths.TASKS + '/:projectId'} />
     <DocScreen path={paths.DOC + '/:projectId/:id'} />
     <Settings path={paths.SETTINGS} />
+    <Journal path={paths.DB_JOURNAL} />
+    <Insights path={paths.DB_INSIGHTS} />
     <Redirect path={paths.APP} to={paths.TODAY} />
   </Router>
 )

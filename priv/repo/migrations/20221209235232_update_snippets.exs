@@ -3,7 +3,7 @@ defmodule Sequence.Repo.Migrations.UpdateSnippets do
 
   def change do
     alter table(:daily_notes) do
-      change :snippet, :string, size: 255
+      modify :snippet, :string, size: 255, from: :string
     end
   end
 end
