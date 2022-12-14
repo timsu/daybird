@@ -9,6 +9,7 @@ import AppHeader from '@/components/layout/AppHeader'
 import { OAuthToken } from '@/models'
 import { authStore } from '@/stores/authStore'
 import { calendarStore } from '@/stores/calendarStore'
+import { uiStore } from '@/stores/uiStore'
 import { TrashIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -26,6 +27,7 @@ export default (props: { path: string }) => {
         <div class="flex flex-col gap-6">
           <TimeZoneSetting />
           <CalendarSettings />
+          <LogOut />
         </div>
       </div>
     </>
@@ -48,7 +50,7 @@ function TimeZoneSetting() {
 
   return (
     <div>
-      <label htmlFor="timezone" className="block text-sm font-medium text-gray-700">
+      <label htmlFor="timezone" className="block text-sm font-medium text-gray-700 mb-2">
         Timezone
       </label>
       <select
@@ -67,6 +69,8 @@ function TimeZoneSetting() {
 }
 
 function CalendarSettings() {
+  if (uiStore.insightLoop) return null
+
   const tokens = useStore(calendarStore.tokens)
 
   const onConnect = async (response: GoogleResponse) => {
@@ -80,7 +84,7 @@ function CalendarSettings() {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700">Calendars</label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Calendars</label>
       {tokens?.map((token) => (
         <div class="flex items-center my-2 gap-4">
           {token.email}
@@ -95,6 +99,14 @@ function CalendarSettings() {
         onSuccess={onConnect}
         skipToken
       />
+    </div>
+  )
+}
+
+function LogOut() {
+  return (
+    <div className="mt-10">
+      <Pressable onClick={() => authStore.logout()}>Log Out</Pressable>
     </div>
   )
 }

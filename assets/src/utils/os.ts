@@ -60,3 +60,5 @@ export const isMac = getOS() == 'mac'
 export const isWindows = getOS() == 'windows'
 export const isLinux = getOS() == 'linux'
 export const isMobile: boolean = ['ios', 'android', 'react-native'].indexOf(getOS()) > -1
+
+export const isSafariWebview = getOS() == 'ios' && !/Safari/.test(navigator.userAgent)

@@ -10,6 +10,7 @@ import Submit from '@/components/core/Submit'
 import { config, OAuthProvider, paths } from '@/config'
 import AuthForm from '@/screens/auth/AuthForm'
 import { authStore } from '@/stores/authStore'
+import { uiStore } from '@/stores/uiStore'
 import { unwrapError } from '@/utils'
 
 export default () => {
@@ -57,25 +58,29 @@ export default () => {
   }
 
   return (
-    <AuthForm title="Create an account">
-      <div className="flex justify-center">
-        <GoogleServerOAuth
-          desc="Sign up with Google"
-          scope={PROFILE_SCOPES}
-          onSuccess={signUpGoogle}
-        />
-      </div>
+    <AuthForm title={`Welcome to ${uiStore.insightLoop ? 'InsightLoop' : 'Daybird'}`}>
+      {!uiStore.reactNative && (
+        <>
+          <div className="flex justify-center">
+            <GoogleServerOAuth
+              desc="Sign up with Google"
+              scope={PROFILE_SCOPES}
+              onSuccess={signUpGoogle}
+            />
+          </div>
 
-      <div className="my-6">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
+          <div className="my-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or</span>
+              </div>
+            </div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or</span>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
       <form className="space-y-6" action="#" method="POST" onSubmit={onSubmit}>
         <Input
@@ -114,7 +119,7 @@ export default () => {
 
         <div className="mt-4 flex justify-center">
           <a href={paths.SIGNIN + location.search} className="text-lavender-400 text-sm">
-            Meant to sign in?
+            Already have an account?
           </a>
         </div>
 

@@ -13,7 +13,7 @@ import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
 import { logger } from '@/utils'
 import doOnboarding from '@/utils/onboarding'
-import { getOS, isChrome, isEdge, isMobile, isSafari } from '@/utils/os'
+import { getOS, isChrome, isEdge, isMobile, isSafari, isSafariWebview } from '@/utils/os'
 
 const SLEEP_CHECK_INTERVAL = 30_000
 const LS_RECENT_FILES = 'rf'
@@ -33,9 +33,9 @@ class UIStore {
 
   isPWA = window.matchMedia('(display-mode: standalone)').matches
 
-  insightLoop = false
+  insightLoop = location.pathname.includes('/insight/') || location.search.includes('/insight/')
 
-  reactNative = location.search?.includes('?app')
+  reactNative = location.search?.includes('?app') || isSafariWebview
 
   path = atom<string>()
   prevPaths = atom<string[]>([])

@@ -5,6 +5,7 @@ import { twMerge } from 'tailwind-merge'
 import GoogleIcon from '@/components/auth/GoogleIcon'
 import Button from '@/components/core/Button'
 import ErrorMessage from '@/components/core/ErrorMessage'
+import { uiStore } from '@/stores/uiStore'
 import { classNames, logger, unwrapError } from '@/utils'
 
 const SCOPE_PREFIX = 'https://www.googleapis.com/auth/'
