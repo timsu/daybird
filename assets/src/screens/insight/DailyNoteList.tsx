@@ -14,6 +14,7 @@ import {
 } from '@/models'
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
+import { uiStore } from '@/stores/uiStore'
 import { logger, toTitleCase } from '@/utils'
 import { PencilIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
@@ -74,7 +75,7 @@ export default function ({ period }: { period: Period }) {
                 {title}
                 {isThisPeriod && ` (${period == Period.DAY ? 'today' : `this ${period}`})`}
               </div>
-              <div class="opacity-50">{period == Period.DAY ? format(date, 'P') : 'Insight'}</div>
+              <div class="opacity-50">{period == Period.DAY ? format(date, 'P') : ''}</div>
             </div>
 
             {editingDate == dateString ? (
@@ -89,9 +90,11 @@ export default function ({ period }: { period: Period }) {
               />
             ) : (
               <div class="group relative cursor-pointer" onClick={() => setEditingDate(dateString)}>
-                <div class="group-hover:visible invisible absolute -left-6 top-1">
-                  <PencilIcon class="w-4 h-4 opacity-50" />
-                </div>
+                {!uiStore.reactNative && (
+                  <div class="group-hover:visible invisible absolute -left-6 top-1">
+                    <PencilIcon class="w-4 h-4 opacity-50" />
+                  </div>
+                )}
                 {note ? (
                   <div class="border-l-2 border-blue-400 pl-2 whitespace-pre-wrap">
                     {note.snippet}
