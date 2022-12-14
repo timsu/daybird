@@ -18,7 +18,7 @@ export default (props: Props) => {
         </div>
       </AppHeader>
 
-      <div class="flex flex-col grow w-full px-6 mt-4 max-w-2xl">Coming soon.</div>
+      <div class="flex flex-col grow w-full px-2 sm:px-6 mt-4 max-w-2xl">Coming soon.</div>
     </>
   )
 }

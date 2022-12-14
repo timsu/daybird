@@ -25,7 +25,7 @@ export default (props: Props) => {
         </div>
       </AppHeader>
 
-      <div class="flex flex-col grow w-full px-6 max-w-4xl">
+      <div class="flex flex-col grow w-full px-2 sm:px-6 max-w-4xl">
         <div class="flex">
           {[Period.WEEK, Period.MONTH, Period.YEAR].map((p) => (
             <div
