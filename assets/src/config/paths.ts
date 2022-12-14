@@ -34,4 +34,6 @@ export const paths = {
   PROFILE: '/insight/profile',
 
   INSIGHT_DOC: '/insight/docs',
+
+  INSIGHT_SETTINGS: '/insight/settings',
 }

@@ -1,5 +1,6 @@
 import { action, atom } from 'nanostores'
 import { route, RouterOnChangeArgs } from 'preact-router'
+import toast from 'react-hot-toast'
 
 import { API } from '@/api'
 import { config, paths } from '@/config'
@@ -105,6 +106,26 @@ class UIStore {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       authStore.updateUser({ timezone })
     }
+
+    if (uiStore.reactNative) this.initReactNative()
+  }
+
+  initReactNative = () => {
+    window.addEventListener(
+      'message',
+      (event) => {
+        const message = event.data
+        if (!message) return
+        if (message.startsWith('nav:')) {
+          const rootPath = this.insightLoop ? '/insight/' : '/app/'
+          const subPath = message.substring(4)
+          route(rootPath + subPath + '?app')
+        } else if (config.dev) {
+          toast('msg: ' + message)
+        }
+      },
+      false
+    )
   }
 
   checkForSleep = () => {
