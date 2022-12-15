@@ -9,6 +9,10 @@
   margin-bottom: 200px;
 }
 
+.mini .ProseMirror {
+  min-height: 13rem;
+}
+
 .ProseMirror {
   margin-bottom: 20px;
   line-height: 170%;

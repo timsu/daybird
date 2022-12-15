@@ -17,8 +17,6 @@ export default ({ project, date, id, type }: Props) => {
   useEffect(() => {
     if (project && id) {
       docStore.loadDoc(project, id, true)
-    } else {
-      docStore.initEmptyDoc(date)
     }
   }, [project, id])
 
@@ -29,18 +27,19 @@ export default ({ project, date, id, type }: Props) => {
 
   if (!project) return null
 
-  if (!doc || doc.contents === undefined)
+  if (!doc || doc.contents === undefined) {
     return (
       <div className="flex justify-center mt-10">
         <Loader size={40} />
       </div>
     )
+  }
 
   const placeholder = `What was the highlight of your ${type}?`
 
   return (
     <MiniEditor
-      className="min-h-[14rem]"
+      className="min-h-[14rem] mini"
       project={project}
       id={doc.id}
       contents={doc.contents}

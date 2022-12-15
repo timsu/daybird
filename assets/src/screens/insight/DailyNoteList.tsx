@@ -96,7 +96,7 @@ export default function ({ period }: { period: Period }) {
                   </div>
                 )}
                 {note ? (
-                  <div class="border-l-2 border-blue-400 pl-2 whitespace-pre-wrap">
+                  <div class="border-l-2 border-blue-400 pl-2 whitespace-pre-wrap break-words">
                     {note.snippet}
                   </div>
                 ) : (
