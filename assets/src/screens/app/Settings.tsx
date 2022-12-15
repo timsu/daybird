@@ -27,6 +27,7 @@ export default (props: { path: string }) => {
         <div class="flex flex-col gap-6">
           <TimeZoneSetting />
           <CalendarSettings />
+          <ReactNativeSettings />
           <LogOut />
         </div>
       </div>
@@ -41,6 +42,8 @@ declare global {
 }
 
 function TimeZoneSetting() {
+  if (uiStore.insightLoop) return null
+
   const user = useStore(authStore.loggedInUser)
 
   const tzs: string[] = Intl.supportedValuesOf('timeZone')
@@ -104,9 +107,30 @@ function CalendarSettings() {
 }
 
 function LogOut() {
+  const user = useStore(authStore.loggedInUser)
   return (
-    <div className="mt-10">
-      <Pressable onClick={() => authStore.logout()}>Log Out</Pressable>
+    <div className="my-2">
+      <Pressable
+        className="text-red-500 py-3"
+        onClick={() => confirm('Log out?') && authStore.logout()}
+      >
+        Log Out ({user?.email})
+      </Pressable>
+    </div>
+  )
+}
+
+function ReactNativeSettings() {
+  if (!uiStore.reactNative) return null
+
+  return (
+    <div className="my-2">
+      <Pressable
+        className="text-blue-600 py-3"
+        onClick={() => window.ReactNativeWebView?.postMessage('notif-settings')}
+      >
+        Notification Settings
+      </Pressable>
     </div>
   )
 }
