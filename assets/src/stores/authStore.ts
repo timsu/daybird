@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid'
 import { API } from '@/api'
 import { config, LS_AUTH_TOKENS, OAuthProvider, paths } from '@/config'
 import { AuthTokenPair, Project, User } from '@/models'
+import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 
 import { projectStore } from './projectStore'
@@ -113,7 +114,10 @@ class AuthStore {
   logout = () => {
     localStorage.removeItem(LS_AUTH_TOKENS)
 
-    location.href = paths.SIGNIN
+    location.href =
+      paths.SIGNIN +
+      (uiStore.insightLoop ? '?path=' + paths.JOURNAL : '') +
+      (uiStore.reactNative ? '?app' : '')
   }
 
   debugMode = () => {
