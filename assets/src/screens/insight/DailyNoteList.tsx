@@ -131,6 +131,8 @@ export default function ({ period }: { period: Period }) {
   )
 }
 
+const uuidCache: { [date: string]: string } = {}
+
 const dateTitle = (period: Period, date: Date, today: Date) =>
   period == Period.DAY
     ? Math.abs(differenceInDays(date, today)) < 6
@@ -161,13 +163,15 @@ const InsightEditor = ({
   endDate: Date
   doneEditing: () => void
 }) => {
-  if (period == Period.DAY)
+  if (period == Period.DAY) {
+    if (!uuidCache[date]) uuidCache[date] = note?.id || uuid()
     return (
       <div>
-        <DailyNoteEditor date={date} id={note?.id || uuid()} project={project} type={period} />
+        <DailyNoteEditor date={date} id={uuidCache[date]} project={project} type={period} />
         <Button onClick={doneEditing}>Done</Button>
       </div>
     )
+  }
 
   const [reviewNotes, setReviewNotes] = useState<DailyNote[]>([])
   const reviewPeriod =
