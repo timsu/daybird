@@ -179,7 +179,9 @@ const InsightEditor = ({
   useEffect(() => {
     const start = dateToPeriodDateString(reviewPeriod, add(startDate, { days: 1 }))
     const end = dateToPeriodDateString(reviewPeriod, endDate)
-    API.listNotes(project, reviewPeriod, start, end).then((r) => setReviewNotes(r.notes))
+    API.listNotes(project, reviewPeriod, start, end).then((r) =>
+      setReviewNotes(r.notes.sort((a, b) => a.date.localeCompare(b.date)))
+    )
   }, [period, date])
 
   return (
@@ -187,7 +189,7 @@ const InsightEditor = ({
       {reviewNotes.length > 0 && (
         <div class="my-2">
           {reviewNotes.map((note) => (
-            <div class="my-2 border-l-2 border-blue-400 pl-2">
+            <div class="my-2 border-l-2 border-blue-400 p-2 bg-gray-100 rounded-md">
               <div class="font-bold">
                 {dateTitle(
                   reviewPeriod,
