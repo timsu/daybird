@@ -58,6 +58,8 @@ defmodule Sequence.Users do
 
   def check_password(nil, _), do: {:error, "Incorrect email or password"}
 
+  def check_password(user, _) when is_nil(user.password_hash), do: {:error, "Try signing in with OAuth instead"}
+
   def check_password(user, given_password) do
     case Bcrypt.verify_pass(given_password, user.password_hash) do
       true -> {:ok, user}
