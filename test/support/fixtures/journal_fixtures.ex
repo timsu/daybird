@@ -22,4 +22,20 @@ defmodule Sequence.JournalFixtures do
     daily_note
   end
 
+
+  @doc """
+  Generate a streak.
+  """
+  def streak_fixture(attrs \\ %{}) do
+    {:ok, streak} =
+      attrs
+      |> Enum.into(%{
+        current: 42,
+        date: "some date",
+        longest: 42
+      })
+      |> Sequence.Journal.create_streak()
+
+    streak
+  end
 end

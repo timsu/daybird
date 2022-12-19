@@ -19,7 +19,7 @@ export default (props: Props) => {
   const currentProject = useStore(projectStore.currentProject)
   const fileTree = useStore(fileStore.fileTree)
 
-  const specialDaysFn = (activeDate: Date) => {
+  const specialDaysFn = async (activeDate: Date) => {
     if (!currentProject) return
     const files = fileTree[currentProject.id]
     if (!files) return

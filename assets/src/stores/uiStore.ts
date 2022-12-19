@@ -81,6 +81,10 @@ class UIStore {
       }
     } else if (this.goingBack) this.goingBack = false
     store.set(ctx.url!)
+
+    if (this.reactNative) {
+      window.ReactNativeWebView?.postMessage('url:' + ctx.path)
+    }
   })
 
   goBack = () => {
