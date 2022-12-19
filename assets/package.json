@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^1.6.6",
     "@event-calendar/core": "^0.13.4",
     "@event-calendar/time-grid": "^0.13.4",
     "@headlessui/react": "^1.6.6",

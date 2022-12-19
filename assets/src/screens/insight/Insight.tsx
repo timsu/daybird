@@ -7,6 +7,7 @@ import AppLayout from '@/components/layout/AppLayout'
 import { paths } from '@/config'
 import InsightRouter from '@/screens/insight/InsightRouter'
 import { authStore } from '@/stores/authStore'
+import tracker from '@/stores/tracker'
 import { uiStore } from '@/stores/uiStore'
 import { useStore } from '@nanostores/preact'
 
@@ -20,10 +21,7 @@ export default () => {
       location.href = paths.SIGNUP + '?path=' + location.pathname + location.search
     else {
       uiStore.initLoggedInUser(user)
-
-      if (location.pathname == paths.APP) {
-        route(paths.TODAY)
-      }
+      tracker.openJournal()
     }
   }, [user])
 

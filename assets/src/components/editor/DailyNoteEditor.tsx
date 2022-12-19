@@ -6,6 +6,7 @@ import { Period, Project } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
+import tracker from '@/stores/tracker'
 import { useStore } from '@nanostores/preact'
 
 type Props = { project: Project; date: string; id?: string; type: Period }
@@ -23,6 +24,9 @@ export default ({ project, date, id, type }: Props) => {
   const saveContents = (project: Project, id: string, contents: any, snippet: string) => {
     docStore.saveDoc(project, id, contents)
     journalStore.saveNote(project, type, date, contents, snippet, id)
+
+    if (type == Period.DAY) tracker.journalEntry()
+    else tracker.insightEntry(type)
   }
 
   if (!project) return null
