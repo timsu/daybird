@@ -19,6 +19,8 @@ import { logger, toTitleCase } from '@/utils'
 import { PencilIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
+let startWithEditorOpen = true
+
 export default function ({ period }: { period: Period }) {
   const project = useStore(projectStore.currentProject)
   const notes = useStore(journalStore.notes)
@@ -37,7 +39,7 @@ export default function ({ period }: { period: Period }) {
   const entries = Array(lookBack).fill(0)
   const today = new Date()
   const [editingDate, setEditingDate] = useState(
-    period == Period.DAY ? dateToPeriodDateString(period, today) : undefined
+    startWithEditorOpen && period == Period.DAY ? dateToPeriodDateString(period, today) : undefined
   )
 
   const iteration = (n: number) =>
@@ -86,7 +88,10 @@ export default function ({ period }: { period: Period }) {
                 note={note}
                 startDate={sub(date, iteration(1))}
                 endDate={date}
-                doneEditing={() => setEditingDate(undefined)}
+                doneEditing={() => {
+                  startWithEditorOpen = false
+                  setEditingDate(undefined)
+                }}
               />
             ) : (
               <div class="group relative cursor-pointer" onClick={() => setEditingDate(dateString)}>
