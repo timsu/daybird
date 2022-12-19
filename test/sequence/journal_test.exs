@@ -64,4 +64,62 @@ defmodule Sequence.JournalTest do
     end
   end
 
+
+  describe "streaks" do
+    alias Sequence.Journal.Streak
+
+    import Sequence.JournalFixtures
+
+    @invalid_attrs %{current: nil, date: nil, longest: nil}
+
+    test "list_streaks/0 returns all streaks" do
+      streak = streak_fixture()
+      assert Journal.list_streaks() == [streak]
+    end
+
+    test "get_streak!/1 returns the streak with given id" do
+      streak = streak_fixture()
+      assert Journal.get_streak!(streak.id) == streak
+    end
+
+    test "create_streak/1 with valid data creates a streak" do
+      valid_attrs = %{current: 42, date: "some date", longest: 42}
+
+      assert {:ok, %Streak{} = streak} = Journal.create_streak(valid_attrs)
+      assert streak.current == 42
+      assert streak.date == "some date"
+      assert streak.longest == 42
+    end
+
+    test "create_streak/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Journal.create_streak(@invalid_attrs)
+    end
+
+    test "update_streak/2 with valid data updates the streak" do
+      streak = streak_fixture()
+      update_attrs = %{current: 43, date: "some updated date", longest: 43}
+
+      assert {:ok, %Streak{} = streak} = Journal.update_streak(streak, update_attrs)
+      assert streak.current == 43
+      assert streak.date == "some updated date"
+      assert streak.longest == 43
+    end
+
+    test "update_streak/2 with invalid data returns error changeset" do
+      streak = streak_fixture()
+      assert {:error, %Ecto.Changeset{}} = Journal.update_streak(streak, @invalid_attrs)
+      assert streak == Journal.get_streak!(streak.id)
+    end
+
+    test "delete_streak/1 deletes the streak" do
+      streak = streak_fixture()
+      assert {:ok, %Streak{}} = Journal.delete_streak(streak)
+      assert_raise Ecto.NoResultsError, fn -> Journal.get_streak!(streak.id) end
+    end
+
+    test "change_streak/1 returns a streak changeset" do
+      streak = streak_fixture()
+      assert %Ecto.Changeset{} = Journal.change_streak(streak)
+    end
+  end
 end
