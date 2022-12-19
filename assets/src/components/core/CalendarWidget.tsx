@@ -44,12 +44,12 @@ export default ({
 
   const getHeader = () => {
     return (
-      <div class="flex items-center mb-2">
+      <div class="flex items-center mb-2 mx-4">
         <ChevronLeftIcon
           className="rounded cursor-pointer h-4 w-4 text-gray-400 hover:bg-gray-200"
           onClick={() => setActiveDate(subMonths(activeDate, 1))}
         />
-        <h2 className="flex-1 text-center">{format(activeDate, 'MMMM yyyy')}</h2>
+        <h2 className="flex-1 text-center text-[110%]">{format(activeDate, 'MMMM yyyy')}</h2>
         <ChevronRightIcon
           className="rounded cursor-pointer h-4 w-4 text-gray-400 hover:bg-gray-200"
           onClick={() => setActiveDate(addMonths(activeDate, 1))}
