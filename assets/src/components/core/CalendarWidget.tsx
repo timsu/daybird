@@ -3,14 +3,17 @@ import {
     startOfWeek, subMonths
 } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
+import { twMerge } from 'tailwind-merge'
 
 import { classNames } from '@/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline'
 
-type Props = {
+export type CalendarProps = {
+  className?: string
+  gridClassName?: string
   currentDate?: Date
   onSelect?: (date: Date) => void
-  specialDaysFn?: (month: Date) => SpecialDays | undefined
+  specialDaysFn?: (month: Date) => Promise<SpecialDays | undefined>
 }
 
 type SpecialDays = {
@@ -19,7 +22,13 @@ type SpecialDays = {
 }
 
 // from https://medium.com/@jain.jenil007/building-a-calendar-in-react-2c53b6ca3e96
-export default ({ currentDate, onSelect, specialDaysFn }: Props) => {
+export default ({
+  currentDate,
+  onSelect,
+  specialDaysFn,
+  className,
+  gridClassName,
+}: CalendarProps) => {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [activeDate, setActiveDate] = useState(new Date())
 
@@ -30,7 +39,7 @@ export default ({ currentDate, onSelect, specialDaysFn }: Props) => {
   }, [currentDate])
 
   useEffect(() => {
-    if (specialDaysFn) setSpecialDays(specialDaysFn(activeDate))
+    if (specialDaysFn) specialDaysFn(activeDate).then(setSpecialDays)
   }, [activeDate, specialDaysFn])
 
   const getHeader = () => {
@@ -40,7 +49,7 @@ export default ({ currentDate, onSelect, specialDaysFn }: Props) => {
           className="rounded cursor-pointer h-4 w-4 text-gray-400 hover:bg-gray-200"
           onClick={() => setActiveDate(subMonths(activeDate, 1))}
         />
-        <h2 className="text-sm flex-1 text-center">{format(activeDate, 'MMMM yyyy')}</h2>
+        <h2 className="flex-1 text-center">{format(activeDate, 'MMMM yyyy')}</h2>
         <ChevronRightIcon
           className="rounded cursor-pointer h-4 w-4 text-gray-400 hover:bg-gray-200"
           onClick={() => setActiveDate(addMonths(activeDate, 1))}
@@ -59,7 +68,7 @@ export default ({ currentDate, onSelect, specialDaysFn }: Props) => {
         </div>
       )
     }
-    return <div className="grid grid-cols-7">{weekDays}</div>
+    return <>{weekDays}</>
   }
 
   const generateDatesForCurrentWeek = (date: Date, selectedDate: Date, activeDate: Date) => {
@@ -112,14 +121,16 @@ export default ({ currentDate, onSelect, specialDaysFn }: Props) => {
       currentDate = addDays(currentDate, 7)
     }
 
-    return <div className="grid grid-cols-7">{allWeeks}</div>
+    return <>{allWeeks}</>
   }
 
   return (
-    <div class="calendar text-xs p-2 select-none">
+    <div class={twMerge('calendar text-xs p-2 select-none', className)}>
       {getHeader()}
-      {getWeekDaysNames()}
-      {getDates()}
+      <div className={twMerge('grid grid-cols-7', gridClassName)}>
+        {getWeekDaysNames()}
+        {getDates()}
+      </div>
     </div>
   )
 }

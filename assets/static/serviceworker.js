@@ -15,7 +15,6 @@ self.addEventListener('fetch', function (event) {
       try {
         const res = await fetch(event.request)
         if (event.request.method == 'GET' && event.request.url.startsWith('http')) {
-          console.log('requesting', event.request.url)
           const cache = await caches.open('cache')
           cache.put(event.request.url, res.clone())
         }
