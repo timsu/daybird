@@ -8,6 +8,7 @@ import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { fileStore } from '@/stores/fileStore'
 import { taskStore } from '@/stores/taskStore'
+import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 
 export type ProjectMap = { [id: string]: Project }
@@ -41,7 +42,7 @@ class ProjectStore {
       const projects = this.projects.get()
       const lastProjectId = user.meta.lp
       let currentProject: Project | undefined
-      if (lastProjectId) {
+      if (!uiStore.insightLoop && lastProjectId) {
         currentProject = projects.find((p) => p.id == lastProjectId)
       }
       if (!currentProject) currentProject = projects[0]
