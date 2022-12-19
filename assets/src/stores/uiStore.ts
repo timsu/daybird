@@ -11,6 +11,7 @@ import { fileStore } from '@/stores/fileStore'
 import { modalStore } from '@/stores/modalStore'
 import { projectStore } from '@/stores/projectStore'
 import { topicStore } from '@/stores/topicStore'
+import tracker from '@/stores/tracker'
 import { logger } from '@/utils'
 import doOnboarding from '@/utils/onboarding'
 import { getOS, isChrome, isEdge, isMobile, isSafari, isSafariWebview } from '@/utils/os'
@@ -98,6 +99,8 @@ class UIStore {
   }
 
   initLoggedInUser = (user: User) => {
+    tracker.init(user)
+
     if (authStore.debugMode()) (window as any)['uiStore'] = uiStore
     topicStore.initTopicflow()
 
