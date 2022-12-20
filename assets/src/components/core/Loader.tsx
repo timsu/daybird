@@ -5,12 +5,7 @@ type Props = {
 
 export default ({ size = 20, ...rest }: Props) => (
   <div {...rest} style={{ width: size, height: size }}>
-    <svg
-      class="animate-spin text-black"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
+    <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
       <circle
         class="opacity-25"
         cx="12"

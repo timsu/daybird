@@ -23,25 +23,23 @@ export default function () {
   useEffect(() => {
     if (authStore.debugMode()) (window as any)['authStore'] = authStore
 
-    window.addEventListener(
-      'message',
-      (event) => {
-        const message = event.data
-        if (!message) return
-        if (message.startsWith('didlogin:')) {
-          const payloadText = message.substring(9)
-          const payload = JSON.parse(payloadText) as Payload
+    const handler = (event: MessageEvent) => {
+      const message = event.data
+      if (!message) return
+      if (message.startsWith('didlogin:')) {
+        const payloadText = message.substring(9)
+        const payload = JSON.parse(payloadText) as Payload
 
-          if (isErrorPayload(payload)) toast.error(payload.error)
-          else {
-            authStore
-              .logInElseSignUpOAuth(payload.provider, payload.code)
-              .catch((e) => toast.error(unwrapError(e)))
-          }
+        if (isErrorPayload(payload)) toast.error(payload.error)
+        else {
+          authStore
+            .logInElseSignUpOAuth(payload.provider, payload.code)
+            .catch((e) => toast.error(unwrapError(e)))
         }
-      },
-      false
-    )
+      }
+    }
+    window.addEventListener('message', handler, false)
+    return () => window.removeEventListener('message', handler)
   }, [])
 }
 

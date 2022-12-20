@@ -1,20 +1,12 @@
 import { useState } from 'preact/hooks'
 
-import AppleIcon from '@/components/auth/AppleIcon'
-import GoogleIcon from '@/components/auth/GoogleIcon'
-import GoogleServerOAuth, {
-    GoogleResponse, PROFILE_SCOPES
-} from '@/components/auth/GoogleServerOAuth'
-import Checkbox from '@/components/core/Checkbox'
+import { GoogleResponse } from '@/components/auth/GoogleServerOAuth'
 import ErrorMessage from '@/components/core/ErrorMessage'
-import Input from '@/components/core/Input'
 import InsightInput from '@/components/core/InsightInput'
 import InsightLoginButton from '@/components/core/InsightLoginButton'
-import Submit from '@/components/core/Submit'
 import { OAuthProvider, paths } from '@/config'
-import AuthForm from '@/screens/auth/AuthForm'
+import InsightOAuth from '@/screens/auth/InsightOAuth'
 import { authStore } from '@/stores/authStore'
-import { uiStore } from '@/stores/uiStore'
 import { unwrapError } from '@/utils'
 
 export default () => {
@@ -54,13 +46,6 @@ export default () => {
     }
   }
 
-  const GoogleButton = (props: JSX.HTMLAttributes<HTMLButtonElement>) => (
-    <InsightLoginButton {...props} className="bg-[#4285F4] hover:bg-[#3367d6] pl-0">
-      <GoogleIcon size={40} class="mr-2 -my-4" />
-      Sign in with Google
-    </InsightLoginButton>
-  )
-
   return (
     <div className="min-h-full flex flex-col p-8">
       <h2 className="text-2xl text-gray-900 font-medium">Welcome back</h2>
@@ -91,53 +76,18 @@ export default () => {
 
         <ErrorMessage error={error} />
 
-        <div className="flex flex-col items-center">
-          {email && (
-            <InsightLoginButton
-              type="submit"
-              disabled={submitting}
-              className="bg-inblue-500 hover:bg-inblue-700"
-            >
-              LOGIN
-            </InsightLoginButton>
-          )}
-
-          <div className="relative flex justify-center text-xs my-6">
-            <span className="px-2 bg-white text-gray-500">OR</span>
-          </div>
-
-          {uiStore.reactNative ? (
-            <GoogleButton
-              onClick={(e) => {
-                e.preventDefault()
-                window.ReactNativeWebView?.postMessage('login:google')
-              }}
-            />
-          ) : (
-            <GoogleServerOAuth
-              desc="Sign in with Google"
-              scope={PROFILE_SCOPES}
-              onSuccess={signInGoogle}
-              button={<GoogleButton />}
-            />
-          )}
-
-          <div class="h-4" />
-
-          {uiStore.reactNative && (
-            <InsightLoginButton
-              className="bg-black hover:bg-gray-800"
-              onClick={(e) => {
-                e.preventDefault()
-                window.ReactNativeWebView?.postMessage('login:apple')
-              }}
-            >
-              <AppleIcon class="mr-2" />
-              Sign in with Apple
-            </InsightLoginButton>
-          )}
-        </div>
+        {email && (
+          <InsightLoginButton
+            type="submit"
+            disabled={submitting}
+            className="bg-inblue-500 hover:bg-inblue-700 mx-auto"
+          >
+            LOGIN
+          </InsightLoginButton>
+        )}
       </form>
+
+      <InsightOAuth onGoogleSignin={signInGoogle} />
     </div>
   )
 }

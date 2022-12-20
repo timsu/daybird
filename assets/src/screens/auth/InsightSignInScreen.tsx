@@ -8,7 +8,6 @@ type Props = {
 }
 
 export default (props: Props) => {
-  useReactNativeSignin()
   return (
     <InsightSignUpLayout>
       <Helmet title="Login" />

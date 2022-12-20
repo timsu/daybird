@@ -23,6 +23,8 @@ class AuthStore {
 
   authTokens = atom<AuthTokenPair | undefined>()
 
+  oAuthSubmitting = atom<OAuthProvider | undefined>()
+
   // --- initialization
 
   init = () => {
@@ -91,10 +93,15 @@ class AuthStore {
   logInElseSignUpOAuth = async (provider: OAuthProvider, token: string) => {
     logger.info(`AUTH —— logInElseSignUpOAuth`, provider, token)
 
-    const response = await API.logInElseSignUpOAuth(provider, token)
-    const tokens = { refresh: { token: response.token! } }
-    this.saveTokens(tokens)
-    this.postAuth()
+    try {
+      this.oAuthSubmitting.set(provider)
+      const response = await API.logInElseSignUpOAuth(provider, token)
+      const tokens = { refresh: { token: response.token! } }
+      this.saveTokens(tokens)
+      this.postAuth()
+    } finally {
+      this.oAuthSubmitting.set(undefined)
+    }
   }
 
   signIn = async (email: string, password: string) => {
