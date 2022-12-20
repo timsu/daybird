@@ -13,8 +13,8 @@ export default function (props: RenderableProps<{}>) {
 
   return (
     <div class="h-full flex flex-col bg-white">
-      <img src={insightloop_logo} width={120} height={95} class="mx-auto my-4" />
-      <div class="flex flex-col flex-1 rounded-t-3xl bg-inblue-500">
+      <img src={insightloop_logo} width={120} height={95} class="mx-auto my-4 sm:mt-20" />
+      <div class="flex flex-col flex-1 rounded-t-3xl bg-inblue-500 sm:w-[600px] sm:mt-20 sm:mx-auto sm:rounded-3xl sm:p-10 sm:pt-2 sm:flex-grow-0">
         <div class="flex mx-6 my-4 uppercase">
           <a
             href={paths.INSIGHT_SIGNIN}
