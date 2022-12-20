@@ -207,8 +207,7 @@ defmodule SequenceWeb.Router do
 
     get "/signup", PageController, :auth
     get "/signin", PageController, :auth
-    get "/forgot_password", PageController, :auth
-    get "/reset_password", PageController, :auth
+    get "/auth/*path", PageController, :auth
 
     get "/admin/*path", PageController, :admin
 
