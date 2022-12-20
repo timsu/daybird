@@ -33,7 +33,7 @@ export default function () {
         if (isErrorPayload(payload)) toast.error(payload.error)
         else {
           authStore
-            .logInElseSignUpOAuth(payload.provider, payload.code)
+            .logInElseSignUpOAuth(payload.provider, payload.code, payload.name, payload.email)
             .catch((e) => toast.error(unwrapError(e)))
         }
       }
