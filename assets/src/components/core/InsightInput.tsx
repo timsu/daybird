@@ -14,7 +14,7 @@ export default (props: Props) => {
       {label && (
         <label
           htmlFor={props.id}
-          className={twMerge('block text-sm font-medium text-gray-700', labelClassName)}
+          className={twMerge('block text-sm text-gray-700', labelClassName)}
         >
           {label}
         </label>
@@ -24,9 +24,8 @@ export default (props: Props) => {
           ref={forwardRef}
           {...rest}
           className={twMerge(
-            `appearance-none block w-full px-3 py-2 border border-gray-300
-             rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500
-           focus:border-blue-500 text-sm`,
+            `appearance-none block w-full px-0 py-2 border-0 border-b border-b-gray-300
+             placeholder-gray-400 focus:ring-0 focus:border-blue-500 text-sm`,
             className
           )}
         />
