@@ -107,7 +107,12 @@ export default () => {
           </div>
 
           {uiStore.reactNative ? (
-            <GoogleButton onClick={() => window.ReactNativeWebView?.postMessage('login:google')} />
+            <GoogleButton
+              onClick={(e) => {
+                e.preventDefault()
+                window.ReactNativeWebView?.postMessage('login:google')
+              }}
+            />
           ) : (
             <GoogleServerOAuth
               desc="Sign in with Google"
@@ -122,7 +127,10 @@ export default () => {
           {uiStore.reactNative && (
             <InsightLoginButton
               className="bg-black hover:bg-gray-800"
-              onClick={() => window.ReactNativeWebView?.postMessage('login:apple')}
+              onClick={(e) => {
+                e.preventDefault()
+                window.ReactNativeWebView?.postMessage('login:apple')
+              }}
             >
               <AppleIcon class="mr-2" />
               Sign in with Apple
