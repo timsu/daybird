@@ -18,7 +18,7 @@ export default () => {
     uiStore.insightLoop = true
     if (user === undefined) authStore.init()
     else if (user === null)
-      location.href = paths.SIGNUP + '?path=' + location.pathname + location.search
+      location.href = paths.INSIGHT_SIGNUP + '?path=' + location.pathname + location.search
     else {
       uiStore.initLoggedInUser(user)
       tracker.openJournal()

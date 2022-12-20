@@ -25,6 +25,10 @@ export const paths = {
 
   // --- insight loop
 
+  INSIGHT_SIGNIN: '/auth/insight/signin',
+
+  INSIGHT_SIGNUP: '/auth/insight/signup',
+
   JOURNAL: '/insight/journal',
 
   INSIGHTS: '/insight/insights',
