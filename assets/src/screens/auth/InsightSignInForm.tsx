@@ -54,6 +54,13 @@ export default () => {
     }
   }
 
+  const GoogleButton = (props: JSX.HTMLAttributes<HTMLButtonElement>) => (
+    <InsightLoginButton {...props} className="bg-[#4285F4] hover:bg-[#3367d6] pl-0">
+      <GoogleIcon size={40} class="mr-2 -my-4" />
+      Sign in with Google
+    </InsightLoginButton>
+  )
+
   return (
     <div className="min-h-full flex flex-col p-8">
       <h2 className="text-2xl text-gray-900 font-medium">Welcome back</h2>
@@ -67,7 +74,6 @@ export default () => {
           type="email"
           label="Email address"
           autoComplete="email"
-          required
           value={email}
           onChange={(e) => setEmail((e.target as HTMLInputElement).value)}
         />
@@ -78,7 +84,6 @@ export default () => {
             type="password"
             label="Password"
             autoComplete="current-password"
-            required
             value={password}
             onChange={(e) => setPassword((e.target as HTMLInputElement).value)}
           />
@@ -100,24 +105,29 @@ export default () => {
           <div className="relative flex justify-center text-xs my-6">
             <span className="px-2 bg-white text-gray-500">OR</span>
           </div>
-          <GoogleServerOAuth
-            desc="Sign in with Google"
-            scope={PROFILE_SCOPES}
-            onSuccess={signInGoogle}
-            button={
-              <InsightLoginButton className="bg-[#4285F4] hover:bg-[#3367d6] pl-0">
-                <GoogleIcon size={40} class="mr-2 -my-4" />
-                Sign in with Google
-              </InsightLoginButton>
-            }
-          />
+
+          {uiStore.reactNative ? (
+            <GoogleButton onClick={() => window.ReactNativeWebView?.postMessage('login:google')} />
+          ) : (
+            <GoogleServerOAuth
+              desc="Sign in with Google"
+              scope={PROFILE_SCOPES}
+              onSuccess={signInGoogle}
+              button={<GoogleButton />}
+            />
+          )}
 
           <div class="h-4" />
 
-          <InsightLoginButton className="bg-black hover:bg-gray-800">
-            <AppleIcon class="mr-2" />
-            Sign in with Apple
-          </InsightLoginButton>
+          {uiStore.reactNative && (
+            <InsightLoginButton
+              className="bg-black hover:bg-gray-800"
+              onClick={() => window.ReactNativeWebView?.postMessage('login:apple')}
+            >
+              <AppleIcon class="mr-2" />
+              Sign in with Apple
+            </InsightLoginButton>
+          )}
         </div>
       </form>
     </div>
