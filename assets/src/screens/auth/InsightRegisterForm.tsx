@@ -120,7 +120,7 @@ export default () => {
             </InsightLoginButton>
           )}
 
-          <div className="relative flex justify-center text-xs my-6">
+          <div className="relative flex justify-center text-xs my-3">
             <span className="px-2 bg-white text-gray-500">OR</span>
           </div>
 
