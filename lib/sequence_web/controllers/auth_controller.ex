@@ -57,6 +57,14 @@ defmodule SequenceWeb.AuthController do
     |> Map.merge(%{ "google_id" => profile.id, "email" => profile.email })  # prefer fetched google id and email
   end
 
+  defp attrs_from_apple_profile(profile, params) do
+    %{
+      "name" => params["name"],
+      "nickname" => Utils.nickname(params["name"]),
+    }
+    |> Map.merge(%{ "apple_id" => params["id"], "email" => profile.email })
+  end
+
   def log_in_else_sign_up_oauth(conn, %{"provider" => "google", "token" => token} = params) do
     case find_user_by_google_token(token) do
       {:error, message} -> {:error, :unauthorized, message}
@@ -78,11 +86,22 @@ defmodule SequenceWeb.AuthController do
     end
   end
 
-  def log_in_else_sign_up_oauth(conn, %{"provider" => "apple", "token" => token}) do
+  def log_in_else_sign_up_oauth(conn, %{"provider" => "apple", "token" => token} = params) do
     case find_user_by_apple_token(token) do
       {:error, message} -> {:error, :unauthorized, message}
       {:not_found, profile} ->
-        {:error, :not_found, %{ msg: "There's no account associated with #{profile.email}.", email: profile.email }}
+        allow_sign_up = if Map.has_key?(params, "allow_sign_up"), do: params["allow_sign_up"], else: true
+        if allow_sign_up do
+          user_attrs = attrs_from_apple_profile(profile, params)
+          IO.inspect(profile)
+          IO.inspect(user_attrs)
+          with {:ok, user} <- Users.create_user(user_attrs) do
+            Projects.user_joined(user)
+            sign_in_success(conn, user)
+          end
+        else
+          {:error, :not_found, %{ msg: "There's no account associated with #{profile.email}.", email: profile.email }}
+        end
       {:ok, user} ->
         sign_in_success(conn, user)
     end

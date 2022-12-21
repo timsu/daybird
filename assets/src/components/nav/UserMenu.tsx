@@ -83,7 +83,11 @@ export default () => {
       >
         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <Menu.Item key="user">
-            <div class={'block px-4 py-2 text-sm text-gray-700 border-b border-gray-200'}>
+            <div
+              class={
+                'block px-4 py-2 text-sm text-gray-700 border-b border-gray-200 overflow-hidden text-ellipsis'
+              }
+            >
               {user.email}
             </div>
           </Menu.Item>

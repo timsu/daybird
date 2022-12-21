@@ -36,6 +36,7 @@ defmodule Sequence.Users.User do
     field :nickname, :string
     field :email, :string
     field :google_id, :string
+    field :apple_id, :string
     field :profile_img, :string
     field :password, :string, virtual: true
     field :password_hash, :string
@@ -64,7 +65,7 @@ defmodule Sequence.Users.User do
     user
     |> cast(attrs, [:uuid, :name, :nickname, :profile_img,
       :email, :google_id, :password, :timezone, :activated_at,
-      :invite_id, :meta, :org_id, :origin_type])
+      :invite_id, :meta, :org_id, :origin_type, :apple_id])
     |> cast_assoc(:magic_link)
     |> Repo.generate_uuid
     |> validate_required([:uuid, :name, :email])

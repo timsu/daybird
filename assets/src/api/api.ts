@@ -148,20 +148,16 @@ class APIService {
 
   async logInElseSignUpOAuth(
     provider: OAuthProvider,
-    token: string
+    token: string,
+    name?: string,
+    email?: string
   ): Promise<R.OAuthSignInResponse> {
-    const response = await axios.post(
-      `${this.endpoint}/log_in_else_sign_up_oauth`,
-      {
-        provider,
-        token,
-      },
-      {
-        validateStatus: function (status) {
-          return status >= 200 && status < 500
-        },
-      }
-    )
+    const response = await axios.post(`${this.endpoint}/log_in_else_sign_up_oauth`, {
+      provider,
+      token,
+      name,
+      email,
+    })
     logger.info('logInElseSignUpOAuth response', response.data)
     return response.data
   }
