@@ -111,7 +111,7 @@ function LogOut() {
   return (
     <div className="my-2">
       <Pressable
-        className="text-red-500 py-3"
+        className="text-red-500 py-3 text-center"
         onClick={() => confirm('Log out?') && authStore.logout()}
       >
         Log Out ({user?.email})
