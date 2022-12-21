@@ -95,7 +95,7 @@ export default () => {
         )}
       </form>
 
-      <InsightOAuth onGoogleSignin={signUpGoogle} />
+      <InsightOAuth verb="Sign up" onGoogleSignin={signUpGoogle} />
     </div>
   )
 }
