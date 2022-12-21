@@ -62,7 +62,7 @@ defmodule SequenceWeb.AuthController do
       "name" => params["name"],
       "nickname" => Utils.nickname(params["name"]),
     }
-    |> Map.merge(%{ "google_id" => params["id"], "email" => profile.email })
+    |> Map.merge(%{ "apple_id" => params["id"], "email" => profile.email })
   end
 
   def log_in_else_sign_up_oauth(conn, %{"provider" => "google", "token" => token} = params) do
