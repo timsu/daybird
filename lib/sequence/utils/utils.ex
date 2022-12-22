@@ -8,6 +8,7 @@ defmodule Sequence.Utils do
     uuid |> String.replace("-", "")
   end
 
+  def uuid_to_base16(nil), do: nil
   def uuid_to_base16(uuid) do
     uuid |> String.upcase() |> String.replace("-", "") |> Base.decode16!()
   end

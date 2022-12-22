@@ -12,10 +12,11 @@ import { uiStore } from '@/stores/uiStore'
 import { useStore } from '@nanostores/preact'
 
 type Props = {
+  verb: string
   onGoogleSignin: (response: GoogleResponse) => Promise<void>
 }
 
-export default function (props: Props) {
+export default function ({ verb, onGoogleSignin }: Props) {
   useReactNativeSignin()
 
   const oAuthSubmitting = useStore(authStore.oAuthSubmitting)
@@ -23,11 +24,11 @@ export default function (props: Props) {
   const GoogleButton = (props: JSX.HTMLAttributes<HTMLButtonElement>) => (
     <InsightLoginButton {...props} className="bg-[#4285F4] hover:bg-[#3367d6] pl-0">
       {oAuthSubmitting == OAuthProvider.GOOGLE ? (
-        <Loader />
+        <Loader class="mr-2" />
       ) : (
         <GoogleIcon size={40} class="mr-2 -my-4" />
       )}
-      Sign in with Google
+      {verb} with Google
     </InsightLoginButton>
   )
 
@@ -40,16 +41,13 @@ export default function (props: Props) {
       {uiStore.reactNative ? (
         <GoogleButton
           disabled={oAuthSubmitting == OAuthProvider.GOOGLE}
-          onClick={(e) => {
-            e.preventDefault()
-            window.ReactNativeWebView?.postMessage('login:google')
-          }}
+          onClick={() => window.ReactNativeWebView?.postMessage('login:google')}
         />
       ) : (
         <GoogleServerOAuth
           desc="Sign in with Google"
           scope={PROFILE_SCOPES}
-          onSuccess={props.onGoogleSignin}
+          onSuccess={onGoogleSignin}
           button={<GoogleButton />}
         />
       )}
@@ -60,17 +58,14 @@ export default function (props: Props) {
         <InsightLoginButton
           className="bg-black hover:bg-gray-800"
           disabled={oAuthSubmitting == OAuthProvider.APPLE}
-          onClick={(e) => {
-            window.ReactNativeWebView?.postMessage('login:apple')
-            e.preventDefault()
-          }}
+          onClick={() => window.ReactNativeWebView?.postMessage('login:apple')}
         >
           {oAuthSubmitting == OAuthProvider.APPLE ? (
             <Loader class="mr-2" />
           ) : (
             <AppleIcon class="mr-2" />
           )}
-          Sign in with Apple
+          {verb} with Apple
         </InsightLoginButton>
       )}
     </div>
