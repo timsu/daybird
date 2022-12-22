@@ -41,10 +41,7 @@ export default function ({ verb, onGoogleSignin }: Props) {
       {uiStore.reactNative ? (
         <GoogleButton
           disabled={oAuthSubmitting == OAuthProvider.GOOGLE}
-          onClick={(e) => {
-            e.preventDefault()
-            window.ReactNativeWebView?.postMessage('login:google')
-          }}
+          onClick={() => window.ReactNativeWebView?.postMessage('login:google')}
         />
       ) : (
         <GoogleServerOAuth
@@ -61,10 +58,7 @@ export default function ({ verb, onGoogleSignin }: Props) {
         <InsightLoginButton
           className="bg-black hover:bg-gray-800"
           disabled={oAuthSubmitting == OAuthProvider.APPLE}
-          onClick={(e) => {
-            window.ReactNativeWebView?.postMessage('login:apple')
-            e.preventDefault()
-          }}
+          onClick={() => window.ReactNativeWebView?.postMessage('login:apple')}
         >
           {oAuthSubmitting == OAuthProvider.APPLE ? (
             <Loader class="mr-2" />
