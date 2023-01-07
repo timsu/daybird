@@ -43,13 +43,13 @@ defmodule SequenceWeb.JournalController do
   def generate_summary(conn, %{ "notes" => notes }) do
     with user when is_map(user) <- Guardian.Plug.current_resource(conn) do
 
-      prompt = "Summarize my past week:\n" <> notes
+      prompt = notes <> "\n\nWrite a short summary of text with a reflection question based on my week:"
 
       prompt_hash = :crypto.hash(:md5 , prompt) |> Base.encode16()
       case Redix.command(:redix, ["GET", "summary:" <> prompt_hash]) do
         {:ok, nil} ->
-          with {:ok, response} <- Sequence.OpenAI.completions(prompt, "text-babbage-001", 150, 0.5) do
-            IO.puts("missed cache cache")
+          with {:ok, response} <- Sequence.OpenAI.completions(prompt, "text-curie-001", 150, 0.5) do
+            IO.inspect(response)
             result = hd(response["choices"])["text"] |> String.trim
             Redix.command(:redix, ["PUT", "summary:" <> prompt_hash, result])
             text conn, result

@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios'
+import { parse, parseISO } from 'date-fns'
 import { atom, map } from 'nanostores'
 import toast from 'react-hot-toast'
 
@@ -68,7 +69,12 @@ class JournalStore {
   generateAISummary = async (notes: DailyNote[]): Promise<string> => {
     if (notes.length == 0) return 'No notes for this time period'
 
-    const noteContents = notes.map((n) => n.snippet).join('\n')
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const today = new Date()
+    console.log(notes)
+    const noteContents = notes
+      .map((n) => days[parseISO(n.date).getDay()] + ':' + n.snippet)
+      .join('\n')
     const response = await API.generateSummary(noteContents)
     return response
   }
