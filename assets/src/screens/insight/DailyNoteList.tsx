@@ -97,7 +97,7 @@ export default function ({ period }: { period: Period }) {
               />
             ) : (
               <div class="group relative cursor-pointer" onClick={() => setEditingDate(dateString)}>
-                {!dateParam && !note && i == 1 && (
+                {period == Period.WEEK && !dateParam && !note && i == 1 && (
                   <div className="my-4 bg-yellow-100 rounded-md border-yellow-300 border p-4">
                     Write something for your past week:
                   </div>
