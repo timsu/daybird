@@ -225,7 +225,7 @@ const InsightEditor = ({
         )}
       </div>
 
-      {aiContent && <div class="my-2">{aiContent}</div>}
+      {aiContent && <div class="my-2 italic">{aiContent}</div>}
       {reviewNotes.length > 0 && showReviewNotes && (
         <div class="my-2">
           {reviewNotes.map((note) => (
