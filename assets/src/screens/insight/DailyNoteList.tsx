@@ -2,11 +2,13 @@ import {
     add, differenceInDays, format, isAfter, isBefore, isSameWeek, isSameYear, parse, startOfDay, sub
 } from 'date-fns'
 import { useEffect, useState } from 'preact/hooks'
+import { toast } from 'react-hot-toast'
 import { v4 as uuid } from 'uuid'
 
 import { API } from '@/api'
 import Button from '@/components/core/Button'
 import Loader from '@/components/core/Loader'
+import Pressable from '@/components/core/Pressable'
 import DailyNoteEditor from '@/components/editor/DailyNoteEditor'
 import ReadOnlyEditor from '@/components/editor/ReadOnlyEditor'
 import {
@@ -15,7 +17,7 @@ import {
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
-import { logger, toTitleCase } from '@/utils'
+import { logger, toTitleCase, unwrapError } from '@/utils'
 import { PencilIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
@@ -183,6 +185,8 @@ const InsightEditor = ({
     )
   }
 
+  const [aiContent, setAIContent] = useState<string>()
+  const [showReviewNotes, setShowReviewNotes] = useState<boolean>(false)
   const [reviewNotes, setReviewNotes] = useState<DailyNote[]>([])
   const reviewPeriod =
     period == Period.WEEK ? Period.DAY : period == Period.MONTH ? Period.WEEK : Period.MONTH
@@ -196,7 +200,33 @@ const InsightEditor = ({
 
   return (
     <div>
-      {reviewNotes.length > 0 && (
+      <div class="flex gap-2">
+        {!aiContent && reviewNotes.length > 0 && (
+          <Button
+            class="flex-1 px-0 justify-center"
+            onClick={() => {
+              setAIContent('Loading...')
+              journalStore
+                .generateAISummary(reviewNotes)
+                .then(setAIContent)
+                .catch((e) => {
+                  toast.error(unwrapError(e))
+                  setAIContent(undefined)
+                })
+            }}
+          >
+            Week summary
+          </Button>
+        )}
+        {!showReviewNotes && (
+          <Button class="flex-1 px-0 justify-center" onClick={() => setShowReviewNotes(true)}>
+            Show daily notes
+          </Button>
+        )}
+      </div>
+
+      {aiContent && <div class="my-2">{aiContent}</div>}
+      {reviewNotes.length > 0 && showReviewNotes && (
         <div class="my-2">
           {reviewNotes.map((note) => (
             <div class="my-2 border-l-2 border-blue-400 p-2 bg-gray-100 rounded-md">

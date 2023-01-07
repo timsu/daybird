@@ -421,6 +421,13 @@ class APIService {
     return response.data
   }
 
+  async generateSummary(notes: string): Promise<string> {
+    const response = await this.axios.post(`${this.endpoint}/generate/summary`, {
+      notes,
+    })
+    return response.data
+  }
+
   // misc
 
   async githash(): Promise<{ hash: string }> {

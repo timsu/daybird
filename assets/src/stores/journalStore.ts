@@ -64,6 +64,14 @@ class JournalStore {
     this.notes.set({ ...notes, [note.date]: note })
     return note
   }
+
+  generateAISummary = async (notes: DailyNote[]): Promise<string> => {
+    if (notes.length == 0) return 'No notes for this time period'
+
+    const noteContents = notes.map((n) => n.snippet).join('\n')
+    const response = await API.generateSummary(noteContents)
+    return response
+  }
 }
 
 export const journalStore = new JournalStore()
