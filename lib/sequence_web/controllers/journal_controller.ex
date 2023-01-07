@@ -51,7 +51,7 @@ defmodule SequenceWeb.JournalController do
           with {:ok, response} <- Sequence.OpenAI.completions(prompt, "text-curie-001", 150, 0.5) do
             IO.inspect(response)
             result = hd(response["choices"])["text"] |> String.trim
-            Redix.command(:redix, ["PUT", "summary:" <> prompt_hash, result])
+            Redix.command(:redix, ["SET", "summary:" <> prompt_hash, result, "EX", "86400"])
             text conn, result
           else
             {:error, :openai, _status, body} ->
