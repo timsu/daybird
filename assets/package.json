@@ -36,7 +36,6 @@
     "lodash.flatten": "^4.4.0",
     "nanostores": "^0.5.12",
     "normalize-url": "^7.0.3",
-    "openai": "^3.1.0",
     "parchment": "^2.0.1",
     "phoenix": "1.6.10",
     "preact": "^10.5.15",
