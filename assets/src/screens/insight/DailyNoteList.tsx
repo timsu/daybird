@@ -107,7 +107,7 @@ export default function ({ period }: { period: Period }) {
                     <PencilIcon class="w-4 h-4 opacity-50" />
                   </div>
                 )}
-                {note ? (
+                {note?.snippet ? (
                   <div class="border-l-2 border-blue-400 pl-2 whitespace-pre-wrap break-words">
                     {note.snippet}
                   </div>

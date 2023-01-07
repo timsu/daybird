@@ -2,6 +2,7 @@ import { sub } from 'date-fns'
 import { route } from 'preact-router'
 import { useEffect, useState } from 'preact/hooks'
 
+import { API } from '@/api'
 import Helmet from '@/components/core/Helmet'
 import Pressable from '@/components/core/Pressable'
 import AppHeader from '@/components/layout/AppHeader'
@@ -9,6 +10,7 @@ import { paths } from '@/config'
 import { dateToPeriodDateString, Period } from '@/models'
 import DailyNoteList from '@/screens/insight/DailyNoteList'
 import { journalStore } from '@/stores/journalStore'
+import { projectStore } from '@/stores/projectStore'
 import { uiStore } from '@/stores/uiStore'
 import { logger } from '@/utils'
 import { useStore } from '@nanostores/preact'
@@ -39,7 +41,12 @@ export default (props: Props) => {
     logger.info('has old entry?', hasPreviousWeekEntry)
     if (hasPreviousWeekEntry === undefined) return
 
-    setNeedsInsight(true)
+    journalStore
+      .loadNotes(projectStore.currentProject.get()!, Period.WEEK, lastWeekInsight, lastWeekInsight)
+      .then((response) => {
+        logger.info('loaded insight', response)
+        if (!response?.length) setNeedsInsight(true)
+      })
   }, [notes])
 
   return (

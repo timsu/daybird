@@ -35,6 +35,8 @@ class JournalStore {
       const noteMap = this.notes.get() || {}
       notes.forEach((n) => (noteMap[n.date] = n))
       this.notes.set(noteMap)
+
+      return notes
     } catch (e) {
       const status = (e as AxiosError).response?.status
       if (status == 401 || status == 404) {
