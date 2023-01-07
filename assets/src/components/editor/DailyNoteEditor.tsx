@@ -2,7 +2,7 @@ import { useEffect } from 'preact/hooks'
 
 import Loader from '@/components/core/Loader'
 import MiniEditor from '@/components/editor/MiniEditor'
-import { Period, Project } from '@/models'
+import { dateToPeriodDateString, Period, Project } from '@/models'
 import { docStore } from '@/stores/docStore'
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
@@ -39,7 +39,9 @@ export default ({ project, date, id, type }: Props) => {
     )
   }
 
-  const placeholder = `What was the highlight of your ${type}?`
+  const current = dateToPeriodDateString(type, new Date()) == date
+  const datePhrase = current ? (type == Period.DAY ? 'today' : `this ${type}`) : `on this ${type}`
+  const placeholder = `What happened ${datePhrase}? What was the highlight?`
 
   return (
     <MiniEditor

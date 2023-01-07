@@ -48,7 +48,7 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :phoenix, :filter_parameters, ["password", "secret", "contents", "bindata"]
+config :phoenix, :filter_parameters, ["password", "secret", "contents", "bindata", "notes"]
 
 ##############################
 # Server configuration
@@ -74,6 +74,8 @@ config :sequence, static_asset_path: "priv/static"
 config :sequence, load_application_links_from_s3: false
 
 config :sequence, sendgrid_api_key: System.get_env("SENDGRID_KEY")
+
+config :sequence, openai_api_key: System.get_env("OPENAI_KEY")
 
 config :ex_aws,
   access_key_id: {:system, "LN_S3_ACCESS_KEY_ID"},
