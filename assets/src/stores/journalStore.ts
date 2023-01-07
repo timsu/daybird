@@ -70,8 +70,6 @@ class JournalStore {
     if (notes.length == 0) return 'No notes for this time period'
 
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    const today = new Date()
-    console.log(notes)
     const noteContents = notes
       .map((n) => days[parseISO(n.date).getDay()] + ':' + n.snippet)
       .join('\n')
