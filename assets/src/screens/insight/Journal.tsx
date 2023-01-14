@@ -65,7 +65,7 @@ export default (props: Props) => {
             className="m-4 bg-yellow-100 rounded-md border-yellow-300 border p-4"
             onClick={() => route(location.pathname.replace('journal', 'insights'))}
           >
-            📖 Look back at your past week ➡️
+            What stood out to you about last week? ➡️
           </Pressable>
         )}
         <DailyNoteList period={Period.DAY} />

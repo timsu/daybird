@@ -40,8 +40,8 @@ export default ({ project, date, id, type }: Props) => {
   }
 
   const current = dateToPeriodDateString(type, new Date()) == date
-  const datePhrase = current ? (type == Period.DAY ? 'today' : `this ${type}`) : `on this ${type}`
-  const placeholder = `What happened ${datePhrase}? What was the highlight?`
+  const datePhrase = type == Period.DAY ? 'today' : `this ${type}`
+  const placeholder = `What was most meaningful about ${datePhrase}?`
 
   return (
     <MiniEditor

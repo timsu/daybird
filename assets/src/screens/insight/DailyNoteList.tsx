@@ -215,7 +215,7 @@ const InsightEditor = ({
                 })
             }}
           >
-            Week summary
+            AI Summary
           </Button>
         )}
         {!showReviewNotes && (
@@ -225,7 +225,13 @@ const InsightEditor = ({
         )}
       </div>
 
-      {aiContent && <div class="my-2 italic">{aiContent}</div>}
+      {aiContent && (
+        <div class="my-2 pl-2 border-l-2 border-l-gray-700">
+          <div>Here's an automatic summary of your week:</div>
+          <div class="my-2 italic">{aiContent}</div>
+          <hr />
+        </div>
+      )}
       {reviewNotes.length > 0 && showReviewNotes && (
         <div class="my-2">
           {reviewNotes.map((note) => (
