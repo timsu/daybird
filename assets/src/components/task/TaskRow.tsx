@@ -1,4 +1,4 @@
-import { isAfter } from 'date-fns'
+import { add, endOfDay, isAfter } from 'date-fns'
 import { createRef, render, RenderableProps } from 'preact'
 import { MutableRef, useEffect, useRef, useState } from 'preact/hooks'
 import { twMerge } from 'tailwind-merge'
@@ -248,7 +248,9 @@ function TaskActions(props: PropsWithTask) {
           <div
             class={
               'text-xs ' +
-              (isAfter(new Date(task.due_at), new Date()) ? 'text-green-500' : 'text-red-500')
+              (isAfter(endOfDay(new Date(task.due_at)), new Date())
+                ? 'text-green-500'
+                : 'text-red-500')
             }
           >
             {Task.renderDueDate(task)}

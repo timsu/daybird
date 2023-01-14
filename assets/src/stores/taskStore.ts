@@ -1,3 +1,4 @@
+import { add } from 'date-fns'
 import { action, atom, map } from 'nanostores'
 
 import { API } from '@/api'
@@ -55,10 +56,14 @@ class TaskStore {
     this.updateTaskMap(response.task)
   }
 
+  defaultDueDate = () => add(new Date(), { days: 1 }).toISOString()
+
   showOnboardingForNextTask: boolean = false
   createTask = async (attrs: Partial<Task>) => {
     const project = projectStore.currentProject.get()
     assertIsDefined(project, 'has project')
+
+    if (attrs.due_at === undefined) attrs.due_at = this.defaultDueDate()
 
     const response = await API.createTask(project, attrs)
     const task = Task.fromJSON(response.task)

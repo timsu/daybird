@@ -37,7 +37,8 @@ defmodule SequenceWeb.TasksController do
           title: title,
           creator_id: user.id,
           project_id: project.id,
-          doc: params["doc"]
+          doc: params["doc"],
+          due_at: params["due_at"]
          },
          {:ok, task} <- Tasks.create_task(attrs) do
 
