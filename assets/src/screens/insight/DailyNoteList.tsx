@@ -201,7 +201,7 @@ const InsightEditor = ({
   return (
     <div>
       <div class="flex gap-2">
-        {!aiContent && reviewNotes.length > 0 && (
+        {!aiContent && (
           <Button
             class="flex-1 px-0 justify-center"
             onClick={() => {
