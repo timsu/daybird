@@ -26,7 +26,7 @@ defmodule SequenceWeb.Endpoint do
     from: :sequence,
     gzip: true,
     only: ~w(assets js css images sounds favicon.ico robots.txt sitemap.xml pwa.json
-      pwa-local.json pwa-insight.json serviceworker.js)
+      pwa-local.json pwa-insight.json pwa-addie.json serviceworker.js)
 
   plug Plug.Static,
     at: "/", from: :sequence,

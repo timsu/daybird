@@ -19,7 +19,7 @@ defmodule SequenceWeb.Router do
       at: "/", from: :sequence,
       gzip: true,
       only: ~w(assets js css sounds favicon.ico robots.txt version.json pwa.json
-        pwa-local.json pwa-insight.json serviceworker.js)
+        pwa-local.json pwa-insight.json pwa-addie.json serviceworker.js)
     )
   end
 
