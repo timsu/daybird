@@ -20,6 +20,10 @@ class Tracker {
   insightEntry(type: string) {
     amplitude.logEvent('insightEntry', { type })
   }
+
+  openAddie() {
+    amplitude.logEvent('openAddie')
+  }
 }
 
 const tracker = new Tracker()

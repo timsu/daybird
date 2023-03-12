@@ -65,7 +65,7 @@ defmodule Sequence.OpenAI do
       messages: messages,
       max_tokens: max_tokens,
       temperature: temperature,
-      user: user_id,
+      user: "#{user_id}",
     }
 
     post("/chat/completions", authenticated_headers(), request)

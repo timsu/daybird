@@ -6,8 +6,6 @@ import therapist from '@/images/therapist.png'
 import { Author, Message } from '@/models'
 import addieScript from '@/screens/addie/addieScript'
 import { addieStore } from '@/stores/addieStore'
-import { assertIsDefined } from '@/utils'
-import { RefreshIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default () => {
@@ -16,7 +14,7 @@ export default () => {
   }, [])
 
   return (
-    <div class="mx-auto max-w-2xl bg-white p-4 lg:p-10 flex flex-col h-auto overflow-auto">
+    <div class="mx-auto max-w-2xl bg-white p-4 lg:p-10 flex flex-col h-full overflow-auto">
       <div class="flex mb-4 justify-between items-center">
         <img src={therapist} class="w-10 h-10" />
         <Pressable onClick={() => addieStore.resetConversation()} tooltip="Start Over">
@@ -24,6 +22,7 @@ export default () => {
         </Pressable>
       </div>
       <Messages />
+      <AwaitingResponse />
       <Response />
       <ErrorMessage />
     </div>
@@ -47,6 +46,20 @@ function Messages() {
         const props = { message, prevMessage: messages[i - 1], key: i }
         return message.from == Author.BOT ? <BotMessage {...props} /> : <UserMessage {...props} />
       })}
+    </div>
+  )
+}
+
+function AwaitingResponse() {
+  const awaitingResponse = useStore(addieStore.awaitingResponse)
+
+  if (!awaitingResponse) return null
+
+  return (
+    <div class="flex flex-col mb-4 max-w-xl">
+      <div class="bg-purple-300 px-4 py-2 rounded-lg">
+        <div class="dot-flashing ml-4 my-2" />
+      </div>
     </div>
   )
 }
@@ -79,39 +92,39 @@ function Response() {
 
   if (!response) return null
 
-  if (response.kind == 'buttons') {
-    assertIsDefined(response.buttons)
-
-    return (
-      <div ref={divRef} class="flex gap-2 justify-end">
-        {response.buttons.map((button, i) => (
-          <button
-            class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg border border-gray-700"
-            onClick={() => {
-              addieStore.addUserMessage(button)
-              addieScript.handleButton(i)
-            }}
-          >
-            {button}
-          </button>
-        ))}
-      </div>
-    )
-  }
-
-  if (response.kind == 'text') {
-    return (
-      <div ref={divRef}>
-        <TextResponse />
-      </div>
-    )
-  }
-
   if (response.kind == 'end') {
     return <div ref={divRef}>Thank you for talking to Addie.</div>
   }
 
-  return null
+  return (
+    <>
+      {(response.kind == 'buttons' || response.kind == 'buttons_text') && (
+        <>
+          <div ref={divRef} class="flex gap-2 justify-end">
+            {response.buttons?.map((button, i) => (
+              <button
+                class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg border border-gray-700"
+                onClick={() => {
+                  addieStore.addUserMessage(button)
+                  addieScript.handleButton(i)
+                }}
+              >
+                {button}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {response.kind == 'buttons_text' && <div class="h-4 min-h-4" />}
+
+      {(response.kind == 'text' || response.kind == 'buttons_text') && (
+        <div ref={divRef}>
+          <TextResponse />
+        </div>
+      )}
+    </>
+  )
 }
 
 function TextResponse() {
@@ -119,6 +132,8 @@ function TextResponse() {
 
   const handleSubmit = (e: Event) => {
     e.preventDefault()
+    if (textInput.trim().length == 0) return
+
     addieStore.addUserMessage(textInput)
     addieScript.handleInput(textInput)
     setTextInput('')
@@ -127,7 +142,7 @@ function TextResponse() {
   return (
     <form onSubmit={handleSubmit}>
       <input
-        autoFocus
+        ref={(ref) => ref && ref.focus()}
         value={textInput}
         placeholder="Type your response here"
         onChange={(e) => setTextInput((e.target as HTMLInputElement).value)}
@@ -145,7 +160,7 @@ function ErrorMessage() {
 
   return (
     <div
-      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4"
       role="alert"
     >
       <span class="block sm:inline">{error}</span>

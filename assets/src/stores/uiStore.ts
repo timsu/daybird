@@ -36,6 +36,8 @@ class UIStore {
 
   insightLoop = location.pathname.includes('/insight/') || location.search.includes('/insight/')
 
+  addie = location.pathname.includes('/addie') || location.search.includes('/addie')
+
   reactNative = location.search?.includes('?app') || isSafariWebview
 
   path = atom<string>()

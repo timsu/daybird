@@ -4,15 +4,18 @@ import { config } from '@/config'
 import { Author, Message } from '@/models'
 import addieScript from '@/screens/addie/addieScript'
 
-type Response = {
-  kind: 'text' | 'buttons' | 'end'
+export type UserResponse = {
+  kind: 'text' | 'buttons' | 'end' | 'buttons_text'
   buttons?: string[]
+  tooltips?: string[]
 }
 
 class AddieStore {
   messages = atom<Message[]>([])
 
-  response = atom<Response | null>(null)
+  response = atom<UserResponse | null>(null)
+
+  awaitingResponse = atom<boolean>(false)
 
   error = atom<string | null>(null)
 
@@ -39,7 +42,7 @@ class AddieStore {
     this.addMessage(new Message(Author.YOU, text))
   }
 
-  setResponse = (response: Response | null) => {
+  setResponse = (response: UserResponse | null) => {
     this.response.set(response)
   }
 

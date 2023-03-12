@@ -1,43 +1,101 @@
 import { API } from '@/api'
-import { addieStore } from '@/stores/addieStore'
+import { config } from '@/config'
+import { GPTMessage } from '@/models'
+import { addieStore, UserResponse } from '@/stores/addieStore'
+import { authStore } from '@/stores/authStore'
 import { unwrapError } from '@/utils'
 
 enum State {
-  WELCOME,
+  MAIN,
+  CHECKIN,
   ATTEND,
   BEDTIME,
   HOME,
   WEEKEND,
   WORK,
+  REMEMBER,
+  GET_HELP,
 }
 
 const LS_SEEN_BEFORE = 'addie-seen-before'
+
+type ButtonHandler = (index: number) => void
+type InputHandler = (input: string) => void
+
 class AddieScript {
-  state: State = State.WELCOME
+  state: State = State.MAIN
+
+  messageHistory: GPTMessage[] = []
+
+  buttonHandler: ButtonHandler = () => {}
+  inputHandler: InputHandler = () => {}
+
+  setUserResponse = (
+    response: UserResponse,
+    buttonHandler: ButtonHandler | null,
+    inputHandler: InputHandler | null
+  ) => {
+    addieStore.setResponse(response)
+    if (buttonHandler) this.buttonHandler = buttonHandler
+    if (inputHandler) this.inputHandler = inputHandler
+  }
 
   // --- welcome
 
   welcome = async () => {
-    this.state = State.WELCOME
-
     if (!localStorage.getItem(LS_SEEN_BEFORE)) {
       await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.`)
+      await addieStore.addBotMessage(`Visit me any time you need help.`)
       localStorage.setItem(LS_SEEN_BEFORE, 'true')
     } else {
-      await addieStore.addBotMessage(`Hi again!`)
+      const user = authStore.loggedInUser.get()!
+      await addieStore.addBotMessage(user.name ? `Hi again, ${user.name}!` : `Hi again!`)
     }
 
+    this.mainMenu()
+  }
+
+  mainMenu = async () => {
+    this.state = State.MAIN
+    await addieStore.addBotMessage(`What can I help you with today?`)
+
+    this.setUserResponse(
+      {
+        kind: 'buttons',
+        buttons: ['What should I do?', 'Remember / Recall', 'Help me'],
+      },
+      this.handleMainMenu,
+      null
+    )
+  }
+
+  handleMainMenu = async (index: number) => {
+    if (index == 0) {
+      this.doCheckin()
+    } else if (index == 1) {
+      this.doRemember()
+    } else if (index == 2) {
+      this.doHelp()
+    }
+  }
+
+  // --- attend to self
+
+  doCheckin = async () => {
+    this.state = State.CHECKIN
     await addieStore.addBotMessage(`Let's start with an emotional check-in.
 
 Take a deep breath and close your eyes. How are you feeling right now?`)
 
-    addieStore.setResponse({
-      kind: 'buttons',
-      buttons: ['Calm & Present', 'On Autopilot', 'Unwell'],
-    })
+    this.setUserResponse(
+      {
+        kind: 'buttons',
+        buttons: ['Calm & Present', 'On Autopilot', 'Unwell'],
+      },
+      this.handleEmotionalCheckin,
+      null
+    )
   }
-
-  // --- attend to self
 
   handleEmotionalCheckin = async (index: number) => {
     if (index == 0) {
@@ -58,34 +116,29 @@ Take a deep breath and close your eyes. How are you feeling right now?`)
 
 What do you need right now?`)
 
-    addieStore.setResponse({
-      kind: 'text',
-    })
-  }
+    this.setUserResponse(
+      {
+        kind: 'text',
+      },
+      null,
+      this.handleAttendToSelf
+    )
 
-  handleAttendToSelf = async (input: string) => {
-    const messages = [
+    this.messageHistory = [
+      {
+        role: 'system',
+        content:
+          'You are a concise ADHD coach helping a user who is not feeling well to feel ready for coaching.',
+      },
       {
         role: 'assistant',
         content: 'Take a moment to attend to yourself. What do you need right now?',
       },
-      { role: 'user', content: input },
     ]
+  }
 
-    try {
-      const response = await API.generateChat(messages)
-      await addieStore.addBotMessage(response)
-      await addieStore.addBotMessage(`Ready to continue?`)
-      addieStore.setResponse({
-        kind: 'buttons',
-        buttons: ['Ready.'],
-      })
-    } catch (error) {
-      addieStore.setError(unwrapError(error))
-      addieStore.setResponse({
-        kind: 'text',
-      })
-    }
+  handleAttendToSelf = async (input: string) => {
+    this.gptLoop(input, ['Ready to continue.'])
   }
 
   // --- time of day check
@@ -116,10 +169,14 @@ What do you need right now?`)
 
 Are you sleepy?`)
 
-    addieStore.setResponse({
-      kind: 'buttons',
-      buttons: ['Yes', 'No'],
-    })
+    this.setUserResponse(
+      {
+        kind: 'buttons',
+        buttons: ['Yes', 'No'],
+      },
+      this.handleBedtime,
+      null
+    )
   }
 
   handleBedtime = async (index: number) => {
@@ -146,19 +203,28 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
         `Pick an activity that's relaxing and calming and does not involve screens.`
       )
 
-      addieStore.setResponse({
-        kind: 'text',
-      })
+      this.setUserResponse(
+        {
+          kind: 'text',
+        },
+        null,
+        this.handleBedtimeText
+      )
     }
   }
 
   handleBedtimeText = async (input: string) => {
     await addieStore.addBotMessage(`That sounds like a great idea!`)
     await addieStore.addBotMessage('Go do that. Then come back and we can get ready for bed.')
-    addieStore.setResponse({
-      kind: 'buttons',
-      buttons: ["I'm ready."],
-    })
+
+    this.setUserResponse(
+      {
+        kind: 'buttons',
+        buttons: ["I'm ready."],
+      },
+      this.handleBedtime,
+      null
+    )
   }
 
   // --- routines
@@ -167,9 +233,13 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     this.state = State.HOME
     await addieStore.addBotMessage(`Let's think about things to do around the home.`)
 
-    addieStore.setResponse({
-      kind: 'text',
-    })
+    this.setUserResponse(
+      {
+        kind: 'text',
+      },
+      null,
+      this.handleHomeRoutine
+    )
   }
 
   handleHomeRoutine = async (input: string) => {
@@ -183,10 +253,14 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
       `You're probably at work. First things first. Check your calendar and see when your next meeting is`
     )
 
-    addieStore.setResponse({
-      kind: 'buttons',
-      buttons: ["It's coming up soon", "It's in a few hours", 'No meetings'],
-    })
+    this.setUserResponse(
+      {
+        kind: 'buttons',
+        buttons: ["It's coming up soon", "It's in a few hours", 'No meetings'],
+      },
+      this.handleWorkRoutine,
+      null
+    )
   }
 
   handleWorkRoutine = async (index: number) => {
@@ -195,7 +269,28 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
       addieStore.setResponse({
         kind: 'end',
       })
+    } else {
+      await addieStore.addBotMessage(`Great! Now, what would you like to do?`)
+
+      this.setUserResponse(
+        {
+          kind: 'text',
+        },
+        null,
+        this.handleWorkRoutineText
+      )
     }
+  }
+
+  handleWorkRoutineText = async (input: string) => {
+    await addieStore.addBotMessage(`That sounds like a great idea!`)
+    this.setUserResponse(
+      {
+        kind: 'end',
+      },
+      null,
+      null
+    )
   }
 
   weekendRoutine = async () => {
@@ -204,36 +299,100 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
     await addieStore.addBotMessage(`Stop talking to me and go outside.`)
 
-    addieStore.setResponse({
-      kind: 'end',
+    this.setUserResponse(
+      {
+        kind: 'end',
+      },
+      null,
+      null
+    )
+  }
+
+  // --- remember
+
+  doRemember = async () => {}
+
+  // --- help
+
+  doHelp = async () => {
+    this.state = State.GET_HELP
+
+    await addieStore.addBotMessage(`What would you like help with?`)
+
+    this.setUserResponse(
+      {
+        kind: 'buttons_text',
+        buttons: ['Back to menu'],
+      },
+      this.handleHelpButton,
+      this.handleHelp
+    )
+
+    this.messageHistory = [
+      {
+        role: 'system',
+        content: 'You are a concise ADHD coach helping a user.',
+      },
+      {
+        role: 'assistant',
+        content: 'What would you like help with?',
+      },
+    ]
+  }
+
+  handleHelp = async (input: string) => {
+    this.gptLoop(input, ['Back to menu'])
+  }
+
+  handleHelpButton = async (index: number) => {
+    this.mainMenu()
+  }
+
+  // ---
+
+  gptLoop = async (input: string, buttons: string[]) => {
+    this.messageHistory.push({
+      role: 'user',
+      content: input,
     })
+
+    try {
+      addieStore.awaitingResponse.set(true)
+      const response = await API.generateChat(this.messageHistory)
+      this.messageHistory.push({
+        role: 'assistant',
+        content: response,
+      })
+
+      await addieStore.addBotMessage(response)
+      addieStore.setResponse({
+        kind: 'buttons_text',
+        buttons,
+      })
+    } catch (error) {
+      addieStore.setError(unwrapError(error))
+      addieStore.setResponse({
+        kind: 'buttons_text',
+        buttons,
+      })
+    } finally {
+      addieStore.awaitingResponse.set(false)
+    }
   }
 
   // ---
 
   handleButton = async (index: number) => {
     addieStore.setResponse(null)
-    if (this.state == State.WELCOME) {
-      this.handleEmotionalCheckin(index)
-    } else if (this.state == State.ATTEND) {
-      this.handleEmotionalCheckin(index)
-    } else if (this.state == State.BEDTIME) {
-      this.handleBedtime(index)
-    } else if (this.state == State.WORK) {
-      this.handleWorkRoutine(index)
-    }
+    this.buttonHandler(index)
   }
 
   handleInput = async (input: string) => {
     addieStore.setResponse(null)
-    if (this.state == State.ATTEND) {
-      this.handleAttendToSelf(input)
-    } else if (this.state == State.HOME) {
-      this.handleHomeRoutine(input)
-    } else if (this.state == State.BEDTIME) {
-      this.handleBedtimeText(input)
-    }
+    this.inputHandler(input)
   }
 }
 
-export default new AddieScript()
+const addieScript = new AddieScript()
+if (config.dev) (window as any)['addieScript'] = addieScript
+export default addieScript
