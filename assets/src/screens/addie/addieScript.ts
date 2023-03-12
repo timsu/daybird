@@ -1,3 +1,4 @@
+import { API } from '@/api'
 import { addieStore } from '@/stores/addieStore'
 
 enum State {
@@ -52,7 +53,8 @@ Take a deep breath and close your eyes. How are you feeling right now?`)
   attendToSelf = async () => {
     this.state = State.ATTEND
 
-    await addieStore.addBotMessage(`I'm sorry to hear that. Let's take a moment to attend to yourself.
+    await addieStore.addBotMessage(`I'm sorry to hear that. Take a moment to attend to yourself.
+
 What do you need right now?`)
 
     addieStore.setResponse({
@@ -61,10 +63,20 @@ What do you need right now?`)
   }
 
   handleAttendToSelf = async (input: string) => {
-    await addieStore.addBotMessage(`Okay, let's do that. (TODO: GPT)`)
-    await addieStore.addBotMessage(`I'll be here when you're ready.`)
+    const messages = [
+      {
+        role: 'assistant',
+        content: 'Take a moment to attend to yourself. What do you need right now?',
+      },
+      { role: 'user', content: input },
+    ]
+
+    const response = await API.generateChat(messages)
+    await addieStore.addBotMessage(response)
+    await addieStore.addBotMessage(`Ready to continue?`)
     addieStore.setResponse({
-      kind: 'end',
+      kind: 'buttons',
+      buttons: ['Ready.'],
     })
   }
 
@@ -153,6 +165,11 @@ and have a harder time falling asleep as well.`)
     })
   }
 
+  handleHomeRoutine = async (input: string) => {
+    await addieStore.addBotMessage(`That sounds like a great idea!`)
+    await addieStore.addBotMessage('Go do that.')
+  }
+
   workRoutine = async () => {
     this.state = State.WORK
     await addieStore.addBotMessage(
@@ -163,6 +180,15 @@ and have a harder time falling asleep as well.`)
       kind: 'buttons',
       buttons: ["It's coming up soon", "It's in a few hours", 'No meetings'],
     })
+  }
+
+  handleWorkRoutine = async (index: number) => {
+    if (index == 0) {
+      await addieStore.addBotMessage(`Get prepared for it and don't be late.`)
+      addieStore.setResponse({
+        kind: 'end',
+      })
+    }
   }
 
   weekendRoutine = async () => {
@@ -182,14 +208,22 @@ and have a harder time falling asleep as well.`)
     addieStore.setResponse(null)
     if (this.state == State.WELCOME) {
       this.handleEmotionalCheckin(index)
+    } else if (this.state == State.ATTEND) {
+      this.handleEmotionalCheckin(index)
     } else if (this.state == State.BEDTIME) {
       this.handleBedtime(index)
+    } else if (this.state == State.WORK) {
+      this.handleWorkRoutine(index)
     }
   }
 
   handleInput = async (input: string) => {
     addieStore.setResponse(null)
-    if (this.state == State.BEDTIME) {
+    if (this.state == State.ATTEND) {
+      this.handleAttendToSelf(input)
+    } else if (this.state == State.HOME) {
+      this.handleHomeRoutine(input)
+    } else if (this.state == State.BEDTIME) {
       this.handleBedtimeText(input)
     }
   }

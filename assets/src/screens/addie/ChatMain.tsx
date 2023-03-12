@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
 
 import Input from '@/components/core/Input'
+import Pressable from '@/components/core/Pressable'
 import therapist from '@/images/therapist.png'
 import { Author, Message } from '@/models'
 import addieScript from '@/screens/addie/addieScript'
 import { addieStore } from '@/stores/addieStore'
 import { assertIsDefined } from '@/utils'
+import { RefreshIcon } from '@heroicons/react/outline'
 import { useStore } from '@nanostores/preact'
 
 export default () => {
@@ -15,7 +17,12 @@ export default () => {
 
   return (
     <div class="mx-auto max-w-2xl bg-white p-4 lg:p-10 flex flex-col h-auto overflow-auto">
-      <img src={therapist} class="w-10 h-10 rounded-full mb-4" />
+      <div class="flex mb-4 justify-between items-center">
+        <img src={therapist} class="w-10 h-10" />
+        <Pressable onClick={() => addieStore.resetConversation()} tooltip="Start Over">
+          Start Over
+        </Pressable>
+      </div>
       <Messages />
       <Response />
     </div>
