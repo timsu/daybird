@@ -15,7 +15,7 @@ defmodule SequenceWeb.PageController do
   end
 
   def addie(conn, _params) do
-    render conn, "app.html", entry: "addie", title: "Addie ADHD Assistant"
+    render conn, "app.html", pwa: "/pwa-addie.json", entry: "addie", title: "Addie ADHD Assistant"
   end
 
   def auth(conn, _params) do
