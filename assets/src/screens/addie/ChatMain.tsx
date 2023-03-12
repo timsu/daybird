@@ -25,6 +25,7 @@ export default () => {
       </div>
       <Messages />
       <Response />
+      <ErrorMessage />
     </div>
   )
 }
@@ -135,5 +136,19 @@ function TextResponse() {
      focus:border-blue-500 text-sm`}
       />
     </form>
+  )
+}
+
+function ErrorMessage() {
+  const error = useStore(addieStore.error)
+  if (!error) return null
+
+  return (
+    <div
+      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+      role="alert"
+    >
+      <span class="block sm:inline">{error}</span>
+    </div>
   )
 }

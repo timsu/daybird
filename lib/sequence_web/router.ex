@@ -78,6 +78,8 @@ defmodule SequenceWeb.Router do
     post "/attachments", StorageController, :upload_attachment
     get "/attachments/:user_id/:timestamp", StorageController, :get_attachment
 
+    post "/generate/addie", AddieController, :generate_chat
+
     pipe_through :authenticated
 
     get "/user", AuthController, :fetch_user
@@ -109,7 +111,6 @@ defmodule SequenceWeb.Router do
     get "/daily_notes", JournalController, :list_notes
     post "/daily_notes/:date", JournalController, :save_note
     post "/generate/summary", JournalController, :generate_summary
-    post "/generate/addie", AddieController, :generate_chat
 
     resources "/teams", TeamsController
 

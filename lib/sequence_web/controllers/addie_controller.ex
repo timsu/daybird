@@ -9,13 +9,14 @@ defmodule SequenceWeb.AddieController do
   def generate_chat(conn, %{ "messages" => messages }) do
     ip_addr = conn.remote_ip |> :inet.ntoa() |> to_string()
 
-    messages = [%{ role: "system", content: "You are an ADHD coach helping a client with ADHD." } | messages]
+    messages = [%{ role: "system", content: "You are a concise ADHD coach helping the user be their best." } | messages]
 
     case Hammer.check_rate("addie:#{ip_addr}", 60_000, 5) do
       {:allow, _count} ->
+        IO.inspect(messages)
         with {:ok, response} <- Sequence.OpenAI.chat(ip_addr, messages) do
           IO.inspect(response)
-          result = hd(response["choices"])["content"] |> String.trim
+          result = hd(response["choices"])["message"]["content"] |> String.trim
           text conn, result
         else
           {:error, :openai, _status, body} ->

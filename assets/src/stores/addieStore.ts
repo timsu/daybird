@@ -14,6 +14,8 @@ class AddieStore {
 
   response = atom<Response | null>(null)
 
+  error = atom<string | null>(null)
+
   // --- actions
 
   resetConversation = () => {
@@ -39,6 +41,10 @@ class AddieStore {
 
   setResponse = (response: Response | null) => {
     this.response.set(response)
+  }
+
+  setError = (error: string | null) => {
+    this.error.set(error)
   }
 }
 

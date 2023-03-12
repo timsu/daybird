@@ -68,7 +68,7 @@ defmodule Sequence.OpenAI do
       user: user_id,
     }
 
-    post("/completions", authenticated_headers(), request)
+    post("/chat/completions", authenticated_headers(), request)
   end
 
   def api_key, do: Application.get_env(:sequence, :openai_api_key)

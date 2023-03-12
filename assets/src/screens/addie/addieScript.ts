@@ -1,5 +1,6 @@
 import { API } from '@/api'
 import { addieStore } from '@/stores/addieStore'
+import { unwrapError } from '@/utils'
 
 enum State {
   WELCOME,
@@ -71,13 +72,20 @@ What do you need right now?`)
       { role: 'user', content: input },
     ]
 
-    const response = await API.generateChat(messages)
-    await addieStore.addBotMessage(response)
-    await addieStore.addBotMessage(`Ready to continue?`)
-    addieStore.setResponse({
-      kind: 'buttons',
-      buttons: ['Ready.'],
-    })
+    try {
+      const response = await API.generateChat(messages)
+      await addieStore.addBotMessage(response)
+      await addieStore.addBotMessage(`Ready to continue?`)
+      addieStore.setResponse({
+        kind: 'buttons',
+        buttons: ['Ready.'],
+      })
+    } catch (error) {
+      addieStore.setError(unwrapError(error))
+      addieStore.setResponse({
+        kind: 'text',
+      })
+    }
   }
 
   // --- time of day check
@@ -132,8 +140,7 @@ Are you sleepy?`)
     } else if (index == 1) {
       await addieStore.addBotMessage(`Okay, let's get you ready for bed.
 
-It's perfectly normal not to be sleepy yet. People with ADHD typically have a later circadian rhythm
-and have a harder time falling asleep as well.`)
+It's perfectly normal not to be sleepy yet. People with ADHD typically have a later circadian rhythm and have a harder time falling asleep as well.`)
 
       await addieStore.addBotMessage(
         `Pick an activity that's relaxing and calming and does not involve screens.`
