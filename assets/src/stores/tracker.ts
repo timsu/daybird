@@ -24,6 +24,10 @@ class Tracker {
   openAddie() {
     amplitude.logEvent('openAddie')
   }
+
+  addieEvent(type: string) {
+    amplitude.logEvent('addieEvent', { type })
+  }
 }
 
 const tracker = new Tracker()

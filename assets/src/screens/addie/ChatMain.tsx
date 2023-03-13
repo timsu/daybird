@@ -93,7 +93,11 @@ function Response() {
   if (!response) return null
 
   if (response.kind == 'end') {
-    return <div ref={divRef}>Thank you for talking to Addie.</div>
+    return (
+      <div ref={divRef}>
+        Thank you for talking to Addie. If you have any feedback, send it to Tim (tim@daybird.app)
+      </div>
+    )
   }
 
   return (

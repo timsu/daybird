@@ -11,6 +11,7 @@ import { authStore } from '@/stores/authStore'
 import { docStore } from '@/stores/docStore'
 import { journalStore } from '@/stores/journalStore'
 import { projectStore } from '@/stores/projectStore'
+import tracker from '@/stores/tracker'
 import { assertIsDefined, unwrapError } from '@/utils'
 import { Editor } from '@tiptap/core'
 
@@ -26,6 +27,8 @@ class AddieScript {
 
   buttonHandler: ButtonHandler = () => {}
   inputHandler: InputHandler = () => {}
+
+  seenMenu = false
 
   setUserResponse = (
     response: UserResponse,
@@ -55,10 +58,14 @@ class AddieScript {
   mainMenu = async () => {
     await addieStore.addBotMessage(`What can I help you with today?`)
 
+    const buttons = ['What should I do?', 'Journal', 'Help me']
+    if (this.seenMenu) buttons.push('All done')
+    else this.seenMenu = true
+
     this.setUserResponse(
       {
         kind: 'buttons',
-        buttons: ['What should I do?', 'Journal', 'Help me'],
+        buttons: buttons,
       },
       this.handleMainMenu,
       null
@@ -74,12 +81,15 @@ class AddieScript {
       this.doJournal()
     } else if (index == 2) {
       this.doHelp()
+    } else {
+      addieStore.setResponse({ kind: 'end' })
     }
   }
 
   // --- attend to self
 
   doCheckin = async () => {
+    tracker.addieEvent('checkin')
     await addieStore.addBotMessage(`Let's start with an emotional check-in.
 
 Take a deep breath and close your eyes. How are you feeling right now?`)
@@ -107,6 +117,7 @@ Take a deep breath and close your eyes. How are you feeling right now?`)
   }
 
   attendToSelf = async () => {
+    tracker.addieEvent('attendSelf')
     await addieStore.addBotMessage(`I'm sorry to hear that. Take a moment to attend to yourself.
 
 What do you need right now?`)
@@ -157,6 +168,7 @@ What do you need right now?`)
   // --- bedtime
 
   bedtimeRoutine = async () => {
+    tracker.addieEvent('bedtime')
     await addieStore.addBotMessage(`It's bedtime! Let's get ready for bed.
 
 Are you sleepy?`)
@@ -226,6 +238,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   // --- routines
 
   homeRoutine = async () => {
+    tracker.addieEvent('homeRoutine')
     await addieStore.addBotMessage(`What are your important things to do right now?`)
 
     this.setUserResponse(
@@ -259,6 +272,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   workRoutine = async () => {
+    tracker.addieEvent('workRoutine')
     await addieStore.addBotMessage(
       `You're probably at work. First things first. Check your calendar and see when your next meeting is`
     )
@@ -315,6 +329,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   weekendRoutine = async () => {
+    tracker.addieEvent('weekendRoutine')
     await addieStore.addBotMessage(`It's the weekend! How can you spend this time well?`)
 
     this.setUserResponse(
@@ -345,6 +360,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   ydoc: Y.Doc | undefined
 
   doJournal = async () => {
+    tracker.addieEvent('journal')
     const today = new Date()
     const date = dateToPeriodDateString(Period.DAY, today)
     addieStore.awaitingResponse.set(true)
@@ -388,6 +404,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
       this.ydoc = undefined
       this.mainMenu()
     } else if (index == 1) {
+      tracker.addieEvent('seeJournal')
       await addieStore.addBotMessage(`Here's what you've written so far:`)
       await addieStore.addBotMessage(this.editor?.getText() || '')
       this.setUserResponse(
@@ -402,6 +419,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   handleJournal = async (input: string) => {
+    tracker.addieEvent('writeJournal')
     assertIsDefined(this.editor, 'editor')
     assertIsDefined(this.ydoc, 'ydoc')
 
@@ -433,6 +451,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   // --- help
 
   doHelp = async () => {
+    tracker.addieEvent('getHelp')
     await addieStore.addBotMessage(`What would you like help with?`)
 
     this.setUserResponse(
@@ -467,6 +486,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   // ---
 
   gptLoop = async (input: string, buttons: string[]) => {
+    tracker.addieEvent('gptChat')
     this.messageHistory.push({
       role: 'user',
       content: input,
