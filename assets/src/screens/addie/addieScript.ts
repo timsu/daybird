@@ -44,7 +44,7 @@ class AddieScript {
   // --- welcome
 
   welcome = async () => {
-    this.seenMenu = true
+    this.seenMenu = false
     if (!localStorage.getItem(LS_SEEN_BEFORE)) {
       await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.
 
@@ -527,11 +527,15 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   handleHelp = async (input: string) => {
-    this.gptLoop(input, ['Back to menu'])
+    this.gptLoop(input, ['Back to menu', 'All done'])
   }
 
   handleHelpButton = async (index: number) => {
-    this.mainMenu()
+    if (index == 0) {
+      this.mainMenu()
+    } else if (index == 1) {
+      this.finishConversation()
+    }
   }
 
   // --- end
