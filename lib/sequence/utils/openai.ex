@@ -59,7 +59,7 @@ defmodule Sequence.OpenAI do
   #      "total_tokens" => 12
   #    }
   #  }}
-  def chat(user_id, messages, model \\ "gpt-3.5-turbo", max_tokens \\ 256, temperature \\ 0.5) do
+  def chat(user_id, messages, model \\ "gpt-3.5-turbo", max_tokens \\ 100, temperature \\ 0.5) do
     request = %{
       model: model,
       messages: messages,
