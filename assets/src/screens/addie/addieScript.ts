@@ -21,6 +21,7 @@ type ButtonHandler = (index: number) => void
 type InputHandler = (input: string) => void
 
 const coachDescription = `friendly ADHD coach who gives 1-paragraph answers`
+const datePreamble = () => `It's ${new Date().toLocaleString()}.`
 
 class AddieScript {
   messageHistory: GPTMessage[] = []
@@ -44,8 +45,9 @@ class AddieScript {
 
   welcome = async () => {
     if (!localStorage.getItem(LS_SEEN_BEFORE)) {
-      await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.`)
-      await addieStore.addBotMessage(`Visit me any time you need help.`)
+      await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.
+
+Visit me any time you need help.`)
       localStorage.setItem(LS_SEEN_BEFORE, 'true')
     } else {
       const user = authStore.loggedInUser.get()!
@@ -58,7 +60,7 @@ class AddieScript {
   mainMenu = async () => {
     await addieStore.addBotMessage(`What can I help you with today?`)
 
-    const buttons = ['What should I do?', 'Journal', 'Help me']
+    const buttons = ['What should I do?', 'Journal', 'Advice']
     if (this.seenMenu) buttons.push('All done')
     else this.seenMenu = true
 
@@ -133,7 +135,8 @@ What do you need right now?`)
     this.messageHistory = [
       {
         role: 'system',
-        content: `You are a ${coachDescription} helping a user who is not feeling well to feel ready for coaching.`,
+        content: `You are a ${coachDescription} helping a user who is not feeling well to ' +
+          'feel ready for coaching. ${datePreamble()}`,
       },
       {
         role: 'assistant',
@@ -252,7 +255,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     this.messageHistory = [
       {
         role: 'system',
-        content: `You are a ${coachDescription} helping the user focus and get tasks done.`,
+        content: `You are a ${coachDescription} helping the user focus and get tasks done. ${datePreamble()}`,
       },
       {
         role: 'assistant',
@@ -343,7 +346,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     this.messageHistory = [
       {
         role: 'system',
-        content: `You are a ${coachDescription} helping the user recharge and improve.`,
+        content: `You are a ${coachDescription} helping the user recharge and improve. ${datePreamble()}`,
       },
       {
         role: 'assistant',
@@ -466,7 +469,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     this.messageHistory = [
       {
         role: 'system',
-        content: `You are a ${coachDescription} helping the user inside an ADHD assistant app.`,
+        content: `You are a ${coachDescription} helping the user inside an ADHD assistant app. ${datePreamble()}`,
       },
       {
         role: 'assistant',
