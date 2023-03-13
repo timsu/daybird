@@ -19,7 +19,7 @@ const LS_SEEN_BEFORE = 'addie-seen-before'
 type ButtonHandler = (index: number) => void
 type InputHandler = (input: string) => void
 
-const coachDescription = `friendly and concise ADHD coach`
+const coachDescription = `friendly ADHD coach who gives 1-paragraph answers`
 
 class AddieScript {
   messageHistory: GPTMessage[] = []
@@ -226,7 +226,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   // --- routines
 
   homeRoutine = async () => {
-    await addieStore.addBotMessage(`What are your important things to do at home?`)
+    await addieStore.addBotMessage(`What are your important things to do right now?`)
 
     this.setUserResponse(
       {
