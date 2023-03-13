@@ -8,6 +8,7 @@ export type UserResponse = {
   kind: 'text' | 'buttons' | 'end' | 'buttons_text'
   buttons?: string[]
   tooltips?: string[]
+  placeholder?: string
 }
 
 class AddieStore {

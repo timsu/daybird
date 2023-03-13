@@ -242,7 +242,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     )
   }
 
-  // --- routines
+  // --- work / home routines
 
   homeRoutine = async () => {
     tracker.addieEvent('homeRoutine')
@@ -250,7 +250,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
     this.setUserResponse(
       {
-        kind: 'buttons_text',
+        kind: 'text',
       },
       this.handleHomeButton,
       this.handleHomeRoutine
@@ -300,24 +300,44 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
       addieStore.setResponse({
         kind: 'end',
       })
+      return
     } else if (index == 1) {
       await addieStore.addBotMessage(
         `You don't have too much time, so let's work on a few small tasks.`
       )
+      this.workContext = 'I have a meeting in less than an hour.'
       this.handleWorkRoutineText('')
     } else {
       await addieStore.addBotMessage(
         `You've got a good chunk of time to do some deep work. What's important?`
       )
+      this.workContext = 'I have a few hours for deep work.'
       this.handleWorkRoutineText('')
     }
+
+    this.workTasks = []
+
+    this.setUserResponse(
+      {
+        kind: 'text',
+        placeholder: 'What do you want to do?',
+      },
+      this.handleWorkRoutineButton,
+      this.handleWorkRoutineText
+    )
   }
 
+  workTasks: string[] = []
+  workContext: string | undefined
+
   handleWorkRoutineText = async (input: string) => {
+    this.workTasks.push(input)
+
     this.setUserResponse(
       {
         kind: 'buttons_text',
-        buttons: ['Done'],
+        placeholder: 'Anything else?',
+        buttons: ['Next'],
       },
       this.handleWorkRoutineButton,
       this.handleWorkRoutineText
@@ -325,13 +345,18 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   handleWorkRoutineButton = async (input: number) => {
-    await addieStore.addBotMessage(`That sounds like a great idea!`)
+    await addieStore.addBotMessage(
+      `That sounds like a great idea! Do you want to talk it through, ` +
+        `or are you ready to do it?`
+    )
+
     this.setUserResponse(
       {
-        kind: 'end',
+        kind: 'buttons_text',
+        buttons: ['Ready to work', 'Talk it through'],
       },
-      null,
-      null
+      this.handleTaskTalkButtons,
+      this.handleTaskTalkText
     )
   }
 
@@ -341,7 +366,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
     this.setUserResponse(
       {
-        kind: 'buttons_text',
+        kind: 'text',
       },
       this.handleHomeButton,
       this.handleHomeRoutine
@@ -357,6 +382,37 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
         content: "It's the weekend! How can you spend this time well?",
       },
     ]
+  }
+
+  // --- talk it through
+
+  handleTaskTalkButtons = async (index: number) => {
+    if (index == 0) {
+      this.setUserResponse(
+        {
+          kind: 'end',
+        },
+        null,
+        null
+      )
+    } else if (index == 1) {
+      this.messageHistory = [
+        {
+          role: 'system',
+          content: `You are a ${coachDescription} helping the user focus and get tasks done. ${datePreamble()}`,
+        },
+        {
+          role: 'assistant',
+          content: 'What are your important tasks?',
+        },
+      ]
+
+      this.handleTaskTalkText(`${this.workContext} I want to do: ${this.workTasks.join(',')}`)
+    }
+  }
+
+  handleTaskTalkText = async (input: string) => {
+    this.gptLoop(input, ['All Done'])
   }
 
   // --- remember
