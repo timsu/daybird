@@ -23,6 +23,9 @@ class AddieStore {
 
   resetConversation = () => {
     if (config.dev) (window as any)['addieStore'] = addieStore
+    this.response.set(null)
+    this.error.set(null)
+    this.awaitingResponse.set(false)
     this.messages.set([])
     addieScript.welcome()
   }

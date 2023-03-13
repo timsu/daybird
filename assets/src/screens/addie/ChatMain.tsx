@@ -95,7 +95,10 @@ function Response() {
   if (response.kind == 'end') {
     return (
       <div ref={divRef}>
-        Thank you for talking to Addie. If you have any feedback, send it to Tim (tim@daybird.app)
+        Thank you for talking to Addie. If you have any feedback, send it to Tim (tim@daybird.app).
+        <a href="#" class="text-blue-600 block" onClick={() => addieStore.resetConversation()}>
+          Start Over?
+        </a>
       </div>
     )
   }
@@ -104,7 +107,7 @@ function Response() {
     <>
       {(response.kind == 'buttons' || response.kind == 'buttons_text') && (
         <>
-          <div ref={divRef} class="flex gap-2 justify-end">
+          <div ref={divRef} class="flex gap-2 justify-center flex-wrap">
             {response.buttons?.map((button, i) => (
               <button
                 class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg border border-gray-700"

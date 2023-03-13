@@ -44,6 +44,7 @@ class AddieScript {
   // --- welcome
 
   welcome = async () => {
+    this.seenMenu = false
     if (!localStorage.getItem(LS_SEEN_BEFORE)) {
       await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.
 
@@ -179,7 +180,7 @@ Are you sleepy?`)
     this.setUserResponse(
       {
         kind: 'buttons',
-        buttons: ['Yes', 'No', 'Home Mode', 'Work Mode'],
+        buttons: ['Yes', 'No', "I'm not ready"],
       },
       this.handleBedtime,
       null
@@ -218,6 +219,9 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
         this.handleBedtimeText
       )
     } else if (index == 2) {
+      await addieStore.addBotMessage(
+        `Okay, but remember that sleep is extra important for people with ADHD.`
+      )
       this.homeRoutine()
     } else if (index == 3) {
       this.workRoutine()
