@@ -315,17 +315,26 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   weekendRoutine = async () => {
-    await addieStore.addBotMessage(`It's the weekend!`)
-
-    await addieStore.addBotMessage(`Stop talking to me and go outside.`)
+    await addieStore.addBotMessage(`It's the weekend! How can you spend this time well?`)
 
     this.setUserResponse(
       {
-        kind: 'end',
+        kind: 'buttons_text',
       },
-      null,
-      null
+      this.handleHomeButton,
+      this.handleHomeRoutine
     )
+
+    this.messageHistory = [
+      {
+        role: 'system',
+        content: `You are a ${coachDescription} helping the user recharge and improve.`,
+      },
+      {
+        role: 'assistant',
+        content: "It's the weekend! How can you spend this time well?",
+      },
+    ]
   }
 
   // --- remember
@@ -438,7 +447,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     this.messageHistory = [
       {
         role: 'system',
-        content: 'You are a concise ADHD coach helping a user.',
+        content: `You are a ${coachDescription} helping the user inside an ADHD assistant app.`,
       },
       {
         role: 'assistant',
@@ -476,6 +485,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
       // if the response was incomplete, get more (only one time)
       if (status == 206) {
+        addieStore.awaitingResponse.set(true)
         const { response } = await API.generateChat(this.messageHistory)
         this.messageHistory.push({
           role: 'assistant',
