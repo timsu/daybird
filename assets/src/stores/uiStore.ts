@@ -216,3 +216,4 @@ class UIStore {
 }
 
 export const uiStore = new UIStore()
+if (config.dev) (window as any)['uiStore'] = uiStore

@@ -119,11 +119,10 @@ class AuthStore {
   postAuth = () => {
     const search = new URLSearchParams(location.search)
     const postRedirect =
-      search.get('path') || uiStore.insightLoop
-        ? paths.JOURNAL
-        : uiStore.addie
-        ? paths.ADDIE
-        : paths.TODAY
+      search.get('path') ||
+      (uiStore.insightLoop ? paths.JOURNAL : uiStore.addie ? paths.ADDIE : paths.TODAY)
+
+    logger.info('post auth redirect', postRedirect, uiStore.insightLoop)
 
     location.href = postRedirect.match(/^\/[^\/]+/) ? postRedirect : paths.APP
   }
