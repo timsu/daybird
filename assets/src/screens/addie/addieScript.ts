@@ -48,7 +48,7 @@ class AddieScript {
     if (!localStorage.getItem(LS_SEEN_BEFORE)) {
       await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.
 
-Visit me any time you need help.`)
+Visit me any time you need help. (Your conversations are never recorded)`)
       localStorage.setItem(LS_SEEN_BEFORE, 'true')
     } else {
       const user = authStore.loggedInUser.get()!
