@@ -1,21 +1,18 @@
+import { decode } from 'base64-arraybuffer'
+import { prosemirrorToYDoc, yDocToProsemirrorJSON } from 'y-prosemirror'
+import * as Y from 'yjs'
+
 import { API } from '@/api'
 import { config } from '@/config'
-import { GPTMessage } from '@/models'
+import { DailyNote, dateToPeriodDateString, Doc, GPTMessage, Period } from '@/models'
+import { createEditor, loadDoc } from '@/screens/addie/HeadlessEditor'
 import { addieStore, UserResponse } from '@/stores/addieStore'
 import { authStore } from '@/stores/authStore'
-import { unwrapError } from '@/utils'
-
-enum State {
-  MAIN,
-  CHECKIN,
-  ATTEND,
-  BEDTIME,
-  HOME,
-  WEEKEND,
-  WORK,
-  REMEMBER,
-  GET_HELP,
-}
+import { docStore } from '@/stores/docStore'
+import { journalStore } from '@/stores/journalStore'
+import { projectStore } from '@/stores/projectStore'
+import { assertIsDefined, unwrapError } from '@/utils'
+import { Editor } from '@tiptap/core'
 
 const LS_SEEN_BEFORE = 'addie-seen-before'
 
@@ -23,8 +20,6 @@ type ButtonHandler = (index: number) => void
 type InputHandler = (input: string) => void
 
 class AddieScript {
-  state: State = State.MAIN
-
   messageHistory: GPTMessage[] = []
 
   buttonHandler: ButtonHandler = () => {}
@@ -56,13 +51,12 @@ class AddieScript {
   }
 
   mainMenu = async () => {
-    this.state = State.MAIN
     await addieStore.addBotMessage(`What can I help you with today?`)
 
     this.setUserResponse(
       {
         kind: 'buttons',
-        buttons: ['What should I do?', 'Remember / Recall', 'Help me'],
+        buttons: ['What should I do?', 'Journal', 'Help me'],
       },
       this.handleMainMenu,
       null
@@ -72,8 +66,10 @@ class AddieScript {
   handleMainMenu = async (index: number) => {
     if (index == 0) {
       this.doCheckin()
+      // } else if (index == 1) {
+      //   this.doRemember()
     } else if (index == 1) {
-      this.doRemember()
+      this.doJournal()
     } else if (index == 2) {
       this.doHelp()
     }
@@ -82,7 +78,6 @@ class AddieScript {
   // --- attend to self
 
   doCheckin = async () => {
-    this.state = State.CHECKIN
     await addieStore.addBotMessage(`Let's start with an emotional check-in.
 
 Take a deep breath and close your eyes. How are you feeling right now?`)
@@ -110,8 +105,6 @@ Take a deep breath and close your eyes. How are you feeling right now?`)
   }
 
   attendToSelf = async () => {
-    this.state = State.ATTEND
-
     await addieStore.addBotMessage(`I'm sorry to hear that. Take a moment to attend to yourself.
 
 What do you need right now?`)
@@ -163,8 +156,6 @@ What do you need right now?`)
   // --- bedtime
 
   bedtimeRoutine = async () => {
-    this.state = State.BEDTIME
-
     await addieStore.addBotMessage(`It's bedtime! Let's get ready for bed.
 
 Are you sleepy?`)
@@ -230,7 +221,6 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   // --- routines
 
   homeRoutine = async () => {
-    this.state = State.HOME
     await addieStore.addBotMessage(`Let's think about things to do around the home.`)
 
     this.setUserResponse(
@@ -248,7 +238,6 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   workRoutine = async () => {
-    this.state = State.WORK
     await addieStore.addBotMessage(
       `You're probably at work. First things first. Check your calendar and see when your next meeting is`
     )
@@ -294,7 +283,6 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   weekendRoutine = async () => {
-    this.state = State.WEEKEND
     await addieStore.addBotMessage(`It's the weekend!`)
 
     await addieStore.addBotMessage(`Stop talking to me and go outside.`)
@@ -312,11 +300,79 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
   doRemember = async () => {}
 
+  editor: Editor | undefined
+  ydoc: Y.Doc | undefined
+
+  doJournal = async () => {
+    const today = new Date()
+    const date = dateToPeriodDateString(Period.DAY, today)
+    addieStore.awaitingResponse.set(true)
+    const project = projectStore.currentProject.get()!
+
+    const entries = await journalStore.loadNotes(project, Period.DAY, date, date)
+    this.ydoc = new Y.Doc()
+
+    if (entries?.length) {
+      const journalEntry = entries[0]
+      loadDoc(project, journalEntry.id, this.ydoc)
+      await addieStore.addBotMessage(`Adding to your existing journal for today.`)
+    } else {
+      await addieStore.addBotMessage(
+        `Today is ${new Date().toLocaleDateString()}. What would you like to write?`
+      )
+    }
+    this.editor = createEditor(this.ydoc)
+
+    this.setUserResponse(
+      {
+        kind: 'buttons_text',
+        buttons: ['Done'],
+      },
+      this.handleJournalButtons,
+      this.handleJournal
+    )
+  }
+
+  handleJournalButtons = async (index: number) => {
+    if (index == 0) {
+      this.editor = undefined
+      this.ydoc = undefined
+      this.mainMenu()
+    }
+  }
+
+  handleJournal = async (input: string) => {
+    assertIsDefined(this.editor, 'editor')
+    assertIsDefined(this.ydoc, 'ydoc')
+
+    const len = this.editor.state.doc.nodeSize
+    const transaction = this.editor.state.tr.insertText(input + '\n')
+    const newState = this.editor.state.apply(transaction)
+    this.editor.view.updateState(newState)
+    const date = dateToPeriodDateString(Period.DAY, new Date())
+
+    const contents = Y.encodeStateAsUpdate(this.ydoc)
+    const project = projectStore.currentProject.get()!
+    const text = this.editor.getText()
+    const snippet = text.substring(0, 252).trim()
+
+    journalStore
+      .saveNote(project, Period.DAY, date, contents, snippet)
+      .then((note) => docStore.saveDoc(project, note.id, contents))
+
+    this.setUserResponse(
+      {
+        kind: 'buttons_text',
+        buttons: ['Done'],
+      },
+      this.handleJournalButtons,
+      this.handleJournal
+    )
+  }
+
   // --- help
 
   doHelp = async () => {
-    this.state = State.GET_HELP
-
     await addieStore.addBotMessage(`What would you like help with?`)
 
     this.setUserResponse(

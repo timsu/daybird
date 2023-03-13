@@ -1,7 +1,8 @@
 import { useState } from 'preact/hooks'
 
 import GoogleServerOAuth, {
-    GoogleResponse, PROFILE_SCOPES
+  GoogleResponse,
+  PROFILE_SCOPES,
 } from '@/components/auth/GoogleServerOAuth'
 import ErrorMessage from '@/components/core/ErrorMessage'
 import Input from '@/components/core/Input'
@@ -58,7 +59,11 @@ export default () => {
   }
 
   return (
-    <AuthForm title={`Welcome to ${uiStore.insightLoop ? 'InsightLoop' : 'Daybird'}`}>
+    <AuthForm
+      title={`Welcome to ${
+        uiStore.insightLoop ? 'InsightLoop' : uiStore.addie ? 'Addie' : 'Daybird'
+      }`}
+    >
       {!uiStore.reactNative && (
         <>
           <div className="flex justify-center">

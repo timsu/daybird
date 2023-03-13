@@ -33,6 +33,8 @@ class AddieStore {
   }
 
   addBotMessage = async (text: string) => {
+    this.awaitingResponse.set(false)
+
     // add a little delay for realism
     await new Promise((resolve) => setTimeout(resolve, 500))
     this.addMessage(new Message(Author.BOT, text))
