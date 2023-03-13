@@ -348,21 +348,29 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
       const journalEntry = entries[0]
       loadDoc(project, journalEntry.id, this.ydoc)
       await addieStore.addBotMessage(`Adding to your existing journal for today.`)
+
+      this.setUserResponse(
+        {
+          kind: 'buttons_text',
+          buttons: ['Done', 'Show Journal'],
+        },
+        this.handleJournalButtons,
+        this.handleJournal
+      )
     } else {
       await addieStore.addBotMessage(
         `Today is ${new Date().toLocaleDateString()}. What would you like to write?`
       )
+      this.setUserResponse(
+        {
+          kind: 'buttons_text',
+          buttons: ['Done'],
+        },
+        this.handleJournalButtons,
+        this.handleJournal
+      )
     }
     this.editor = createEditor(this.ydoc)
-
-    this.setUserResponse(
-      {
-        kind: 'buttons_text',
-        buttons: ['Done'],
-      },
-      this.handleJournalButtons,
-      this.handleJournal
-    )
   }
 
   handleJournalButtons = async (index: number) => {
@@ -370,6 +378,17 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
       this.editor = undefined
       this.ydoc = undefined
       this.mainMenu()
+    } else if (index == 1) {
+      await addieStore.addBotMessage(`Here's what you've written so far:`)
+      await addieStore.addBotMessage(this.editor?.getText() || '')
+      this.setUserResponse(
+        {
+          kind: 'buttons_text',
+          buttons: ['Done'],
+        },
+        this.handleJournalButtons,
+        this.handleJournal
+      )
     }
   }
 

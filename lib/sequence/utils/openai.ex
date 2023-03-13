@@ -84,7 +84,7 @@ defmodule Sequence.OpenAI do
 
   defp post(url, headers, params) do
     body = Jason.encode!(params)
-    Mojito.post(@url <> url, headers, body)
+    Mojito.post(@url <> url, headers, body, timeout: 20_000)
     |> parse_response()
   end
 
