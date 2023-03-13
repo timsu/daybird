@@ -44,7 +44,7 @@ class AddieScript {
   // --- welcome
 
   welcome = async () => {
-    this.seenMenu = false
+    this.seenMenu = true
     if (!localStorage.getItem(LS_SEEN_BEFORE)) {
       await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.
 
@@ -85,7 +85,7 @@ Visit me any time you need help.`)
     } else if (index == 2) {
       this.doHelp()
     } else {
-      addieStore.setResponse({ kind: 'end' })
+      this.finishConversation()
     }
   }
 
@@ -199,9 +199,7 @@ Are you sleepy?`)
 
 4. I'll see you tomorrow.`)
 
-      addieStore.setResponse({
-        kind: 'end',
-      })
+      this.finishConversation()
     } else if (index == 1) {
       await addieStore.addBotMessage(`Okay, let's get you ready for bed.
 
@@ -273,9 +271,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   }
 
   handleHomeButton = async (index: number) => {
-    addieStore.setResponse({
-      kind: 'end',
-    })
+    this.finishConversation()
   }
 
   workRoutine = async () => {
@@ -297,9 +293,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   handleWorkRoutine = async (index: number) => {
     if (index == 0) {
       await addieStore.addBotMessage(`Get prepared for it and don't be late.`)
-      addieStore.setResponse({
-        kind: 'end',
-      })
+      this.finishConversation()
       return
     } else if (index == 1) {
       await addieStore.addBotMessage(
@@ -388,13 +382,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
   handleTaskTalkButtons = async (index: number) => {
     if (index == 0) {
-      this.setUserResponse(
-        {
-          kind: 'end',
-        },
-        null,
-        null
-      )
+      this.finishConversation()
     } else if (index == 1) {
       this.messageHistory = [
         {
@@ -544,6 +532,33 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
   handleHelpButton = async (index: number) => {
     this.mainMenu()
+  }
+
+  // --- end
+
+  finishConversation = async () => {
+    await addieStore.addBotMessage(`Thanks for talking with me! How was this conversation?`)
+
+    this.setUserResponse(
+      {
+        kind: 'buttons',
+        buttons: ['Great', 'OK', 'Bad'],
+      },
+      this.handleFinishButtons,
+      null
+    )
+  }
+
+  handleFinishButtons = async (index: number) => {
+    const messages = addieStore.messages.get().length
+    if (index == 0) {
+      tracker.addieRating('great', messages)
+    } else if (index == 1) {
+      tracker.addieRating('ok', messages)
+    } else if (index == 2) {
+      tracker.addieRating('bad', messages)
+    }
+    addieStore.setResponse({ kind: 'end' })
   }
 
   // ---

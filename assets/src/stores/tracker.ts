@@ -28,6 +28,10 @@ class Tracker {
   addieEvent(type: string) {
     amplitude.logEvent('addieEvent', { type })
   }
+
+  addieRating(rating: string, messages: number) {
+    amplitude.logEvent('addieRating', { rating, messages })
+  }
 }
 
 const tracker = new Tracker()

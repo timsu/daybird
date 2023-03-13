@@ -95,7 +95,7 @@ function Response() {
   if (response.kind == 'end') {
     return (
       <div ref={divRef}>
-        Thank you for talking to Addie. If you have any feedback, send it to Tim (tim@daybird.app).
+        If you have additional feedback, send it to Tim (tim@daybird.app).
         <a href="#" class="text-blue-600 block" onClick={() => addieStore.resetConversation()}>
           Start Over?
         </a>
