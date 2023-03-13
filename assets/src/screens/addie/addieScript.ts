@@ -464,6 +464,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     })
 
     try {
+      addieStore.setError(null)
       addieStore.awaitingResponse.set(true)
       const { response, status } = await API.generateChat(this.messageHistory)
 
