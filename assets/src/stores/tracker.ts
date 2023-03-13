@@ -29,6 +29,10 @@ class Tracker {
     amplitude.logEvent('addieEvent', { type })
   }
 
+  addieGPTChat(input: string) {
+    amplitude.logEvent('addieGPTChat', { input })
+  }
+
   addieRating(rating: string, messages: number) {
     amplitude.logEvent('addieRating', { rating, messages })
   }

@@ -48,7 +48,7 @@ class AddieScript {
     if (!localStorage.getItem(LS_SEEN_BEFORE)) {
       await addieStore.addBotMessage(`Hi! I am Addie, your personal ADHD assistant.
 
-Visit me any time you need help. (Your conversations are never recorded)`)
+Visit me any time you need help.`)
       localStorage.setItem(LS_SEEN_BEFORE, 'true')
     } else {
       const user = authStore.loggedInUser.get()!
@@ -568,7 +568,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   // ---
 
   gptLoop = async (input: string, buttons: string[]) => {
-    tracker.addieEvent('gptChat')
+    tracker.addieGPTChat(input)
     this.messageHistory.push({
       role: 'user',
       content: input,
