@@ -19,6 +19,8 @@ const LS_SEEN_BEFORE = 'addie-seen-before'
 type ButtonHandler = (index: number) => void
 type InputHandler = (input: string) => void
 
+const coachDescription = `friendly and concise ADHD coach`
+
 class AddieScript {
   messageHistory: GPTMessage[] = []
 
@@ -120,8 +122,7 @@ What do you need right now?`)
     this.messageHistory = [
       {
         role: 'system',
-        content:
-          'You are a concise ADHD coach helping a user who is not feeling well to feel ready for coaching.',
+        content: `You are a ${coachDescription} helping a user who is not feeling well to feel ready for coaching.`,
       },
       {
         role: 'assistant',
@@ -163,7 +164,7 @@ Are you sleepy?`)
     this.setUserResponse(
       {
         kind: 'buttons',
-        buttons: ['Yes', 'No'],
+        buttons: ['Yes', 'No', 'Home Mode', 'Work Mode'],
       },
       this.handleBedtime,
       null
@@ -201,6 +202,10 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
         null,
         this.handleBedtimeText
       )
+    } else if (index == 2) {
+      this.homeRoutine()
+    } else if (index == 3) {
+      this.workRoutine()
     }
   }
 
@@ -221,20 +226,36 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
   // --- routines
 
   homeRoutine = async () => {
-    await addieStore.addBotMessage(`Let's think about things to do around the home.`)
+    await addieStore.addBotMessage(`What are your important things to do at home?`)
 
     this.setUserResponse(
       {
-        kind: 'text',
+        kind: 'buttons_text',
       },
-      null,
+      this.handleHomeButton,
       this.handleHomeRoutine
     )
+
+    this.messageHistory = [
+      {
+        role: 'system',
+        content: `You are a ${coachDescription} helping the user focus and get tasks done.`,
+      },
+      {
+        role: 'assistant',
+        content: 'What are your important things to do at home?',
+      },
+    ]
   }
 
   handleHomeRoutine = async (input: string) => {
-    await addieStore.addBotMessage(`That sounds like a great idea!`)
-    await addieStore.addBotMessage('Go do that.')
+    this.gptLoop(input, ['All Done'])
+  }
+
+  handleHomeButton = async (index: number) => {
+    addieStore.setResponse({
+      kind: 'end',
+    })
   }
 
   workRoutine = async () => {
@@ -245,7 +266,7 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
     this.setUserResponse(
       {
         kind: 'buttons',
-        buttons: ["It's coming up soon", "It's in a few hours", 'No meetings'],
+        buttons: ['Soon', 'Less than an hour', 'In a few hours', 'No meetings left'],
       },
       this.handleWorkRoutine,
       null
@@ -258,20 +279,31 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
       addieStore.setResponse({
         kind: 'end',
       })
-    } else {
-      await addieStore.addBotMessage(`Great! Now, what would you like to do?`)
-
-      this.setUserResponse(
-        {
-          kind: 'text',
-        },
-        null,
-        this.handleWorkRoutineText
+    } else if (index == 1) {
+      await addieStore.addBotMessage(
+        `You don't have too much time, so let's work on a few small tasks.`
       )
+      this.handleWorkRoutineText('')
+    } else {
+      await addieStore.addBotMessage(
+        `You've got a good chunk of time to do some deep work. What's important?`
+      )
+      this.handleWorkRoutineText('')
     }
   }
 
   handleWorkRoutineText = async (input: string) => {
+    this.setUserResponse(
+      {
+        kind: 'buttons_text',
+        buttons: ['Done'],
+      },
+      this.handleWorkRoutineButton,
+      this.handleWorkRoutineText
+    )
+  }
+
+  handleWorkRoutineButton = async (input: number) => {
     await addieStore.addBotMessage(`That sounds like a great idea!`)
     this.setUserResponse(
       {
@@ -414,13 +446,24 @@ It's perfectly normal not to be sleepy yet. People with ADHD typically have a la
 
     try {
       addieStore.awaitingResponse.set(true)
-      const response = await API.generateChat(this.messageHistory)
+      const { response, status } = await API.generateChat(this.messageHistory)
+
       this.messageHistory.push({
         role: 'assistant',
         content: response,
       })
-
       await addieStore.addBotMessage(response)
+
+      // if the response was incomplete, get more (only one time)
+      if (status == 206) {
+        const { response } = await API.generateChat(this.messageHistory)
+        this.messageHistory.push({
+          role: 'assistant',
+          content: response,
+        })
+        await addieStore.addBotMessage(response)
+      }
+
       addieStore.setResponse({
         kind: 'buttons_text',
         buttons,

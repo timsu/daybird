@@ -437,11 +437,13 @@ class APIService {
     return response.data
   }
 
-  async generateChat(messages: { role: string; content: string }[]): Promise<string> {
+  async generateChat(
+    messages: { role: string; content: string }[]
+  ): Promise<{ response: string; status: number }> {
     const response = await this.axios.post(`${this.endpoint}/generate/addie`, {
       messages,
     })
-    return response.data
+    return { response: response.data, status: response.status }
   }
 
   // misc

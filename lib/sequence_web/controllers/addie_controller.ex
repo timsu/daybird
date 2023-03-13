@@ -14,8 +14,16 @@ defmodule SequenceWeb.AddieController do
           IO.inspect(messages)
           with {:ok, response} <- Sequence.OpenAI.chat(user.id, messages) do
             IO.inspect(response)
-            result = hd(response["choices"])["message"]["content"] |> String.trim
-            text conn, result
+            choice = hd(response["choices"])
+            result = choice["message"]["content"] |> String.trim
+            finished = choice["finish_reason"] != "length"
+
+            if !finished do
+              put_status(conn, 206)
+              |> text(result)
+            else
+              text conn, result
+            end
           else
             {:error, :openai, _status, body} ->
               IO.inspect(body)

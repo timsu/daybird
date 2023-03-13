@@ -116,7 +116,7 @@ function Response() {
         </>
       )}
 
-      {response.kind == 'buttons_text' && <div class="h-4 min-h-4" />}
+      {response.kind == 'buttons_text' && <div class="h-4 min-h-[1rem]" />}
 
       {(response.kind == 'text' || response.kind == 'buttons_text') && (
         <div ref={divRef}>
