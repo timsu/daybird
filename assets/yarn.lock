@@ -1491,10 +1491,10 @@ preact-transitioning@^1.3.1:
   resolved "https://registry.yarnpkg.com/preact-transitioning/-/preact-transitioning-1.3.1.tgz#2ab57299de298ae0f99f88eca8895bd570102419"
   integrity sha512-1K3G9KoHBWpXfoiCS3qU24tdoAs4z2KtwsWAoWcrUiiH1hszhN72RajvgoOKuU2UIBDIVNNzcFiXnUxMSTqz/g==
 
-preact@^10.5.15:
-  version "10.9.0"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.9.0.tgz#69b282b26926b66481c9ae3450cf68610fee29ff"
-  integrity sha512-jO6/OvCRL+OT8gst/+Q2ir7dMybZAX8ioP02Zmzh3BkQMHLyqZSujvxbUriXvHi8qmhcHKC2Gwbog6Kt+YTh+Q==
+preact@^10.12.1:
+  version "10.13.1"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.13.1.tgz#d220bd8771b8fa197680d4917f3cefc5eed88720"
+  integrity sha512-KyoXVDU5OqTpG9LXlB3+y639JAGzl8JSBXLn1J9HTSB3gbKcuInga7bZnXLlxmK94ntTs1EFeZp0lrja2AuBYQ==
 
 prosemirror-commands@1.3.0:
   version "1.3.0"
