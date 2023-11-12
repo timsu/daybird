@@ -290,13 +290,20 @@
   dependencies:
     svelte "^3.51.0"
 
-"@event-calendar/core@^0.13.4":
-  version "0.13.4"
-  resolved "https://registry.yarnpkg.com/@event-calendar/core/-/core-0.13.4.tgz#eaa272cc6656174e94ce297343fda397c7cf4213"
-  integrity sha512-GkYPqnxEwrSm8BOsrNZsznhQGwgET3HBpeHiYyKgkfvgyxRfJs6VBDJ3yxAwtyd4l6xRtZyLx7bPYXXgiIJx8g==
+"@event-calendar/common@~0.16.1":
+  version "0.16.1"
+  resolved "https://registry.yarnpkg.com/@event-calendar/common/-/common-0.16.1.tgz#5d12be8641fa0d9f6829745735e243370f3633c8"
+  integrity sha512-HsPluzQB8yLBwmWuMcQ3k/novAR5mCz9Xprr5xqNrsFj97VOmNkptoYGqB5e21IVNqLVqBMez6NEOlpVUgwP5A==
   dependencies:
-    "@event-calendar/common" "~0.13.4"
-    svelte "^3.51.0"
+    svelte "^3.55.1"
+
+"@event-calendar/core@^0.16.1":
+  version "0.16.1"
+  resolved "https://registry.yarnpkg.com/@event-calendar/core/-/core-0.16.1.tgz#17688fd59383c893294879d73a3fc4f575588daf"
+  integrity sha512-m3fn7091WmjVTzxTvopTetkvV9QDgQACf2CQIdSYw9R9vG3w8x0as2ji3PUR59HPt3z8Glm4JgeXWERcge0RYw==
+  dependencies:
+    "@event-calendar/common" "~0.16.1"
+    svelte "^3.55.1"
 
 "@event-calendar/time-grid@^0.13.4":
   version "0.13.4"
@@ -1781,6 +1788,11 @@ svelte@^3.51.0:
   version "3.52.0"
   resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.52.0.tgz#08259eff20904c63882b66a5d409a55e8c6743b8"
   integrity sha512-FxcnEUOAVfr10vDU5dVgJN19IvqeHQCS1zfe8vayTfis9A2t5Fhx+JDe5uv/C3j//bB1umpLJ6quhgs9xyUbCQ==
+
+svelte@^3.55.1:
+  version "3.57.0"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.57.0.tgz#a3969cfe51f25f2a55e75f7b98dbd02c3af0980b"
+  integrity sha512-WMXEvF+RtAaclw0t3bPDTUe19pplMlfyKDsixbHQYgCWi9+O9VN0kXU1OppzrB9gPAvz4NALuoca2LfW2bOjTQ==
 
 tailwind-merge@^1.7.0:
   version "1.7.0"
