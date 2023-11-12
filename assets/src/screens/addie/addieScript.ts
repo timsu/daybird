@@ -89,6 +89,25 @@ Visit me any time you need help.`)
     }
   }
 
+  //
+
+  askAboutTasks = async () => {
+    await addieStore.addBotMessage(`What tasks do you need to do today?`)
+
+    this.setUserResponse(
+      {
+        kind: 'text',
+      },
+      null,
+      this.handleTasks
+    }
+
+  }
+
+  handleTasks = async (input: string) => {
+    this.gptLoop(input, ['Ready to continue.'])
+  }
+
   // --- attend to self
 
   doCheckin = async () => {
