@@ -40,4 +40,8 @@ export const paths = {
   INSIGHT_DOC: '/insight/docs',
 
   INSIGHT_SETTINGS: '/insight/settings',
+
+  // --- addie
+
+  ADDIE: '/addie',
 }

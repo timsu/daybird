@@ -9,6 +9,7 @@
     "tsc": "cd assets && yarn tsc"
   },
   "devDependencies": {
+    "okpush": "^0.0.6",
     "prettier": "^2.7.1"
   },
   "prettier": {

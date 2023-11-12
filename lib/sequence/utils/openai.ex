@@ -40,6 +40,37 @@ defmodule Sequence.OpenAI do
     post("/completions", authenticated_headers(), request)
   end
 
+  # see https://platform.openai.com/docs/api-reference/chat
+  # {:ok,
+  #  %{
+  #    "choices" => [
+  #      %{
+  #        "role" => "assistant",
+  #        "content" => "\n\nThis is a test."
+  #      }
+  #    ],
+  #    "created" => 1673048972,
+  #    "id" => "cmpl-6VqkmcsLfr40Y2qodNNM56eleGnsj",
+  #    "model" => "gpt-3.5-turbo",
+  #    "object" => "chat.completion",
+  #    "usage" => %{
+  #      "completion_tokens" => 7,
+  #      "prompt_tokens" => 5,
+  #      "total_tokens" => 12
+  #    }
+  #  }}
+  def chat(user_id, messages, model \\ "gpt-3.5-turbo", max_tokens \\ 100, temperature \\ 0.5) do
+    request = %{
+      model: model,
+      messages: messages,
+      max_tokens: max_tokens,
+      temperature: temperature,
+      user: "#{user_id}",
+    }
+
+    post("/chat/completions", authenticated_headers(), request)
+  end
+
   def api_key, do: Application.get_env(:sequence, :openai_api_key)
 
   def std_headers(content_type \\ "application/json") do
@@ -53,7 +84,7 @@ defmodule Sequence.OpenAI do
 
   defp post(url, headers, params) do
     body = Jason.encode!(params)
-    Mojito.post(@url <> url, headers, body)
+    Mojito.post(@url <> url, headers, body, timeout: 20_000)
     |> parse_response()
   end
 

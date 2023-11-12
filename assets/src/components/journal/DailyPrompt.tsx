@@ -13,7 +13,6 @@ const prompts = [
   ' “If there are nine rabbits on the ground, if you want to catch one, just focus on one.” – Jack Ma',
   '“You may delay, but time will not.” – Benjamin Franklin',
   '“The tragedy in life doesn’t lie in not reaching your goal. The tragedy lies in having no goal to reach.” – Benjamin E. Mays',
-  '“If you are interested in balancing work and pleasure, stop trying to balance them. Instead make your work more pleasurable.” – Donald Trump',
   '“Both good and bad days should end with productivity. Your mood affairs should never influence your work.” – Greg Evans',
   '“When one has much to put into them, a day has a hundred pockets.” – Friedrich Nietzsche',
   '“Focus on being productive instead of busy.” -Tim Ferriss',

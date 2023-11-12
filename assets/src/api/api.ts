@@ -3,8 +3,17 @@ import { encode } from 'base64-arraybuffer'
 
 import { config, OAuthProvider } from '@/config'
 import {
-    AuthToken, AuthTokenPair, File as LNFile, FileType, OAuthToken, Period, Project, ProjectRole,
-    Task, Team, User
+  AuthToken,
+  AuthTokenPair,
+  File as LNFile,
+  FileType,
+  OAuthToken,
+  Period,
+  Project,
+  ProjectRole,
+  Task,
+  Team,
+  User,
 } from '@/models'
 import { AsyncPromise, logger } from '@/utils'
 
@@ -426,6 +435,15 @@ class APIService {
       notes,
     })
     return response.data
+  }
+
+  async generateChat(
+    messages: { role: string; content: string }[]
+  ): Promise<{ response: string; status: number }> {
+    const response = await this.axios.post(`${this.endpoint}/generate/addie`, {
+      messages,
+    })
+    return { response: response.data, status: response.status }
   }
 
   // misc

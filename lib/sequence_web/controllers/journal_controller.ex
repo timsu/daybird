@@ -48,15 +48,20 @@ defmodule SequenceWeb.JournalController do
       prompt_hash = :crypto.hash(:md5 , prompt) |> Base.encode16()
       case Redix.command(:redix, ["GET", "summary:" <> prompt_hash]) do
         {:ok, nil} ->
-          with {:ok, response} <- Sequence.OpenAI.completions(prompt, "text-curie-001", 150, 0.3) do
-            IO.inspect(response)
-            result = hd(response["choices"])["text"] |> String.trim
-            Redix.command(:redix, ["SET", "summary:" <> prompt_hash, result, "EX", "86400"])
-            text conn, result
-          else
-            {:error, :openai, _status, body} ->
-              IO.inspect(body)
-              {:error, :bad_request, "Unable to generate summary"}
+          case Hammer.check_rate("journal:#{user.id}", 60_000, 5) do
+            {:allow, _count} ->
+              with {:ok, response} <- Sequence.OpenAI.completions(prompt, "text-curie-001", 150, 0.3) do
+                IO.inspect(response)
+                result = hd(response["choices"])["text"] |> String.trim
+                Redix.command(:redix, ["SET", "summary:" <> prompt_hash, result, "EX", "86400"])
+                text conn, result
+              else
+                {:error, :openai, _status, body} ->
+                  IO.inspect(body)
+                  {:error, :bad_request, "Unable to generate summary"}
+              end
+            {:deny, _limit} ->
+              {:error, :too_many_requests, "Too many requests"}
           end
         {:ok, data} ->
           IO.puts("hit cache")

@@ -14,6 +14,11 @@ defmodule SequenceWeb.PageController do
     render conn, "app.html", pwa: "/pwa-insight.json", entry: "insight", title: "InsightLoop"
   end
 
+  def addie(conn, _params) do
+    render conn, "app.html", pwa: "/pwa-addie.json", entry: "addie", title: "Addie ADHD Assistant",
+      apple_icon: "/images/apple-therapist.png"
+  end
+
   def auth(conn, _params) do
     render conn, "app.html", entry: "auth"
   end

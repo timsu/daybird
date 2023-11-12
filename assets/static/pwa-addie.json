@@ -1,0 +1,31 @@
+{
+  "name": "Addie",
+  "short_name": "Addie",
+  "id": "/addie?source=pwa",
+  "start_url": "/addie?source=pwa",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#f9fafb",
+  "icons": [
+    {
+      "src": "/images/therapist.png",
+      "type": "image/png", "sizes": "512x512"
+    },
+    {
+      "src": "/images/therapist.png",
+      "type": "image/png", "sizes": "256x256"
+    },
+    {
+      "src": "/images/therapist.png",
+      "type": "image/png", "sizes": "144x144"
+    },
+    {
+      "src": "/images/therapist.png",
+      "type": "image/png", "sizes": "96x96"
+    },
+    {
+      "src": "/images/therapist.png",
+      "type": "image/png","sizes": "48x48"
+    }
+  ]
+}

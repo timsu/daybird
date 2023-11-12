@@ -19,7 +19,7 @@ defmodule SequenceWeb.Router do
       at: "/", from: :sequence,
       gzip: true,
       only: ~w(assets js css sounds favicon.ico robots.txt version.json pwa.json
-        pwa-local.json pwa-insight.json serviceworker.js)
+        pwa-local.json pwa-insight.json pwa-addie.json serviceworker.js)
     )
   end
 
@@ -109,6 +109,7 @@ defmodule SequenceWeb.Router do
     get "/daily_notes", JournalController, :list_notes
     post "/daily_notes/:date", JournalController, :save_note
     post "/generate/summary", JournalController, :generate_summary
+    post "/generate/addie", AddieController, :generate_chat
 
     resources "/teams", TeamsController
 
@@ -205,6 +206,8 @@ defmodule SequenceWeb.Router do
 
     get "/app/*path", PageController, :app
     get "/insight/*path", PageController, :insight
+
+    get "/addie", PageController, :addie
 
     get "/signup", PageController, :auth
     get "/signin", PageController, :auth

@@ -109,6 +109,9 @@ config :mojito,
   timeout: 10_000,
   pool_opts: [size: 100, max_overflow: 500]
 
+config :hammer,
+  backend: {Hammer.Backend.ETS, [expiry_ms: 60_000 * 60 * 4,
+                                 cleanup_interval_ms: 60_000 * 10]}
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
