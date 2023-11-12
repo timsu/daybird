@@ -100,8 +100,7 @@ Visit me any time you need help.`)
       },
       null,
       this.handleTasks
-    }
-
+    )
   }
 
   handleTasks = async (input: string) => {
